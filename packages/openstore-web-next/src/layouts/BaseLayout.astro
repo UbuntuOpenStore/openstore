@@ -1,0 +1,87 @@
+---
+import { SEO } from "astro-seo";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import "../styles/global.css";
+import { Head } from "astro-capo";
+import { generateSchema } from "@/lib/json-schema";
+
+export type Props = {
+  pageTitle: string;
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
+  schema: ReturnType<typeof generateSchema> | undefined;
+};
+
+const { pageTitle, title, description, image, imageAlt, noindex, schema } = Astro.props;
+
+const ogImage = new URL(image ?? "/images/logo.webp", import.meta.env.SITE).href;
+const ogImageAlt = imageAlt || "OpenStore logo";
+---
+
+<html lang="en">
+  <Head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <SEO
+      title={pageTitle}
+      description={description}
+      noindex={noindex ?? false}
+      openGraph={{
+        basic: {
+          title,
+          type: "website",
+          image: ogImage,
+        },
+        optional: {
+          siteName: "OpenStore",
+          locale: "en_US",
+        },
+        image: {
+          alt: ogImageAlt,
+        },
+      }}
+    />
+
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="icon" href="/images/logo.svg" type="image/svg+xml" />
+
+    <link rel="alternate" href="/rss/updates.xml" type="application/rss+xml" title="RSS feed" />
+
+    {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />}
+
+    {
+      /*
+      Disabling this for now as it seems to have issues with Firefox right now.
+      <ClientRouter />
+    */
+    }
+  </Head>
+
+  <body class="antialiased text-primary tracking-tight bg-white flex flex-col justify-between h-full">
+    <Header />
+    <slot />
+    <Footer />
+
+    <script is:inline>
+      window.onload = function () {
+        const menu = document.querySelector("[data-toggle-menu]");
+
+        menu.addEventListener(
+          "click",
+          () => {
+            menu.classList.toggle("expanded");
+            document.body.classList.toggle("overflow-hidden");
+            document.getElementById("header")?.classList.toggle("h-screen");
+            document.querySelector("#header nav")?.classList.toggle("hidden");
+          },
+          false
+        );
+      };
+    </script>
+  </body>
+</html>

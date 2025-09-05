@@ -1,0 +1,240 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2020-09-05 06:21+0000\n"
+"Last-Translator: tamer dab <dabsantamer@yahoo.com>\n"
+"Language-Team: Hebrew <https://translate.ubports.com/projects/openstore/"
+"openstore-api/he/>\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
+"n % 10 == 0) ? 2 : 3));\n"
+"X-Generator: Weblate 3.11.3\n"
+
+msgid "Accessibility"
+msgstr "נגישות"
+
+msgid "Books & Comics"
+msgstr "ספרים וקומיקס"
+
+msgid "Business & Finance"
+msgstr "עסקים ופיננסים"
+
+msgid "Communication & Social"
+msgstr "תקשורת וחברה"
+
+msgid "Developer Tools"
+msgstr "כלי מפתח"
+
+msgid "Education & Reference"
+msgstr "חינוך והפניה"
+
+msgid "Entertainment"
+msgstr "בידור"
+
+msgid "Food & Drink"
+msgstr "אוכל ושתייה"
+
+msgid "Games"
+msgstr "משחקים"
+
+msgid "Graphics"
+msgstr "גרפיקה"
+
+msgid "Health & Fitness"
+msgstr "בריאות וכושר"
+
+msgid "Lifestyle"
+msgstr "סגנון חיים"
+
+msgid "Media & Video"
+msgstr "מדיה ווידאו"
+
+msgid "Music & Audio"
+msgstr "מוסיקה ואודיו"
+
+msgid "News & Magazines"
+msgstr "חדשות ומגזינים"
+
+msgid "Personalisation"
+msgstr "התאמה אישית"
+
+msgid "Productivity"
+msgstr "פרודוקטיביות"
+
+msgid "Science & Engineering"
+msgstr "מדע והנדסה"
+
+msgid "Shopping"
+msgstr "קניות"
+
+msgid "Sports"
+msgstr "ספורט"
+
+msgid "Travel & Weather"
+msgstr "נסיעות ומזג אוויר"
+
+msgid "Utilities"
+msgstr "כלי עזר"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "הורד מ"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr "אפליקציות חדשות ומעודכנות"
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr "אפליקציות ועדכונים חדשים ומרתקים"
+
+# Discovery section category name
+msgid "Health & Wellness"
+msgstr "בריאות"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr "תפוח ביום..."
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr "אפליקציות חוצות פלטפורמות"
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr "מצא אפליקציות האלה בכל מקום"
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr "אפליקציות חיוניות"
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr "בדוק זאת קודם"
+
+# Discovery section category name
+msgid "Dev Tools & Reference"
+msgstr "כלי עזר והתייחסות"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr "דיבורים זולים. הראה לי את הקוד."
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr "הכי אהובים"
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr "אפליקציות עם הדירוג הגבוה ביותר"
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr ""
+
+# Discovery section category name
+msgid "Tools"
+msgstr ""
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr ""
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr ""
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr ""
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr ""
+
+#, fuzzy
+#| msgid "Games"
+msgid "Fun Games"
+msgstr "משחקים"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr ""
+
+#, fuzzy
+#| msgid "Games"
+msgid "Best Games"
+msgstr "משחקים"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr ""
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr ""
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr ""
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr ""
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr ""
+
+# Discovery section category name
+msgid "News"
+msgstr ""
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr ""
+
+#, fuzzy
+#| msgid "Games"
+msgid "Godot Games"
+msgstr "משחקים"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr ""
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr ""
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr ""
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr ""
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr ""
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr ""
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr ""
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr ""
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr ""

@@ -1,0 +1,241 @@
+# Italian translation for openstore-web
+# Copyright (c) 2017 Rosetta Contributors and Canonical Ltd 2017
+# This file is distributed under the same license as the openstore-web package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openstore-web\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2025-04-19 05:11+0000\n"
+"Last-Translator: picatsv <picatsv@gmail.com>\n"
+"Language-Team: Italian <https://hosted.weblate.org/projects/open-store-io/"
+"openstore-api/it/>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.11.1-dev\n"
+"X-Launchpad-Export-Date: 2017-06-21 14:52+0000\n"
+
+msgid "Accessibility"
+msgstr "Accessibilità"
+
+msgid "Books & Comics"
+msgstr "Libri e fumetti"
+
+msgid "Business & Finance"
+msgstr "Business e finanza"
+
+msgid "Communication & Social"
+msgstr "Comunicazione e social"
+
+msgid "Developer Tools"
+msgstr "Strumenti per lo sviluppatore"
+
+msgid "Education & Reference"
+msgstr "Istruzione e fonti"
+
+msgid "Entertainment"
+msgstr "Intrattenimento"
+
+msgid "Food & Drink"
+msgstr "Cibo e bevande"
+
+msgid "Games"
+msgstr "Giochi"
+
+msgid "Graphics"
+msgstr "Grafica"
+
+msgid "Health & Fitness"
+msgstr "Salute e fitness"
+
+msgid "Lifestyle"
+msgstr "Life-style"
+
+msgid "Media & Video"
+msgstr "Multimedia e video"
+
+msgid "Music & Audio"
+msgstr "Musica e suono"
+
+msgid "News & Magazines"
+msgstr "Notizie e riviste"
+
+msgid "Personalisation"
+msgstr "Personalizzazione"
+
+msgid "Productivity"
+msgstr "Produttività"
+
+msgid "Science & Engineering"
+msgstr "Scienza e ingegneria"
+
+msgid "Shopping"
+msgstr "Acquisti"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Viaggi e meteo"
+
+msgid "Utilities"
+msgstr "Utilità"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "Scarica da"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr "App nuove e aggiornate"
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr "Nuove entusiasmanti App e Aggiornamenti"
+
+msgid "Health & Wellness"
+msgstr "Salute e benessere"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr "Una mela al giorno..."
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr "App cross-piattaforma"
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr "Trova queste app ovunque"
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr "App essenziali"
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr "Guarda prima qui"
+
+msgid "Dev Tools & Reference"
+msgstr "Strumenti di sviluppo e di riferimento"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr "Basta parlare. Fammi vedere il codice."
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr "Le più amate"
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr "App con valutazioni più alte"
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr "È essenziale avere buoni strumenti"
+
+# Discovery section category name
+msgid "Tools"
+msgstr "Strumenti"
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr ""
+"Anche gli strumenti più semplici possono permettere alle persone di fare "
+"grandi cose"
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr "Kit strumenti"
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr "Non è la cosa in sé, ma come la si usa."
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr ""
+"Noi stessi siamo il nostro peggior nemico. Ma anche il migliore insegnante."
+
+msgid "Fun Games"
+msgstr "Giochi Divertenti"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr "Perché gioco sempre per vincere!"
+
+msgid "Best Games"
+msgstr "I Migliori Giochi"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr "Dopotutto ci siamo divertiti, no?"
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr "Giochi Fantastici"
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr "È pericoloso andare da soli, prendi questo!"
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr ""
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr ""
+
+# Discovery section category name
+msgid "News"
+msgstr "Notizie"
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr "Le notizie non sono che la bozza della storia"
+
+msgid "Godot Games"
+msgstr "Giochi in Godot"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr "L'ambiente di sviluppo per giochi che stavi aspettando"
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr "Fediverso"
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr "Verso l'infinito ed oltre!"
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr "Connessioni Chat"
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr "Non dimenticarti di scrivere alla mamma!"
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr "Lettori di Feed RSS"
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr "RSS è morto, lunga vita a RSS!"
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr "App Essenziali"
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr "C'è un app per farlo"

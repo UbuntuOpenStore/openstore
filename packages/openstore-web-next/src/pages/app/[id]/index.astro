@@ -1,0 +1,387 @@
+---
+export const prerender = false;
+
+import { AppSchema, ReviewsSchema } from "@/lib/schema";
+import { categorySlug, getRelativeLocaleUrl, localeSlugToCode } from "@/lib/utils";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import CircleIcon from "@/components/CircleIcon.astro";
+import DownloadDialog from "@/components/apps/DownloadDialog";
+import IconList from "@/components/apps/IconList.astro";
+import IconListItem from "@/components/apps/IconListItem.astro";
+import Review from "@/components/apps/Review.astro";
+import Screenshots from "@/components/apps/Screenshots";
+import AppTypeBadges from "@/components/apps/AppTypeBadges";
+import Ratings from "@/components/apps/Ratings";
+
+import SvgCommunity from "@/components/icons/Community";
+import SvgDate from "@/components/icons/Date";
+import SvgDevice from "@/components/icons/Device";
+import SvgGlobe from "@/components/icons/Globe";
+import SvgHeart from "@/components/icons/Heart";
+import SvgInfo from "@/components/icons/Info";
+import SvgLock from "@/components/icons/Lock";
+import SvgSave from "@/components/icons/Save";
+import SvgSecurityAlert from "@/components/icons/SecurityAlert";
+import SvgSource from "@/components/icons/Source";
+import SvgUser from "@/components/icons/User";
+import SvgExternalLink from "@/components/icons/ExternalLink";
+import SvgHome from "@/components/icons/Home";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
+import { generateSchema } from "@/lib/json-schema";
+
+await initializeI18N(Astro.currentLocale);
+const lang = localeSlugToCode(Astro.currentLocale);
+
+const { id } = Astro.params;
+
+const [appResponse, reviewsResponse] = await Promise.all([
+  fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}?lang=${lang}`, { headers: { 'X-Source': 'openstore-web-next' } }),
+  fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}/reviews?lang=${lang}`, { headers: { 'X-Source': 'openstore-web-next' } }),
+]);
+
+if (appResponse.status === 404) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not found'
+  });
+}
+
+const [{ data: appData }, { data: reviewsData }] = await Promise.all([appResponse.json(), reviewsResponse.json()]);
+
+const app = AppSchema.parse(appData);
+const { reviews } = ReviewsSchema.parse(reviewsData);
+
+const PERMISSION_LABELS = {
+  accounts: t('Accounts'),
+  audio: t('Audio'),
+  bluetooth: t('Bluetooth'),
+  calendar: t('Calendar'),
+  camera: t('Camera'),
+  connectivity: t('Connectivity'),
+  contacts: t('Contacts'),
+  content_exchange_source: t('Content Exchange Source'),
+  content_exchange: t('Content Exchange'),
+  debug: t('Debug'),
+  document_files_read: t('Read Document Files'),
+  document_files: t('Document Files'),
+  history: t('History'),
+  'in-app-purchases': t('In App Purchases'),
+  'keep-display-on': t('Keep Display On'),
+  location: t('Location'),
+  microphone: t('Microphone'),
+  music_files_read: t('Read Music Files'),
+  music_files: t('Music Files'),
+  nfc: t('NFC'),
+  networking: t('Networking'),
+  picture_files_read: t('Read Picture Files'),
+  picture_files: t('Picture Files'),
+  'push-notification-client': t('Push Notifications'),
+  sensors: t('Sensors'),
+  usermetrics: t('User Metrics'),
+  video_files_read: t('Read Video Files'),
+  video_files: t('Video Files'),
+  video: t('Video'),
+  webview: t('Webview'),
+  unconfined: t('Full System Access'),
+};
+
+const RESTRICTED_PERMISSIONS = new Set([
+  "bluetooth",
+  "calendar",
+  "contacts",
+  "debug",
+  "history",
+  "music_files",
+  "music_files_read",
+  "picture_files",
+  "picture_files_read",
+  "video_files",
+  "video_files_read",
+  "unconfined",
+]);
+
+const dateFormatter = new Intl.DateTimeFormat(Astro.currentLocale ?? 'en', {
+  dateStyle: "medium",
+});
+const numberFormatter = new Intl.NumberFormat(Astro.currentLocale ?? 'en');
+function domainFormatter(url: string) {
+  return new URL(url).host;
+}
+
+const hasRestrictedPermissions = app.permissions.some((permission) => RESTRICTED_PERMISSIONS.has(permission)) || app.read_paths.length > 0 || app.write_paths.length > 0;
+const isTrustedApp =
+  (app.id.startsWith("com.ubuntu.") && !app.id.startsWith("com.ubuntu.developer.")) ||
+  app.id.startsWith("com.canonical.") ||
+  app.id.startsWith("ubports.") ||
+  app.id.startsWith("openstore.");
+const isProprietary = app.license.toLowerCase() === "proprietary";
+
+const publisherUrl = `/apps/#search=publisher:${app.publisher}`;
+---
+
+<BaseLayout
+  title={app.name}
+  pageTitle={`${app.name} | OpenStore`}
+  description={app.tagline}
+  schema={generateSchema(app.name, [{ name: "Apps", path: "/apps/" }, { name: app.name, path: `/app/${app.id}/` }], app)}
+>
+  {app.category && (
+    <section class="section flex">
+      <a href={getRelativeLocaleUrl(Astro.currentLocale, "/")}>
+        <SvgHome />
+      </a>
+
+      <div class="ml-1">/ <a href={getRelativeLocaleUrl(Astro.currentLocale, `/apps/${categorySlug(app.category)}/`)} class="underline">{app.category}</a></div>
+    </section>
+  )}
+
+  <section class="flex flex-col md:flex-row justify-between section">
+    <div class="flex flex-row gap-4 max-w-xl mb-4 md:mb-0">
+      <div>
+        <img class="rounded-2xl" src={app.icon} alt={app.name} width="128" height="128" loading="eager" style={`view-transition-name: app-${app.id.replace(/\./g, '-')}`} />
+      </div>
+      <div>
+        <h1 class="text-4xl">{app.name}</h1>
+        {app.publisher && (
+          <p>
+            by <a href={getRelativeLocaleUrl(Astro.currentLocale, publisherUrl)} class="underline">{app.publisher}</a>
+          </p>
+        )}
+
+        <AppTypeBadges
+          types={app.types}
+          messages={{
+            new: t("New!"),
+            app: t("App"),
+            bookmark: t("Bookmark"),
+            webapp: t("Web App"),
+          }}
+        />
+
+        <p class="mt-4 text-xl">{app.tagline}</p>
+      </div>
+    </div>
+
+    <div class="flex gap-4 items-center">
+      <DownloadDialog
+        app={app}
+        messages={{
+          download: t("Download"),
+          downloadApp: t("Download %{app}"),
+          olderVersions: t("Older versions"),
+        }}
+        currentLocale={Astro.currentLocale}
+        client:load
+      />
+
+      <a href={`openstore://${app.id}`} title={t("Install via the OpenStore app")} class="btn w-full bg-ubuntu-orange text-white font-bold"
+        >{t("Install")}</a
+      >
+    </div>
+  </section>
+
+  <section class="section flex justify-center">
+    <Ratings app={app} />
+  </section>
+
+  <div class="mx-auto w-full max-w-6xl h-1 bg-ubuntu-gradient rounded-full"></div>
+
+  <section class="section">
+    <Screenshots images={app.screenshots} videoUrl={app.video_url} nsfw={app.nsfw} messages={{ nsfw: t("This app contains NSFW content, to click to reveal the screenshots.")}} client:idle />
+  </section>
+
+  <section class="section">
+    <h2 class="text-xl text-center mb-4">{t("About %{app}").replace("%{app}", app.name)}</h2>
+    <p>
+      {
+        app.description.split("\n").map((line) => (
+          <>
+            {line} <br />
+          </>
+        ))
+      }
+    </p>
+  </section>
+
+  <div class="mx-auto w-full max-w-6xl h-1 bg-ubuntu-gradient rounded-full"></div>
+
+  <section class="section">
+    <h2 class="text-xl text-center mb-4">{t("Recent Changes")}</h2>
+    <p class="max-h-64 overflow-y-auto">
+      {
+        app.changelog.split("\n").map((line) => (
+          <>
+            {line} <br />
+          </>
+        ))
+      }
+    </p>
+  </section>
+
+  <section class="section flex flex-col md:flex-row gap-4 items-stretch">
+    <div class="card">
+      <h2 class="text-xl text-center mb-4">{t("Permissions")}</h2>
+
+      {
+        hasRestrictedPermissions && !isTrustedApp ? (
+          <CircleIcon outerClass="bg-yellow-500/70 mb-4" innerClass="bg-yellow-200">
+            <SvgSecurityAlert />
+          </CircleIcon>
+        ) : (
+          <CircleIcon outerClass="bg-green-500/70 mb-4" innerClass="bg-green-200">
+            <SvgLock />
+          </CircleIcon>
+        )
+      }
+
+      <ul>
+        {app.permissions.map((permission) => (
+          <li class={`${RESTRICTED_PERMISSIONS.has(permission) ? 'text-red-700' : ''}`}>
+            {PERMISSION_LABELS[permission as keyof typeof PERMISSION_LABELS]}
+          </li>
+        ))}
+
+        {app.write_paths.map((path) => (
+          <li class="text-red-700">
+            {t("Unrestricted write access to:")} {path}
+          </li>
+        ))}
+
+        {app.read_paths.map((path) => (
+          <li class="text-red-700">
+            {t("Unrestricted read access to:")} {path}
+          </li>
+        ))}
+      </ul>
+
+      {app.permissions.length === 0 && app.read_paths.length === 0 && app.write_paths.length === 0 && (
+        <p class="text-center">{t("No permissions needed")}</p>
+      )}
+    </div>
+
+    <div class="card">
+      {
+        isProprietary ? (
+          <>
+            <h2 class="text-xl text-center mb-4">{t("Proprietary")}</h2>
+
+            <CircleIcon outerClass="bg-yellow-500/70 mb-4" innerClass="bg-yellow-200">
+              <SvgInfo />
+            </CircleIcon>
+
+            <p>
+              {t("This app's source code is not available and has not been reviewed by the community. There is no accountability for what this app does or how it is developed. Please install at your own risk")}
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 class="text-xl text-center mb-4">{t("Community Built")}</h2>
+
+            <CircleIcon outerClass="bg-green-500/70 mb-4" innerClass="bg-green-200">
+              <SvgCommunity />
+            </CircleIcon>
+
+            <p>
+              {t("This app has been released under the %{license} license.").replace("%{license}", app.license)}
+              {app.source && <>{t("It is developed in the open and you can review the source code.")}</>}
+            </p>
+
+            <div class="text-center">
+              {app.source && (
+                <a href={app.source} class="underline" rel="noopener noreferrer nofollow">{t("Get involved")}</a>
+                <a href={app.source} class="inline-block -mb-1" rel="noopener noreferrer nofollow">
+                  <SvgExternalLink />
+                </a>
+              )}
+            </div>
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section flex flex-col md:flex-row gap-4 items-stretch">
+    <IconList
+      title={t("Info")}
+    >
+      <IconListItem label={t("Published Date")} value={dateFormatter.format(app.published_date)}>
+        <SvgDate />
+      </IconListItem>
+
+      <IconListItem label={t("Updated Date")} value={dateFormatter.format(app.updated_date)}>
+        <SvgDate />
+      </IconListItem>
+
+      <IconListItem label={t("Total Downloads")} value={numberFormatter.format(app.totalDownloads)}>
+        <SvgSave />
+      </IconListItem>
+
+      <IconListItem label={t("Latest Version Downloads")} value={numberFormatter.format(app.latestDownloads)}>
+        <SvgSave />
+      </IconListItem>
+
+      <IconListItem label={t("Supported Architectures")} value={app.architectures.join(", ")}>
+        <SvgDevice />
+      </IconListItem>
+
+      {app.languages.length > 0 && (
+        <IconListItem label={t("Translation Languages")} value={app.languages.join(", ")}>
+          <SvgGlobe />
+        </IconListItem>
+      )}
+    </IconList>
+
+    <IconList
+      title={t("Links")}
+    >
+      {app.source && (
+        <IconListItem label={t("Source Code")} value={`<a href="${app.source}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.source)}</a>`}>
+          <SvgSource />
+        </IconListItem>
+        )
+      }
+
+      {app.support_url && (
+        <IconListItem label={t("Support")} value={`<a href="${app.support_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.support_url)}</a>`}>
+          <SvgUser />
+        </IconListItem>
+        )
+      }
+
+      {app.donate_url && (
+        <IconListItem label={t("Donate")} value={`<a href="${app.donate_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.donate_url)}</a>`}>
+          <SvgHeart />
+        </IconListItem>
+        )
+      }
+
+      {app.translation_url && (
+        <IconListItem label={t("Translations")} value={`<a href="${app.translation_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.translation_url)}</a>`}>
+          <SvgGlobe />
+        </IconListItem>
+        )
+      }
+    </IconList>
+  </section>
+
+  <section class="section flex flex-col gap-4 items-stretch">
+    <h2 class="text-xl text-center mb-4">{t("Reviews")}</h2>
+
+    {
+      reviews.length > 0 ? (
+        <>
+          {reviews.map((review, index) => (
+            <div>
+              <Review review={review} />
+
+              {index < reviews.length - 1 && <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mt-4" />}
+            </div>
+          ))}
+        </>
+      ) : (
+        <p class="text-center">{t("No reviews yet!")}</p>
+      )
+    }
+  </section>
+</BaseLayout>

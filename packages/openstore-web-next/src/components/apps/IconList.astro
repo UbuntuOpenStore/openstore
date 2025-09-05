@@ -1,0 +1,14 @@
+---
+export type Props = {
+  title: string;
+};
+
+const { title } = Astro.props;
+---
+
+<div class="card">
+  <h2 class="text-xl text-center mb-4">{title}</h2>
+  <ul>
+    <slot />
+  </ul>
+</div>

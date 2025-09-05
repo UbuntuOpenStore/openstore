@@ -1,0 +1,235 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2024-03-17 13:27+0000\n"
+"Last-Translator: gallegonovato <fran-carro@hotmail.es>\n"
+"Language-Team: Spanish <https://hosted.weblate.org/projects/open-store-io/"
+"openstore-api/es/>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.5-dev\n"
+
+msgid "Accessibility"
+msgstr "Accesibilidad"
+
+msgid "Books & Comics"
+msgstr "Libros y cómics"
+
+msgid "Business & Finance"
+msgstr "Negocios y finanzas"
+
+msgid "Communication & Social"
+msgstr "Comunicación y social"
+
+msgid "Developer Tools"
+msgstr "Herramientas de desarrollo"
+
+msgid "Education & Reference"
+msgstr "Educación y referencia"
+
+msgid "Entertainment"
+msgstr "Entretenimiento"
+
+msgid "Food & Drink"
+msgstr "Comida y bebida"
+
+msgid "Games"
+msgstr "Juegos"
+
+msgid "Graphics"
+msgstr "Gráficos"
+
+msgid "Health & Fitness"
+msgstr "Salud y condición física"
+
+msgid "Lifestyle"
+msgstr "Estilo de vida"
+
+msgid "Media & Video"
+msgstr "Multimedia y vídeo"
+
+msgid "Music & Audio"
+msgstr "Música y sonido"
+
+msgid "News & Magazines"
+msgstr "Noticias y revistas"
+
+msgid "Personalisation"
+msgstr "Personalización"
+
+msgid "Productivity"
+msgstr "Productividad"
+
+msgid "Science & Engineering"
+msgstr "Ciencia e ingeniería"
+
+msgid "Shopping"
+msgstr "Compras"
+
+msgid "Sports"
+msgstr "Deportes"
+
+msgid "Travel & Weather"
+msgstr "Viajes y meteorología"
+
+msgid "Utilities"
+msgstr "Utilidades"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "Descargar en"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr "Aplicaciones nuevas y actualizadas"
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr "Emocionantes aplicaciones nuevas y actualizaciones"
+
+msgid "Health & Wellness"
+msgstr "Salud y bienestar"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr "Una manzana al día…"
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr "Aplicaciones multiplataforma"
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr "Encuentre estas aplicaciones en cualquier lugar"
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr "Aplicaciones imprescindibles"
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr "Mire estas primero"
+
+msgid "Dev Tools & Reference"
+msgstr "Herramientas de desarrollo y referencia"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr "Hablar es fácil. Enséñame el código."
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr "Mejor valoradas"
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr "Aplicaciones con las mejores puntuaciones"
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr "Es esencial disponer de buenas herramientas"
+
+# Discovery section category name
+msgid "Tools"
+msgstr "Herramientas"
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr ""
+"Incluso las herramientas más sencillas pueden ayudar a la gente a hacer "
+"grandes cosas"
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr "Caja de herramientas"
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr "No es la cosa en sí, sino cómo la usas."
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr "Todos somos nuestro peor enemigo. Pero también, nuestro mejor maestro."
+
+msgid "Fun Games"
+msgstr "Juegos divertidos"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr "¡Porque siempre juego para ganar!"
+
+msgid "Best Games"
+msgstr "Los mejores juegos"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr "¿No nos divertimos un poco?"
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr "Juegos increíbles"
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr "¡Es peligroso ir solo, toma esto!"
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr "Ayudantes para el juego"
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr ""
+"Sea cual sea el juego, todo el mundo está de acuerdo en que los juegos son "
+"divertidos."
+
+# Discovery section category name
+msgid "News"
+msgstr "Noticias"
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr "Las noticias son sólo el primer borrador de la historia"
+
+msgid "Godot Games"
+msgstr "Juegos de Godot"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr "El motor de juego que esperabas"
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr "Fediverse"
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr "¡Hasta el infinito y más allá!"
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr "Conexión al chat"
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr "¡No olvides enviar un mensaje a mamá!"
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr "Lectores de feeds RSS"
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr "RSS está muerto, ¡larga vida al RSS!"
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr "Aplicaciones principales"
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr "Existe una aplicación para eso"

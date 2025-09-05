@@ -1,0 +1,231 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2025-08-26 19:01+0000\n"
+"Last-Translator: Ida Brenna <ida@larald.no>\n"
+"Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/"
+"open-store-io/openstore-api/nb_NO/>\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.13\n"
+
+msgid "Accessibility"
+msgstr "Tilgjengelighet"
+
+msgid "Books & Comics"
+msgstr "Bøker & tegneserier"
+
+msgid "Business & Finance"
+msgstr "Næring & finans"
+
+msgid "Communication & Social"
+msgstr "Kommunikasjon & sosiale medier"
+
+msgid "Developer Tools"
+msgstr "Utviklerverktøy"
+
+msgid "Education & Reference"
+msgstr "Utdanning & informasjon"
+
+msgid "Entertainment"
+msgstr "Underholdning"
+
+msgid "Food & Drink"
+msgstr "Mat & drikke"
+
+msgid "Games"
+msgstr "Spill"
+
+msgid "Graphics"
+msgstr "Grafikk"
+
+msgid "Health & Fitness"
+msgstr "Helse & velvære"
+
+msgid "Lifestyle"
+msgstr "Livsstil"
+
+msgid "Media & Video"
+msgstr "Media & video"
+
+msgid "Music & Audio"
+msgstr "Musikk & lyd"
+
+msgid "News & Magazines"
+msgstr "Nyheter & tidsskrifter"
+
+msgid "Personalisation"
+msgstr "Temaer & tilpasninger"
+
+msgid "Productivity"
+msgstr "Produktivitet"
+
+msgid "Science & Engineering"
+msgstr "Vitenskap & ingeniørvitenskap"
+
+msgid "Shopping"
+msgstr "Kjøp & salg"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Reise & vær"
+
+msgid "Utilities"
+msgstr "Verktøy"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "Last ned fra"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr "Nye og oppdaterte apper"
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr "Spennende nye apper & oppdateringer"
+
+msgid "Health & Wellness"
+msgstr "Helse & velvære"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr "Et eple om dagen..."
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr "Tverrplattformsapper"
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr "Finn disse appene hvor som helst"
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr "Essensielle apper"
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr "Sjekk disse først"
+
+msgid "Dev Tools & Reference"
+msgstr "Utviklingsverktøy og referanse"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr "Nok snakk. Vis meg koden."
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr "Mest begunstiget"
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr "Programmer med best vurderinger"
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr "Det er viktig å ha gode verktøy"
+
+# Discovery section category name
+msgid "Tools"
+msgstr "Verktøy"
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr "Selv de enkleste verktøy kan gi folk kraften til å gjøre store ting"
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr "Verktøykasse"
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr "Det er ikke tingen i seg selv, men hvordan du bruker den."
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr "Vi er alle vår egen verste fiende. Men også vår beste lærer."
+
+msgid "Fun Games"
+msgstr "Morsomme spill"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr "Fordi jeg alltid spiller for å vinne!"
+
+msgid "Best Games"
+msgstr "De beste spillene"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr "Hadde vi det ikke litt gøy da folkens?"
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr "Knallbra spill"
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr "Det er farlig å gå alene, ta denne!"
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr "Spillhjelpemidler"
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr "Uansett hvilket spill, alle kan være enige om at spill er morsomt."
+
+# Discovery section category name
+msgid "News"
+msgstr "Nyheter"
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr "Nyheter er bare et førsteutkast av historien"
+
+msgid "Godot Games"
+msgstr "Godot-spill"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr "Spillmotoren du har ventet på"
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr "Fediverset"
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr "Til evigheten og videre!"
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr ""
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr "Ikke glem å sende melding til mutter'n!"
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr "RSS-strømlesere"
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr "RSS er dødt, lenge leve RSS!"
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr "Basisapper"
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr "Det finnes det en app for"

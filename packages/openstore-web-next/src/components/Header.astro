@@ -1,0 +1,60 @@
+---
+import { getRelativeLocaleUrl } from "@/lib/utils";
+import SvgNavigationMenu from "./icons/NavigationMenu";
+import SearchBar from "./SearchBar";
+import LoginLogout from "./LoginLogout.astro";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
+
+await initializeI18N(Astro.currentLocale);
+---
+
+<header class="sticky top-0 z-40 flex-none mx-auto w-full bg-primary mb-6" id="header">
+  <div class="py-3 px-3 mx-auto w-full md:flex md:justify-between max-w-6xl md:px-4 text-slate-200">
+    <div class="flex justify-between">
+      <a class="flex items-center" href={getRelativeLocaleUrl(Astro.currentLocale, "/")}>
+        <img id="logo" src="/images/logo.svg" alt="OpenStore Logo" width="32" height="32" class="mr-1" />
+        OpenStore
+      </a>
+
+      <div class="flex items-center md:hidden">
+        <button
+          type="button"
+          class="ml-1.5 text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-4 focus:ring-gray-200 rounded-2xl text-sm p-2.5 inline-flex items-center transition cursor-pointer"
+          aria-label="Toggle Menu"
+          data-toggle-menu
+        >
+          <SvgNavigationMenu />
+        </button>
+      </div>
+    </div>
+
+    <nav
+      class="items-center w-full md:w-auto hidden md:flex text-slate-200 h-[calc(100vh-100px)] md:h-auto overflow-y-auto md:overflow-visible"
+      aria-label="Main navigation"
+    >
+      <ul class="flex flex-col pt-8 md:pt-0 md:flex-row md:self-center w-full md:w-auto text-xl md:text-base h-full">
+        <li class="md:mr-4 text-black">
+          <SearchBar isDark client:only="preact" messages={{ search: t("Search...") }} />
+        </li>
+
+        <li>
+          <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/submit/")} data-astro-prefetch="tap">{t("Submit")}</a>
+        </li>
+        <li>
+          <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/apps/")} data-astro-prefetch="tap">{t("Browse")}</a>
+        </li>
+        <li class="md:hidden">
+          <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/apps/categories/")} data-astro-prefetch="tap"
+            >{t("Categories")}</a
+          >
+        </li>
+        <li>
+          <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/about/")} data-astro-prefetch="tap">{t("About")}</a>
+        </li>
+
+        <LoginLogout server:defer />
+      </ul>
+    </nav>
+  </div>
+</header>

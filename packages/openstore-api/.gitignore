@@ -1,0 +1,12 @@
+node_modules/
+npm-debug.log
+.vagrant
+bundle.js
+scripts
+config.json
+config-file.json
+*.log
+.nyc_output/
+dist
+.env
+tsconfig.tsbuildinfo

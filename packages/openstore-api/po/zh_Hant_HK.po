@@ -1,0 +1,241 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2019-05-09 09:02+0000\n"
+"Last-Translator: louies0623 <louies0623@gmail.com>\n"
+"Language-Team: Chinese (Hong Kong) <https://translate.ubports.com/projects/"
+"openstore/openstore-api/zh_Hant_HK/>\n"
+"Language: zh_Hant_HK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 3.6.1\n"
+
+msgid "Accessibility"
+msgstr "無障礙"
+
+msgid "Books & Comics"
+msgstr "書籍漫畫"
+
+msgid "Business & Finance"
+msgstr "商業金融"
+
+msgid "Communication & Social"
+msgstr "社交通訊"
+
+msgid "Developer Tools"
+msgstr "開發工具"
+
+msgid "Education & Reference"
+msgstr "教育資源"
+
+msgid "Entertainment"
+msgstr "休閑娛樂"
+
+msgid "Food & Drink"
+msgstr "美食佳飲"
+
+msgid "Games"
+msgstr "遊戲"
+
+msgid "Graphics"
+msgstr "圖形繪圖"
+
+msgid "Health & Fitness"
+msgstr "健康塑身"
+
+msgid "Lifestyle"
+msgstr "生活品味"
+
+msgid "Media & Video"
+msgstr "影音媒體"
+
+msgid "Music & Audio"
+msgstr "音樂音頻"
+
+msgid "News & Magazines"
+msgstr "新聞雜誌"
+
+msgid "Personalisation"
+msgstr "個人化"
+
+msgid "Productivity"
+msgstr "生產應用"
+
+msgid "Science & Engineering"
+msgstr "科學工程"
+
+msgid "Shopping"
+msgstr "買嘢"
+
+msgid "Sports"
+msgstr "運動"
+
+msgid "Travel & Weather"
+msgstr "天氣旅行"
+
+msgid "Utilities"
+msgstr "實用應用程序"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "下載自"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr ""
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr ""
+
+#, fuzzy
+#| msgid "Health & Fitness"
+msgid "Health & Wellness"
+msgstr "健康塑身"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr ""
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr ""
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr ""
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr ""
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr ""
+
+#, fuzzy
+#| msgid "Education & Reference"
+msgid "Dev Tools & Reference"
+msgstr "教育資源"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr ""
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr ""
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr ""
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr ""
+
+# Discovery section category name
+msgid "Tools"
+msgstr ""
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr ""
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr ""
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr ""
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr ""
+
+#, fuzzy
+#| msgid "Games"
+msgid "Fun Games"
+msgstr "遊戲"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr ""
+
+#, fuzzy
+#| msgid "Games"
+msgid "Best Games"
+msgstr "遊戲"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr ""
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr ""
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr ""
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr ""
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr ""
+
+# Discovery section category name
+msgid "News"
+msgstr ""
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr ""
+
+#, fuzzy
+#| msgid "Games"
+msgid "Godot Games"
+msgstr "遊戲"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr ""
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr ""
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr ""
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr ""
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr ""
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr ""
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr ""
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr ""
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr ""

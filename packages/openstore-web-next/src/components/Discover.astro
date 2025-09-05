@@ -1,0 +1,53 @@
+---
+import HighlightedApps from "@/components/apps/HighlightedApps";
+import { DEFAULT_CHANNEL, DiscoverSchema } from "../lib/schema";
+import AppList from "@/components/apps/AppList";
+import { categorySlug, getRelativeLocaleUrl, localeSlugToCode } from "@/lib/utils";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
+
+await initializeI18N(Astro.currentLocale);
+const lang = localeSlugToCode(Astro.currentLocale);
+
+const discoverResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/discover?channel=${DEFAULT_CHANNEL}&lang=${lang}`, { headers: { 'X-Source': 'openstore-web-next' } });
+const discoverData = await discoverResponse.json();
+const { highlights, categories } = DiscoverSchema.parse(discoverData.data);
+---
+
+<section class="py-3 px-3 mx-auto w-full max-w-2xl md:px-4">
+  <HighlightedApps highlights={highlights} currentLocale={Astro.currentLocale} client:load />
+</section>
+
+<section class="section">
+  {
+    categories.map((category, index) => (
+      <>
+        <div>
+          <h2 class="text-2xl text-center font-bold">
+            {category.referral ? (
+              <a href={getRelativeLocaleUrl(Astro.currentLocale, `/apps/${categorySlug(category.referral)}/`)} class="underline">
+                {category.name}
+              </a>
+            ) : (
+              <>{category.name}</>
+            )}
+          </h2>
+          <p class="mb-4 text-center">{category.tagline}</p>
+
+          <AppList
+            apps={category.apps}
+            messages={{
+              new: t("New!"),
+              app: t("App"),
+              bookmark: t("Bookmark"),
+              webapp: t("Web App"),
+            }}
+            currentLocale={Astro.currentLocale}
+          />
+        </div>
+
+        {index < categories.length - 1 && <div class="mx-auto w-full max-w-6xl h-1 bg-ubuntu-gradient rounded-full mb-4" />}
+      </>
+    ))
+  }
+</section>

@@ -1,0 +1,231 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2025-08-23 17:02+0000\n"
+"Last-Translator: Poesty Li <poesty7450@gmail.com>\n"
+"Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
+"projects/open-store-io/openstore-api/zh_Hans/>\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.13\n"
+
+msgid "Accessibility"
+msgstr "无障碍"
+
+msgid "Books & Comics"
+msgstr "书籍 & 漫画"
+
+msgid "Business & Finance"
+msgstr "商业 & 金融"
+
+msgid "Communication & Social"
+msgstr "沟通 & 社会"
+
+msgid "Developer Tools"
+msgstr "开发者工具"
+
+msgid "Education & Reference"
+msgstr "教育 & 参考"
+
+msgid "Entertainment"
+msgstr "娱乐"
+
+msgid "Food & Drink"
+msgstr "美食 & 饮料"
+
+msgid "Games"
+msgstr "游戏"
+
+msgid "Graphics"
+msgstr "图像"
+
+msgid "Health & Fitness"
+msgstr "健康 & 健身"
+
+msgid "Lifestyle"
+msgstr "生活方式"
+
+msgid "Media & Video"
+msgstr "媒体 & 视频"
+
+msgid "Music & Audio"
+msgstr "音乐 & 音频"
+
+msgid "News & Magazines"
+msgstr "新闻 & 杂志"
+
+msgid "Personalisation"
+msgstr "个性化"
+
+msgid "Productivity"
+msgstr "生产能力"
+
+msgid "Science & Engineering"
+msgstr "科学 & 工程"
+
+msgid "Shopping"
+msgstr "购物"
+
+msgid "Sports"
+msgstr "运动"
+
+msgid "Travel & Weather"
+msgstr "旅游 & 天气"
+
+msgid "Utilities"
+msgstr "公共事业"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "从下载"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr "最新软件"
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr "最令人激动的软件更新"
+
+msgid "Health & Wellness"
+msgstr "健康 & 健身"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr "一天一个苹果..."
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr "跨平台软件"
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr "随时随地找到这些软件"
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr "基本软件"
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr "先来看看这些"
+
+msgid "Dev Tools & Reference"
+msgstr "开发工具 & 参考"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr "屁话少说，放码过来。"
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr "最受喜爱的"
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr "评分最高的应用"
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr "拥有良好的工具至关重要"
+
+# Discovery section category name
+msgid "Tools"
+msgstr "工具"
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr "即使是最简单的工具也能赋予人们做大事的能力"
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr "工具箱"
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr "重要的不是事物本身,而在于你如何使用它."
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr "我们都是自己最可怕的敌人。但同时也是最好的老师。"
+
+msgid "Fun Games"
+msgstr "有趣的游戏"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr "因为我总是为了赢而玩！"
+
+msgid "Best Games"
+msgstr "最佳游戏"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr "可我们终究有过些快乐时光，不是吗？"
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr "不可思议的游戏"
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr "单独操作存在风险 ,请使用辅助工具!"
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr "游戏帮助"
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr "无论何种游戏，大家都能达成共识：游戏总是充满乐趣的。"
+
+# Discovery section category name
+msgid "News"
+msgstr "新闻"
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr "新闻只是历史的第一个草稿"
+
+msgid "Godot Games"
+msgstr "Godot 游戏"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr "您期待的游戏引擎"
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr "联邦宇宙"
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr "到无限和超越!"
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr "聊天连接"
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr "不要忘记给妈妈发短信!"
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr "RSS订阅阅读器"
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr "RSS已死,RSS长青!"
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr "核心应用"
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr "有一个应用可以做到这一点"

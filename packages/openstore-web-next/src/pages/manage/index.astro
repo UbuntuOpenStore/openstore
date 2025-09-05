@@ -1,0 +1,42 @@
+---
+import Loading from "@/components/Loading";
+import ManageList from "@/components/manage/ManageList.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getUser } from "@/lib/user";
+
+export const prerender = false;
+
+const url = new URL(Astro.request.url);
+const term = url.searchParams.get("search") ?? "";
+const hashPage = parseInt(url.searchParams.get("page") ?? "0");
+const currentPage = isNaN(hashPage) || hashPage < 0 ? 0 : hashPage;
+
+if (url.searchParams.has("key")) {
+  const expires = new Date();
+  expires.setDate(expires.getDate() + 14);
+
+  Astro.cookies.set("apikey", url.searchParams.get("key")!, { expires, path: "/" });
+  return Astro.redirect("/manage/");
+}
+
+const apikey = Astro.cookies.get("apikey")?.value;
+if (!apikey) {
+  return Astro.redirect("/login/");
+}
+
+const user = await getUser(apikey);
+if (!user) {
+  Astro.cookies.delete("apikey");
+  return Astro.redirect("/login/");
+}
+---
+
+<BaseLayout title="OpenStore" pageTitle="Manage | OpenStore" description="The open source app store for Ubuntu Touch" schema={undefined}>
+  <section class="section space-y-4 grow">
+    <h1 class="text-4xl">Welcome {user.name || user.username}</h1>
+
+    <ManageList term={term} currentPage={currentPage} server:defer>
+      <Loading slot="fallback" />
+    </ManageList>
+  </section>
+</BaseLayout>

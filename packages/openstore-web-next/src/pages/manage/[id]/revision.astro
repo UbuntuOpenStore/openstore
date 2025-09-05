@@ -1,0 +1,25 @@
+---
+import RevisionPage from "@/components/manage/RevisionPage";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+if (!id) {
+  return Astro.redirect("/manage/");
+}
+
+const apikey = Astro.cookies.get("apikey")?.value;
+if (!apikey) {
+  return Astro.redirect("/login/");
+}
+---
+
+<BaseLayout
+  title="OpenStore"
+  pageTitle="Manage App Revision | OpenStore"
+  description="The open source app store for Ubuntu Touch"
+  schema={undefined}
+>
+  <RevisionPage id={id} client:only="preact" />
+</BaseLayout>

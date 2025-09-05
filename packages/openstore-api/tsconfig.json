@@ -1,0 +1,32 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/index.ts",
+    "types/express.d.ts"
+  ],
+  "include": [
+    "src"
+  ],
+  "exclude": ["**/node_modules", "**/.*/", "**/dist"],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "strict": true,
+    "module": "NodeNext",
+    "outDir": "dist",
+    "sourceMap": true,
+    "lib": ["es2022"],
+    "rootDir": "src",
+    "baseUrl": "src",
+    "typeRoots": ["./types", "./node_modules/@types/"],
+    "allowSyntheticDefaultImports": true,
+    "useUnknownInCatchVariables": false,
+  }
+}

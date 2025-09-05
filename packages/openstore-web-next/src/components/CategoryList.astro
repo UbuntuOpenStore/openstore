@@ -1,0 +1,33 @@
+---
+import { CategoriesSchema } from "@/lib/schema";
+import { cn, getRelativeLocaleUrl, localeSlugToCode } from "@/lib/utils";
+
+export type Props = {
+  class?: string;
+};
+
+const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/categories?all=true&lang=${localeSlugToCode(Astro.currentLocale)}`, {
+  headers: { "X-Source": "openstore-web-next" },
+});
+const { data } = await response.json();
+const categories = CategoriesSchema.parse(data);
+---
+
+<div class={cn("space-y-2", Astro.props.class)}>
+  {
+    categories.map((category) => (
+      <div>
+        <a
+          href={getRelativeLocaleUrl(Astro.currentLocale, `/apps/${category.slug}/`)}
+          class="text-lg flex gap-2 mb-2 text-ubuntu-orange font-bold"
+        >
+          <img src={category.icon} alt="" class="h-6 w-6" />
+
+          {category.translation}
+        </a>
+
+        <div class="w-full h-0.5 bg-ubuntu-gradient rounded-full" />
+      </div>
+    ))
+  }
+</div>

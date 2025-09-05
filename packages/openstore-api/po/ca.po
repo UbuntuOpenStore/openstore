@@ -1,0 +1,238 @@
+# Catalan translation for openstore-web
+# Copyright (c) 2017 Rosetta Contributors and Canonical Ltd 2017
+# This file is distributed under the same license as the openstore-web package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openstore-web\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2017-06-20 01:45:+0000\n"
+"PO-Revision-Date: 2024-10-30 19:05+0000\n"
+"Last-Translator: Joan CiberSheep <cibersheep@gmail.com>\n"
+"Language-Team: Catalan <https://hosted.weblate.org/projects/open-store-io/"
+"openstore-api/ca/>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.8.2-dev\n"
+"X-Launchpad-Export-Date: 2017-06-21 14:52+0000\n"
+
+msgid "Accessibility"
+msgstr "Accessibilitat"
+
+msgid "Books & Comics"
+msgstr "Llibres i còmics"
+
+msgid "Business & Finance"
+msgstr "Negocis i finances"
+
+msgid "Communication & Social"
+msgstr "Comunicació i xarxes"
+
+msgid "Developer Tools"
+msgstr "Eines de desenvolupament"
+
+msgid "Education & Reference"
+msgstr "Educació i referència"
+
+msgid "Entertainment"
+msgstr "Entreteniment"
+
+msgid "Food & Drink"
+msgstr "Menjar i beure"
+
+msgid "Games"
+msgstr "Jocs"
+
+msgid "Graphics"
+msgstr "Gràfics"
+
+msgid "Health & Fitness"
+msgstr "Salut i benestar"
+
+msgid "Lifestyle"
+msgstr "Estil de vida"
+
+msgid "Media & Video"
+msgstr "Multimèdia i vídeo"
+
+msgid "Music & Audio"
+msgstr "Música i àudio"
+
+msgid "News & Magazines"
+msgstr "Notícies i publicacions"
+
+msgid "Personalisation"
+msgstr "Personalització"
+
+msgid "Productivity"
+msgstr "Productivitat"
+
+msgid "Science & Engineering"
+msgstr "Ciència i enginyeria"
+
+msgid "Shopping"
+msgstr "Compres"
+
+msgid "Sports"
+msgstr "Esports"
+
+msgid "Travel & Weather"
+msgstr "Viatjes i meteorologia"
+
+msgid "Utilities"
+msgstr "Utilitats"
+
+# This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
+msgid "Download from the"
+msgstr "Descarregueu-la des de l'"
+
+# Discovery section category name
+msgid "New and Updated Apps"
+msgstr "Apps noves i actualitzacions"
+
+# Discovery section category tagline for "New and Updated Apps"
+msgid "Exciting new apps & updates"
+msgstr "Excitants noves aplicacions i actualitzacions"
+
+msgid "Health & Wellness"
+msgstr "Salut i benestar"
+
+# Discovery section category tagline for "Health & Wellness"
+msgid "An apple a day..."
+msgstr "Una poma diària..."
+
+# Discovery section category name
+msgid "Cross Platform Apps"
+msgstr "Aplicacions multiplataforma"
+
+# Discovery section category tagline for "Cross Platform Apps"
+msgid "Find these apps anywhere"
+msgstr "Les trobareu a tot arreu"
+
+# Discovery section category name
+msgid "Essential Apps"
+msgstr "Aplicacions essencials"
+
+# Discovery section category tagline for "Essential Apps"
+msgid "Check these out first"
+msgstr "Feu una ullada per aquí primer"
+
+msgid "Dev Tools & Reference"
+msgstr "Eines de desenvolupament i referència"
+
+# Discovery section category tagline for "Dev Tools & Reference"
+msgid "Talk is cheap. Show me the code."
+msgstr "Les paraules se les duu el vent. Mostra'm el codi."
+
+# Discovery section category name
+msgid "Most Loved"
+msgstr "Les millor valorades"
+
+# Discovery section category tagline for "Most Loved"
+msgid "Apps with the highest ratings"
+msgstr "Apps amb les puntuacions més altes"
+
+# Discovery section category tagline for "Utilities"
+msgid "It is essential to have good tools"
+msgstr "És essencial tenir bones eines"
+
+# Discovery section category name
+msgid "Tools"
+msgstr "Eines"
+
+# Discovery section category tagline for "Tools"
+msgid "Even the simplest tools can empower people to do great things"
+msgstr "Fins i tot les eines més senzilles poden ajudar-vos a fer grans coses"
+
+# Discovery section category name
+msgid "Toolbox"
+msgstr "Caixa d'eines"
+
+# Discovery section category tagline for "Toolbox"
+msgid "It's not the thing itself, but how you use it."
+msgstr "No és tant què és, sinó com es fa servir."
+
+# Discovery section category tagline for "Games"
+msgid "We are all our own worst enemy. But also, our best teacher."
+msgstr "Som els nostre pitjor enemic, però també el millor mestre."
+
+msgid "Fun Games"
+msgstr "Jocs divertits"
+
+# Discovery section category tagline for "Fun Games"
+msgid "Cause I always play to win!"
+msgstr "Perquè sempre jugam per guanyar!"
+
+msgid "Best Games"
+msgstr "Els millors jocs"
+
+# Discovery section category tagline for "Best Games"
+msgid "Didn't we have some fun though?"
+msgstr "Però a què hem passat una bona estona?"
+
+# Discovery section category name
+msgid "Awesome Games"
+msgstr "Jocs meravellosos"
+
+# Discovery section category tagline for "Awesome Games"
+msgid "It's dangerous to go alone, take this!"
+msgstr "És perillós allà fora, ges això!"
+
+# Discovery section category name
+msgid "Game Helpers"
+msgstr "Ajudes per jocs"
+
+# Discovery section category tagline for "Game Helpers"
+msgid "No matter what the game, everyone can agree, games are fun."
+msgstr "No importa el joc, tothom està d'acord que són divertits."
+
+# Discovery section category name
+msgid "News"
+msgstr "Notícies"
+
+# Discovery section category tagline for "News"
+msgid "News is only the first rough draft of history"
+msgstr "Les notícies són només el primer esborrany de la història"
+
+msgid "Godot Games"
+msgstr "Jocs del Godot"
+
+# Discovery section category tagline for "Godot Games"
+msgid "The game engine you waited for"
+msgstr "El motor de joc que estaves esperant"
+
+# Discovery section category name
+msgid "Fediverse"
+msgstr "Fedivers"
+
+# Discovery section category tagline for "Fediverse"
+msgid "To infinity and beyond!"
+msgstr "Cap a l'infinit i més enllà!"
+
+# Discovery section category name
+msgid "Chat Connection"
+msgstr "Connexions a xats"
+
+# Discovery section category tagline for "Chat Connection"
+msgid "Don't forget to text mom!"
+msgstr "No oblidis enviar un missatge a ta mare!"
+
+# Discovery section category name
+msgid "RSS Feed Readers"
+msgstr "Lector de RSS"
+
+# Discovery section category tagline for "RSS Feed Readers"
+msgid "RSS is dead, long live RSS!"
+msgstr "L'RSS és mort, llarga vida als RSS!"
+
+# Discovery section category name
+msgid "Core Apps"
+msgstr "Aplicacions del sistema"
+
+# Discovery section category tagline for "Core Apps"
+msgid "There is an app for that"
+msgstr "Hi ha una aplicació per fer això"

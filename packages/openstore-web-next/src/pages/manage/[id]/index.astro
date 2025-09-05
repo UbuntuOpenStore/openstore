@@ -1,0 +1,33 @@
+---
+import Loading from "@/components/Loading";
+import ManagePage from "@/components/manage/ManagePage";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getUser } from "@/lib/user";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+if (!id) {
+  return Astro.redirect("/manage/");
+}
+
+const apikey = Astro.cookies.get("apikey")?.value;
+if (!apikey) {
+  return Astro.redirect("/login/");
+}
+
+const user = await getUser(apikey);
+if (!user) {
+  Astro.cookies.delete("apikey");
+  return Astro.redirect("/login/");
+}
+---
+
+<BaseLayout
+  title="OpenStore"
+  pageTitle="Manage App | OpenStore"
+  description="The open source app store for Ubuntu Touch"
+  schema={undefined}
+>
+  <ManagePage id={id} user={user} client:only="preact" />
+</BaseLayout>
