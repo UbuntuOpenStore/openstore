@@ -1,0 +1,6 @@
+*.log
+scripts
+archive
+.data
+tmp
+node_modules
