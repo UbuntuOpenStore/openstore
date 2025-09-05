@@ -1,0 +1,18 @@
+{
+  "name": "openstore",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/theopenstore/openstore-web-dev.git"
+  },
+  "author": "Brian Douglass",
+  "license": "GPL-3.0",
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "volta": {
+    "node": "22.19.0"
+  }
+}
