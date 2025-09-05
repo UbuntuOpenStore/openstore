@@ -1,37 +1,10 @@
-version: "3"
 services:
-  api:
-    build:
-      context: ./docker/api
-    ports:
-      - "8082:8080"
-    volumes:
-      - ./openstore-api:/srv/openstore
-      - ./.data/clicks:/srv/openstore-data
-      - ./.data/clicks:/srv/data/openstore-data
-      - ./.data/icons:/srv/data/openstore-icons
-      - ./.data/screenshots:/srv/data/openstore-screenshots
-    environment:
-      - DATA_DIR=/srv/data/openstore-data
-      - ICON_DIR=/srv/data/openstore-icons
-      - IMAGE_DIR=/srv/data/openstore-screenshots
-
-  web:
-    image: node:20
-    command: npm run serve
-    working_dir: /srv/openstore
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./openstore-web:/srv/openstore
-
   mongo:
     image: mongo:6
     ports:
       - "27017:27017"
     volumes:
       - ./.data/db:/data/db
-      - ./openstore-api:/srv/openstore
 
   elasticsearch:
     image: elasticsearch:7.10.1

@@ -60,7 +60,7 @@ export default defineConfig({
   }),
   vite: {
     server: {
-      allowedHosts: ["next.local.open-store.io", "next.open-store.io", "open-store.io"],
+      allowedHosts: ["next.local.open-store.io", "local.open-store.io", "next.open-store.io", "open-store.io"],
     },
 
     plugins: [tailwindcss()],

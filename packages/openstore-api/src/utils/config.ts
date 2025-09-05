@@ -1,9 +1,9 @@
 import path from 'path';
 
 let configuration = {
-  data_dir: process.env.DATA_DIR || '/tmp',
-  image_dir: process.env.IMAGE_DIR || '/tmp',
-  icon_dir: process.env.ICON_DIR || '/tmp',
+  data_dir: process.env.DATA_DIR || '../../.data/clicks',
+  image_dir: process.env.IMAGE_DIR || '../../.data/screenshots',
+  icon_dir: process.env.ICON_DIR || '../../.data/icons',
   server: {
     ip: process.env.NODEJS_IP || '0.0.0.0',
     port: parseInt(process.env.PORT || process.env.NODEJS_PORT || '8080', 10),
@@ -14,11 +14,11 @@ let configuration = {
     static_root: process.env.STATIC_ROOT || path.join(__dirname, '../../www/'),
   },
   mongo: {
-    uri: process.env.MONGODB_URI || 'mongodb://mongo:27017',
+    uri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017',
     database: process.env.MONGODB_DB || 'openstore',
   },
   elasticsearch: {
-    uri: process.env.ELASTICSEARCH_URI || 'http://elasticsearch:9200/',
+    uri: process.env.ELASTICSEARCH_URI || 'http://127.0.0.1:9200/',
     index: process.env.ELASTICSEARCH_INDEX || 'openstore_packages',
   },
   clickreview: {
