@@ -20,6 +20,7 @@ api-check:
   stage: check
   image: node:22
   script:
+    - npm run type-check -w openstore-api
     - npm run lint -w openstore-api
     - npm run lint:json -w openstore-api
     - npm run test:ci -w openstore-api
@@ -38,18 +39,13 @@ deploy:
   only:
     - master
   image: bhdouglass/openstore-ci
-  before_script:
+  script:
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-  script:
     - VERSION=$(date +"%Y-%m-%d_%H-%M-%S")
     - echo $VERSION
     - npm run build -w openstore-api
     - npm run build -w openstore-web-next
     - tar -czf ../openstore_$VERSION.tar.gz .
     - scp ../openstore_$VERSION.tar.gz brian@ssh.open-store.io:/srv/openstore-next/
-  artifacts:
-    paths:
-      - ../openstore_*.tar.gz
-    expire_in: 1 week

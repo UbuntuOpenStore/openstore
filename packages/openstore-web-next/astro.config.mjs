@@ -63,6 +63,7 @@ export default defineConfig({
       allowedHosts: ["next.local.open-store.io", "local.open-store.io", "next.open-store.io", "open-store.io"],
     },
 
+    // @ts-ignore
     plugins: [tailwindcss()],
   },
 });

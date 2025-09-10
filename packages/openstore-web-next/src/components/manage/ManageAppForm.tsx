@@ -8,7 +8,6 @@ import type { JSX } from "preact/jsx-runtime";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { getClientApiKey } from "@/lib/utils";
-import { createRef } from "preact";
 
 type ManageAppFormProps = {
   user: UserData,

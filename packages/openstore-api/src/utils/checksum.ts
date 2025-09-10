@@ -6,7 +6,7 @@ export function sha512Checksum(filePath: string): Promise<string> {
     const hash = crypto.createHash('sha512');
     const stream = fs.createReadStream(filePath);
 
-    stream.on('data', (data: string) => {
+    stream.on('data', (data: any /* TODO fix type */) => {
       hash.update(data, 'utf8');
     });
 

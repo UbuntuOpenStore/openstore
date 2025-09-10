@@ -3,6 +3,6 @@ import { getRelativeLocaleUrl } from "@/lib/utils";
 
 export const prerender = false;
 
-Astro.cookies.delete("apikey", { path: '/' });
+Astro.cookies.delete("apikey", { path: "/" });
 return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/"));
 ---

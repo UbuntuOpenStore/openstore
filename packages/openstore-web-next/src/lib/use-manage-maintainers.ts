@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { UserListSchema, type UserData } from "./schema";
 import { getClientApiKey } from "./utils";
 
-export const useManageMaintainers = (isAdmin: boolean) => {
+export const useManageMaintainers = () => {
   const [maintainers, setMaintainers] = useState<(UserData & { display_name: string })[]>([]);
 
   useEffect(() => {
