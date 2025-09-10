@@ -1,0 +1,14 @@
+import QmlProject 1.1
+
+Project {
+    mainFile: "Main.qml"
+
+    Files {
+        directory: "."
+        filter: "*"
+    }
+
+    /* List of plugin directories passed to QML runtime */
+    importPaths: [ "." ,"/usr/bin","/usr/lib/x86_64-linux-gnu/qt5/qml" ]
+}
+

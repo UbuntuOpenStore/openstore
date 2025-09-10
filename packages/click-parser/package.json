@@ -1,0 +1,49 @@
+{
+  "name": "click-parser",
+  "version": "4.2.5",
+  "description": "Extract data from Ubuntu's click packages",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha test/test.js",
+    "lint": "eslint src/*.js test/*.js bin/click-parser"
+  },
+  "bin": {
+    "click-parser": "bin/click-parser"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/theopenstore/click-parser.git"
+  },
+  "keywords": [
+    "click",
+    "ubuntu",
+    "debian",
+    "package",
+    "deb",
+    "scope",
+    "clickable",
+    "ubports",
+    "ubuntu-touch"
+  ],
+  "author": "Brian Douglass",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://gitlab.com/theopenstore/click-parser/issues"
+  },
+  "homepage": "https://gitlab.com/theopenstore/click-parser",
+  "dependencies": {
+    "ar": "0.0.1",
+    "streamifier": "^0.1.1",
+    "tar": "^6.2.0",
+    "tar-stream": "^3.1.6",
+    "utf8": "^3.0.0",
+    "uuid": "^9.0.1",
+    "xml2js": "^0.6.2",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-bhdouglass": "^0.0.9",
+    "mocha": "^10.2.0"
+  }
+}
