@@ -16,7 +16,7 @@ await initializeI18N(Astro.currentLocale);
   schema={generateSchema(t("Apps"), [{ name: "Apps", path: "/apps/" }])}
 >
   <section class="grow flex flex-row py-3 px-4">
-    <CategoryList class="mx-12 w-96 mb-2 hidden md:block" />
+    <CategoryList class="mx-12 w-96 mb-2 hidden md:block" showDivider={false} linkClass="" />
 
     <div class="w-full">
       <SearchApps

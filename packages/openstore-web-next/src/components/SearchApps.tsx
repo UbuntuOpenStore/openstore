@@ -55,16 +55,16 @@ type Props = {
 
 const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) => {
   const SORT_OPTIONS = [
-  { value: "relevance", label: messages.options.relevance },
-  { value: "-calculated_rating", label: messages.options['-calculated_rating'] },
-  { value: "calculated_rating", label: messages.options.calculated_rating },
-  { value: "name", label: messages.options.name },
-  { value: "-name", label: messages.options["-name"] },
-  { value: "-published_date", label: messages.options["-published_date"] },
-  { value: "published_date", label: messages.options.published_date },
-  { value: "-updated_date", label: messages.options["-updated_date"] },
-  { value: "updated_date", label: messages.options.updated_date },
-];
+    { value: "relevance", label: messages.options.relevance },
+    { value: "-calculated_rating", label: messages.options['-calculated_rating'] },
+    { value: "calculated_rating", label: messages.options.calculated_rating },
+    { value: "name", label: messages.options.name },
+    { value: "-name", label: messages.options["-name"] },
+    { value: "-published_date", label: messages.options["-published_date"] },
+    { value: "published_date", label: messages.options.published_date },
+    { value: "-updated_date", label: messages.options["-updated_date"] },
+    { value: "updated_date", label: messages.options.updated_date },
+  ];
 
   const hash = new URLSearchParams(document.location.hash.substring(1));
   const hashPage = parseInt(hash.get('page') ?? '0');
@@ -108,12 +108,17 @@ const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) 
     const url = new URL(`${import.meta.env.PUBLIC_API_URL}api/v4/apps?lang=${localeSlugToCode(currentLocale)}`);
     url.searchParams.append('limit', PAGE_SIZE.toString());
     url.searchParams.append('skip', skip.toString());
-    url.searchParams.append('search', query.search);
     url.searchParams.append('sort', query.sort);
     url.searchParams.append('type', query.type);
     url.searchParams.append('category', category ?? '');
     url.searchParams.append('channel', query.channel);
     url.searchParams.append('nsfw', query.showNsfw ? '' : 'false');
+    if (query.search.startsWith('publisher:')) {
+      url.searchParams.append('publisher', query.search.replace('publisher:', '').trim());
+    }
+    else {
+      url.searchParams.append('search', query.search);
+    }
 
     const updateHash = new URLSearchParams();
     if (query.search) {

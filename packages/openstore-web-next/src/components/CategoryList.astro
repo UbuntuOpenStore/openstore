@@ -4,6 +4,9 @@ import { cn, getRelativeLocaleUrl, localeSlugToCode } from "@/lib/utils";
 
 export type Props = {
   class?: string;
+  showDivider?: boolean;
+  linkClass?: string;
+  selected?: string;
 };
 
 const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/categories?all=true&lang=${localeSlugToCode(Astro.currentLocale)}`, {
@@ -11,6 +14,12 @@ const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/categories
 });
 const { data } = await response.json();
 const categories = CategoriesSchema.parse(data);
+
+const {
+  showDivider = true,
+  linkClass = "text-ubuntu-orange font-bold",
+  selected
+} = Astro.props;
 ---
 
 <div class={cn("space-y-2", Astro.props.class)}>
@@ -19,14 +28,14 @@ const categories = CategoriesSchema.parse(data);
       <div>
         <a
           href={getRelativeLocaleUrl(Astro.currentLocale, `/apps/${category.slug}/`)}
-          class="text-lg flex gap-2 mb-2 text-ubuntu-orange font-bold"
+          class={cn('text-lg flex gap-2 mb-2', linkClass, selected === category.slug && 'font-bold')}
         >
           <img src={category.icon} alt="" class="h-6 w-6" />
 
           {category.translation}
         </a>
 
-        <div class="w-full h-0.5 bg-ubuntu-gradient rounded-full" />
+        <div class={cn('w-full h-0.5', showDivider && 'bg-ubuntu-gradient rounded-full')} />
       </div>
     ))
   }
