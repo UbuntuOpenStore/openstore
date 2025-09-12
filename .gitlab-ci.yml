@@ -16,14 +16,24 @@ cache:
 before_script:
   - npm ci --cache .npm --prefer-offline
 
-api-check:
+api-lint:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run lint -w openstore-api
+    - npm run lint:json -w openstore-api
+
+api-test:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run test:ci -w openstore-api
+
+api-build:
   stage: check
   image: bhdouglass/openstore-ci
   script:
     - npm run type-check -w openstore-api
-    - npm run lint -w openstore-api
-    - npm run lint:json -w openstore-api
-    - npm run test:ci -w openstore-api
     - npm run build -w openstore-api
 
 web-check:
@@ -32,7 +42,13 @@ web-check:
   script:
     - npm run convert-po -w openstore-web
     - npm run check -w openstore-web
-    - npm run build -w openstore-web
+
+web-build:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run convert-po -w openstore-web
+    - npm run check -w openstore-web
 
 deploy:
   stage: deploy
