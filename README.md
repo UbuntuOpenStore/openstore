@@ -28,7 +28,7 @@ technology! Donate on [Liberapay](https://liberapay.com/OpenStore/).
 - Add `127.0.0.1   local.open-store.io` to your `/etc/hosts` file
 - Start the database and proxy: `docker compose up -d`
 - Start the api: `npm run dev -w openstore-api`
-- Start the frontend: `npm run dev -w openstore-web-next`
+- Start the frontend: `npm run dev -w openstore-web`
 
 ## Configuration
 

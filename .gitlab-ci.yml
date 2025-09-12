@@ -30,9 +30,9 @@ web-check:
   stage: check
   image: node:22
   script:
-    - npm run convert-po -w openstore-web-next
-    - npm run check -w openstore-web-next
-    - npm run build -w openstore-web-next
+    - npm run convert-po -w openstore-web
+    - npm run check -w openstore-web
+    - npm run build -w openstore-web
 
 deploy:
   stage: deploy
@@ -46,7 +46,7 @@ deploy:
     - VERSION=$(date +"%Y-%m-%d_%H-%M-%S")
     - echo $VERSION
     - npm run build -w openstore-api
-    - npm run build -w openstore-web-next
+    - npm run build -w openstore-web
     - tar -czf ../openstore_$VERSION.tar.gz --exclude .npm --exclude docker .
     - scp ../openstore_$VERSION.tar.gz brian@ssh.open-store.io:/srv/openstore-next/
     - ssh brian@ssh.open-store.io "/srv/openstore/post-deploy.sh $VERSION"
