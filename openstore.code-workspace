@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "name": "openstore-api",
+      "path": "./packages/openstore-api"
+    },
+    {
+      "name": "openstore-web",
+      "path": "./packages/openstore-web"
+    }
+  ]
+}
