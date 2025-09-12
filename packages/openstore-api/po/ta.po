@@ -8,7 +8,7 @@ msgstr ""
 "openstore-api/ta/>\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 5.13-dev\n"
@@ -143,8 +143,7 @@ msgstr "கருவிகள்"
 
 # Discovery section category tagline for "Tools"
 msgid "Even the simplest tools can empower people to do great things"
-msgstr ""
-"எளிமையான கருவிகள் கூட பெரிய காரியங்களைச் செய்ய மக்களுக்கு அதிகாரம் அளிக்கும்"
+msgstr "எளிமையான கருவிகள் கூட பெரிய காரியங்களைச் செய்ய மக்களுக்கு அதிகாரம் அளிக்கும்"
 
 # Discovery section category name
 msgid "Toolbox"
