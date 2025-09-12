@@ -25,6 +25,6 @@ await initializeI18N(Astro.currentLocale);
       }
     </p>
 
-    <BadgeSelect currentLocale={Astro.currentLocale} client:load />
+    <BadgeSelect currentLocale={Astro.currentLocale} client:only="preact" />
   </section>
 </BaseLayout>

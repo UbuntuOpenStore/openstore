@@ -172,7 +172,7 @@ const publisherUrl = `/apps/#search=publisher:${app.publisher}`;
           olderVersions: t("Older versions"),
         }}
         currentLocale={Astro.currentLocale}
-        client:load
+        client:only="preact"
       />
 
       <a href={`openstore://${app.id}`} title={t("Install via the OpenStore app")} class="btn w-full bg-ubuntu-orange text-white font-bold"
