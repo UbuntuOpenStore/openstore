@@ -75,7 +75,7 @@ function authenticated(req: Request, res: Response) {
     const returnToUrl = safeParseUrl(returnTo);
     delete req.session.returnTo;
 
-    if (returnToUrl && returnToUrl.hostname !== config.server.domain) {
+    if (returnToUrl && returnToUrl.hostname === config.server.domain) {
       res.redirect(`${returnTo}?key=${req.user.apikey}`);
     }
     else {

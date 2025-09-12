@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "npm run pot-file && astro dev --host",
-    "start": "npm run pot-file && astro dev --host",
+    "start": "node ./dist/server/entry.mjs",
     "build": "npm run convert-po && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",

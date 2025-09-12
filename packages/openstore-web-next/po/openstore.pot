@@ -5,56 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-04-15T20:39:20.624Z\n"
-"PO-Revision-Date: 2025-04-15T20:39:20.624Z\n"
-
-msgid "New!"
-msgstr "New!"
-
-msgid "App"
-msgstr "App"
-
-msgid "Bookmark"
-msgstr "Bookmark"
-
-msgid "Web App"
-msgstr "Web App"
-
-msgid "Report an Issue"
-msgstr "Report an Issue"
-
-msgid "Chat with us on Telegram"
-msgstr "Chat with us on Telegram"
-
-msgid "Site Status"
-msgstr "Site Status"
-
-msgid "Search..."
-msgstr "Search..."
-
-msgid "Submit"
-msgstr "Submit"
-
-msgid "Browse"
-msgstr "Browse"
-
-msgid "Categories"
-msgstr "Categories"
-
-msgid "About"
-msgstr "About"
-
-msgid "Manage"
-msgstr "Manage"
-
-msgid "Logout"
-msgstr "Logout"
-
-msgid "Login"
-msgstr "Login"
-
-msgid "Reviwed %{date} for version %{version}"
-msgstr "Reviwed %{date} for version %{version}"
+"POT-Creation-Date: 2025-09-12T03:13:06.103Z\n"
+"PO-Revision-Date: 2025-09-12T03:13:06.103Z\n"
 
 msgid "The open source app store for Ubuntu Touch"
 msgstr "The open source app store for Ubuntu Touch"
@@ -68,6 +20,9 @@ msgid ""
 msgstr ""
 "The app or page you are looking for could not be found. Try using the "
 "search bar."
+
+msgid "About"
+msgstr "About"
 
 msgid "About the OpenStore"
 msgstr "About the OpenStore"
@@ -346,6 +301,18 @@ msgstr "Webview"
 msgid "Full System Access"
 msgstr "Full System Access"
 
+msgid "New!"
+msgstr "New!"
+
+msgid "App"
+msgstr "App"
+
+msgid "Bookmark"
+msgstr "Bookmark"
+
+msgid "Web App"
+msgstr "Web App"
+
 msgid "Download"
 msgstr "Download"
 
@@ -514,6 +481,9 @@ msgstr "Latest Update"
 msgid "Oldest Update"
 msgstr "Oldest Update"
 
+msgid "Categories"
+msgstr "Categories"
+
 msgid "Badge"
 msgstr "Badge"
 
@@ -529,6 +499,9 @@ msgstr ""
 "repository, social media, or anywhere on the internet. The badges are "
 "available in several different languages and in both PNG and SVG formats."
 
+msgid "Login"
+msgstr "Login"
+
 msgid "Login via GitHub"
 msgstr "Login via GitHub"
 
@@ -537,6 +510,9 @@ msgstr "Login via GitLab"
 
 msgid "Login via Ubuntu One"
 msgstr "Login via Ubuntu One"
+
+msgid "Submit"
+msgstr "Submit"
 
 msgid "Submit Your App to the OpenStore"
 msgstr "Submit Your App to the OpenStore"
@@ -700,3 +676,27 @@ msgstr ""
 "Apps that are found to be stealing the users data, trying to escalate their "
 "privileges without user consent, or executing malicious process are "
 "strictly prohibited."
+
+msgid "Report an Issue"
+msgstr "Report an Issue"
+
+msgid "Chat with us on Telegram"
+msgstr "Chat with us on Telegram"
+
+msgid "Site Status"
+msgstr "Site Status"
+
+msgid "Search..."
+msgstr "Search..."
+
+msgid "Browse"
+msgstr "Browse"
+
+msgid "Manage"
+msgstr "Manage"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Reviwed %{date} for version %{version}"
+msgstr "Reviwed %{date} for version %{version}"
