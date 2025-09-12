@@ -72,10 +72,10 @@ function authenticated(req: Request, res: Response) {
 
   if (typeof req.session?.returnTo === 'string') {
     const returnTo = req.session.returnTo;
-    const returnToUrl = safeParseUrl(returnTo);
     delete req.session.returnTo;
 
-    if (returnToUrl && returnToUrl.hostname === config.server.domain) {
+    // Don't send the API to the old web app
+    if (req.header('X-Source') === 'openstore-web-next') {
       res.redirect(`${returnTo}?key=${req.user.apikey}`);
     }
     else {
