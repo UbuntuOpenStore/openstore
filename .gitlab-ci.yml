@@ -18,7 +18,7 @@ before_script:
 
 api-check:
   stage: check
-  image: node:22
+  image: bhdouglass/openstore-ci
   script:
     - npm run type-check -w openstore-api
     - npm run lint -w openstore-api
@@ -28,7 +28,7 @@ api-check:
 
 web-check:
   stage: check
-  image: node:22
+  image: bhdouglass/openstore-ci
   script:
     - npm run convert-po -w openstore-web
     - npm run check -w openstore-web
