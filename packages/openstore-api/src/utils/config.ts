@@ -6,7 +6,7 @@ let configuration = {
   icon_dir: process.env.ICON_DIR || './.data/icons',
   server: {
     ip: process.env.NODEJS_IP || '0.0.0.0',
-    port: parseInt(process.env.PORT || process.env.NODEJS_PORT || '5432', 10),
+    port: parseInt(process.env.PORT || process.env.NODEJS_PORT || '6543', 10),
     session_secret: process.env.SESSION_SECRET || 'openstore',
     host: process.env.HOST || 'http://local.open-store.io',
     domain: (process.env.HOST || 'http://local.open-store.io').replace('http://', '').replace('https://', ''),
