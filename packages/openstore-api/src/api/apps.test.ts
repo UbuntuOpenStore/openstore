@@ -290,5 +290,26 @@ describe('Apps API', () => {
     test('gets the download by version', async () => {
       await request(app).get(`${route}${package3.id}/download/${DEFAULT_CHANNEL}/armhf/2`).expect(200);
     });
+
+    test('returns version changelogs in serialized app', async () => {
+      const pkg = await factory.package({
+        id: 'app-with-version-changelogs',
+        published: true,
+        changelog: 'Legacy changelog',
+        version_changelogs: [
+          { version: '1.0.0', changelog: 'Initial release' },
+          { version: '1.1.0', changelog: 'Bug fixes' },
+          { version: '2.0.0', changelog: 'Major update' },
+        ],
+      });
+      pkg.createNextRevision('2.0.0', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
+      await pkg.save();
+
+      const res = await request(app).get(`${route}${pkg.id}`).expect(200);
+
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.version_changelogs.length, 3);
+      assert.equal(res.body.data.changelog, 'Major update');
+    });
   });
 });

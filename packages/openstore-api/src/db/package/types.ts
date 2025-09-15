@@ -60,7 +60,7 @@ export interface IRevision {
 
 export type HydratedRevision = HydratedDocument<IRevision>;
 
-export interface RevisionModel extends Model<IRevision> {}
+export interface RevisionModel extends Model<IRevision> { }
 
 export interface SerializedDownload extends IRevision { }
 
@@ -79,6 +79,7 @@ export type SerializedPackage = {
   publisher: string;
   category: string;
   changelog: string;
+  version_changelogs: Array<{ version: string; changelog: string }>;
   channels: Channel[];
   channel_architectures: ChannelArchitecture[];
   device_compatibilities: string[];
@@ -181,6 +182,7 @@ export interface IPackage {
   tagline?: string;
   description?: string;
   changelog?: string;
+  version_changelogs?: Array<{ version: string; changelog: string }>;
   screenshots: string[];
   category?: string;
   keywords: string[];
@@ -226,6 +228,7 @@ export interface BodyUpdate {
   locked?: string | boolean;
   category?: string;
   changelog?: string;
+  version_changelogs?: Array<{ version: string; changelog: string }> | string;
   description?: string;
   license?: string;
   source?: string;

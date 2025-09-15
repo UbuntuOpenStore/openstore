@@ -41,6 +41,9 @@ let configuration = {
 if (process.env.NODE_ENV === 'testing') {
   configuration = {
     ...configuration,
+    data_dir: '/tmp',
+    image_dir: '/tmp',
+    icon_dir: '/tmp',
     mongo: {
       uri: 'mongodb://127.0.0.1:27017',
       database: process.env.SNAPSHOT_TEST === 'true' ? 'openstore' : 'openstore-test',

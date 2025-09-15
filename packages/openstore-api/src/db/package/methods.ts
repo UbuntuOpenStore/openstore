@@ -225,6 +225,34 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.category = body.category ?? this.category;
     this.license = body.license ?? this.license;
     this.changelog = sanitize(body.changelog ?? this.changelog ?? '');
+
+    if (body.version_changelogs) {
+      if (!this.version_changelogs) {
+        this.version_changelogs = [];
+      }
+
+      try {
+        const parsedChangelogs = typeof body.version_changelogs === 'string'
+          ? JSON.parse(body.version_changelogs) as Array<{ version: string; changelog: string }>
+          : body.version_changelogs;
+
+        for (const { version, changelog } of parsedChangelogs) {
+          if (isValidVersion(version)) {
+            const idx = this.version_changelogs.findIndex(vc => vc.version === version);
+            if (idx !== -1) {
+              this.version_changelogs[idx].changelog = sanitize(changelog);
+            }
+            else {
+              this.version_changelogs.push({ version, changelog: sanitize(changelog) });
+            }
+          }
+        }
+      }
+      catch (err) {
+        console.error('Failed to parse version_changelogs', err);
+      }
+    }
+
     this.description = sanitize(body.description ?? this.description ?? '');
     this.tagline = sanitize(body.tagline ?? this.tagline ?? '');
 
@@ -354,7 +382,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     return url;
   });
 
-  /* eslint-disable no-restricted-syntax */
   packageSchema.method<HydratedPackage>('serializeRatings', function (): SerializedRatings {
     return serializeRatings(this.rating_counts);
   });
@@ -466,10 +493,24 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       manifest.hooks[key.replace(/__/g, '.')] = value;
     }
 
+    let changelog = this.changelog || '';
+    if (this.version_changelogs && this.version_changelogs.length > 0) {
+      if (revisionData) {
+        const found = this.version_changelogs.find(vc => vc.version === revisionData.version);
+        if (found) {
+          changelog = found.changelog;
+        }
+        else {
+          changelog = '';
+        }
+      }
+    }
+
     const json = {
       architectures: this.architectures.filter((arch) => Object.values(Architecture).includes(arch)) || [],
       category: this.category || '',
-      changelog: this.changelog || '',
+      changelog,
+      version_changelogs: (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version)),
       channels: this.channels || [DEFAULT_CHANNEL],
       channel_architectures: this.channel_architectures || [],
       device_compatibilities: this.device_compatibilities || [],
@@ -525,33 +566,33 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [...downloads, ...this.architectures.map((arch) => {
-          if (!Object.values(Architecture).includes(arch)) {
-            return null; // Filter out unsupported arches like i386 (legacy apps)
-          }
+          return [...downloads, ...this.architectures.map((arch) => {
+            if (!Object.values(Architecture).includes(arch)) {
+              return null; // Filter out unsupported arches like i386 (legacy apps)
+            }
 
-          const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
 
-          if (downloadRevisionData) {
-            const download = {
-              ...downloadRevisionData.toObject(),
-              _id: undefined,
-              architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-              download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
-              installedSize: toBytes(downloadRevisionData.filesize),
-              downloadSize: downloadRevisionData.downloadSize ?? 0,
+            if (downloadRevisionData) {
+              const download = {
+                ...downloadRevisionData.toObject(),
+                _id: undefined,
+                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                installedSize: toBytes(downloadRevisionData.filesize),
+                downloadSize: downloadRevisionData.downloadSize ?? 0,
 
-              // TODO deprecate
-              filesize: toBytes(downloadRevisionData.filesize),
-            };
+                // TODO deprecate
+                filesize: toBytes(downloadRevisionData.filesize),
+              };
 
-            delete download._id;
-            return download;
-          }
+              delete download._id;
+              return download;
+            }
 
-          return null;
-        })];
-      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+            return null;
+          })];
+        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
@@ -742,6 +783,18 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (changelog) {
       const updatedChangelog = this.changelog ? `${changelog.trim()}\n\n${this.changelog}` : changelog.trim();
       this.changelog = sanitize(updatedChangelog);
+
+      if (!this.version_changelogs) {
+        this.version_changelogs = [];
+      }
+
+      const found = this.version_changelogs.find(vc => vc.version === version);
+      if (found) {
+        found.changelog = sanitize(changelog.trim());
+      }
+      else {
+        this.version_changelogs.push({ version, changelog: sanitize(changelog.trim()) });
+      }
     }
 
     if (!this.channels.includes(channel)) {

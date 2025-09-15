@@ -1,4 +1,4 @@
-import { AppManageSchema, type AppManageData, type UserData } from "@/lib/schema";
+import { AppManageSchema, type AppData, type AppManageData, type UserData } from "@/lib/schema";
 import { Switch } from "../ui/switch";
 import { APP_TYPE_OPTIONS, CATEGORIES, LICENSES } from "@/lib/constants";
 import SortableScreenshots from "./SortableScreenshots";
@@ -21,7 +21,19 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [screenshots, setScreenshots] = useState(app.screenshots);
+  const [newVersionChangelogs, setNewVersionChangelogs] = useState<Array<{ id: number; version: string; changelog: string }>>([]);
   const fileRef = useRef<HTMLInputElement>();
+
+  const addNewVersionChangelog = useCallback(() => {
+    setNewVersionChangelogs((prev) => [
+      ...prev,
+      { id: Math.random(), version: '', changelog: '' }
+    ]);
+  }, []);
+
+  const removeVersionChangelog = useCallback((id: number) => {
+    setNewVersionChangelogs((prev) => prev.filter(item => item.id !== id));
+  }, []);
 
   const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,6 +47,9 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
 
       const newFormData = new FormData();
       let screenshotFileCount = 0;
+
+      const versionChangelogs: AppData['version_changelogs'] = [];
+
       for (const [key, value] of entries) {
         if (key === 'screenshot_files') {
           if (screenshotFileCount < 5) {
@@ -45,10 +60,26 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         else if (key === 'published' || key === 'nsfw' || key === 'locked') {
           // Skip
         }
-        else {
+        else if (key.startsWith('version_changelogs[') && key.endsWith(']')) {
+          const versionMatch = key.match(/\[(.*?)\]/);
+          if (versionMatch && versionMatch[1] && typeof value === 'string') {
+            versionChangelogs.push({ version: versionMatch[1], changelog: value } );
+          }
+        }
+        else if (key.startsWith('new_version_') && typeof value === 'string') {
+          const id = key.replace('new_version_', '');
+          const changelog = formData.get(`new_changelog_${id}`);
+          if (value && changelog && typeof changelog === 'string') {
+            versionChangelogs.push({ version: value, changelog });
+          }
+        }
+        else if (!key.startsWith('new_changelog_')) {
+          // Don't add new_changelog_ fields as they're handled above
           newFormData.append(key, value);
         }
       }
+
+      newFormData.append('version_changelogs', JSON.stringify(versionChangelogs));
       newFormData.append('published', formData.get('published') ? 'on' : 'off');
       newFormData.append('nsfw', formData.get('nsfw') ? 'on' : 'off');
       newFormData.append('locked', formData.get('locked') ? 'on' : 'off');
@@ -62,6 +93,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
       if (response.ok) {
         const appData = AppManageSchema.parse((await response.json()).data);
         setScreenshots(appData.screenshots);
+        setNewVersionChangelogs([]);
 
         if (fileRef.current) {
           fileRef.current.value = '';
@@ -125,9 +157,84 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         </div>
 
         <div class="form-group">
-          <label for="changelog" class="form-label">Changelog</label>
-          <textarea id="changelog" name="changelog" class="form-input" rows={4}>{app.changelog}</textarea>
+          <label class="form-label">Changelogs</label>
+          <div
+            class="border rounded-md w-full max-h-96 overflow-auto min-h-26"
+          >
+            <div class="p-4">
+              {newVersionChangelogs.map((entry) => (
+                <div key={entry.id} class="border-b pb-2 flex items-start gap-4 mb-2">
+                  <div class="flex flex-col min-w-[120px] gap-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <h4 class="font-bold whitespace-nowrap">New Version</h4>
+                      <button
+                        type="button"
+                        class="text-sm text-red-600 hover:text-red-800"
+                        onClick={() => removeVersionChangelog(entry.id)}
+                      >
+                        <SvgClose class="w-4 h-4" />
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-input w-full"
+                      placeholder="Version (e.g. 1.0.0)"
+                      name={`new_version_${entry.id}`}
+                      required
+                    />
+                  </div>
+                  <textarea
+                    name={`new_changelog_${entry.id}`}
+                    class="form-input w-full resize-vertical"
+                    rows={3}
+                    placeholder="Enter changelog for this version..."
+                    required
+                  ></textarea>
+                </div>
+              ))}
+
+              {app.version_changelogs.map((versionChangelog) => (
+                <div key={versionChangelog.version} class="border-b pb-2 last:border-0 last:pb-0 flex items-start gap-4 mb-2">
+                  <div class="flex items-center gap-2 min-w-[120px]">
+                    <h4 class="font-bold whitespace-nowrap">v{versionChangelog.version}</h4>
+                  </div>
+                  <textarea
+                    name={`version_changelogs[${versionChangelog.version}]`}
+                    class="form-input w-full resize-vertical"
+                    rows={3}
+                    defaultValue={versionChangelog.changelog}
+                  ></textarea>
+                </div>
+              ))}
+            </div>
+
+            <div class="p-4 text-right sticky bottom-0 bg-white">
+              <button
+                type="button"
+                class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                onClick={addNewVersionChangelog}
+              >
+                Add New Changelog
+              </button>
+            </div>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label for="changelog" class="form-label">
+            Legacy Changelog <span class="text-xs text-red-500">(Deprecated)</span>
+          </label>
+          <textarea
+            id="changelog"
+            name="changelog"
+            class="form-input"
+            rows={4}
+            placeholder="This field is deprecated. Please use version-specific changelogs above."
+          >{app.changelog}</textarea>
+        </div>
+        <p class="mt-1 text-xs text-gray-500 text-right">
+          This global changelog is being deprecated in favor of version-specific changelogs.
+        </p>
 
         <div class="form-group">
           <label for="screenshot_files" class="form-label">Screenshots (Limit 5)</label>

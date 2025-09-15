@@ -29,6 +29,7 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   tagline: String,
   description: String,
   changelog: String,
+  version_changelogs: [{ version: String, changelog: String }],
   screenshots: [String],
 
   // Discovery

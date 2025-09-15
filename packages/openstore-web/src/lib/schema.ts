@@ -46,6 +46,7 @@ export const AppSchema = z.object({
   architectures: z.array(z.nativeEnum(Architecture)),
   category: z.string().nullable(),
   changelog: z.string(),
+  version_changelogs: z.array(z.object({ version: z.string(), changelog: z.string() })),
   channels: z.array(z.string()),
   description: z.string(),
   downloads: z.array(z.object({

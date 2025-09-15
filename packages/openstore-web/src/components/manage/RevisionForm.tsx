@@ -186,10 +186,6 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
           <label for="changelog" class="form-label">Changelog</label>
           <textarea id="changelog" name="changelog" class="form-input" rows={4}></textarea>
         </div>
-
-        <p class="text-xs text-gray-500 text-right">
-          This will be added to the beginning of your current changelog
-        </p>
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>

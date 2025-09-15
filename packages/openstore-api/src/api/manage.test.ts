@@ -16,7 +16,7 @@ describe('Manage', () => {
   let user: TestUser;
 
   // TODO setup elastic search for testing in CI
-  const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => {} : undefined) as any;
+  const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => { } : undefined) as any;
 
   before(async () => {
     await waitForMongoose();
@@ -818,6 +818,68 @@ describe('Manage', () => {
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
       });
+    });
+  });
+
+  describe('Version-specific changelogs', () => {
+    let pkg: TestPackage;
+    let route: string;
+
+    beforeEach(async () => {
+      user.role = 'community';
+      await user.save();
+
+      pkg = await factory.package({
+        maintainer: user._id,
+        changelog: 'Legacy changelog',
+      });
+
+      route = `/api/v3/manage/${pkg.id}?apikey=${user.apikey}`;
+    });
+
+    test('can update version-specific changelogs', async () => {
+      pkg.version_changelogs = [
+        { version: '1.0.0', changelog: 'Initial release notes' },
+      ];
+      await pkg.save();
+
+      const versionChangelogs = [
+        { version: '1.0.0', changelog: 'Updated initial release notes' },
+        { version: '1.1.0', changelog: 'New version changelog' },
+      ];
+
+      const res = await request(app)
+        .put(route)
+        .field('version_changelogs', JSON.stringify(versionChangelogs))
+        .expect(200);
+
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.version_changelogs.length, 2);
+
+      const updatedPkg = await Package.findById(pkg._id);
+      assert.ok(updatedPkg);
+      assert.ok(updatedPkg.version_changelogs);
+      assert.equal(updatedPkg.version_changelogs.length, 2);
+      assert.equal(updatedPkg.version_changelogs.find(vc => vc.version === '1.0.0')?.changelog, 'Updated initial release notes');
+      assert.equal(updatedPkg.version_changelogs.find(vc => vc.version === '1.1.0')?.changelog, 'New version changelog');
+
+      // Test merging behavior by adding a new version without touching existing ones
+      const additionalChangelog = [
+        { version: '1.2.0', changelog: 'Another new version' },
+      ];
+
+      const res2 = await request(app)
+        .put(route)
+        .field('version_changelogs', JSON.stringify(additionalChangelog))
+        .expect(200);
+
+      assert.ok(res2.body.success);
+      assert.equal(res2.body.data.version_changelogs.length, 3);
+
+      const mergedPkg = await Package.findById(pkg._id);
+      assert.ok(mergedPkg);
+      assert.ok(mergedPkg.version_changelogs);
+      assert.equal(mergedPkg.version_changelogs.length, 3);
     });
   });
 });

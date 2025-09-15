@@ -256,6 +256,7 @@ describe('Package', () => {
             THUMBS_UP: 0,
           },
           changelog: 'some changes',
+          version_changelogs: [],
           donate_url: 'https://example.com/donate',
           review_exceptions: [],
           downloads: [

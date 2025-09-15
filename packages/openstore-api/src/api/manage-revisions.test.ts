@@ -742,7 +742,6 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      package1.changelog = 'old changelog';
       await package1.save();
 
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
@@ -766,7 +765,9 @@ describe('Manage Revision POST', () => {
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
 
       const pkg = await Package.findOneByFilters(package1.id);
-      assert.equal(pkg?.changelog, 'changelog update\n\nold changelog');
+      assert.ok(pkg);
+      assert.ok(pkg.version_changelogs);
+      assert.equal(pkg.version_changelogs.find(vc => vc.version === '1.0.0')?.changelog, 'changelog update');
     });
 
     test('successfully reviews/updates/saves a package and icon and updates elasticsearch', async (t) => {
