@@ -64,7 +64,7 @@ await initializeI18N(Astro.currentLocale);
       <li>
         {t("Run the command:")}
 
-        <CopyToClipboard client:idle code="pkcon install-local --allow-untrusted openstore.openstore-team_latest_armhf.click" />
+        <CopyToClipboard client:only="preact" code="pkcon install-local --allow-untrusted openstore.openstore-team_latest_armhf.click" />
       </li>
     </ol>
   </section>

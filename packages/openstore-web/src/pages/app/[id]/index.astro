@@ -188,7 +188,7 @@ const publisherUrl = `/apps/#search=publisher:${app.publisher}`;
   <div class="mx-auto w-full max-w-6xl h-1 bg-ubuntu-gradient rounded-full"></div>
 
   <section class="section">
-    <Screenshots images={app.screenshots} videoUrl={app.video_url} nsfw={app.nsfw} messages={{ nsfw: t("This app contains NSFW content, to click to reveal the screenshots.")}} client:idle />
+    <Screenshots images={app.screenshots} videoUrl={app.video_url} nsfw={app.nsfw} messages={{ nsfw: t("This app contains NSFW content, to click to reveal the screenshots.")}} client:only="preact" />
   </section>
 
   <section class="section">
