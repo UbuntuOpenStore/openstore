@@ -74,13 +74,7 @@ function authenticated(req: Request, res: Response) {
     const returnTo = req.session.returnTo;
     delete req.session.returnTo;
 
-    // Don't send the API to the old web app
-    if (req.header('X-Source') === 'openstore-web-next') {
-      res.redirect(`${returnTo}?key=${req.user.apikey}`);
-    }
-    else {
-      res.redirect(returnTo);
-    }
+    res.redirect(`${returnTo}?key=${req.user.apikey}`);
   }
   else {
     res.redirect('/manage');
