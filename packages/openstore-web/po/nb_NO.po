@@ -5,19 +5,22 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openstore-web 1.0.0 "
-"Report-Msgid-Bugs-To:  "
-"POT-Creation-Date: 2019-09-08 23:33-0400 "
-"PO-Revision-Date: 2024-03-28 12:02+0000 "
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no> "
+"Project-Id-Version: openstore-web 1.0.0 Report-Msgid-Bugs-To:  POT-Creation-"
+"Date: 2019-09-08 23:33-0400 PO-Revision-Date: 2024-03-28 12:02+0000 Last-"
+"Translator: Allan Nordhøy <epost@anotheragency.no> Language-Team: Norwegian "
+"Bokmål <https://hosted.weblate.org/projects/open-store-io/openstore-web/"
+"nb_NO/> Language: nb_NO MIME-Version: 1.0 Content-Type: text/plain; "
+"charset=UTF-8 Content-Transfer-Encoding: 8bit Plural-Forms: nplurals=2; "
+"plural=n != 1; X-Generator: Weblate 5.5-dev\n"
+"PO-Revision-Date: 2025-09-17 14:02+0000\n"
+"Last-Translator: Ida Brenna <ida@larald.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/"
-"open-store-io/openstore-web/nb_NO/> "
-"Language: nb_NO "
-"MIME-Version: 1.0 "
-"Content-Type: text/plain; charset=UTF-8 "
-"Content-Transfer-Encoding: 8bit "
-"Plural-Forms: nplurals=2; plural=n != 1; "
-"X-Generator: Weblate 5.5-dev "
+"open-store-io/openstore-web-next/nb_NO/>\n"
+"Language: nb_NO\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.14-dev\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid ""
 "*This app contains NSFW content, to view the description and "
@@ -41,21 +44,17 @@ msgstr "Om oss"
 msgid "Accounts"
 msgstr "Kontoer"
 
-#, fuzzy
-#| msgid "Architecture"
 msgid "Add Another Architecture"
-msgstr "Arkitektur"
+msgstr "Legg til en annen arkitektur"
 
 msgid "Admin"
-msgstr ""
+msgstr "Administrator"
 
 msgid "All Categories"
 msgstr "Alle kategorier"
 
-#, fuzzy
-#| msgid "Channels"
 msgid "All Channels"
-msgstr "Kanaler"
+msgstr "Alle kanaler"
 
 msgid "All Types"
 msgstr "Alle typer"
@@ -108,7 +107,7 @@ msgid "App Stats"
 msgstr "App statistikk"
 
 msgid "App Submission Tutorial"
-msgstr ""
+msgstr "Appopplastingskurs"
 
 msgid "App Title"
 msgstr "App tittel"
@@ -122,21 +121,14 @@ msgstr "App typer"
 msgid "Apps"
 msgstr "Apper"
 
-#, fuzzy
-#| msgid ""
-#| "Apps containing gambling involving real world money transactions are not "
-#| "allowed. "
-#| "This includes, but is not limited to, online casinos, betting, and "
-#| "lotteries."
 msgid ""
 "Apps containing gambling involving real world money transactions are not "
 "allowed. "
 "This includes, but is not limited to, online casinos, betting, and "
 "lotteries."
 msgstr ""
-"Spillapper som involverer spill med virkelige pengemidler er forbudt. "
-"Dette inkluderer, men begrenser seg ikke til, online kasinoer, betting og "
-"lotterier."
+"Spillapper som involverer spill med virkelige pengemidler er forbudt. Dette "
+"inkluderer, men begrenser seg ikke til, nettkasinoer, betting og lotterier."
 
 msgid ""
 "Apps containing or promoting child abuse or child sexual abuse are strictly "
@@ -145,35 +137,23 @@ msgstr ""
 "Apper som inneholder eller promoterer barnemishandling eller seksuelle "
 "overgrep mot barn er strengt forbudt."
 
-#, fuzzy
-#| msgid ""
-#| "Apps containing or promoting gratuitous violence are not allowed. "
-#| "This includes, but is not limited to, violence, terrorism, bomb/weapon "
-#| "making, self harm, and grotesque imagery."
 msgid ""
 "Apps containing or promoting gratuitous violence are not allowed. "
 "This includes, but is not limited to, violence, terrorism, bomb/weapon "
 "making, self harm, and grotesque imagery."
 msgstr ""
-"Apper som inneholder eller promoterer umotivert vold er forbudt. "
-"Dette inkluderer, men begrenser seg ikke til, vold, terrorisme, produksjon "
-"av bomber/våpen, selvskading og bilder "
-"som vekker avsky."
+"Apper som inneholder eller promoterer umotivert vold er forbudt. Dette "
+"inkluderer, men begrenser seg ikke til, vold, terrorisme, produksjon av "
+"bomber/våpen, selvskading og bilder som vekker avsky."
 
-#, fuzzy
-#| msgid ""
-#| "Apps containing or promoting sexually explicit content are not allowed. "
-#| "This includes, but is not limited to, pornography and services promoting "
-#| "sexually explicit content."
 msgid ""
 "Apps containing or promoting sexually explicit content are not allowed. "
 "This includes, but is not limited to, pornography and services promoting "
 "sexually explicit content."
 msgstr ""
 "Apper som inneholder eller promoterer eksplisitt seksuelt innhold er "
-"forbudt. "
-"Dette inkluderer, men begrenser seg ikke til, pornografi og tjenester som "
-"promoterer eksplisitt seksuelt innhold."
+"forbudt. Dette inkluderer, men begrenser seg ikke til, pornografi og "
+"tjenester som promoterer eksplisitt seksuelt innhold."
 
 msgid ""
 "Apps not requiring manual review can be submitted by logging in with the "
@@ -194,19 +174,14 @@ msgstr ""
 "Apper som krever manuell kontroll må først sendes til en administrator i vår "
 "Telegram gruppe for kontroll."
 
-#, fuzzy
-#| msgid ""
-#| "Apps that are found to be stealing the users data, trying to escalate "
-#| "their privileges without user consent, "
-#| "or executing malicious process are strictly prohibited."
 msgid ""
 "Apps that are found to be stealing the users data, trying to escalate their "
 "privileges without user consent, "
 "or executing malicious process are strictly prohibited."
 msgstr ""
 "Apper som viser seg å stjele brukerens data, forsøker å øke sine tillatelser "
-"uten brukergodkjenning, "
-"eller utfører ondsinnede handlinger er strengt forbudt."
+"uten brukergodkjenning, eller utfører ondsinnede handlinger er strengt "
+"forbudt."
 
 msgid ""
 "Apps uploaded to the OpenStore are subject to our submission rules and "
@@ -218,7 +193,7 @@ msgstr ""
 "Du kan gjennomgå reglene før du laster opp din app."
 
 msgid "Arch"
-msgstr ""
+msgstr "Arkitektur"
 
 msgid "Architecture"
 msgstr "Arkitektur"
@@ -239,10 +214,10 @@ msgid "Bluetooth"
 msgstr "Blåtann"
 
 msgid "Bookmark"
-msgstr ""
+msgstr "Bokmerke"
 
 msgid "Bookmarks"
-msgstr ""
+msgstr "Bokmerker"
 
 msgid "Browse"
 msgstr "Bla igjennom"
@@ -287,7 +262,7 @@ msgid "Choose a maintainer"
 msgstr "Velg vedlikeholder"
 
 msgid "Completed"
-msgstr ""
+msgstr "Fullført"
 
 msgid "Connectivity"
 msgstr "Tilknytning"
@@ -328,10 +303,8 @@ msgstr "Beskrivelse"
 msgid "Discovery"
 msgstr "Oppdag"
 
-#, fuzzy
-#| msgid "Picture Files"
 msgid "Document Files"
-msgstr "Bildefiler"
+msgstr "Dokumentfiler"
 
 msgid "Donate"
 msgstr "Støtte"
@@ -366,16 +339,14 @@ msgstr "Feil"
 msgid "Feeds"
 msgstr "Feeder"
 
-#, fuzzy
-#| msgid "File Size"
 msgid "File"
-msgstr "Filstørrelse"
+msgstr "Fil"
 
 msgid "File Upload"
 msgstr "Filopplasting"
 
 msgid "Focal"
-msgstr ""
+msgstr "Focal"
 
 msgid ""
 "For any questions you may have or help you may need just chat with us in our "
@@ -476,7 +447,7 @@ msgid "Latest Update"
 msgstr "Nyeste utgivelse"
 
 msgid "Least Popular"
-msgstr ""
+msgstr "Minst populær"
 
 msgid "License"
 msgstr "Lisens"
@@ -485,7 +456,7 @@ msgid "Location"
 msgstr "Posisjon"
 
 msgid "Locked"
-msgstr ""
+msgstr "Låst"
 
 msgid "Log In"
 msgstr "Logg inn"
@@ -508,10 +479,8 @@ msgstr "Logg inn via GitHub"
 msgid "Login via GitLab"
 msgstr "Logg inn via GitLab"
 
-#, fuzzy
-#| msgid "Login via Ubuntu"
 msgid "Login via Ubuntu One"
-msgstr "Logg inn via Ubuntu"
+msgstr "Logg inn via Ubuntu One"
 
 msgid "Maintainer"
 msgstr "Vedlikeholder"
@@ -529,7 +498,7 @@ msgid "Microphone"
 msgstr "Mikrofon"
 
 msgid "Most Popular"
-msgstr ""
+msgstr "Mest populær"
 
 msgid "Music Files"
 msgstr "Musikkfiler"
@@ -555,8 +524,6 @@ msgstr "Ny utgave av %{channel} ble opprettet!"
 msgid "New Revision for %{name}"
 msgstr "Ny utgave av %{name}"
 
-#, fuzzy
-#| msgid "New revision for %{channel} was created!"
 msgid "New revisions for %{channel} were created!"
 msgstr "Ny utgave av %{channel} ble opprettet!"
 
@@ -564,7 +531,7 @@ msgid "Newest"
 msgstr "Nyeste"
 
 msgid "NFC"
-msgstr ""
+msgstr "NFC"
 
 msgid "No"
 msgstr "Nei"
@@ -573,7 +540,7 @@ msgid "No apps found."
 msgstr "Ingen apper funnet."
 
 msgid "No longer available"
-msgstr ""
+msgstr "Ikke lenger tilgjengelig"
 
 msgid "None"
 msgstr "Ingen"
@@ -587,10 +554,8 @@ msgstr "Uegnet for arbeidsplassen"
 msgid "NSFW content"
 msgstr "Innhold som er uegnet for arbeidsplassen"
 
-#, fuzzy
-#| msgid "Version"
 msgid "Older Versions"
-msgstr "Versjon"
+msgstr "Eldre versjoner"
 
 msgid "Oldest"
 msgstr "Eldst"
@@ -598,16 +563,6 @@ msgstr "Eldst"
 msgid "Oldest Update"
 msgstr "Eldste utgave"
 
-#, fuzzy
-#| msgid ""
-#| "One of the main goals of the OpenStore is to provide a safe app store for "
-#| "people of all ages. "
-#| "To accomplish this goal we do not allow certain types of app to be "
-#| "published. "
-#| "Failure to follow the guidelines will result in your app being removed. "
-#| "Any account with serious infractions may be subject to termination. "
-#| "The OpenStore team thanks you for helping us promote a better environment "
-#| "for everyone."
 msgid ""
 "One of the main goals of the OpenStore is to provide a safe app store for "
 "people of all ages. "
@@ -618,12 +573,11 @@ msgid ""
 "The OpenStore team thanks you for helping us promote a better environment "
 "for everyone."
 msgstr ""
-"Et hovedmål for OpenStore er å være en sikker app kilde for folk i alle "
-"aldere. "
-"For å oppnå dette tillater vi ikke publisering av visse typer innhold. "
-"Dersom retningslinjene ikke blir overholdt vil din app bli fjernet. "
-"Ved alvorlige brudd på retningslinjene vil kontoen bli slettet. "
-"OpenStore teamet takker for at du hjelper oss å sikre et godt miljø for alle."
+"Et hovedmål for OpenStore er å være en sikker appkilde for folk i alle "
+"aldre. For å oppnå dette tillater vi ikke publisering av visse typer "
+"innhold. Dersom retningslinjene ikke blir overholdt vil din app bli fjernet. "
+"Ved alvorlige brudd på retningslinjene vil kontoen bli slettet. OpenStore-"
+"teamet takker for at du hjelper oss å sikre et godt miljø for alle."
 
 msgid ""
 "Only open source applications allowed for manual review: "
@@ -634,16 +588,12 @@ msgstr ""
 "Siden apper kan ha forskjellige typer tilgang til enheten vil manuell "
 "kontroll innebære gjennomgang av kildekoden."
 
-#, fuzzy
-#| msgid ""
-#| "Only YouTube videos are supported at this time. Make sure the url is for "
-#| "the embedded video!"
 msgid ""
 "Only YouTube and Odysee videos are supported at this time. Make sure the url "
 "is for the embedded video!"
 msgstr ""
-"For tiden støttes kun YouTube videoer. Sørg for at URLen er til den "
-"innebygde videoen!"
+"For tiden støttes kun YouTube- og Odysee-videoer. Sørg for at URLen er til "
+"den innebygde videoen!"
 
 msgid "Open the terminal app"
 msgstr "Åpne terminal appen"
@@ -667,7 +617,7 @@ msgid "OpenStore source on GitLab"
 msgstr "OpenStore kildekode på GitLab"
 
 msgid "OpenStore Website Contributors"
-msgstr "Bidragsytere til OpenStore nettsiden"
+msgstr "Bidragsytere til OpenStore-nettsiden"
 
 msgid "Override Type"
 msgstr ""
@@ -688,7 +638,7 @@ msgid "Presentation"
 msgstr "Presentasjon"
 
 msgid "Processing"
-msgstr ""
+msgstr "Bearbeider"
 
 msgid "Prohibited Apps"
 msgstr "Forbudte apper"
@@ -718,18 +668,14 @@ msgstr "Publisert"
 msgid "Published Date"
 msgstr "Utgivelsesdato"
 
-#, fuzzy
-#| msgid "Published"
 msgid "Publisher"
-msgstr "Publisert"
+msgstr "Utgiver"
 
 msgid "Push Notifications"
 msgstr "Dyttingsmerknader"
 
-#, fuzzy
-#| msgid "Read Picture Files"
 msgid "Read Document Files"
-msgstr "Leste bildefiler"
+msgstr "Leste dokumentfiler"
 
 msgid "Read Music Files"
 msgstr "Leste musikkfiler"
@@ -750,12 +696,10 @@ msgid "Restricted permission"
 msgstr "Begrenset tilgang"
 
 msgid "Review Exceptions"
-msgstr ""
+msgstr "Undersøk unntak"
 
-#, fuzzy
-#| msgid "Webview"
 msgid "Reviews"
-msgstr "Vev-visning"
+msgstr "Rapporter"
 
 msgid "Revision"
 msgstr "Revisjon"
@@ -797,10 +741,8 @@ msgstr "Sensorer"
 msgid "Sexually Explicit Content"
 msgstr "Eksplisitt seksuelt innhold"
 
-#, fuzzy
-#| msgid "New Revision"
 msgid "Show All Revisions"
-msgstr "Ny utgave"
+msgstr "Vis alle versjoner"
 
 msgid "Show NSFW Content"
 msgstr "Vis 'uegnet for arbeidsplassen' innhold"
@@ -814,10 +756,8 @@ msgstr "Sortér etter"
 msgid "Source"
 msgstr "Kilde"
 
-#, fuzzy
-#| msgid "Source"
 msgid "Source Code"
-msgstr "Kilde"
+msgstr "Kildekode"
 
 msgid "Source URL"
 msgstr "Kilde URL"
@@ -850,7 +790,7 @@ msgid "Tag Line"
 msgstr "Nøkkelord"
 
 msgid "Telegram"
-msgstr ""
+msgstr "Telegram"
 
 msgid "Terms"
 msgstr "Betingelser"
@@ -997,7 +937,7 @@ msgstr ""
 "er gruppen eller personen som utgir appen."
 
 msgid "This revision is still available"
-msgstr ""
+msgstr "Denne utgaven er fortsatt tilgjengelig"
 
 msgid "This will be added to the beginning of your current changelog"
 msgstr "Dette legges til i starten på din nåværende endringslogg"
@@ -1023,15 +963,11 @@ msgstr "Totalt:"
 msgid "Translation Languages"
 msgstr "Oversettelsesspråk"
 
-#, fuzzy
-#| msgid "Translation Languages"
 msgid "Translation URL"
-msgstr "Oversettelsesspråk"
+msgstr "Oversettelses-URL"
 
-#, fuzzy
-#| msgid "Translation Languages"
 msgid "Translations"
-msgstr "Oversettelsesspråk"
+msgstr "Oversettelser"
 
 msgid "Try searching for something else"
 msgstr "Prøv å søke etter noe annet"
@@ -1064,7 +1000,7 @@ msgid "Updated Date"
 msgstr "Oppdatert dato"
 
 msgid "Upload Revision via:"
-msgstr ""
+msgstr "Last opp versjonen via:"
 
 msgid "URL"
 msgstr "URL"
@@ -1113,6 +1049,7 @@ msgstr "Ja"
 
 msgid "You are not allowed to impersonate someone else or another app."
 msgstr ""
+"Du har ikke lov til å gi deg ut for å være noen andre eller en annen app."
 
 msgid ""
 "You are only allowed to publish apps that you have permission to distribute."
