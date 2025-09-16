@@ -584,4 +584,71 @@ describe('Package', () => {
       assert.equal(rev2?.framework, 'ubuntu-sdk-20.04');
     });
   });
+
+  describe('video_url transformation', () => {
+    let pkg: TestPackage;
+    beforeEach(() => {
+      pkg = new Package({
+        id: 'app.id',
+        name: 'Test',
+        channels: [DEFAULT_CHANNEL],
+        architectures: [Architecture.ARMHF],
+        author: 'Author',
+        video_url: '',
+      });
+    });
+
+    test('transforms YouTube watch URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://www.youtube.com/watch?v=abcdefghijk&pp=oihergn' });
+      assert.equal(pkg.video_url, 'https://www.youtube.com/embed/abcdefghijk');
+    });
+
+    test('transforms YouTube short URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://youtu.be/abcdefghijk?si=oqneib' });
+      assert.equal(pkg.video_url, 'https://www.youtube.com/embed/abcdefghijk');
+    });
+
+    test('transforms YouTube embed URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://www.youtube.com/embed/abcdefghijk?si=oeagn' });
+      assert.equal(pkg.video_url, 'https://www.youtube.com/embed/abcdefghijk');
+    });
+
+    test('transforms Vimeo URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://vimeo.com/123456789?fl=wc' });
+      assert.equal(pkg.video_url, 'https://player.vimeo.com/video/123456789');
+    });
+
+    test('transforms Vimeo embed URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://player.vimeo.com/video/123456789?h=0984532' });
+      assert.equal(pkg.video_url, 'https://player.vimeo.com/video/123456789');
+    });
+
+    test('transforms PeerTube URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://peer.tube/w/abcdefghijk' });
+      assert.equal(pkg.video_url, 'https://peer.tube/videos/embed/abcdefghijk');
+    });
+
+    test('transforms PeerTube embed URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://peer.tube/videos/embed/abcdefghijk' });
+      assert.equal(pkg.video_url, 'https://peer.tube/videos/embed/abcdefghijk');
+    });
+
+    test('transforms Rumble embed URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://rumble.com/embed/v3abcd/?pub=4' });
+      assert.equal(pkg.video_url, 'https://rumble.com/embed/v3abcd/');
+    });
+
+    test('transforms Rumble normal URL', async () => {
+      await pkg.updateFromBody({ video_url: 'https://rumble.com/v3abcd-foo-bar.html?e9s=src_v1_asdf' });
+      assert.equal(pkg.video_url, 'https://rumble.com/embed/v3abcd/');
+    });
+
+    test('empty or invalid URL returns empty', async () => {
+      await pkg.updateFromBody({ video_url: '' });
+      assert.equal(pkg.video_url, '');
+
+      await pkg.updateFromBody({ video_url: 'https://notavideosite.com/xyz' });
+      assert.equal(pkg.video_url, '');
+    });
+  });
 });

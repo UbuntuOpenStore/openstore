@@ -100,6 +100,11 @@ Apps in the OpenStore track compatibility with:
 - `channel`: Ubuntu Touch OS version (xenial, focal, etc.)
 - `framework`: SDK version (ubuntu-sdk-16.04, ubuntu-sdk-20.04, etc.)
 
+### Testing
+
+- API test use node:test and supertest
+- Use existing tests as examples for new tests
+
 ## Key Files
 
 - `/packages/openstore-api/src/index.ts`: API entry point

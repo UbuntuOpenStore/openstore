@@ -36,8 +36,8 @@ async function revisionsByVersion(req: Request, res: Response) {
 
       const revisionData = pkg.revisions.filter((rev) => (
         rev.version === version &&
-                  rev.channel === channel &&
-                  (rev.architecture === architecture || rev.architecture === Architecture.ALL)
+        rev.channel === channel &&
+        (rev.architecture === architecture || rev.architecture === Architecture.ALL)
       ))[0];
       const revision = revisionData ? revisionData.revision : 0;
 

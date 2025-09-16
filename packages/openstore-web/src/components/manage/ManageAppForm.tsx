@@ -310,7 +310,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         </div>
 
         <p class="mt-1 text-xs text-gray-500 text-right">
-          Only YouTube videos are supported at this time. Make sure the url is for the embedded video!
+          Only YouTube, Vimeo, Rumble, and PeerTube videos are supported at this time.
         </p>
 
         <div class="form-group">

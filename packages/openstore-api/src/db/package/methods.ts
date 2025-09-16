@@ -207,6 +207,49 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.tagline = this.tagline ? this.tagline : sanitize(data.description);
   });
 
+  packageSchema.method<HydratedPackage>('updateVideoUrl', function (url: string) {
+    let embedUrl = '';
+    if (isURL(url)) {
+      if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);
+        if (ytMatch) {
+          embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+        }
+      }
+      else if (url.includes('vimeo.com')) {
+        const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        if (vimeoMatch) {
+          embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+        }
+      }
+      else if (url.match(/^https?:\/\/[^/]+\/w\/[\w-]+/)) {
+        // Peertube "watch" URLs, e.g. https://peer.tube/w/abcdefghijk
+        const peertubeMatch = url.match(/^(https?:\/\/[^/]+)\/w\/([\w-]+)/);
+        if (peertubeMatch) {
+          embedUrl = `${peertubeMatch[1]}/videos/embed/${peertubeMatch[2]}`;
+        }
+      }
+      else if (url.includes('/videos/embed/')) {
+        // Peertube already-embedded URL
+        embedUrl = url;
+      }
+      else if (url.includes('rumble.com/embed/')) {
+        const rumbleEmbedMatch = url.match(/rumble\.com\/embed\/(v[\w]+)/);
+        if (rumbleEmbedMatch) {
+          embedUrl = `https://rumble.com/embed/${rumbleEmbedMatch[1]}/`;
+        }
+      }
+      else if (url.includes('rumble.com')) {
+        const rumbleMatch = url.match(/rumble\.com\/(?:[\w-]+-)?(v[\w]+)-?/);
+        if (rumbleMatch) {
+          embedUrl = `https://rumble.com/embed/${rumbleMatch[1]}/`;
+        }
+      }
+    }
+
+    this.video_url = embedUrl;
+  });
+
   packageSchema.method<HydratedPackage>('updateFromBody', async function (body: BodyUpdate) {
     if (body.locked !== undefined) {
       this.locked = (body.locked === 'true' || body.locked === 'on' || body.locked === true);
@@ -262,18 +305,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.translation_url = (isURL(body.translation_url ?? '') || body.translation_url === '')
       ? body.translation_url
       : (this.translation_url ?? '');
-
-    if ((body.video_url && isURL(body.video_url)) || body.video_url === '') {
-      // TODO support regular urls and transform them into embedded urls
-      if (
-        body.video_url.indexOf('https://www.youtube.com/embed/') === 0
-      ) {
-        this.video_url = body.video_url;
-      }
-      else {
-        this.video_url = '';
-      }
-    }
+    this.updateVideoUrl(body.video_url ?? '');
 
     let updatedScreenshots: string[] = [];
     if (body.screenshots) {
@@ -566,32 +598,30 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [...downloads, ...this.architectures.map((arch) => {
-          if (!Object.values(Architecture).includes(arch)) {
-            return null; // Filter out unsupported arches like i386 (legacy apps)
-          }
-
-          const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-
-          if (downloadRevisionData) {
-            const download = {
-              ...downloadRevisionData.toObject(),
-              _id: undefined,
-              architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-              download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
-              installedSize: toBytes(downloadRevisionData.filesize),
-              downloadSize: downloadRevisionData.downloadSize ?? 0,
-
-              // TODO deprecate
-              filesize: toBytes(downloadRevisionData.filesize),
-            };
-
-            delete download._id;
-            return download;
-          }
-
-          return null;
-        })];
+        return [
+          ...downloads,
+          ...this.architectures.map((arch) => {
+            if (!Object.values(Architecture).includes(arch)) {
+              return null; // Filter out unsupported arches like i386 (legacy apps)
+            }
+            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+            if (downloadRevisionData) {
+              const download = {
+                ...downloadRevisionData.toObject(),
+                _id: undefined,
+                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                installedSize: toBytes(downloadRevisionData.filesize),
+                downloadSize: downloadRevisionData.downloadSize ?? 0,
+                // TODO deprecate
+                filesize: toBytes(downloadRevisionData.filesize),
+              };
+              delete download._id;
+              return download;
+            }
+            return null;
+          }),
+        ];
       }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
