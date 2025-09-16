@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import 'db'; // Make sure the database connection gets setup
-import { Package } from 'db/package';
-import { type IPackage } from 'db/package/types';
+import { Package } from '../db/package';
+import { type IPackage } from '../db/package/types';
 import { type FilterQuery } from 'mongoose';
 
 const query: FilterQuery<IPackage> = {};

@@ -9,9 +9,9 @@ import { Strategy as GitHubStrategy } from 'passport-github2';
 import { Strategy as GitLabStrategy } from 'passport-gitlab2';
 import { v4 } from 'uuid';
 import express, { type NextFunction, type Request, type Response } from 'express';
-import { type HydratedUser, User } from 'db/user';
+import { type HydratedUser, User } from '../db/user';
 
-import { logger, config, asyncErrorWrapper } from 'utils';
+import { logger, config, asyncErrorWrapper } from '../utils';
 
 // Passport doesn't seem to have nice types for the `done` callback
 export interface GenericCallback {

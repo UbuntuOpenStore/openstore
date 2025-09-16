@@ -1,7 +1,7 @@
 import 'db'; // Make sure the database connection gets setup
-import { packageSearchInstance } from 'db/package/search';
-import { type HydratedPackage, Package } from 'db/package';
-import { recalculatePackageRatings } from 'db/rating_count/utils';
+import { packageSearchInstance } from '../db/package/search';
+import { type HydratedPackage, Package } from '../db/package';
+import { recalculatePackageRatings } from '../db/rating_count/utils';
 
 Package.find({ published: true }).then((pkgs) => {
   return Promise.all(pkgs.map((pkg) => {

@@ -1,15 +1,15 @@
 import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from 'tests/utils';
-import factory, { type TestPackage } from 'tests/factory';
-import * as api from 'api';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
+import factory, { type TestPackage } from '../tests/factory';
+import * as api from '.';
 import { type App } from 'supertest/types';
 
 import path from 'node:path';
-import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL } from 'db/package/types';
-import { Package } from 'db/package/model';
-import * as messages from 'utils/error-messages';
+import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL } from '../db/package/types';
+import { Package } from '../db/package/model';
+import * as messages from '../utils/error-messages';
 
 describe('Apps API', () => {
   const route = '/api/v3/apps/';

@@ -1,19 +1,19 @@
 import { test, describe, beforeEach, before, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from 'tests/utils';
-import factory, { type TestPackage, type TestUser } from 'tests/factory';
-import * as api from 'api';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
+import factory, { type TestPackage, type TestUser } from '../tests/factory';
+import * as api from '.';
 import { type App } from 'supertest/types';
 
 import path from 'path';
-import { Package } from 'db/package';
-import { Architecture, Channel } from 'db/package/types';
-import { Lock } from 'db/lock';
-import * as reviewPackage from 'utils/review-package';
-import * as clickParser from 'utils/click-parser-async';
-import { packageSearchInstance } from 'db/package/search';
-import * as messages from 'utils/error-messages';
+import { Package } from '../db/package';
+import { Architecture, Channel } from '../db/package/types';
+import { Lock } from '../db/lock';
+import * as reviewPackage from '../utils/review-package';
+import * as clickParser from '../utils/click-parser-async';
+import { packageSearchInstance } from '../db/package/search';
+import * as messages from '../utils/error-messages';
 
 const GOOD_REVIEW = { manualReviewMessages: [], errorMessages: [], warningMessages: [] };
 const MANUAL_REVIEW = {

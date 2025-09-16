@@ -2,14 +2,14 @@
 import shuffle from 'shuffle-array';
 import express, { type Request, type Response } from 'express';
 
-import { Package } from 'db/package';
-import { Architecture, type Channel, PackageType } from 'db/package/types';
-import { RatingCount } from 'db/rating_count';
-import { success, getData, getDataArray, setLang, gettext, config, asyncErrorWrapper } from 'utils';
-import { serializeRatings } from 'db/package/methods';
+import { Package } from '../db/package';
+import { Architecture, type Channel, PackageType } from '../db/package/types';
+import { RatingCount } from '../db/rating_count';
+import { success, getData, getDataArray, setLang, gettext, config, asyncErrorWrapper } from '../utils';
+import { serializeRatings } from '../db/package/methods';
 import discoverJSON from './json/discover_apps.json';
 import { type DiscoverHighlight, type DiscoverData } from './types';
-import { handleChannel } from 'utils/channels';
+import { handleChannel } from '../utils/channels';
 
 const router = express.Router();
 

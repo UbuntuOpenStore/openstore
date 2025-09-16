@@ -1,9 +1,9 @@
 import express, { type Request, type Response } from 'express';
 
-import { Package } from 'db/package';
-import { setLang, gettext, config, success, getData, asyncErrorWrapper } from 'utils';
+import { Package } from '../db/package';
+import { setLang, gettext, config, success, getData, asyncErrorWrapper } from '../utils';
 import categoryIcons from './json/category_icons.json';
-import { handleChannel } from 'utils/channels';
+import { handleChannel } from '../utils/channels';
 
 const categoryNames = Object.keys(categoryIcons);
 const router = express.Router();

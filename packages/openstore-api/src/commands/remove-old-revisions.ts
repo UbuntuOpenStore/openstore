@@ -3,9 +3,9 @@ import fs from 'fs';
 import path from 'path';
 
 import 'db'; // Make sure the database connection gets setup
-import { Architecture, Channel } from 'db/package/types';
-import { Package } from 'db/package';
-import { config } from 'utils';
+import { Architecture, Channel } from '../db/package/types';
+import { Package } from '../db/package';
+import { config } from '../utils';
 import limitedApps from './limited-apps.json';
 
 const MAX_REVISIONS = 3;

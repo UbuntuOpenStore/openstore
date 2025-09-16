@@ -1,11 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 import express, { type Request, type Response } from 'express';
 
-import 'db/comment';
-import { error, success, apiLinks, asyncErrorWrapper } from 'utils';
-import { Review, RATINGS, REVIEW_MAX_LEN } from 'db/review';
-import { authenticate, anonymousAuthenticate, userRole, fetchPublishedPackage } from 'middleware';
-import { recalculatePackageRatings } from 'db/rating_count/utils';
+import '../db/comment';
+import { error, success, apiLinks, asyncErrorWrapper } from '../utils';
+import { Review, RATINGS, REVIEW_MAX_LEN } from '../db/review';
+import { authenticate, anonymousAuthenticate, userRole, fetchPublishedPackage } from '../middleware';
+import { recalculatePackageRatings } from '../db/rating_count/utils';
 import {
   PARAMETER_MISSING,
   REVIEW_TOO_LONG,

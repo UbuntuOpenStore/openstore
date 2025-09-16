@@ -1,4 +1,4 @@
-import { type SerializedPackage } from 'db/package/types';
+import { type SerializedPackage } from '../db/package/types';
 
 export type DiscoverHighlight = {
   id: string;

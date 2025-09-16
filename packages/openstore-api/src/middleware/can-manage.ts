@@ -1,6 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
-import { error } from 'utils';
-import { APP_LOCKED, PERMISSION_DENIED } from 'utils/error-messages';
+import { error } from '../utils';
+import { APP_LOCKED, PERMISSION_DENIED } from '../utils/error-messages';
 
 export function canManage(req: Request, res: Response, next: NextFunction) {
   if (!req.isAdminUser && req.user!._id.toString() !== req.pkg.maintainer) {

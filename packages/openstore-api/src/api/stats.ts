@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
-import { success } from 'utils';
-import { Package } from 'db/package';
+import { success } from '../utils';
+import { Package } from '../db/package';
 
 const router = express.Router();
 

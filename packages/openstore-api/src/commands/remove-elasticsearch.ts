@@ -1,4 +1,4 @@
-import { packageSearchInstance } from 'db/package/search';
+import { packageSearchInstance } from '../db/package/search';
 
 packageSearchInstance.removeIndex().then(() => {
   console.log('done');

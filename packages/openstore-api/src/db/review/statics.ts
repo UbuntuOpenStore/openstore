@@ -3,11 +3,11 @@
 import { type FilterQuery, type Schema } from 'mongoose';
 import { type Request } from 'express';
 
-import { UserError } from 'exceptions';
-import { REVIEW_REDACTED } from 'utils/error-messages';
-import { getDataInt } from 'utils';
-import { type HydratedUser } from 'db/user';
-import { type HydratedPackage } from 'db/package';
+import { UserError } from '../../exceptions';
+import { REVIEW_REDACTED } from '../../utils/error-messages';
+import { getDataInt } from '../../utils';
+import { type HydratedUser } from '../user/types';
+import { type HydratedPackage } from '../package/types';
 import { type HydratedReview, type IReview, type IReviewMethods, type ReviewModel, type ReviewRequestFilters } from './types';
 import { type Ratings } from './constants';
 

@@ -1,6 +1,6 @@
 import elasticsearch from '@elastic/elasticsearch';
 
-import { config } from 'utils';
+import { config } from '../../utils';
 import { type HydratedPackage, type IPackage, type PackageRequestFilters } from './types';
 
 // Modified from https://github.com/bhdouglass/uappexplorer/blob/master/src/db/elasticsearch/elasticsearch.js

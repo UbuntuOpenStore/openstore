@@ -1,5 +1,5 @@
 import childProcess from 'child_process';
-import { UserError } from 'exceptions';
+import { UserError } from '../exceptions';
 
 import { config } from './config';
 import { captureException } from './logger';

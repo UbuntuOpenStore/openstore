@@ -1,8 +1,8 @@
 import RSS from 'rss';
 import express, { type Request, type Response } from 'express';
 
-import { Package } from 'db/package';
-import { logger, config, error, captureException, titleCase } from 'utils';
+import { Package } from '../db/package';
+import { logger, config, error, captureException, titleCase } from '../utils';
 
 const router = express.Router();
 

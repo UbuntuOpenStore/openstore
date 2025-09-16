@@ -1,8 +1,8 @@
 import passport from 'passport';
 import { type Request, type Response, type NextFunction } from 'express';
 
-import { error } from 'utils';
-import { type HydratedUser } from 'db/user';
+import { error } from '../utils';
+import { type HydratedUser } from '../db/user';
 
 export function userRole(req: Request, res: Response, next: NextFunction) {
   req.isAdminUser = (req.isAuthenticated() && req.user && req.user.role === 'admin');

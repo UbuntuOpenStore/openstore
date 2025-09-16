@@ -1,8 +1,8 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
-import { closeMongoose, waitForMongoose } from 'tests/utils';
-import * as api from 'api';
+import { closeMongoose, waitForMongoose } from './utils';
+import * as api from '../api';
 import { type App } from 'supertest/types';
 
 import axios from 'axios';

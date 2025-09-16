@@ -1,15 +1,15 @@
 import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from 'tests/utils';
-import factory, { type TestUser, type TestPackage } from 'tests/factory';
-import * as api from 'api';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
+import factory, { type TestUser, type TestPackage } from '../tests/factory';
+import * as api from '.';
 import { type App } from 'supertest/types';
 
 import path from 'path';
-import { Package } from 'db/package';
-import { packageSearchInstance } from 'db/package/search';
-import * as messages from 'utils/error-messages';
+import { Package } from '../db/package';
+import { packageSearchInstance } from '../db/package/search';
+import * as messages from '../utils/error-messages';
 
 describe('Manage', () => {
   let app: App;

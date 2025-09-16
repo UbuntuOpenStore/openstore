@@ -1,7 +1,7 @@
 import { type NextFunction, type Request, type RequestHandler, type Response } from 'express';
 
-import { HttpError } from 'exceptions';
-import { captureException, error } from 'utils';
+import { HttpError } from '../exceptions';
+import { captureException, error } from '.';
 
 export function asyncErrorWrapper(fn: RequestHandler, errorMessage: string = 'An unknown error happened.') {
   return async function (req: Request, res: Response, next: NextFunction) {

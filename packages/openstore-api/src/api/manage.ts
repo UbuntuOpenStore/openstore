@@ -3,11 +3,20 @@ import express, { type Request, type Response } from 'express';
 
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
-import { type HydratedLock, Lock } from 'db/lock';
-import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from 'db/package';
-import { packageSearchInstance } from 'db/package/search';
-import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from 'utils';
-import { authenticate, userRole, downloadFile, extendTimeout, fetchPackage, canManage, canManageLocked, maintenanceMode } from 'middleware';
+import { type HydratedLock, Lock } from '../db/lock';
+import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from '../db/package';
+import { packageSearchInstance } from '../db/package/search';
+import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
+import {
+  authenticate,
+  userRole,
+  downloadFile,
+  extendTimeout,
+  fetchPackage,
+  canManage,
+  canManageLocked,
+  maintenanceMode,
+} from '../middleware';
 import {
   APP_NOT_FOUND,
   PERMISSION_DENIED,
@@ -21,10 +30,10 @@ import {
   NEEDS_MANUAL_REVIEW,
   CLICK_REVIEW_ERROR,
   INVALID_CHANNEL,
-} from 'utils/error-messages';
-import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from 'exceptions';
-import { clickReview } from 'utils/review-package';
-import { handleChannel } from 'utils/channels';
+} from '../utils/error-messages';
+import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
+import { clickReview } from '../utils/review-package';
+import { handleChannel } from '../utils/channels';
 
 const mupload = multer({ dest: '/tmp' });
 const router = express.Router();

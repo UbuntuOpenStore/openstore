@@ -1,11 +1,11 @@
 import express, { type Request, type Response } from 'express';
 
-import { Package } from 'db/package';
-import { Architecture, type Channel } from 'db/package/types';
-import { getDataArray, getData, success, asyncErrorWrapper } from 'utils';
-import { INVALID_ARCH } from 'utils/error-messages';
-import { UserError } from 'exceptions';
-import { handleChannel } from 'utils/channels';
+import { Package } from '../db/package';
+import { Architecture, type Channel } from '../db/package/types';
+import { getDataArray, getData, success, asyncErrorWrapper } from '../utils';
+import { INVALID_ARCH } from '../utils/error-messages';
+import { UserError } from '../exceptions';
+import { handleChannel } from '../utils/channels';
 
 const router = express.Router();
 

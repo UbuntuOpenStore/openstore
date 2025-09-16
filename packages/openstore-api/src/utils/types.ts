@@ -1,4 +1,4 @@
-import { type Architecture, type PackageType } from 'db/package/types';
+import { type Architecture, type PackageType } from '../db/package/types';
 
 export type ClickParserApp = {
   name: string;

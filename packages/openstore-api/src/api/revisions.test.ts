@@ -1,13 +1,13 @@
 import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from 'tests/utils';
-import factory, { type TestPackage } from 'tests/factory';
-import * as api from 'api';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
+import factory, { type TestPackage } from '../tests/factory';
+import * as api from '.';
 import { type App } from 'supertest/types';
 
-import { Package } from 'db/package';
-import { Architecture, Channel, type HydratedRevision } from 'db/package/types';
+import { Package } from '../db/package';
+import { Architecture, Channel, type HydratedRevision } from '../db/package/types';
 
 describe('Revisions GET', () => {
   const route = '/api/v3/revisions';

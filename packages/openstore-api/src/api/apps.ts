@@ -2,14 +2,14 @@ import express, { type Request, type Response } from 'express';
 
 import fsPromise from 'fs/promises';
 import fs from 'fs';
-import { Architecture, type HydratedPackage } from 'db/package/types';
-import { Package } from 'db/package';
-import { success, getData, apiLinks, asyncErrorWrapper, getDataArray, getDataBoolean } from 'utils';
-import { fetchPublishedPackage } from 'middleware';
-import { NotFoundError, UserError } from 'exceptions';
+import { Architecture, type HydratedPackage } from '../db/package/types';
+import { Package } from '../db/package';
+import { success, getData, apiLinks, asyncErrorWrapper, getDataArray, getDataBoolean } from '../utils';
+import { fetchPublishedPackage } from '../middleware';
+import { NotFoundError, UserError } from '../exceptions';
 import reviews from './reviews';
 import { DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH } from '../utils/error-messages';
-import { handleChannel } from 'utils/channels';
+import { handleChannel } from '../utils/channels';
 
 const router = express.Router();
 

@@ -1,9 +1,9 @@
 import express, { type Request, type Response } from 'express';
 
-import { User } from 'db/user';
-import { success, asyncErrorWrapper } from 'utils';
-import { authenticate, adminOnly } from 'middleware';
-import { NotFoundError } from 'exceptions';
+import { User } from '../db/user';
+import { success, asyncErrorWrapper } from '../utils';
+import { authenticate, adminOnly } from '../middleware';
+import { NotFoundError } from '../exceptions';
 import { USER_NOT_FOUND } from '../utils/error-messages';
 
 const router = express.Router();

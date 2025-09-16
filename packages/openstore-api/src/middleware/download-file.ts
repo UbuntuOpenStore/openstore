@@ -3,7 +3,7 @@ import { type Request, type Response, type NextFunction } from 'express';
 import fs from 'fs';
 import axios from 'axios';
 
-import { error, config, captureException } from 'utils';
+import { error, config, captureException } from '../utils';
 
 export async function downloadFile(req: Request, res: Response, next: NextFunction) {
   if (!req.file && req.body && req.body.downloadUrl) {

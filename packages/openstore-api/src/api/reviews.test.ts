@@ -1,16 +1,16 @@
 import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from 'tests/utils';
-import factory, { type TestPackage, type TestUser } from 'tests/factory';
-import * as api from 'api';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
+import factory, { type TestPackage, type TestUser } from '../tests/factory';
+import * as api from '.';
 import { type App } from 'supertest/types';
 
-import { Package } from 'db/package';
-import { Review } from 'db/review';
-import { recalculatePackageRatings } from 'db/rating_count/utils';
-import { Architecture, Channel } from 'db/package/types';
-import * as messages from 'utils/error-messages';
+import { Package } from '../db/package';
+import { Review } from '../db/review';
+import { recalculatePackageRatings } from '../db/rating_count/utils';
+import { Architecture, Channel } from '../db/package/types';
+import * as messages from '../utils/error-messages';
 
 describe('Reviews', () => {
   let route: string;
@@ -126,12 +126,16 @@ describe('Reviews', () => {
       await recalculatePackageRatings(package1._id);
 
       let pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');
-      let checkRatings = pkg!.rating_counts.reduce((accumulator, count) => {
-        return {
-          ...accumulator,
-          [count.name]: count.count,
-        };
-      }, {});
+      let checkRatings: Record<string, number> = {};
+      if (pkg && pkg.rating_counts) {
+        const initial: Record<string, number> = {};
+        checkRatings = pkg.rating_counts.reduce((accumulator, count) => {
+          return {
+            ...accumulator,
+            [count.name]: count.count,
+          };
+        }, initial);
+      }
       assert.deepEqual(checkRatings, { THUMBS_UP: 0, THUMBS_DOWN: 1, HAPPY: 1, NEUTRAL: 1, BUGGY: 0 });
 
       const res = await request(app).put(route)
@@ -153,12 +157,16 @@ describe('Reviews', () => {
       assert.equal(review?.user.toString(), user1._id.toString());
 
       pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');
-      checkRatings = pkg!.rating_counts.reduce((accumulator, count) => {
-        return {
-          ...accumulator,
-          [count.name]: count.count,
-        };
-      }, {});
+      checkRatings = {};
+      if (pkg && pkg.rating_counts) {
+        const initial: Record<string, number> = {};
+        checkRatings = pkg.rating_counts.reduce((accumulator, count) => {
+          return {
+            ...accumulator,
+            [count.name]: count.count,
+          };
+        }, initial);
+      }
       assert.deepEqual(checkRatings, { THUMBS_UP: 1, THUMBS_DOWN: 0, HAPPY: 1, NEUTRAL: 1, BUGGY: 0 });
     });
 

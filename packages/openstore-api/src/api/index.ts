@@ -7,7 +7,7 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import cluster from 'cluster';
 import * as Sentry from '@sentry/node';
 
-import { logger, config, success, error } from 'utils';
+import { logger, config, success, error } from '../utils';
 import apps from './apps';
 import stats from './stats';
 import manage from './manage';

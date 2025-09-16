@@ -1,12 +1,12 @@
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { Ratings } from 'db/review';
-import { UserError } from 'exceptions';
 import { Package } from '.';
 import { Architecture, Channel, PackageType, DEFAULT_CHANNEL, ChannelArchitecture } from './types';
 import { serializeRatings } from './methods';
-import { type TestPackage } from 'tests/factory';
+import { Ratings } from '../review/constants';
+import { UserError } from '../../exceptions';
+import { type TestPackage } from '../../tests/factory';
 
 describe('Package', () => {
   describe('parseRequestFilters', () => {

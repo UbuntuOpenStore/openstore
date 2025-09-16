@@ -1,7 +1,7 @@
 import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
 import { type Request } from 'express';
 
-import { type HydratedUser } from 'db/user';
+import { type HydratedUser } from '../user/types';
 import { type HydratedPackage } from '../package/types';
 import { type Ratings } from './constants';
 

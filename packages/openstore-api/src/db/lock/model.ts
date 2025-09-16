@@ -3,7 +3,7 @@ import { sleep } from 'sleepjs';
 import { type Request } from 'express';
 import { Schema, model } from 'mongoose';
 
-import { logger, captureException } from 'utils';
+import { logger, captureException } from '../../utils';
 import { type HydratedLock, type ILock, type LockModel } from './types';
 
 const TIMEOUT = 30 * 1000; // 30s in ms

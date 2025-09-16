@@ -4,9 +4,9 @@ import { type FilterQuery, type Schema, type Types } from 'mongoose';
 import uniq from 'lodash/uniq';
 import { type Request } from 'express';
 
-import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from 'utils';
-import { UserError } from 'exceptions';
-import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH } from 'utils/error-messages';
+import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from '../../utils';
+import { UserError } from '../../exceptions';
+import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH } from '../../utils/error-messages';
 import {
   Architecture,
   type PackageRequestFilters,
@@ -22,7 +22,7 @@ import {
 } from './types';
 import { packageSearchInstance } from './search';
 import { RatingCount } from '../rating_count/model';
-import { handleChannel } from 'utils/channels';
+import { handleChannel } from '../../utils/channels';
 
 export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPackageMethods>) {
   packageSchema.statics.incrementDownload = async function (id: Types.ObjectId, revisionIndex: number) {

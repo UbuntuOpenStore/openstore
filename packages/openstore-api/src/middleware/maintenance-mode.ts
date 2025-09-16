@@ -1,6 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
 
-import { error } from 'utils';
+import { error } from '../utils';
 
 export function maintenanceMode(req: Request, res: Response, next: NextFunction) {
   if (process.env.OPENSTORE_MAINTENANCE_MODE) {

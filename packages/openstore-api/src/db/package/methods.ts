@@ -4,8 +4,8 @@ import { type Schema } from 'mongoose';
 import path from 'path';
 import fs from 'fs/promises';
 
-import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from 'utils';
-import { type HydratedRatingCount } from 'db/rating_count/types';
+import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
+import { type HydratedRatingCount } from '../rating_count/types';
 import { v4 } from 'uuid';
 import {
   EXISTING_VERSION,
@@ -17,9 +17,9 @@ import {
   NO_NON_ALL,
   NON_ASCENDING_VERSION,
   WRONG_PACKAGE,
-} from 'utils/error-messages';
-import { UserError } from 'exceptions';
-import * as clickParser from 'utils/click-parser-async';
+} from '../../utils/error-messages';
+import { UserError } from '../../exceptions';
+import * as clickParser from '../../utils/click-parser-async';
 import { isURL } from 'class-validator';
 import { difference, omit } from 'lodash';
 import {
@@ -40,7 +40,7 @@ import {
   type HydratedRevision,
 } from './types';
 import { User } from '../user';
-import { compareVersions, isValidVersion } from 'utils/dpkg-compare-versions';
+import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 
 /*
   The filesize is stored in kilobytes (from the click package

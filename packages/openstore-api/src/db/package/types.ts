@@ -1,7 +1,7 @@
 import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
 import { type Request } from 'express';
 
-import { type ClickParserData } from 'utils';
+import { type ClickParserData } from '../../utils';
 import { type HydratedRatingCount } from '../rating_count/types';
 
 export enum PackageType {

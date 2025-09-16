@@ -3,7 +3,7 @@
 import { type Schema } from 'mongoose';
 import path from 'path';
 
-import { config } from 'utils';
+import { config } from '../../utils';
 import { DEFAULT_CHANNEL, type HydratedPackage, type IPackage, type IPackageMethods, type PackageModel } from './types';
 
 const DEFAULT_VERSION = '0.0.0';
