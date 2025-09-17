@@ -29,3 +29,5 @@ export class ClickReviewError extends UserError {
     this.reasons = reasons;
   }
 }
+
+export class ValidationError extends UserError { }

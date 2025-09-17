@@ -720,7 +720,7 @@ describe('Manage', () => {
             support_url: 'https://example.com/',
             donate_url: 'https://example.com/',
             translation_url: 'https://example.com/',
-            video_url: 'https://www.youtube.com/embed/example',
+            video_url: 'https://www.youtube.com/embed/abcdefghijk',
           })
           .expect(200);
 

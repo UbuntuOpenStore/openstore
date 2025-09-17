@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { type IUser, type IUserMethods, type UserModel } from './types';
+import { type IUser, type IUserMethods, type UserModel, type ProfileUpdateData } from './types';
+import { ValidationError } from '../../exceptions';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   apikey: String,
@@ -11,17 +12,69 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   github_id: String,
   gitlab_id: String,
   username: String,
+  website_url: String,
+  github_profile_url: String,
+  gitlab_profile_url: String,
+  ubports_forum_username: String,
+  donation_url: String,
+  avatar: String,
+  description: { type: String, maxlength: 200 },
 });
 
-userSchema.method('serialize', function () {
-  return {
+userSchema.method('serialize', function (includeRole: boolean, includeApiKey: boolean) {
+  const userData: Record<string, any> = {
     _id: this._id,
     email: this.email,
     name: this.name ? this.name : this.username,
-    role: this.role ? this.role : 'community',
     username: this.username,
     language: this.language,
+    website_url: this.website_url,
+    github_profile_url: this.github_profile_url,
+    gitlab_profile_url: this.gitlab_profile_url,
+    ubports_forum_username: this.ubports_forum_username,
+    donation_url: this.donation_url,
+    avatar: this.avatar,
+    description: this.description,
   };
+
+  if (includeRole) {
+    userData.role = this.role ? this.role : 'community';
+  }
+
+  if (includeApiKey) {
+    userData.apikey = this.apikey;
+  }
+
+  return userData;
+});
+
+userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAdmin: boolean) {
+  // Only admins can update the role
+  if (isAdmin && data.role !== undefined) {
+    this.role = data.role;
+  }
+
+  const allowedFields: Array<keyof ProfileUpdateData> = [
+    'website_url',
+    'github_profile_url',
+    'gitlab_profile_url',
+    'ubports_forum_username',
+    'donation_url',
+    'description',
+    'avatar',
+  ];
+
+  if (data.description && data.description.length > 200) {
+    throw new ValidationError('Description must be 200 characters or less');
+  }
+
+  for (const field of allowedFields) {
+    if (field in data && data[field] !== undefined) {
+      this[field] = data[field];
+    }
+  }
+
+  await this.save();
 });
 
 export const User = model<IUser, UserModel>('User', userSchema);

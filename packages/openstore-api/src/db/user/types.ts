@@ -10,10 +10,33 @@ export interface IUser {
   github_id?: string;
   gitlab_id?: string;
   username: string;
+  website_url?: string;
+  github_profile_url?: string;
+  gitlab_profile_url?: string;
+  ubports_forum_username?: string;
+  donation_url?: string;
+  avatar?: string;
+  description?: string;
+}
+
+export type ProfileUpdateData = Pick<IUser,
+  'website_url' |
+  'github_profile_url' |
+  'gitlab_profile_url' |
+  'ubports_forum_username' |
+  'donation_url' |
+  'description' |
+  'avatar' |
+  'role'
+>;
+
+export interface UserSerializeOutput extends Omit<IUser, 'apikey'> {
+  apikey?: string;
 }
 
 export interface IUserMethods {
-  serialize: () => IUser;
+  serialize: (includeRole: boolean, includeApiKey: boolean) => UserSerializeOutput;
+  updateProfile: (data: ProfileUpdateData, isAdmin: boolean) => Promise<void>;
 }
 
 export type HydratedUser = HydratedDocument<IUser, IUserMethods>;
