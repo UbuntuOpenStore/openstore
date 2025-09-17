@@ -8,6 +8,7 @@ const UserCache = defineTable({
     name: column.text(),
     username: column.text(),
     expiresAt: column.date(),
+    avatar: column.text({ optional: true }),
   }
 });
 

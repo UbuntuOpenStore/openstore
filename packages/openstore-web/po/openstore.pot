@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-09-16T03:23:42.020Z\n"
-"PO-Revision-Date: 2025-09-16T03:23:42.020Z\n"
+"POT-Creation-Date: 2025-09-17T18:32:23.387Z\n"
+"PO-Revision-Date: 2025-09-17T18:32:23.387Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -44,8 +44,11 @@ msgstr "Categories"
 msgid "About"
 msgstr "About"
 
-msgid "Manage"
-msgstr "Manage"
+msgid "Profile"
+msgstr "Profile"
+
+msgid "Manage Apps"
+msgstr "Manage Apps"
 
 msgid "Logout"
 msgstr "Logout"
@@ -537,6 +540,69 @@ msgstr "Login via GitLab"
 
 msgid "Login via Ubuntu One"
 msgstr "Login via Ubuntu One"
+
+msgid "Manage your OpenStore profile information"
+msgstr "Manage your OpenStore profile information"
+
+msgid "An error occurred while saving your profile"
+msgstr "An error occurred while saving your profile"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Username cannot be changed"
+msgstr "Username cannot be changed"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Email is managed by your login provider"
+msgstr "Email is managed by your login provider"
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Upload new avatar"
+msgstr "Upload new avatar"
+
+msgid "Profile picture"
+msgstr "Profile picture"
+
+msgid "JPG or PNG, max 2MB"
+msgstr "JPG or PNG, max 2MB"
+
+msgid "Biography"
+msgstr "Biography"
+
+msgid "Short bio"
+msgstr "Short bio"
+
+msgid "Maximum 200 characters"
+msgstr "Maximum 200 characters"
+
+msgid "Contact Links"
+msgstr "Contact Links"
+
+msgid "Website URL"
+msgstr "Website URL"
+
+msgid "GitHub Profile URL"
+msgstr "GitHub Profile URL"
+
+msgid "GitLab Profile URL"
+msgstr "GitLab Profile URL"
+
+msgid "UBports Forum Username"
+msgstr "UBports Forum Username"
+
+msgid "Donation URL"
+msgstr "Donation URL"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Save"
+msgstr "Save"
 
 msgid "Submit Your App to the OpenStore"
 msgstr "Submit Your App to the OpenStore"

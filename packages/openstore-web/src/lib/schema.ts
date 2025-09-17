@@ -180,6 +180,13 @@ export const UserSchema = z.object({
   language: z.string().optional(),
   username: z.string(),
   role: z.string().optional(),
+  website_url: z.string().optional(),
+  github_profile_url: z.string().optional(),
+  gitlab_profile_url: z.string().optional(),
+  ubports_forum_username: z.string().optional(),
+  donation_url: z.string().optional(),
+  avatar: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export type UserData = z.infer<typeof UserSchema>;

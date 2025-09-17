@@ -23,5 +23,6 @@ services:
       - ./docker/proxy.conf:/etc/nginx/conf.d/default.conf
       - ./.data/icons:/srv/openstore-icons
       - ./.data/screenshots:/srv/openstore-screenshots
+      - ./.data/avatars:/srv/openstore-avatars
     extra_hosts:
       - "host.docker.internal:host-gateway"

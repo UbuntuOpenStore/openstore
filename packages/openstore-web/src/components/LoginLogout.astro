@@ -2,22 +2,34 @@
 import { getRelativeLocaleUrl } from "@/lib/utils";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
+import { getUser } from "@/lib/user";
+import UserMenu from "./UserMenu";
 
 await initializeI18N(Astro.currentLocale);
 
 const apikey = Astro.cookies.get("apikey")?.value;
+const user = apikey ? await getUser(apikey) : undefined;
 ---
 
-{apikey ? (
-  <li>
-    <a class="header-link" href="/manage/">{t("Manage")}</a>
-  </li>
-
-  <li>
-    <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/logout/")}>{t("Logout")}</a>
-  </li>
-) : (
-  <li>
-    <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/login/")}>{t("Login")}</a>
-  </li>
-)}
+{
+  user ? (
+    <li class="flex items-center w-full md:w-auto justify-start">
+      <UserMenu
+        user={user}
+        currentLocale={Astro.currentLocale}
+        messages={{
+          profile: t("Profile"),
+          manageApps: t("Manage Apps"),
+          logout: t("Logout"),
+        }}
+        client:only="preact"
+      />
+    </li>
+  ) : (
+    <li>
+      <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/login/")}>
+        {t("Login")}
+      </a>
+    </li>
+  )
+}

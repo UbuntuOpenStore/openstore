@@ -1,0 +1,67 @@
+---
+import Loading from "@/components/Loading";
+import ProfileForm from "@/components/manage/ProfileForm";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getUser, invalidateUserCache } from "@/lib/user";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
+
+export const prerender = false;
+
+const apikey = Astro.cookies.get("apikey")?.value;
+if (!apikey) {
+  return Astro.redirect("/login/");
+}
+
+const user = await getUser(apikey, false);
+if (!user) {
+  Astro.cookies.delete("apikey");
+  return Astro.redirect("/login/");
+}
+
+// Invalidate the user cache in case the user will update their profile, the actual update occurs on the client instead of the server
+// so we need to make sure we don't serve stale data from the cache on the next request
+await invalidateUserCache(apikey);
+
+await initializeI18N(Astro.currentLocale);
+---
+
+<BaseLayout
+  title={`${t("Profile")} | OpenStore`}
+  pageTitle={t("Profile")}
+  description={t("Manage your OpenStore profile information")}
+  schema={undefined}
+>
+  <section class="section">
+    <h1 class="text-4xl">{t("Profile")}</h1>
+  </section>
+
+  <ProfileForm
+    user={user}
+    messages={{
+      errorOccurred: t("An error occurred while saving your profile"),
+      username: t("Username"),
+      usernameCannotBeChanged: t("Username cannot be changed"),
+      email: t("Email"),
+      emailManagedByProvider: t("Email is managed by your login provider"),
+      avatar: t("Avatar"),
+      uploadNewAvatar: t("Upload new avatar"),
+      profilePicture: t("Profile picture"),
+      imageFileTypes: t("JPG or PNG, max 2MB"),
+      biography: t("Biography"),
+      shortBio: t("Short bio"),
+      maximumChars: t("Maximum 200 characters"),
+      contactLinks: t("Contact Links"),
+      websiteURL: t("Website URL"),
+      githubProfileURL: t("GitHub Profile URL"),
+      gitlabProfileURL: t("GitLab Profile URL"),
+      ubportsForumUsername: t("UBports Forum Username"),
+      donationURL: t("Donation URL"),
+      saving: t("Saving..."),
+      save: t("Save"),
+    }}
+    client:only="preact"
+  >
+    <Loading slot="fallback" />
+  </ProfileForm>
+</BaseLayout>

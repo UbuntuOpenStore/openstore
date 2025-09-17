@@ -12,7 +12,7 @@ import { USER_NOT_FOUND } from '../utils/error-messages';
 
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, config.screenshot_dir);
+    cb(null, config.avatar_dir);
   },
   filename: (req, file, cb) => {
     const uniqueName = uuidv4();

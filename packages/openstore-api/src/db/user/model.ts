@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { type IUser, type IUserMethods, type UserModel, type ProfileUpdateData } from './types';
 import { ValidationError } from '../../exceptions';
+import { config } from '../../utils/config';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   apikey: String,
@@ -33,7 +34,7 @@ userSchema.method('serialize', function (includeRole: boolean, includeApiKey: bo
     gitlab_profile_url: this.gitlab_profile_url,
     ubports_forum_username: this.ubports_forum_username,
     donation_url: this.donation_url,
-    avatar: this.avatar,
+    avatar: this.avatar ? `${config.server.host}/avatars/${this.avatar}` : undefined,
     description: this.description,
   };
 
