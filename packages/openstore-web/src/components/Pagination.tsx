@@ -31,10 +31,10 @@ const Pagination = ({ currentPage, totalPages, onPageChanged, messages }: Props)
       {currentPage >= 2 && (<button class="pagination-btn" title={buttonTitle(currentPage - 2)} onClick={() => onPageChanged(currentPage - 2)}>{formatPage(currentPage - 2)}</button>)}
       {currentPage >= 1 && (<button class="pagination-btn" title={buttonTitle(currentPage - 1)} onClick={() => onPageChanged(currentPage - 1)}>{formatPage(currentPage - 1)}</button>)}
       <button class="pagination-btn bg-white text-black" title={buttonTitle(currentPage)} onClick={() => onPageChanged(currentPage)}>{formatPage(currentPage)}</button>
-      {currentPage >= 0 && (totalPages - currentPage) >= 1 && (<button class="pagination-btn" title={buttonTitle(currentPage + 1)} onClick={() => onPageChanged(currentPage + 1)}>{formatPage(currentPage + 1)}</button>)}
-      {currentPage >= 0 && (totalPages - currentPage) >= 2 && (<button class="pagination-btn" title={buttonTitle(currentPage + 2)} onClick={() => onPageChanged(currentPage + 2)}>{formatPage(currentPage + 2)}</button>)}
+      {currentPage >= 0 && (totalPages - currentPage) > 1 && (<button class="pagination-btn" title={buttonTitle(currentPage + 1)} onClick={() => onPageChanged(currentPage + 1)}>{formatPage(currentPage + 1)}</button>)}
+      {currentPage >= 0 && (totalPages - currentPage) > 2 && (<button class="pagination-btn" title={buttonTitle(currentPage + 2)} onClick={() => onPageChanged(currentPage + 2)}>{formatPage(currentPage + 2)}</button>)}
 
-      {currentPage >= 0 && (totalPages - currentPage) >= 3 && (<span class="text-gray-600 mt-1">...</span>)}
+      {currentPage >= 0 && (totalPages - currentPage) > 3 && (<span class="text-gray-600 mt-1">...</span>)}
 
       <button disabled={currentPage >= totalPages} class={`${currentPage >= totalPages ? 'text-gray-400' : 'cursor-pointer'}`} onClick={() => onPageChanged(currentPage + 1)} title={messages.next}>
         <SvgGoNext />

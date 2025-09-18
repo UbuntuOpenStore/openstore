@@ -151,7 +151,7 @@ const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) 
       const search = AppSearchSchema.parse(data);
 
       setApps(search.packages);
-      setTotalPages(Math.ceil(data.count / PAGE_SIZE) - 1);
+      setTotalPages(Math.ceil(data.count / PAGE_SIZE));
     }
     catch (err) {
       console.error(err);
