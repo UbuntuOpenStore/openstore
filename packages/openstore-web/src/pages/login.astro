@@ -40,7 +40,7 @@ const next = `${import.meta.env.SITE}manage/`;
       </a>
 
       <form action={`${import.meta.env.PUBLIC_API_URL}auth/ubuntu?next=${next}`} method="post">
-        <button class="btn w-full bg-ubuntu-orange text-white font-bold">
+        <button class="btn w-full bg-ubuntu-orange text-white font-bold cursor-pointer">
           <SvgUbuntuone class="pr-2" />
           {t("Login via Ubuntu One")}
         </button>
