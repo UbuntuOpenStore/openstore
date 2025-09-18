@@ -20,14 +20,14 @@ export interface IUser {
 }
 
 export type ProfileUpdateData = Pick<IUser,
-  'website_url' |
-  'github_profile_url' |
-  'gitlab_profile_url' |
-  'ubports_forum_username' |
-  'donation_url' |
-  'description' |
-  'avatar' |
-  'role'
+'website_url' |
+'github_profile_url' |
+'gitlab_profile_url' |
+'ubports_forum_username' |
+'donation_url' |
+'description' |
+'avatar' |
+'role'
 >;
 
 export interface UserSerializeOutput extends Omit<IUser, 'apikey'> {

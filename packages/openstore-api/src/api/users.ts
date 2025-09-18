@@ -52,15 +52,6 @@ router.get('/me', authenticate, asyncErrorWrapper(async (req: Request, res: Resp
   }
 }, 'Could not fetch user at this time'));
 
-router.get('/:id', authenticate, asyncErrorWrapper(async (req: Request, res: Response) => {
-  const user = await User.findById(req.params.id);
-  if (!user) {
-    throw new NotFoundError(USER_NOT_FOUND);
-  }
-
-  success(res, user.serialize(req.user?.role === 'admin', false));
-}, 'Could not fetch user at this time'));
-
 router.put('/me', authenticate, upload.single('avatar'), asyncErrorWrapper(async (req: Request, res: Response) => {
   if (!req.user) {
     throw new AuthenticationError();
@@ -80,10 +71,18 @@ router.put('/me', authenticate, upload.single('avatar'), asyncErrorWrapper(async
   }
 
   const isAdmin = req.user.role === 'admin';
-
   await req.user.updateProfile(updateData, isAdmin);
   success(res, req.user.serialize(true, true));
 }, 'Could not update user profile at this time'));
+
+router.get('/:id', asyncErrorWrapper(async (req: Request, res: Response) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    throw new NotFoundError(USER_NOT_FOUND);
+  }
+
+  success(res, user.serialize(false, false));
+}, 'Could not fetch user at this time'));
 
 router.put('/:id', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id);

@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import { type IUser, type IUserMethods, type UserModel, type ProfileUpdateData } from './types';
 import { ValidationError } from '../../exceptions';
 import { config } from '../../utils/config';
+import { sanitize } from '../../utils/sanitize';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   apikey: String,
@@ -65,8 +66,11 @@ userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAd
     'avatar',
   ];
 
-  if (data.description && data.description.length > 200) {
-    throw new ValidationError('Description must be 200 characters or less');
+  if (data.description) {
+    if (data.description.length > 200) {
+      throw new ValidationError('Description must be 200 characters or less');
+    }
+    data.description = sanitize(data.description);
   }
 
   for (const field of allowedFields) {

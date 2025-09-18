@@ -97,21 +97,9 @@ describe('Users API', () => {
   });
 
   describe('GET /:id', () => {
-    test('allows admin to get user by id with role but not apikey', async () => {
+    test('allows unauthenticated users to get other users by id', async () => {
       const res = await request(app)
-        .get(`${route}${regularUser._id}?apikey=${adminUser.apikey}`)
-        .expect(200);
-
-      assert.ok(res.body.success);
-      assert.equal(res.body.data.username, 'regular-user');
-      assert.equal(res.body.data.name, 'Regular User');
-      assert.equal(res.body.data.role, 'community');
-      assert.equal(res.body.data.apikey, undefined);
-    });
-
-    test('allows regular users to get other users by id', async () => {
-      const res = await request(app)
-        .get(`${route}${adminUser._id}?apikey=${regularUser.apikey}`)
+        .get(`${route}${adminUser._id}`)
         .expect(200);
 
       assert.ok(res.body.success);

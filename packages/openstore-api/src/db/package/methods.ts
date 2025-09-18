@@ -443,6 +443,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     return {
       architectures: this.architectures || [],
       publisher: this.author || '',
+      publisher_id: this.maintainer || '',
       name: this.name || '',
       id: this.id || '',
       category: this.category || '',
@@ -580,6 +581,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       type_override: this.type_override || '',
       calculated_rating: this.calculated_rating || 0,
       publisher: this.author || '',
+      publisher_id: this.maintainer || '',
       review_exceptions: this.review_exceptions ?? [],
       permissions: [] as string[],
       read_paths: this.read_paths ?? [],
@@ -598,31 +600,31 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-          return [
-            ...downloads,
-            ...this.architectures.map((arch) => {
-              if (!Object.values(Architecture).includes(arch)) {
-                return null; // Filter out unsupported arches like i386 (legacy apps)
-              }
-              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-              if (downloadRevisionData) {
-                const download = {
-                  ...downloadRevisionData.toObject(),
-                  _id: undefined,
-                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                  download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
-                  installedSize: toBytes(downloadRevisionData.filesize),
-                  downloadSize: downloadRevisionData.downloadSize ?? 0,
-                  // TODO deprecate
-                  filesize: toBytes(downloadRevisionData.filesize),
-                };
-                delete download._id;
-                return download;
-              }
-              return null;
-            }),
-          ];
-        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+        return [
+          ...downloads,
+          ...this.architectures.map((arch) => {
+            if (!Object.values(Architecture).includes(arch)) {
+              return null; // Filter out unsupported arches like i386 (legacy apps)
+            }
+            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+            if (downloadRevisionData) {
+              const download = {
+                ...downloadRevisionData.toObject(),
+                _id: undefined,
+                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                installedSize: toBytes(downloadRevisionData.filesize),
+                downloadSize: downloadRevisionData.downloadSize ?? 0,
+                // TODO deprecate
+                filesize: toBytes(downloadRevisionData.filesize),
+              };
+              delete download._id;
+              return download;
+            }
+            return null;
+          }),
+        ];
+      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
