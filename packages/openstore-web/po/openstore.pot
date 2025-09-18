@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-09-17T18:32:23.387Z\n"
-"PO-Revision-Date: 2025-09-17T18:32:23.387Z\n"
+"POT-Creation-Date: 2025-09-18T15:01:07.214Z\n"
+"PO-Revision-Date: 2025-09-18T15:01:07.214Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -766,3 +766,30 @@ msgstr ""
 "Apps that are found to be stealing the users data, trying to escalate their "
 "privileges without user consent, or executing malicious process are "
 "strictly prohibited."
+
+msgid "User profile on the OpenStore"
+msgstr "User profile on the OpenStore"
+
+msgid "Website"
+msgstr "Website"
+
+msgid "GitHub"
+msgstr "GitHub"
+
+msgid "GitLab"
+msgstr "GitLab"
+
+msgid "UBports Forum"
+msgstr "UBports Forum"
+
+msgid "new"
+msgstr "new"
+
+msgid "app"
+msgstr "app"
+
+msgid "bookmark"
+msgstr "bookmark"
+
+msgid "webapp"
+msgstr "webapp"

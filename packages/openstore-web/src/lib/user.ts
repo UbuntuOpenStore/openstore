@@ -56,3 +56,27 @@ export async function getUser(apikey: string, useCache = true): Promise<UserData
 
   return user;
 }
+
+/**
+ * Get a user by ID
+ * @param id The user ID to fetch
+ * @returns The user data or undefined if not found
+ */
+export async function getUserById(id: string): Promise<UserData | undefined> {
+  try {
+    console.log(`${import.meta.env.PUBLIC_API_URL}api/users/${id}`)
+    const userResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/${id}`, {
+      headers: { 'X-Source': 'openstore-web-next' }
+    });
+
+    if (userResponse.status !== 200) {
+      return undefined;
+    }
+
+    const { data } = await userResponse.json();
+    return UserSchema.parse(data);
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    return undefined;
+  }
+}

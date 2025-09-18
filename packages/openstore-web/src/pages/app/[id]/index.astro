@@ -117,7 +117,7 @@ const isTrustedApp =
   app.id.startsWith("openstore.");
 const isProprietary = app.license.toLowerCase() === "proprietary";
 
-const publisherUrl = `/apps/#search=publisher:${app.publisher}`;
+const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#search=publisher:${app.publisher}`;
 ---
 
 <BaseLayout

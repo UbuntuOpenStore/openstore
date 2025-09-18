@@ -82,6 +82,7 @@ export const AppSchema = z.object({
     [RatingType.BUGGY]: z.number(),
   }),
   publisher: z.string().optional(),
+  publisher_id: z.string().optional(),
   permissions: z.array(z.string()),
   read_paths: z.array(z.string()),
   write_paths: z.array(z.string()),
