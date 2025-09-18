@@ -837,7 +837,9 @@ describe('Manage', () => {
       route = `/api/v3/manage/${pkg.id}?apikey=${user.apikey}`;
     });
 
-    test('can update version-specific changelogs', async () => {
+    test('can update version-specific changelogs', async (t) => {
+      t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
       pkg.version_changelogs = [
         { version: '1.0.0', changelog: 'Initial release notes' },
       ];
