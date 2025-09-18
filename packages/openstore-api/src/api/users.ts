@@ -13,7 +13,7 @@ router.get('/', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, 
   success(res, users.map((user) => user.serialize()));
 }, 'Could not fetch user list at this time'));
 
-router.get('/me', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, res: Response) => {
+router.get('/me', authenticate, asyncErrorWrapper(async (req: Request, res: Response) => {
   if (req.user) {
     success(res, req.user.serialize());
   }
