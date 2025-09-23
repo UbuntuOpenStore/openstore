@@ -332,5 +332,3 @@ export class PackageSearch {
     });
   }
 }
-
-export const packageSearchInstance = new PackageSearch();

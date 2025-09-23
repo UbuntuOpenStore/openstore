@@ -8,7 +8,7 @@ import { type App } from 'supertest/types';
 
 import path from 'path';
 import { Package } from '../db/package';
-import { packageSearchInstance } from '../db/package/search';
+import { packageSearchInstance } from '../db/package/search-factory';
 import * as messages from '../utils/error-messages';
 
 describe('Manage', () => {

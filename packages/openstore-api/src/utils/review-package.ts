@@ -58,7 +58,6 @@ export function clickReview(file: string, exceptions: string[]): Promise<ReviewS
 
       Object.values(reviewData).forEach((groupData) => {
         Object.entries(groupData.error).forEach(([name, error]) => {
-          console.log(name);
           if (exceptions.includes(name)) {
             return;
           }

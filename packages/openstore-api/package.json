@@ -41,6 +41,7 @@
     "@elastic/elasticsearch": "^7.13.0",
     "@sentry/node": "^8.32.0",
     "axios": "^1.7.7",
+    "meilisearch": "^0.36.0",
     "body-parser": "^1.20.3",
     "class-validator": "^0.14.1",
     "click-parser": "^4.2.5",

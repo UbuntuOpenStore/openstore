@@ -23,7 +23,7 @@ async function apps(req: Request, res: Response) {
   let pkgs: HydratedPackage[] = [];
 
   // Send search queries to elastic search
-  // TODO move author searches to a different request parameter
+  // Author/publisher queries have been moved to a separate parameter, this is just for backwards compatibility
   if (filters.search && !filters.search.startsWith('author:') && !filters.search.startsWith('publisher:')) {
     const results = await Package.searchByFilters(filters, getDataBoolean(req, 'full', false));
     pkgs = results.pkgs;

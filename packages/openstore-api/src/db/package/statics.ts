@@ -20,7 +20,7 @@ import {
   type HydratedPackage,
   type PackageType,
 } from './types';
-import { packageSearchInstance } from './search';
+import { packageSearchInstance } from './search-factory';
 import { RatingCount } from '../rating_count/model';
 import { handleChannel } from '../../utils/channels';
 

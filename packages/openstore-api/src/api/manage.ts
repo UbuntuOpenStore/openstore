@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from '../db/package';
-import { packageSearchInstance } from '../db/package/search';
+import { packageSearchInstance } from '../db/package/search-factory';
 import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
 import {
   authenticate,
@@ -212,7 +212,6 @@ router.post(
       channel = handleChannel(req.body.channel);
     }
     catch (err) {
-      console.log(err);
       if (err instanceof UserError) {
         error(res, INVALID_CHANNEL, 400);
         return;

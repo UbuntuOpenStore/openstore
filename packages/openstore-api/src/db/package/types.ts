@@ -4,6 +4,8 @@ import { type Request } from 'express';
 import { type ClickParserData } from '../../utils';
 import { type HydratedRatingCount } from '../rating_count/types';
 
+export type SearchProvider = 'elasticsearch' | 'meilisearch';
+
 export enum PackageType {
   APP = 'app',
   WEBAPP = 'webapp',

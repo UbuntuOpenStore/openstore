@@ -12,7 +12,7 @@ import { Architecture, Channel } from '../db/package/types';
 import { Lock } from '../db/lock';
 import * as reviewPackage from '../utils/review-package';
 import * as clickParser from '../utils/click-parser-async';
-import { packageSearchInstance } from '../db/package/search';
+import { packageSearchInstance } from '../db/package/search-factory';
 import * as messages from '../utils/error-messages';
 
 const GOOD_REVIEW = { manualReviewMessages: [], errorMessages: [], warningMessages: [] };

@@ -15,6 +15,17 @@ services:
     environment:
       - discovery.type=single-node
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.21
+    ports:
+      - "7700:7700"
+    volumes:
+      - ./.data/meilisearch:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-masterKey}
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_ENV=development
+
   nginx:
     image: nginx
     ports:
