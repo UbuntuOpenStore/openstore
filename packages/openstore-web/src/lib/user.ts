@@ -43,15 +43,21 @@ export async function getUser(apikey: string, useCache = true): Promise<UserData
   expiresAt.setDate(expiresAt.getDate() + 2);
 
   if (useCache) {
-    await db.insert(UserCache).values({
-      _id: user._id,
+    const data = {
       lookupHash,
       name: user.name ?? '',
       username: user.username,
       role: user.role ?? 'community',
       avatar: user.avatar,
       expiresAt,
-    });
+    };
+
+    await db.insert(UserCache).values({
+      _id: user._id,
+      ...data
+    }).onConflictDoUpdate({
+      target: UserCache._id, set: data
+    }).execute();
   }
 
   return user;
