@@ -42,17 +42,17 @@ export default function UserMenu({ user, currentLocale, messages }: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="md:w-auto w-52">
         <DropdownMenuItem asChild>
-          <a href={getRelativeLocaleUrl(currentLocale, "/manage/profile/")} className="w-full">
+          <a href={getRelativeLocaleUrl(currentLocale, "/manage/profile/")} className="w-full cursor-pointer">
             {messages.profile}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href={getRelativeLocaleUrl(currentLocale, "/manage/")} className="w-full">
+          <a href={getRelativeLocaleUrl(currentLocale, "/manage/")} className="w-full cursor-pointer">
             {messages.manageApps}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href={getRelativeLocaleUrl(currentLocale, "/logout/")} className="w-full">
+          <a href={getRelativeLocaleUrl(currentLocale, "/logout/")} className="w-full cursor-pointer">
             {messages.logout}
           </a>
         </DropdownMenuItem>
