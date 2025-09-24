@@ -89,6 +89,8 @@ The OpenStore is the official app store for the Ubuntu Touch mobile OS. The repo
 ### Internationalization
 
 - Use the `t()` function for translations in frontend components
+- The value passed to the `t()` function is the string to be translated, not a key
+- When translation strings are needed inside Preact components, pass them as props from the Astro page
 - Translation strings are extracted from source to `.pot` files
 - Run `npm run pot-file` to update translation templates
 - Run `npm run convert-po` to generate JSON files from .po files
