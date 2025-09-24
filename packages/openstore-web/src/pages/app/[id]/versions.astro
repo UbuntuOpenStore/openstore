@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import { AppSchema, type AppRevisionData } from "@/lib/schema";
+import { AppSchema, Channel, type AppRevisionData } from "@/lib/schema";
 import { categorySlug, getRelativeLocaleUrl } from "@/lib/utils";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SvgHome from "@/components/icons/Home";
@@ -11,9 +11,13 @@ import { generateSchema } from "@/lib/json-schema";
 
 await initializeI18N(Astro.currentLocale);
 
+const CHANNEL_MAP = {
+  [Channel.FOCAL as string]: "Stable",
+};
+
 const { id } = Astro.params;
 
-const appResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}`, { headers: { 'X-Source': 'openstore-web-next' } });
+const appResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}`, { headers: { "X-Source": "openstore-web-next" } });
 if (appResponse.status === 404) {
   return new Response(null, {
     status: 404,
@@ -48,11 +52,15 @@ function titleCase(value: string) {
   title={app.name}
   pageTitle={`${app.name} - ${t("Versions")} | OpenStore`}
   description={app.tagline}
-  schema={generateSchema(`${app.name} - ${t("Versions")}`, [
-    { name: "Apps", path: "/apps/" },
-    { name: app.name, path: `/app/${app.id}/` },
-    { name: `${app.name} - Versions`, path: `/app/${app.id}/versions/` },
-  ], app)}
+  schema={generateSchema(
+    `${app.name} - ${t("Versions")}`,
+    [
+      { name: "Apps", path: "/apps/" },
+      { name: app.name, path: `/app/${app.id}/` },
+      { name: `${app.name} - Versions`, path: `/app/${app.id}/versions/` },
+    ],
+    app
+  )}
 >
   <section class="section flex">
     <a href={getRelativeLocaleUrl(Astro.currentLocale, "/")}>
@@ -95,22 +103,28 @@ function titleCase(value: string) {
   <section class="section">
     <ul class="space-y-4">
       {
-        Object.entries(formattedRevisions).map(([version, versions]) => (
-          <li>
-            <span class="text-lg">v{version}</span>
-            <ul class="list-disc ml-4">
-              {Object.keys(versions)
-                .sort()
-                .map((key) => (
-                  <li>
-                    <a href={versions[key].download_url} class="underline">
-                      {titleCase(versions[key].channel)} - {versions[key].architecture ?? "armhf"}
-                    </a>
-                  </li>
-                ))}
-            </ul>
-          </li>
-        ))
+        Object.entries(formattedRevisions).map(([version, versions]) => {
+          const framework = Object.values(versions).find((v) => v.framework)?.framework;
+
+          return (
+            <li>
+              <span class="text-lg">
+                v{version} {framework && `(${framework})`}
+              </span>
+              <ul class="list-disc ml-4">
+                {Object.keys(versions)
+                  .sort()
+                  .map((key) => (
+                    <li>
+                      <a href={versions[key].download_url} class="underline">
+                        {CHANNEL_MAP[versions[key].channel] || titleCase(versions[key].channel)} - {versions[key].architecture ?? "armhf"}
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            </li>
+          );
+        })
       }
     </ul>
   </section>

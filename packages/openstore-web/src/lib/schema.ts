@@ -30,11 +30,12 @@ export const DEFAULT_CHANNEL = Channel.FOCAL;
 
 export const AppRevisionSchema = z.object({
   version: z.string(),
-  download_url: z.string().nullable(),
+  download_url: z.string().nullish(),
   channel: z.string(),
   architecture: z.nativeEnum(Architecture),
   revision: z.number(),
   downloads: z.number(),
+  framework: z.string().nullish(),
 });
 
 export type AppRevisionData = z.infer<typeof AppRevisionSchema>;
@@ -44,14 +45,14 @@ export const AppSchema = z.object({
   name: z.string(),
   tagline: z.string(),
   architectures: z.array(z.nativeEnum(Architecture)),
-  category: z.string().nullable(),
+  category: z.string().nullish(),
   changelog: z.string(),
   version_changelogs: z.array(z.object({ version: z.string(), changelog: z.string() })),
   channels: z.array(z.string()),
   description: z.string(),
   downloads: z.array(z.object({
     version: z.string(),
-    download_url: z.string().nullable(),
+    download_url: z.string().nullish(),
     channel: z.string(),
     architecture: z.nativeEnum(Architecture),
     revision: z.number(),
@@ -108,7 +109,7 @@ export const ReviewSchema = z.object({
   version: z.string(),
   rating: z.nativeEnum(RatingType),
   date: z.coerce.date(),
-  comment: z.string().nullable(),
+  comment: z.string().nullish(),
 });
 
 export type ReviewData = z.infer<typeof ReviewSchema>;
@@ -157,8 +158,8 @@ export type DiscoverData = z.infer<typeof DiscoverSchema>;
 
 export const AppSearchSchema = z.object({
   count: z.number(),
-  next: z.string().nullable(),
-  previous: z.string().nullable(),
+  next: z.string().nullish(),
+  previous: z.string().nullish(),
   packages: z.array(SlimAppSchema),
 });
 

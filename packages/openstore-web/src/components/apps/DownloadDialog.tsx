@@ -30,7 +30,7 @@ const DownloadDialog = ({ app, messages, currentLocale } : { app: AppData, curre
             <div class="mt-4 space-y-4">
               {downloads.map((download) => (
                 <a href={download.download_url!} target="_blank" class="btn w-full bg-ubuntu-purple text-white font-bold">
-                  {formatChannel(download.channel)} v{download.version} ({download.architecture})
+                  v{download.version} ({download.architecture})
                 </a>
               ))}
             </div>
