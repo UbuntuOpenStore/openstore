@@ -181,6 +181,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       architectures,
       category: getData(req, 'category'),
       author: getData(req, 'author') ? getData(req, 'author') : getData(req, 'publisher'),
+      publisherId: getData(req, 'publisher_id'),
       search: getData(req, 'search'),
       channel,
       nsfw,
@@ -198,7 +199,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     channel,
     search,
     nsfw,
-    maintainer,
+    publisherId,
     published,
   }: PackageRequestFilters, textSearch = true): FilterQuery<IPackage> {
     const query: FilterQuery<IPackage> = {};
@@ -267,8 +268,8 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       query.nsfw = { $in: nsfw };
     }
 
-    if (maintainer) {
-      query.maintainer = maintainer;
+    if (publisherId) {
+      query.maintainer = publisherId;
     }
 
     if (published) {

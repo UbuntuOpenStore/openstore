@@ -42,6 +42,7 @@ describe('Package', () => {
         search: 'term',
         channel: Channel.FOCAL,
         nsfw: [null, false],
+        publisherId: '',
       });
     });
 
@@ -82,7 +83,7 @@ describe('Package', () => {
         channel: Channel.FOCAL,
         search: 'term',
         nsfw: [true],
-        maintainer: 'foobar',
+        publisherId: 'foobar',
         published: true,
       });
 

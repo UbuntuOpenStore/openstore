@@ -174,7 +174,7 @@ export type PackageRequestFilters = {
   search?: string;
   channel?: Channel;
   nsfw?: (boolean | null)[];
-  maintainer?: string;
+  publisherId?: string;
   published?: boolean;
 };
 

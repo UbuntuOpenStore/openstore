@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-09-18T15:01:07.214Z\n"
-"PO-Revision-Date: 2025-09-18T15:01:07.214Z\n"
+"POT-Creation-Date: 2025-09-24T03:00:18.105Z\n"
+"PO-Revision-Date: 2025-09-24T03:00:18.105Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -793,3 +793,6 @@ msgstr "bookmark"
 
 msgid "webapp"
 msgstr "webapp"
+
+msgid "View all apps by this user"
+msgstr "View all apps by this user"

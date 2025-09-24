@@ -45,7 +45,7 @@ const router = express.Router();
 router.get('/', authenticate, userRole, asyncErrorWrapper(async (req: Request, res: Response) => {
   const filters = Package.parseRequestFilters(req);
   if (!req.isAdminUser) {
-    filters.maintainer = req.user!._id.toString();
+    filters.publisherId = req.user!._id.toString();
   }
 
   const pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip, false);
@@ -100,7 +100,7 @@ router.post(
 
     success(res, pkg.serialize());
   },
-  'There was an error creating your app, please try again later'),
+    'There was an error creating your app, please try again later'),
 );
 
 const putUpload = mupload.fields([
@@ -158,7 +158,7 @@ router.put(
 
     success(res, pkg.serialize());
   },
-  'There was an error updating your app, please try again later'),
+    'There was an error updating your app, please try again later'),
 );
 
 /**
@@ -180,7 +180,7 @@ router.delete(
     await req.pkg.deleteOne();
     success(res, {});
   },
-  'There was an error deleting your app, please try again later'),
+    'There was an error deleting your app, please try again later'),
 );
 
 const postUpload = mupload.fields([

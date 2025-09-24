@@ -34,7 +34,7 @@ if (!userData) {
 }
 
 const appUrl = new URL("api/v4/apps", import.meta.env.PUBLIC_API_URL);
-appUrl.searchParams.set("publisher", userData.name || userData.username);
+appUrl.searchParams.set("publisher_id", userData._id);
 appUrl.searchParams.set("limit", "32");
 appUrl.searchParams.set("sort", "-published_date");
 const appsResponse = await fetch(appUrl, {
