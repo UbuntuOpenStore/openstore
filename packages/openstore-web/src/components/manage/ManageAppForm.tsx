@@ -8,6 +8,7 @@ import type { JSX } from "preact/jsx-runtime";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { getClientApiKey } from "@/lib/utils";
+import DeleteApp from "./DeleteApp";
 
 type ManageAppFormProps = {
   user: UserData,
@@ -211,7 +212,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
             <div class="p-4 text-right sticky bottom-0 bg-white">
               <button
                 type="button"
-                class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                class="btn bg-ubuntu-purple text-white font-bold cursor-pointer"
                 onClick={addNewVersionChangelog}
               >
                 Add New Changelog
@@ -370,28 +371,32 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         </>
       )}
 
-      <section class="section flex gap-4 items-center mb-4">
-        <button type="submit" class="btn bg-ubuntu-orange text-white font-bold cursor-pointer" disabled={saving}>
-          Save
+      <section class="section flex justify-between mb-4">
+        <div class="flex gap-4 items-center">
+          <button type="submit" class="btn bg-ubuntu-orange text-white font-bold cursor-pointer" disabled={saving}>
+            Save
 
-          {saving && <SvgSpinner class="animate-spin ml-2" />}
-        </button>
+            {saving && <SvgSpinner class="animate-spin ml-2" />}
+          </button>
 
-        {success && <SvgCheck class="text-green-500" />}
+          {success && <SvgCheck class="text-green-500" />}
 
-        {error && (
-          <>
-            <div class="bg-red-400 border-2 border-red-500 rounded flex px-6 py-4 gap-4">
-              <SvgClose class="text-red-600" />
-              <div>
-                Failed to update your app:
-                <p>
-                  {error}
-                </p>
+          {error && (
+            <>
+              <div class="bg-red-400 border-2 border-red-500 rounded flex px-6 py-4 gap-4">
+                <SvgClose class="text-red-600" />
+                <div>
+                  Failed to update your app:
+                  <p>
+                    {error}
+                  </p>
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
+
+        <DeleteApp app={app} />
       </section>
     </form>
   );

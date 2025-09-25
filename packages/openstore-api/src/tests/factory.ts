@@ -1,10 +1,12 @@
 import { type IPackage, type IRevision, Package, type IPackageMethods } from '../db/package';
 import { type IReview, Review } from '../db/review';
 import { type IUser, User } from '../db/user';
+import { type IReservedNamespace, type IReservedNamespaceMethods, ReservedNamespace } from '../db/reserved-namespace';
 
 export type TestPackage = IPackage & IPackageMethods & { _id: any; save: () => Promise<IPackage> };
 export type TestUser = IUser & { _id: any; save: () => Promise<IUser> };
 export type TestReview = IReview & { _id: any; save: () => Promise<IReview> };
+export type TestReservedNamespace = IReservedNamespace & IReservedNamespaceMethods & { _id: any; save: () => Promise<IReservedNamespace> };
 
 export default {
   package(data: Omit<Partial<IPackage>, 'revisions'> & { revisions?: Partial<IRevision>[] } = {}): Promise<TestPackage> {
@@ -19,7 +21,7 @@ export default {
     return pkg.save();
   },
 
-  review(data = {}): Promise<TestReview> {
+  review(data: Partial<IReview> = {}): Promise<TestReview> {
     const review = new Review({
       rating: 'THUMBS_UP',
       body: `review body ${Math.random()}`,
@@ -31,7 +33,7 @@ export default {
     return review.save();
   },
 
-  user(data = {}): Promise<TestUser> {
+  user(data: Partial<IUser> = {}): Promise<TestUser> {
     const user = new User({
       name: `User ${Math.random()}`,
       username: `username-${Math.random()}`,
@@ -41,5 +43,15 @@ export default {
     });
 
     return user.save();
+  },
+
+  reservedNamespace(data: Partial<IReservedNamespace> & Pick<IReservedNamespace, 'owner_id'>): Promise<TestReservedNamespace> {
+    const namespace = new ReservedNamespace({
+      namespace: `test.namespace.${Math.random()}`,
+      type: 'exact',
+      ...data,
+    });
+
+    return namespace.save();
   },
 };

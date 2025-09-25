@@ -7,7 +7,7 @@ import * as api from '.';
 import { type App } from 'supertest/types';
 
 import { Package } from '../db/package';
-import { Review } from '../db/review';
+import { Ratings, Review } from '../db/review';
 import { recalculatePackageRatings } from '../db/rating_count/utils';
 import { Architecture, Channel } from '../db/package/types';
 import * as messages from '../utils/error-messages';
@@ -59,8 +59,8 @@ describe('Reviews', () => {
     });
 
     await Promise.all([
-      factory.review({ pkg: package1._id, user: user3._id, rating: 'HAPPY' }),
-      factory.review({ pkg: package1._id, user: user4._id, rating: 'NEUTRAL' }),
+      factory.review({ pkg: package1._id, user: user3._id, rating: Ratings.HAPPY }),
+      factory.review({ pkg: package1._id, user: user4._id, rating: Ratings.NEUTRAL }),
     ]);
 
     await recalculatePackageRatings(package1._id);
@@ -122,7 +122,7 @@ describe('Reviews', () => {
     });
 
     test('updates own review', async () => {
-      await factory.review({ pkg: package1._id, user: user1._id, rating: 'THUMBS_DOWN' });
+      await factory.review({ pkg: package1._id, user: user1._id, rating: Ratings.THUMBS_DOWN });
       await recalculatePackageRatings(package1._id);
 
       let pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');

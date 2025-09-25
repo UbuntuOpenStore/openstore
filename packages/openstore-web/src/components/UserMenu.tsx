@@ -51,6 +51,15 @@ export default function UserMenu({ user, currentLocale, messages }: Props) {
             {messages.manageApps}
           </a>
         </DropdownMenuItem>
+
+        {user.role ==='admin' && (
+          <DropdownMenuItem asChild>
+            <a href={getRelativeLocaleUrl(currentLocale, "/admin/")} className="w-full cursor-pointer">
+              Admin
+            </a>
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem asChild>
           <a href={getRelativeLocaleUrl(currentLocale, "/logout/")} className="w-full cursor-pointer">
             {messages.logout}

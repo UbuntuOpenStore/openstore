@@ -17,6 +17,7 @@ import revisions from './revisions';
 import auth from './auth';
 import users from './users';
 import rss from './rss';
+import admin from './admin';
 import '../db'; // Make sure the database connection gets setup
 
 export function setup() {
@@ -94,6 +95,7 @@ export function setup() {
   app.use('/api/v4/apps', apps);
   app.use('/api/v4/discover', discover);
   app.use('/api/v4/revisions', revisions);
+  app.use('/api/v4/admin', admin);
 
   app.use(express.static(config.server.static_root));
 

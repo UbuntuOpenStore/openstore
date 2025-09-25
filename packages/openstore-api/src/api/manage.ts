@@ -3,8 +3,10 @@ import express, { type Request, type Response } from 'express';
 
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
+import { Types } from 'mongoose';
 import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from '../db/package';
+import { ReservedNamespace } from '../db/reserved-namespace';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
 import {
@@ -34,6 +36,7 @@ import {
 import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
 import { clickReview } from '../utils/review-package';
 import { handleChannel } from '../utils/channels';
+import { validateNamespace } from '../utils/validate-namespace';
 
 const mupload = multer({ dest: '/tmp' });
 const router = express.Router();
@@ -85,6 +88,8 @@ router.post(
 
     const name = req.body.name.trim();
     const id = req.body.id.toLowerCase().trim();
+
+    await validateNamespace(id, req.user!._id.toString(), !!req.isAdminUser);
 
     await Package.checkId(id);
     if (!req.isAdminUser && !req.isTrustedUser) {
@@ -172,9 +177,70 @@ router.delete(
   fetchPackage(),
   canManageLocked,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    if (req.pkg.revisions.length > 0) {
+    // Allow deletion of apps with revisions if force=true is specified
+    const forceDelete = req.query.force === 'true';
+
+    if (req.pkg.revisions.length > 0 && !forceDelete) {
       error(res, APP_HAS_REVISIONS, 400);
       return;
+    }
+
+    if (req.pkg.revisions.length > 0) {
+      for (const revision of req.pkg.revisions) {
+        try {
+          if (revision.download_url) {
+            const filePath = revision.download_url;
+            if (existsSync(filePath)) {
+              await fs.unlink(filePath);
+              logger.info(`Deleted click file: ${filePath}`);
+            }
+          }
+        }
+        catch (err) {
+          logger.error('Error deleting revision file:', err);
+          captureException(err, req.originalUrl);
+        }
+      }
+    }
+
+    try {
+      if (req.pkg.icon) {
+        const iconPath = req.pkg.icon;
+        if (existsSync(iconPath)) {
+          await fs.unlink(iconPath);
+          logger.info(`Deleted icon file: ${iconPath}`);
+        }
+      }
+    }
+    catch (err) {
+      logger.error('Error deleting icon file:', err);
+      captureException(err, req.originalUrl);
+    }
+
+    try {
+      await packageSearchInstance.remove(req.pkg);
+    }
+    catch (err) {
+      logger.error('Error removing from search index:', err);
+      captureException(err, req.originalUrl);
+    }
+
+    // Create a namespace reservation for the deleted app's ID
+    try {
+      const existingNamespace = await ReservedNamespace.findByNamespace(req.pkg.id);
+      if (!existingNamespace && req.pkg.maintainer) {
+        const reservedNamespace = new ReservedNamespace({
+          namespace: req.pkg.id,
+          type: 'exact',
+          owner_id: new Types.ObjectId(req.pkg.maintainer),
+        });
+
+        await reservedNamespace.save();
+      }
+    }
+    catch (err) {
+      logger.error('Error creating namespace reservation:', err);
+      captureException(err, req.originalUrl);
     }
 
     await req.pkg.deleteOne();

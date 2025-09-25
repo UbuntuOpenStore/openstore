@@ -2,7 +2,7 @@ import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestUser, type TestPackage } from '../tests/factory';
+import factory, { type TestUser, type TestPackage, type TestReservedNamespace } from '../tests/factory';
 import * as api from '.';
 import { type App } from 'supertest/types';
 
@@ -185,10 +185,27 @@ describe('Manage', () => {
   describe('Manage POST', () => {
     let route: string;
     let package1: TestPackage;
+    let exactReservedNamespace: TestReservedNamespace;
+    let wildcardReservedNamespace: TestReservedNamespace;
+    let user2: TestUser;
 
     beforeEach(async () => {
       route = `/api/v3/manage/?apikey=${user.apikey}`;
       package1 = await factory.package({ maintainer: user._id, name: 'User app' });
+      user2 = await factory.user();
+
+      // Create reserved namespaces for testing
+      exactReservedNamespace = await factory.reservedNamespace({
+        namespace: 'reserved.exact.test',
+        type: 'exact',
+        owner_id: user2._id,
+      });
+
+      wildcardReservedNamespace = await factory.reservedNamespace({
+        namespace: '*.reserved.wildcard',
+        type: 'wildcard',
+        owner_id: user2._id,
+      });
     });
 
     test('blocks access when not logged in', async () => {
@@ -239,6 +256,25 @@ describe('Manage', () => {
           .expect(200);
 
         assert.ok(res.body.success);
+      });
+
+      test('succeeds with an exact reserved namespace id', async () => {
+        const res = await request(app).post(route)
+          .send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.id, exactReservedNamespace.namespace);
+      });
+
+      test('succeeds with a wildcard reserved namespace id', async () => {
+        const packageId = `app.${wildcardReservedNamespace.namespace.substring(2)}`;
+        const res = await request(app).post(route)
+          .send({ id: packageId, name: 'Reserved Wildcard App' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.id, packageId);
       });
     });
 
@@ -380,6 +416,58 @@ describe('Manage', () => {
           .expect(200);
 
         assert.ok(res.body.success);
+      });
+
+      test('fails with an exact reserved namespace id', async () => {
+        const res = await request(app).post(route)
+          .send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' })
+          .expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.ok(res.body.message.includes('reserved by another user'));
+      });
+
+      test('fails with a wildcard reserved namespace id', async () => {
+        const packageId = `app.${wildcardReservedNamespace.namespace.substring(2)}`;
+        const res = await request(app).post(route)
+          .send({ id: packageId, name: 'Reserved Wildcard App' })
+          .expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.ok(res.body.message.includes('reserved by another user'));
+      });
+
+      test('succeeds when using their own reserved namespace', async () => {
+        // Create a namespace owned by the current user
+        const userOwnedNamespace = await factory.reservedNamespace({
+          namespace: 'user.owned.namespace',
+          type: 'exact',
+          owner_id: user._id,
+        });
+
+        const res = await request(app).post(route)
+          .send({ id: userOwnedNamespace.namespace, name: 'User Owned App' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.id, userOwnedNamespace.namespace);
+      });
+
+      test('succeeds when using their own wildcard reserved namespace', async () => {
+        // Create a wildcard namespace owned by the current user
+        await factory.reservedNamespace({
+          namespace: '*.user.wildcard',
+          type: 'wildcard',
+          owner_id: user._id,
+        });
+
+        const packageId = 'app.user.wildcard';
+        const res = await request(app).post(route)
+          .send({ id: packageId, name: 'User Wildcard App' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.id, packageId);
       });
 
       test('creates a new package', async () => {

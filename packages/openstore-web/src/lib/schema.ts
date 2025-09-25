@@ -194,3 +194,15 @@ export const UserSchema = z.object({
 export type UserData = z.infer<typeof UserSchema>;
 
 export const UserListSchema = z.array(UserSchema);
+
+export const NamespaceSchema = z.object({
+  id: z.string(),
+  namespace: z.string(),
+  type: z.enum(['exact', 'wildcard']),
+  owner_id: z.string(),
+  owner: UserSchema.optional(),
+});
+
+export type NamespaceData = z.infer<typeof NamespaceSchema>;
+
+export const NamespaceListSchema = z.array(NamespaceSchema);

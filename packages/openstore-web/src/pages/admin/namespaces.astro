@@ -1,0 +1,46 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdminMenu from "../../components/admin/AdminMenu";
+import NamespacesPage from "../../components/admin/NamespacesPage";
+import { getUser } from "../../lib/user";
+import Loading from "../../components/Loading";
+
+export const prerender = false;
+
+const apikey = Astro.cookies.get("apikey")?.value;
+if (!apikey) {
+  return Astro.redirect("/login/");
+}
+
+const user = await getUser(apikey);
+if (!user) {
+  Astro.cookies.delete("apikey");
+  return Astro.redirect("/login/");
+}
+
+// Check if user is admin
+if (!user.role || user.role !== "admin") {
+  return Astro.redirect("/");
+}
+---
+
+<BaseLayout
+  title="Manage Namespaces | OpenStore"
+  pageTitle="Manage Namespaces"
+  description="Manage reserved package namespaces in OpenStore"
+  schema={undefined}
+>
+  <section class="section">
+    <h1 class="text-4xl">Manage Namespaces</h1>
+
+    <AdminMenu currentPath={Astro.url.pathname} />
+
+    <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+  </section>
+
+  <section class="section grow">
+    <NamespacesPage client:only="preact">
+      <Loading slot="fallback" />
+    </NamespacesPage>
+  </section>
+</BaseLayout>
