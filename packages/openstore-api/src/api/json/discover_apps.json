@@ -64,7 +64,8 @@
           "me.fredl.ghostcloudphotobackup",
           "me.fredl.ghostcloud",
           "me.fredl.isodrive",
-          "wifitransfer.costa"
+          "wifitransfer.aloysliska",
+          "contactbridge.brennoflavio"
         ]
       },
       {
@@ -80,7 +81,8 @@
           "scooter.s710",
           "subaybay.kugiigi",
           "hhash.mateosalta",
-          "transmission.pavelprosto"
+          "transmission.pavelprosto",
+          "snapz0r.fredldotme"
         ]
       },
       {
@@ -95,7 +97,8 @@
           "openstore.tagger",
           "authenticator-ng.dobey",
           "uadblockng.liohmoeller",
-          "webber.timsueberkrueb"
+          "webber.timsueberkrueb",
+          "waydroid-files.jcm"
         ]
       },
       {
@@ -109,7 +112,8 @@
           "ubuntu-ui-toolkit-gallery-m.mateosalta",
           "qqc2-gallery.ubad",
           "org.kde.kirigami2.gallery",
-          "logviewer.ruditimmer"
+          "logviewer.ruditimmer",
+          "uitk-gallery.ubports"
         ]
       },
       {
@@ -125,7 +129,9 @@
           "superttt.emanuelesorce",
           "guess-words.bhdouglass",
           "circlepuzzle.cibersheep",
-          "esviji.cibersheep"
+          "esviji.cibersheep",
+          "8192.alaskalinuxuser",
+          "gearsystem.alaskalinuxuser"
         ]
       },
       {
@@ -140,7 +146,10 @@
           "sakawochi.wendigosoft",
           "gelek-vanilla.cibersheep",
           "monsterwars.t-mon",
-          "com.ubuntu.developer.1bsyl.demineur"
+          "com.ubuntu.developer.1bsyl.demineur",
+          "mastermind.alaskalinuxuser",
+          "com.rainingrock.birdle",
+          "tris.meshmi2"
         ]
       },
       {
@@ -154,7 +163,9 @@
           "wumpus.cibersheep",
           "gearboy.bhdouglass",
           "pathwindfork.mateo-salta",
-          "ttris.lduboeuf"
+          "ttris.lduboeuf",
+          "ovi.alaskalinuxuser",
+          "qmlmahjongg"
         ]
       },
       {
@@ -167,14 +178,24 @@
           "tankball.cibersheep",
           "com.ubuntu.developer.1bsyl.negative-space",
           "falldown.rpadovani",
-          "com.ubuntu.developer.rpadovani.100balls"
+          "com.ubuntu.developer.rpadovani.100balls",
+          "neverball.semphris",
+          "blackjack-app.alaskalinuxuser",
+          "mines.alaskalinuxuser"
         ]
       },
       {
         "name": "Game Helpers",
         "tagline": "No matter what the game, everyone can agree, games are fun.",
         "referral": "",
-        "ids": ["scorekeeper.red", "com.jchrtech.coinflip", "dice-roller.bhdouglass"]
+        "ids": [
+          "scorekeeper.red",
+          "com.jchrtech.coinflip",
+          "dice-roller.bhdouglass",
+          "clockchess.alaskalinuxuser",
+          "dicenomicon.cibersheep",
+          "kellypool.alaskalinuxuser"
+        ]
       },
       {
         "name": "Essential Apps",
@@ -186,7 +207,9 @@
           "com.ubuntu.docviewer",
           "navigator.costales",
           "dekko2.dekkoproject",
-          "com.ubuntu.docviewer"
+          "com.ubuntu.docviewer",
+          "pure-maps.jonnius",
+          "sturmreader.emanuelesorce"
         ]
       },
       {
@@ -199,7 +222,14 @@
           "hnr.davidv.dev",
           "net.gsantner.ut.ttrssreadermobile",
           "newsie.martinferretti",
-          "quickddit"
+          "quickddit",
+          "hnr.davidv.dev",
+          "theoldreader.bolly",
+          "rssreader.florisluiten",
+          "it.mardy.ttrss",
+          "inoreader.cibersheep",
+          "doniks.shorter",
+          "feedbin.jos-henson"
         ]
       },
       {
@@ -213,7 +243,8 @@
           "package-resolved.marquiskurt",
           "godot3dtest.pavelprosto",
           "costumemaster.marquiskurt",
-          "3rdperson.gabriele"
+          "3rdperson.gabriele",
+          "org.arctiagames.ast"
         ]
       },
       {
@@ -226,45 +257,68 @@
           "ulemmy.povoq",
           "umastodon.christianpauly",
           "udiaspora-webapp.darkeye",
-          "hyperspacedesktop.marquiskurt"
+          "hyperspacedesktop.marquiskurt",
+          "nl.btr.mastodon"
         ]
       },
       {
         "name": "Health & Wellness",
         "tagline": "An apple a day...",
         "referral": "Health & Fitness",
-        "ids": ["fastburgers.collaproductions", "pulse.mivoligo", "activitytracker.cwayne18", "iquit.aurora", "fatburners.christianpauly", "weight-tracker.avisoftware"]
+        "ids": [
+          "fastburgers.collaproductions",
+          "activitytracker.cwayne18",
+          "iquit.aurora",
+          "fatburners.christianpauly",
+          "weight-tracker.avisoftware",
+          "siete.alaskalinuxuser",
+          "watercount.alaskalinuxuser",
+          "checkup.alaskalinuxuser",
+          "pulse.alaskalinuxuser"
+        ]
       },
       {
         "name": "Cross Platform Apps",
         "tagline": "Find these apps anywhere",
         "referral": "",
-        "ids": ["pure-maps.jonnius", "harbour-messwerk.mymike00", "me.fredl.ghostcloud", "me.fredl.qshodan", "io.guh.nymeaapp"]
+        "ids": [
+          "pure-maps.jonnius",
+          "harbour-messwerk.mymike00",
+          "me.fredl.ghostcloud",
+          "me.fredl.qshodan",
+          "io.guh.nymeaapp"
+        ]
       },
       {
         "name": "Chat Connection",
         "tagline": "Don't forget to text mom!",
         "referral": "Communication & Social",
-        "ids": ["im.kaidan.kaidan", "teleports.ubports", "linphone.cibersheep", "fluffychat.christianpauly", "umatriks.larreamikel"]
-      },
-      {
-        "name": "RSS Feed Readers",
-        "tagline": "RSS is dead, long live RSS!",
-        "referral": "",
-        "ids": ["rssreader.florisluiten", "it.mardy.ttrss", "inoreader.cibersheep", "doniks.shorter", "feedbin.jos-henson"]
+        "ids": [
+          "im.kaidan.kaidan",
+          "teleports.ubports",
+          "linphone.cibersheep",
+          "fluffychat.christianpauly",
+          "umatriks.larreamikel",
+          "chatter.alaskalinuxuser",
+          "cinny.danfro",
+          "cinnyweb.nuno"
+        ]
       },
       {
         "name": "Core Apps",
         "tagline": "There is an app for that",
         "referral": "",
         "ids": [
-          "com.ubuntu.calculator",
-          "com.ubuntu.calendar",
-          "com.ubuntu.camera",
-          "com.ubuntu.clock",
-          "com.ubuntu.gallery",
-          "com.ubuntu.music",
-          "com.ubuntu.reminders"
+          "calendar.ubports",
+          "terminal.ubports",
+          "filemanager.ubports",
+          "gallery.ubports",
+          "calculator.ubports",
+          "camera.ubports",
+          "clock.ubports",
+          "music.ubports",
+          "docviewer.ubports",
+          "weather.ubports"
         ]
       }
     ]
