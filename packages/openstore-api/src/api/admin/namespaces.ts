@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import { Types } from 'mongoose';
-import { ReservedNamespace } from '../../db/reserved-namespace';
+import { ReservedNamespace } from '../../db/reserved_namespace';
 import { User } from '../../db/user';
 import { adminOnly, authenticate } from '../../middleware';
 import { success, asyncErrorWrapper } from '../../utils';

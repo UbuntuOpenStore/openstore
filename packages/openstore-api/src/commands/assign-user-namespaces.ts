@@ -3,7 +3,7 @@ import 'db'; // Make sure the database connection gets setup
 import { Types } from 'mongoose';
 import { Package } from '../db/package';
 import { User } from '../db/user';
-import { ReservedNamespace } from '../db/reserved-namespace';
+import { ReservedNamespace } from '../db/reserved_namespace';
 
 /**
  * Command to assign wildcard namespaces to users based on their existing packages

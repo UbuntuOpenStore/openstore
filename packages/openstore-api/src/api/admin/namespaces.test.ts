@@ -1,7 +1,7 @@
 import { beforeEach, before, after, describe, it } from 'node:test';
 import { strictEqual } from 'node:assert/strict';
 import { User } from '../../db/user';
-import { ReservedNamespace } from '../../db/reserved-namespace';
+import { ReservedNamespace } from '../../db/reserved_namespace';
 import mongoose from 'mongoose';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
 import * as api from '..';

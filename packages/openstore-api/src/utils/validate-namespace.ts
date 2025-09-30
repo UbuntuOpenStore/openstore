@@ -1,4 +1,4 @@
-import { ReservedNamespace } from '../db/reserved-namespace';
+import { ReservedNamespace } from '../db/reserved_namespace';
 import { AuthorizationError } from '../exceptions';
 
 /**

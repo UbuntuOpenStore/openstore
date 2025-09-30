@@ -1,7 +1,7 @@
 import { type IPackage, type IRevision, Package, type IPackageMethods } from '../db/package';
 import { type IReview, Review } from '../db/review';
 import { type IUser, User } from '../db/user';
-import { type IReservedNamespace, type IReservedNamespaceMethods, ReservedNamespace } from '../db/reserved-namespace';
+import { type IReservedNamespace, type IReservedNamespaceMethods, ReservedNamespace } from '../db/reserved_namespace';
 
 export type TestPackage = IPackage & IPackageMethods & { _id: any; save: () => Promise<IPackage> };
 export type TestUser = IUser & { _id: any; save: () => Promise<IUser> };

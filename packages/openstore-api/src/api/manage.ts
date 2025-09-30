@@ -6,7 +6,7 @@ import { existsSync } from 'fs';
 import { Types } from 'mongoose';
 import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from '../db/package';
-import { ReservedNamespace } from '../db/reserved-namespace';
+import { ReservedNamespace } from '../db/reserved_namespace';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
 import {
