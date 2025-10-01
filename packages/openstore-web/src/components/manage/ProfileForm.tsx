@@ -47,6 +47,20 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
 
       const formData = new FormData(e.currentTarget);
 
+      // Convert GitHub username to URL
+      const githubUsername = formData.get('github_username');
+      if (githubUsername) {
+        formData.delete('github_username');
+        formData.append('github_profile_url', `https://github.com/${githubUsername}`);
+      }
+
+      // Convert GitLab username to URL
+      const gitlabUsername = formData.get('gitlab_username');
+      if (gitlabUsername) {
+        formData.delete('gitlab_username');
+        formData.append('gitlab_profile_url', `https://gitlab.com/${gitlabUsername}`);
+      }
+
       try {
         const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/me?apikey=${getClientApiKey()}`, {
           method: 'PUT',
@@ -186,30 +200,30 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
         </div>
 
         <div class="form-group">
-          <label for="github_profile_url" class="form-label">
+          <label for="github_username" class="form-label">
             {messages.githubProfileURL}
           </label>
           <input
-            id="github_profile_url"
-            name="github_profile_url"
-            type="url"
-            placeholder="https://github.com/username"
+            id="github_username"
+            name="github_username"
+            type="text"
+            placeholder="username"
             class="form-input"
-            defaultValue={user.github_profile_url || ''}
+            defaultValue={user.github_profile_url ? user.github_profile_url.replace('https://github.com/', '') : ''}
           />
         </div>
 
         <div class="form-group">
-          <label for="gitlab_profile_url" class="form-label">
+          <label for="gitlab_username" class="form-label">
             {messages.gitlabProfileURL}
           </label>
           <input
-            id="gitlab_profile_url"
-            name="gitlab_profile_url"
-            type="url"
-            placeholder="https://gitlab.com/username"
+            id="gitlab_username"
+            name="gitlab_username"
+            type="text"
+            placeholder="username"
             class="form-input"
-            defaultValue={user.gitlab_profile_url || ''}
+            defaultValue={user.gitlab_profile_url ? user.gitlab_profile_url.replace('https://gitlab.com/', '') : ''}
           />
         </div>
 

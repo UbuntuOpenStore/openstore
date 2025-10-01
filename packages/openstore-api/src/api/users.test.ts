@@ -185,6 +185,36 @@ describe('Users API', () => {
       assert.notEqual(user.description, longDescription);
     });
 
+    test('rejects non-HTTPS URLs', async () => {
+      const profileData = {
+        website_url: 'http://example.com',
+      };
+
+      await request(app)
+        .put(`${route}me?apikey=${regularUser.apikey}`)
+        .send(profileData)
+        .expect(400);
+
+      const user = await User.findById(regularUser._id);
+      assert.ok(user);
+      assert.notEqual(user.website_url, profileData.website_url);
+    });
+
+    test('rejects invalid URLs', async () => {
+      const profileData = {
+        github_profile_url: 'invalid-url',
+      };
+
+      await request(app)
+        .put(`${route}me?apikey=${regularUser.apikey}`)
+        .send(profileData)
+        .expect(400);
+
+      const user = await User.findById(regularUser._id);
+      assert.ok(user);
+      assert.notEqual(user.github_profile_url, profileData.github_profile_url);
+    });
+
     test('returns 401 when not authenticated', async () => {
       await request(app)
         .put(`${route}me`)

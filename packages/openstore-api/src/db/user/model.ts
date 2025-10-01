@@ -73,6 +73,21 @@ userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAd
     data.description = sanitize(data.description);
   }
 
+  const urlFields: Array<keyof ProfileUpdateData> = ['website_url', 'github_profile_url', 'gitlab_profile_url', 'donation_url'];
+  for (const field of urlFields) {
+    if (data[field]) {
+      try {
+        const url = new URL(data[field]);
+        if (url.protocol !== 'https:') {
+          throw new ValidationError(`${field} must use HTTPS protocol`);
+        }
+      }
+      catch (error) {
+        throw new ValidationError(`Invalid URL provided for ${field}`);
+      }
+    }
+  }
+
   for (const field of allowedFields) {
     if (field in data && data[field] !== undefined) {
       this[field] = data[field];
