@@ -586,6 +586,49 @@ describe('Package', () => {
       assert.equal(rev2?.channel, Channel.FOCAL);
       assert.equal(rev2?.framework, 'ubuntu-sdk-20.04');
     });
+
+    describe('when version numbers differ by framework', () => {
+      let package1: TestPackage;
+
+      beforeEach(() => {
+        package1 = new Package({
+          id: 'app.id',
+          name: 'Best App Ever',
+          channels: [DEFAULT_CHANNEL],
+          architectures: [Architecture.ARMHF, Architecture.ARM64],
+        });
+
+        package1.createNextRevision('1.0.0-24.04-2.x', Channel.FOCAL, Architecture.ARM64, 'ubuntu-touch-24.04-2.x', 'url', 'shasum', 10, 8);
+
+        package1.createNextRevision('1.0.0-24.04-1.x', Channel.FOCAL, Architecture.ARM64, 'ubuntu-touch-24.04-1.x', 'url', 'shasum', 10, 8);
+
+        package1.createNextRevision('1.0.0-20.04', Channel.FOCAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
+      });
+
+      test('gets the latest revision for an arch/channel/framework', () => {
+        const { revisionData: rev1 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, ['ubuntu-sdk-20.04']);
+        assert.equal(rev1?.version, '1.0.0-20.04');
+        assert.equal(rev1?.architecture, Architecture.ARM64);
+        assert.equal(rev1?.channel, Channel.FOCAL);
+        assert.equal(rev1?.framework, 'ubuntu-sdk-20.04');
+
+        const { revisionData: rev2 } = package1.getLatestRevision(
+          Channel.FOCAL, Architecture.ARM64, undefined, ['ubuntu-sdk-16.04', 'ubuntu-touch-24.04-1.x'],
+        );
+        assert.equal(rev2?.version, '1.0.0-24.04-1.x');
+        assert.equal(rev2?.architecture, Architecture.ARM64);
+        assert.equal(rev2?.channel, Channel.FOCAL);
+        assert.equal(rev2?.framework, 'ubuntu-touch-24.04-1.x');
+
+        const { revisionData: rev3 } = package1.getLatestRevision(
+          Channel.FOCAL, Architecture.ARM64, undefined, ['ubuntu-sdk-16.04', 'ubuntu-touch-24.04-1.x', 'ubuntu-touch-24.04-2.x'],
+        );
+        assert.equal(rev3?.version, '1.0.0-24.04-2.x');
+        assert.equal(rev3?.architecture, Architecture.ARM64);
+        assert.equal(rev3?.channel, Channel.FOCAL);
+        assert.equal(rev3?.framework, 'ubuntu-touch-24.04-2.x');
+      });
+    });
   });
 
   describe('video_url transformation', () => {
