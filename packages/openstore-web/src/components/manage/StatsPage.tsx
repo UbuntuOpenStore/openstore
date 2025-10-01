@@ -46,20 +46,15 @@ const StatsPage = ({ id }: { id: string}) => {
             </tr>
 
             {
-              revisions.map((revision) => {
-                const isCurrent = app.downloads.some((download) => download.revision === revision.revision);
-                return (
-                  <tr class={`border-b-1 border-b-gray-300 text-center ${isCurrent ? "font-extrabold" : ""}`}>
-                    <td class="text-left p-1">
-                      {revision.revision} {isCurrent ? "*" : ""}
-                    </td>
-                    <td>{revision.channel}</td>
-                    <td>{revision.architecture}</td>
-                    <td>{revision.version}</td>
-                    <td class="text-right p-1">{revision.downloads.toLocaleString()}</td>
-                  </tr>
-                );
-              })
+              revisions.map((revision) => (
+                <tr class="border-b-1 border-b-gray-300 text-center">
+                  <td class="text-left p-1">{revision.revision}</td>
+                  <td>{revision.channel}</td>
+                  <td>{revision.architecture}</td>
+                  <td>{revision.version}</td>
+                  <td class="text-right p-1">{revision.downloads.toLocaleString()}</td>
+                </tr>
+              ))
             }
           </tbody>
         </table>
