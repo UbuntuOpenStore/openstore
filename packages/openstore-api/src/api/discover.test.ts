@@ -38,6 +38,7 @@ describe('Discover API', () => {
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
         published_date: (new Date()).toISOString(),
         types: [PackageType.APP],
+        banner: 'test.svg',
       }),
       factory.package({
         published: true,
@@ -49,6 +50,7 @@ describe('Discover API', () => {
         published_date: '2021-01-01T13:35:16.095Z',
         updated_date: '2021-01-01T13:35:16.095Z',
         types: [PackageType.APP],
+        banner: 'test.svg',
       }),
       factory.package({
         published: true,
@@ -60,6 +62,7 @@ describe('Discover API', () => {
         published_date: '2021-01-01T13:35:16.095Z',
         updated_date: '2021-01-01T13:35:16.095Z',
         types: [PackageType.APP],
+        banner: 'test.svg',
       }),
       factory.package({
         published: true,
@@ -70,6 +73,7 @@ describe('Discover API', () => {
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-16.04`],
         published_date: (new Date()).toISOString(),
         types: [PackageType.APP],
+        banner: 'test.svg',
       }),
     ]);
   });

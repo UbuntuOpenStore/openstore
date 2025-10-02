@@ -222,6 +222,7 @@ describe('Package', () => {
         package1.revisions[0].created_date = now;
         package1.revisions[1].created_date = now;
         package1.updated_date = now;
+        package1.banner = 'test.svg';
 
         const serialized = package1.serialize(Architecture.ARMHF, DEFAULT_CHANNEL, [], 4);
 
@@ -229,6 +230,7 @@ describe('Package', () => {
           id: 'app.id',
           name: 'Best App Ever',
           icon: 'http://local.open-store.io/icons/app.id/app.id-1.0.0.png',
+          banner: 'http://local.open-store.io/banners/test.svg',
           channels: [DEFAULT_CHANNEL],
           architecture: '',
           architectures: [Architecture.ARMHF, Architecture.ARM64],
