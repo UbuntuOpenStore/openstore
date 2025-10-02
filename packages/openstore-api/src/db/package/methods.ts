@@ -550,6 +550,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       description: this.description || '',
       downloads: [] as SerializedDownload[],
       icon: this.icon_url,
+      banner: this.banner_url,
       id: this.id || '',
       keywords: this.keywords || [],
       license: this.license || 'Proprietary',
@@ -600,31 +601,31 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [
-          ...downloads,
-          ...this.architectures.map((arch) => {
-            if (!Object.values(Architecture).includes(arch)) {
-              return null; // Filter out unsupported arches like i386 (legacy apps)
-            }
-            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-            if (downloadRevisionData) {
-              const download = {
-                ...downloadRevisionData.toObject(),
-                _id: undefined,
-                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
-                installedSize: toBytes(downloadRevisionData.filesize),
-                downloadSize: downloadRevisionData.downloadSize ?? 0,
-                // TODO deprecate
-                filesize: toBytes(downloadRevisionData.filesize),
-              };
-              delete download._id;
-              return download;
-            }
-            return null;
-          }),
-        ];
-      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+          return [
+            ...downloads,
+            ...this.architectures.map((arch) => {
+              if (!Object.values(Architecture).includes(arch)) {
+                return null; // Filter out unsupported arches like i386 (legacy apps)
+              }
+              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+              if (downloadRevisionData) {
+                const download = {
+                  ...downloadRevisionData.toObject(),
+                  _id: undefined,
+                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                  download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                  installedSize: toBytes(downloadRevisionData.filesize),
+                  downloadSize: downloadRevisionData.downloadSize ?? 0,
+                  // TODO deprecate
+                  filesize: toBytes(downloadRevisionData.filesize),
+                };
+                delete download._id;
+                return download;
+              }
+              return null;
+            }),
+          ];
+        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
@@ -711,6 +712,35 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         this.screenshots.push(filename);
       }
     }
+  });
+
+  packageSchema.method<HydratedPackage>('updateBannerFile', async function (bannerFile: File) {
+    const ext = path.extname(bannerFile.originalname).toLowerCase();
+
+    if (ext !== '.svg') {
+      await fs.unlink(bannerFile.path);
+      return false;
+    }
+
+    if (this.banner) {
+      try {
+        await fs.unlink(`${config.banner_dir}/${this.banner}`);
+      }
+      catch (err) {
+        // Ignore errors if file doesn't exist
+      }
+    }
+
+    const uuid = v4();
+    const filename = `${this.id as string}-banner-${uuid}${ext}`;
+
+    await moveFile(
+      bannerFile.path,
+      `${config.banner_dir}/${filename}`,
+    );
+
+    this.banner = filename;
+    return true;
   });
 
   packageSchema.method<HydratedPackage>('createRevisionFromClick', async function (filePath: string, channel: Channel, changelog?: string) {

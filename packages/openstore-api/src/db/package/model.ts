@@ -73,6 +73,7 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   channels: [String],
 
   icon: String, // Path to a local icon file
+  banner: String, // Path to a local SVG banner file
 
   // Number of ratings in each category
   rating_counts: [{ type: Schema.Types.ObjectId, ref: 'RatingCount' }],

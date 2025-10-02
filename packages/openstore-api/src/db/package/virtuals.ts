@@ -42,4 +42,12 @@ export function setupVirtuals(packageSchema: Schema<IPackage, PackageModel, IPac
 
     return `${config.server.host}/icons/${this.id as string}/${this.id as string}-${version}${path.extname(this.icon)}`;
   });
+
+  packageSchema.virtual<HydratedPackage>('banner_url').get(function (): string | null {
+    if (!this.banner) {
+      return null;
+    }
+
+    return `${config.server.host}/banners/${this.banner}`;
+  });
 }

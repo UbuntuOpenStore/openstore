@@ -22,6 +22,11 @@ declare global {
           path: string;
           size: number;
         }[];
+        banner_file?: {
+          originalname: string;
+          path: string;
+          size: number;
+        }[];
       };
       file?: {
         originalname: string;
@@ -33,6 +38,6 @@ declare global {
     interface Response {
     }
 
-    interface User extends HydratedUser {}
+    interface User extends HydratedUser { }
   }
 }

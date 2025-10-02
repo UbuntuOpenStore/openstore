@@ -90,6 +90,7 @@ export type SerializedPackage = {
   downloads: SerializedDownload[];
   framework: string;
   icon: string;
+  banner: string | null;
   id: string;
   keywords: string[];
   license: string;
@@ -222,6 +223,7 @@ export interface IPackage {
   revisions: Types.DocumentArray<HydratedRevision>;
   channels: Channel[];
   icon?: string;
+  banner?: string;
   rating_counts: Types.DocumentArray<HydratedRatingCount>;
   calculated_rating?: number;
 }
@@ -282,6 +284,7 @@ export interface IPackageMethods {
     apiVersion?: number
   ) => SerializedPackage;
   updateScreenshotFiles: (screenshotFiles: File[]) => Promise<void>;
+  updateBannerFile: (bannerFile: File) => Promise<boolean>;
   createRevisionFromClick: (filePath: string, channel: Channel, changelog?: string) => Promise<void>;
   updateCalculatedProperties: () => void;
 
@@ -289,6 +292,7 @@ export interface IPackageMethods {
   architecture: string;
   next_revision: number;
   icon_url: string;
+  banner_url: string | null;
 }
 
 export type HydratedPackage = HydratedDocument<IPackage, IPackageMethods>;

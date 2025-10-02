@@ -44,12 +44,14 @@ async function getHighlights(
       return null;
     }
 
+    const serializedApp = highlightedApp.serialize(architecture, channel, frameworks, apiVersion);
+
     return {
       ...highlight,
-      image: config.server.host + highlight.image,
-      app: highlightedApp.serialize(architecture, channel, frameworks, apiVersion),
+      image: serializedApp.banner,
+      app: serializedApp,
     };
-  }).filter(Boolean) as DiscoverHighlight[]);
+  }).filter((highlight): highlight is DiscoverHighlight => !!highlight && !!highlight.image));
 
   // Deprecated, for backwards compatibility
   discover.highlight = discover.highlights[0];

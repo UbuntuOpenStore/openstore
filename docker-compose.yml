@@ -35,5 +35,6 @@ services:
       - ./.data/icons:/srv/openstore-icons
       - ./.data/screenshots:/srv/openstore-screenshots
       - ./.data/avatars:/srv/openstore-avatars
+      - ./.data/banners:/srv/openstore-banners
     extra_hosts:
       - "host.docker.internal:host-gateway"

@@ -5,6 +5,7 @@ let configuration = {
   screenshot_dir: process.env.IMAGE_DIR || './.data/screenshots',
   icon_dir: process.env.ICON_DIR || './.data/icons',
   avatar_dir: process.env.AVATAR_DIR || './.data/avatars',
+  banner_dir: process.env.BANNER_DIR || './.data/banners',
   server: {
     ip: process.env.NODEJS_IP || '0.0.0.0',
     port: parseInt(process.env.PORT || process.env.NODEJS_PORT || '6543', 10),
@@ -52,6 +53,7 @@ if (process.env.NODE_ENV === 'testing') {
     screenshot_dir: '/tmp',
     icon_dir: '/tmp',
     avatar_dir: '/tmp',
+    banner_dir: '/tmp',
     mongo: {
       uri: 'mongodb://127.0.0.1:27017',
       database: process.env.SNAPSHOT_TEST === 'true' ? 'openstore' : 'openstore-test',

@@ -58,6 +58,7 @@ export const AppSchema = z.object({
     revision: z.number(),
   })),
   icon: z.string(),
+  banner: z.string().nullish(),
   keywords: z.array(z.string()),
   license: z.string(),
   nsfw: z.boolean(),

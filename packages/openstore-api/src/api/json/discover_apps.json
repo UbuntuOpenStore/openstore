@@ -2,52 +2,42 @@
     "highlights": [
       {
         "id": "io.guh.nymeaapp",
-        "image": "/banners/nymea.svg",
         "description": "nymea transforms your regular smart devices into a harmoniously connected ecosystem."
       },
       {
         "id": "futify.frenchutouch",
-        "image": "/banners/futify.svg",
         "description": "Unofficial native qml Spotify client for premium users only"
       },
       {
         "id": "circlejump.abmyii",
-        "image": "/banners/circlejump.svg",
         "description": "How far can you get? Tap to jump from circle to circle for as long as you can."
       },
       {
         "id": "me.lduboeuf.stellarium",
-        "image": "/banners/stellarium.svg",
         "description": "A realistic night sky map in 3D in the palm of your hand."
       },
       {
         "id": "dekko2.dekkoproject",
-        "image": "/banners/dekko.svg",
         "description": "An email client for multiple email providers."
       },
       {
         "id": "pure-maps.jonnius",
-        "image": "/banners/puremaps.svg",
         "description": "A full-featured map and navigation application allowing you to explore maps and navigate to your destination."
       },
       {
         "id": "sturmreader.emanuelesorce",
-        "image": "/banners/sturmreader.svg",
         "description": "An e-book and comic reader supporting Epub, PDF,  CBZ and CBR files."
       },
       {
         "id": "teleports.ubports",
-        "image": "/banners/telegram.svg",
         "description": "The Telegram client for Ubuntu Touch."
       },
       {
         "id": "uadblockng.liohmoeller",
-        "image": "/banners/uadblock.svg",
         "description": "System wide adblocker for Ubuntu Touch."
       },
       {
         "id": "navigator.costales",
-        "image": "/banners/unav.svg",
         "description": "Navigation and maps powered by OpenStreetMap."
       }
     ],

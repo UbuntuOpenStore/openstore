@@ -114,6 +114,7 @@ const putUpload = mupload.fields([
     the handling of extra files is done in updateScreenshotFiles()
   */
   { name: 'screenshot_files' },
+  { name: 'banner_file', maxCount: 1 },
 ]);
 
 /**
@@ -148,8 +149,14 @@ router.put(
 
     await req.pkg.updateFromBody(req.body);
 
-    if (req.files && !Array.isArray(req.files) && req.files.screenshot_files && req.files.screenshot_files.length > 0) {
-      await req.pkg.updateScreenshotFiles(req.files.screenshot_files);
+    if (req.files && !Array.isArray(req.files)) {
+      if (req.files.screenshot_files && req.files.screenshot_files.length > 0) {
+        await req.pkg.updateScreenshotFiles(req.files.screenshot_files);
+      }
+
+      if (req.files.banner_file && req.files.banner_file.length > 0) {
+        await req.pkg.updateBannerFile(req.files.banner_file[0]);
+      }
     }
 
     const pkg = await req.pkg.save();

@@ -254,6 +254,29 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
           <div class="form-label">{/* Intentionally left blank */}</div>
           <SortableScreenshots screenshots={screenshots} onUpdate={setScreenshots} />
         </div>
+
+        <div class="form-group">
+          <label for="banner_file" class="form-label">Banner Image (SVG only)</label>
+          <input
+            type="file"
+            id="banner_file"
+            name="banner_file"
+            accept=".svg"
+            class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 file:cursor-pointer border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <p class="mt-1 text-xs text-gray-500 text-right">
+          Upload an SVG banner image for your app. This will be displayed if you app is featured on the discover page.
+        </p>
+
+        {app.banner && (
+          <div class="form-group">
+            <label class="form-label">Current Banner</label>
+            <div class="border rounded-md p-4">
+              <img src={app.banner} alt="App banner" class="max-h-40" />
+            </div>
+          </div>
+        )}
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
