@@ -105,7 +105,7 @@ router.post(
 
     success(res, pkg.serialize());
   },
-    'There was an error creating your app, please try again later'),
+  'There was an error creating your app, please try again later'),
 );
 
 const putUpload = mupload.fields([
@@ -170,7 +170,7 @@ router.put(
 
     success(res, pkg.serialize());
   },
-    'There was an error updating your app, please try again later'),
+  'There was an error updating your app, please try again later'),
 );
 
 /**
@@ -253,7 +253,7 @@ router.delete(
     await req.pkg.deleteOne();
     success(res, {});
   },
-    'There was an error deleting your app, please try again later'),
+  'There was an error deleting your app, please try again later'),
 );
 
 const postUpload = mupload.fields([
