@@ -2,6 +2,7 @@ import express, { type Request, type Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { Types } from 'mongoose';
 
 import { User } from '../db/user';
 import { success, asyncErrorWrapper, config } from '../utils';
@@ -76,6 +77,11 @@ router.put('/me', authenticate, upload.single('avatar'), asyncErrorWrapper(async
 }, 'Could not update user profile at this time'));
 
 router.get('/:id', asyncErrorWrapper(async (req: Request, res: Response) => {
+  // Validate that the ID is a valid MongoDB ObjectId
+  if (!Types.ObjectId.isValid(req.params.id)) {
+    throw new NotFoundError(USER_NOT_FOUND);
+  }
+
   const user = await User.findById(req.params.id);
   if (!user) {
     throw new NotFoundError(USER_NOT_FOUND);
@@ -85,6 +91,11 @@ router.get('/:id', asyncErrorWrapper(async (req: Request, res: Response) => {
 }, 'Could not fetch user at this time'));
 
 router.put('/:id', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, res: Response) => {
+  // Validate that the ID is a valid MongoDB ObjectId
+  if (!Types.ObjectId.isValid(req.params.id)) {
+    throw new NotFoundError(USER_NOT_FOUND);
+  }
+
   const user = await User.findById(req.params.id);
   if (!user) {
     throw new NotFoundError(USER_NOT_FOUND);

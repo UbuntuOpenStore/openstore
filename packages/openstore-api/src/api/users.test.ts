@@ -8,6 +8,7 @@ import * as api from '.';
 import { type App } from 'supertest/types';
 import { User } from '../db/user';
 import { Types } from 'mongoose';
+import { USER_NOT_FOUND } from '../utils/error-messages';
 
 describe('Users API', () => {
   const route = '/api/users/';
@@ -113,6 +114,15 @@ describe('Users API', () => {
       await request(app)
         .get(`${route}${new Types.ObjectId().toString()}?apikey=${adminUser.apikey}`)
         .expect(404);
+    });
+
+    test('returns 404 for invalid ObjectId', async () => {
+      const res = await request(app)
+        .get(`${route}invalid-objectid`)
+        .expect(404);
+
+      assert.ok(!res.body.success);
+      assert.equal(res.body.message, USER_NOT_FOUND);
     });
   });
 
@@ -271,6 +281,16 @@ describe('Users API', () => {
         .put(`${route}${new Types.ObjectId().toString()}?apikey=${adminUser.apikey}`)
         .send({ website_url: 'https://example.com' })
         .expect(404);
+    });
+
+    test('returns 404 for invalid ObjectId', async () => {
+      const res = await request(app)
+        .put(`${route}invalid-objectid?apikey=${adminUser.apikey}`)
+        .send({ website_url: 'https://example.com' })
+        .expect(404);
+
+      assert.ok(!res.body.success);
+      assert.equal(res.body.message, 'User not found');
     });
   });
 });
