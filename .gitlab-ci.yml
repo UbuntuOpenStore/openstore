@@ -50,6 +50,12 @@ web-build:
     - npm run convert-po -w openstore-web
     - npm run check -w openstore-web
 
+dpkg-build:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run build -w openstore-dpkg
+
 deploy:
   stage: deploy
   only:

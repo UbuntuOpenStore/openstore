@@ -1,0 +1,22 @@
+{
+  "name": "openstore-dpkg",
+  "version": "1.0.0",
+  "description": "Native Node.js binding to dpkg version comparison using official dpkg code",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "install": "npm run build",
+    "build": "node-gyp rebuild",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "OpenStore Team",
+  "license": "GPL-3.0",
+  "gypfile": true,
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^7.0.0"
+  },
+  "devDependencies": {
+    "node-gyp": "^10.0.1"
+  }
+}
