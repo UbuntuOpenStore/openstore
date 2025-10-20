@@ -37,7 +37,7 @@ export default defineConfig({
     i18n({
       locales,
       defaultLocale,
-      exclude: ["pages/api/**/*", "pages/manage/**/*"],
+      exclude: ["pages/api/**/*", "pages/manage/**/*", "pages/admin/**/*"],
     }),
     sitemap({
       i18n: {

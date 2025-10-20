@@ -1,4 +1,3 @@
-import { getRelativeLocaleUrl } from "@/lib/utils";
 import type { UserData } from "@/lib/schema";
 import {
   DropdownMenu,
@@ -42,26 +41,26 @@ export default function UserMenu({ user, currentLocale, messages }: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="md:w-auto w-52">
         <DropdownMenuItem asChild>
-          <a href={getRelativeLocaleUrl(currentLocale, "/manage/profile/")} className="w-full cursor-pointer">
+          <a href="/manage/profile/" className="w-full cursor-pointer">
             {messages.profile}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href={getRelativeLocaleUrl(currentLocale, "/manage/")} className="w-full cursor-pointer">
+          <a href="/manage/" className="w-full cursor-pointer">
             {messages.manageApps}
           </a>
         </DropdownMenuItem>
 
         {user.role ==='admin' && (
           <DropdownMenuItem asChild>
-            <a href={getRelativeLocaleUrl(currentLocale, "/admin/")} className="w-full cursor-pointer">
+            <a href="/admin/" className="w-full cursor-pointer">
               Admin
             </a>
           </DropdownMenuItem>
         )}
 
         <DropdownMenuItem asChild>
-          <a href={getRelativeLocaleUrl(currentLocale, "/logout/")} className="w-full cursor-pointer">
+          <a href="/logout/" className="w-full cursor-pointer">
             {messages.logout}
           </a>
         </DropdownMenuItem>
