@@ -28,7 +28,7 @@ const SortableScreenshotItem = ({ screenshot, onRemove }: SortableScreenshotItem
       </div>
 
       <div {...attributes as any} {...listeners} class="cursor-move">
-        <img src={screenshot} alt="" loading="lazy" class="max-h-36 max-w-36 h-auto w-auto rounded-2xl block border border-primary" />
+        <img src={screenshot} alt="" loading="lazy" class="max-h-64 max-w-64 h-auto w-auto rounded-2xl block border border-primary" />
         <input type="hidden" name="screenshots" value={screenshot} />
       </div>
     </div>
