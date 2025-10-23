@@ -30,7 +30,8 @@ const PROPERTIES = [
 ];
 
 const SEARCH_FIELDS = [
-  'search_name^3',
+  'search_name^4',
+  'tagline^3',
   'description^2',
   'keywords^2',
   'author',

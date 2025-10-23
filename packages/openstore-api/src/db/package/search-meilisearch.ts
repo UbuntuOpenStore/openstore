@@ -27,11 +27,10 @@ const PROPERTIES: (keyof IPackage)[] = [
 
 const SEARCH_FIELDS = [
   'search_name',
-  'name',
+  'tagline',
   'description',
   'keywords',
   'author',
-  'tagline',
 ];
 
 function sanitizeId(id: string): string {
