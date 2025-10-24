@@ -2,79 +2,82 @@ msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
 "POT-Creation-Date: 2025-09-26T02:55:19.730Z\n"
-"PO-Revision-Date: 2025-09-26T02:55:19.730Z\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2025-10-25 08:03+0000\n"
+"Last-Translator: Priit Jõerüüt <jrthwlate@users.noreply.hosted.weblate.org>\n"
+"Language-Team: Estonian <https://hosted.weblate.org/projects/open-store-io/"
+"openstore-web-next/et/>\n"
 "Language: et\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.14.1-dev\n"
 "mime-version: 1.0\n"
 
 msgid "New!"
-msgstr ""
+msgstr "Uus!"
 
 msgid "App"
-msgstr ""
+msgstr "Rakendus"
 
 msgid "Bookmark"
-msgstr ""
+msgstr "Lisa järjehoidjaks"
 
 msgid "Web App"
-msgstr ""
+msgstr "Veebirakendus"
 
 msgid "Report an Issue"
-msgstr ""
+msgstr "Teata veast või probleemist"
 
 msgid "Chat with us on Telegram"
-msgstr ""
+msgstr "Suhtle meiega Telegramis"
 
 msgid "Site Status"
-msgstr ""
+msgstr "Veebisaidi olek"
 
 msgid "Search..."
-msgstr ""
+msgstr "Otsi..."
 
 msgid "Submit"
-msgstr ""
+msgstr "Lisa rakendus"
 
 msgid "Browse"
-msgstr ""
+msgstr "Sirvi"
 
 msgid "Categories"
-msgstr ""
+msgstr "Kategooriad"
 
 msgid "About"
-msgstr ""
+msgstr "Teave"
 
 msgid "Profile"
-msgstr ""
+msgstr "Profiil"
 
 msgid "Manage Apps"
-msgstr ""
+msgstr "Halda rakendusi"
 
 msgid "Logout"
-msgstr ""
+msgstr "Logi välja"
 
 msgid "Login"
-msgstr ""
+msgstr "Logi sisse"
 
 msgid "Reviwed %{date} for version %{version}"
-msgstr ""
+msgstr "Versioon %{version}, arvustatud %{date}"
 
 msgid "The open source app store for Ubuntu Touch"
-msgstr ""
+msgstr "Rakendustepood avatud lähtekoodiga Ubuntu Touchi rakendustele"
 
 msgid "Not Found"
-msgstr ""
+msgstr "Otsitavat ei leidu"
 
 msgid ""
 "The app or page you are looking for could not be found. Try using the "
 "search bar."
 msgstr ""
+"Sinu otsitavat rakendust või lehte ei leidu. Proovi kasutada otsinguvälja."
 
 msgid "About the OpenStore"
-msgstr ""
+msgstr "Teave OpenStore'i kohta"
 
 msgid ""
 "The OpenStore is the official app store for Ubuntu Touch. It is an open "
@@ -86,40 +89,43 @@ msgid ""
 msgstr ""
 
 msgid "Learn more about Ubuntu Touch"
-msgstr ""
+msgstr "Lisateave Ubuntu Touchi kohta"
 
 msgid "Badges"
-msgstr ""
+msgstr "Reklaamsildid"
 
 msgid "Promote your app on the OpenStore!"
-msgstr ""
+msgstr "Reklaami oma rakendust OpenStore'is!"
 
 msgid "Get your badge"
-msgstr ""
+msgstr "Siit saada oma reklaamsildi"
 
 msgid "Install"
-msgstr ""
+msgstr "Paigalda"
 
 msgid ""
 "The OpenStore app is installed by default on the UBports builds of Ubuntu "
 "Touch. But if you need to install the OpenStore manually, follow these "
 "steps:"
 msgstr ""
+"OpenStore'i rakendus on Ubuntu Touchi UBports-variatsioonis vaikimisi "
+"paigaldatud. Aga kui peaks olema vaja OpenStore'i käsitsi paigaldada, siis "
+"toimi alljärgnevalt:"
 
 msgid "Download the OpenStore App"
-msgstr ""
+msgstr "Laadi alla OpenStore'i rakendus"
 
 msgid "Open the terminal app on your Ubuntu Touch device"
-msgstr ""
+msgstr "Ava oma Ubuntu Touchi seadmes terminalirakendus"
 
 msgid "Navigate to the downloads folder"
-msgstr ""
+msgstr "Mine allalaadimiste kausta"
 
 msgid "Run the command:"
-msgstr ""
+msgstr "Käivita käsk:"
 
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 msgid ""
 "For any questions you may have or help you may need just chat with us in "
@@ -128,32 +134,37 @@ msgid ""
 msgstr ""
 
 msgid "OpenStore group on Telegram"
-msgstr ""
+msgstr "OpenStore'i grupp Telegramis"
 
 msgid "Bug Tracker"
-msgstr ""
+msgstr "Veahaldus"
 
 msgid "License"
-msgstr ""
+msgstr "Litsents"
 
 msgid ""
 "The source code for OpenStore related projects is available under the GPL "
 "v3. You can find the code on the OpenStore GitLab page."
 msgstr ""
+"OpenStore'i ja temaga seotud projektide lähtekood on avaldatud GPL v3 "
+"litsentsi alusel. Lähtekoodi leiad OpenStore'i GitLabi lehelt."
 
 msgid "GPL v3 License"
-msgstr ""
+msgstr "GPL v3 litsents"
 
 msgid "OpenStore source on GitLab"
-msgstr ""
+msgstr "OpenStore'i lähtekood GitLabis"
 
 msgid ""
 "The apps available for download from the OpenStore have their own licensing "
 "and terms. Consult each individual app's page for more information."
 msgstr ""
+"OpenStore'i rakendusetepoes saadavalolevad rakendused on avaldatud oma "
+"litsentsi ja tingimuste alusel. Täpsemat teavet leiad iga rakenduse "
+"infovaatest."
 
 msgid "Terms"
-msgstr ""
+msgstr "Tingimused"
 
 msgid ""
 "The OpenStore a non-profit volunteer project. Although every effort is made "
@@ -191,294 +202,303 @@ msgid ""
 msgstr ""
 
 msgid "Submit your app"
-msgstr ""
+msgstr "Lisa oma rakendus"
 
 msgid "App Submission Tutorial"
-msgstr ""
+msgstr "Rakenduse lisamise juhend"
 
 msgid "Contributors"
-msgstr ""
+msgstr "Kaasautorid"
 
 msgid "The OpenStore is made possible by many amazing contributors:"
-msgstr ""
+msgstr "OpenStore on olemas tänu paljude suurepäraste kaasautorite tegevusele:"
 
 msgid "OpenStore API/Server Contributors"
-msgstr ""
+msgstr "OpenStore'i API/Serveri kaasautorid"
 
 msgid "OpenStore Website Contributors"
-msgstr ""
+msgstr "OpenStore'i veebisaidi kaasautorid"
 
 msgid "OpenStore App Contributors"
-msgstr ""
+msgstr "OpenStore'i rakenduse kaasautorid"
 
 msgid ""
 "And many amazing developers, testers, and users from the OpenStore "
 "community!"
 msgstr ""
+"Ja palju suurepäraseid arendajaid, testijaid ja kasutajaid OpenStore'i "
+"kogukonnast!"
 
 msgid "Accounts"
-msgstr ""
+msgstr "Kasutajakontod"
 
 msgid "Audio"
-msgstr ""
+msgstr "Heli"
 
 msgid "Bluetooth"
-msgstr ""
+msgstr "Bluetooth"
 
 msgid "Calendar"
-msgstr ""
+msgstr "Kalender"
 
 msgid "Camera"
-msgstr ""
+msgstr "Kaamera"
 
 msgid "Connectivity"
-msgstr ""
+msgstr "Ühenduvus"
 
 msgid "Contacts"
-msgstr ""
+msgstr "Kontaktid"
 
 msgid "Content Exchange Source"
-msgstr ""
+msgstr "Sisuvahetuse allikas"
 
 msgid "Content Exchange"
-msgstr ""
+msgstr "Sisuvahetus"
 
 msgid "Debug"
-msgstr ""
+msgstr "Veaotsing"
 
 msgid "Read Document Files"
-msgstr ""
+msgstr "Dokumendifailide lugemine"
 
 msgid "Document Files"
-msgstr ""
+msgstr "Dokumendifailid"
 
 msgid "History"
-msgstr ""
+msgstr "Ajalugu"
 
 msgid "In App Purchases"
-msgstr ""
+msgstr "Rakendusesisesed ostud"
 
 msgid "Keep Display On"
-msgstr ""
+msgstr "Ekraani hoidmine sisselülitatuna"
 
 msgid "Location"
-msgstr ""
+msgstr "Asukoht"
 
 msgid "Microphone"
-msgstr ""
+msgstr "Mikrofon"
 
 msgid "Read Music Files"
-msgstr ""
+msgstr "Muusikafailide lugemine"
 
 msgid "Music Files"
-msgstr ""
+msgstr "Muusikafailid"
 
 msgid "NFC"
-msgstr ""
+msgstr "NFC"
 
 msgid "Networking"
-msgstr ""
+msgstr "Võrgundus"
 
 msgid "Read Picture Files"
-msgstr ""
+msgstr "Pildifailide lugemine"
 
 msgid "Picture Files"
-msgstr ""
+msgstr "Pildifailid"
 
 msgid "Push Notifications"
-msgstr ""
+msgstr "Tõuketeavitused"
 
 msgid "Sensors"
-msgstr ""
+msgstr "Andurid"
 
 msgid "User Metrics"
-msgstr ""
+msgstr "Kasutajate statistika"
 
 msgid "Read Video Files"
-msgstr ""
+msgstr "Videofailide lugemine"
 
 msgid "Video Files"
-msgstr ""
+msgstr "Videofailid"
 
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 msgid "Webview"
-msgstr ""
+msgstr "Webview sisemine brauser"
 
 msgid "Full System Access"
-msgstr ""
+msgstr "Täisligipääs süsteemile"
 
 msgid "Download"
-msgstr ""
+msgstr "Laadi alla"
 
 msgid "Download %{app}"
-msgstr ""
+msgstr "Laadi %{app} alla"
 
 msgid "Older versions"
-msgstr ""
+msgstr "Vanemad versioonid"
 
 msgid "Install via the OpenStore app"
-msgstr ""
+msgstr "Paigalda OpenStore'i rakenduse abil"
 
 msgid "This app contains NSFW content, to click to reveal the screenshots."
 msgstr ""
+"Selles rakenduses on tööle ja avalikku ruumi mittesobivat sisu, "
+"ekraanipiltide nägemiseks klõpsi."
 
 msgid "About %{app}"
-msgstr ""
+msgstr "Rakenduse teave: %{app}"
 
 msgid "Recent Changes"
-msgstr ""
+msgstr "Hiljutised muudatused"
 
 msgid "Permissions"
-msgstr ""
+msgstr "Õigused"
 
 msgid "Unrestricted write access to:"
-msgstr ""
+msgstr "Piiramatu õigus kirjutada asukohta:"
 
 msgid "Unrestricted read access to:"
-msgstr ""
+msgstr "Piiramatu õigus lugeda asukohast:"
 
 msgid "No permissions needed"
-msgstr ""
+msgstr "Ei vaja õigusi"
 
 msgid "Proprietary"
-msgstr ""
+msgstr "Omanduslik ja suletud"
 
 msgid ""
 "This app's source code is not available and has not been reviewed by the "
 "community. There is no accountability for what this app does or how it is "
 "developed. Please install at your own risk"
 msgstr ""
+"Rakenduse lähtekood pole saadaval ja kogukond pole seda üle vaadanud. Pole "
+"mitte mingit vastutavust ega tuvastatavust, mida see rakendus teeb ja kuidas "
+"ta on arendatud. Paigaldad ta omal vastutusel"
 
 msgid "Community Built"
-msgstr ""
+msgstr "Kogukonna poolt arendatud rakendus"
 
 msgid "This app has been released under the %{license} license."
-msgstr ""
+msgstr "See rakendus on avaldatud %{license} litsentsi alusel."
 
 msgid "It is developed in the open and you can review the source code."
 msgstr ""
+"Ta on arendatud kõikidele huvilistele nähtaval moel ning sul on võimalus "
+"lähtekoodiga tutvuda."
 
 msgid "Get involved"
-msgstr ""
+msgstr "Osale"
 
 msgid "Info"
-msgstr ""
+msgstr "Teave"
 
 msgid "Published Date"
-msgstr ""
+msgstr "Avaldamise kuupäev"
 
 msgid "Updated Date"
-msgstr ""
+msgstr "Uuendamise kuupäev"
 
 msgid "Total Downloads"
-msgstr ""
+msgstr "Allalaadimisi kokku"
 
 msgid "Latest Version Downloads"
-msgstr ""
+msgstr "Viimase versiooni allalaadimisi"
 
 msgid "Supported Architectures"
-msgstr ""
+msgstr "Toetatud arhitektuurid"
 
 msgid "Translation Languages"
-msgstr ""
+msgstr "Tõlke keeled"
 
 msgid "Links"
-msgstr ""
+msgstr "Lingid"
 
 msgid "Source Code"
-msgstr ""
+msgstr "Lähtekood"
 
 msgid "Support"
-msgstr ""
+msgstr "Kasutajatugi"
 
 msgid "Donate"
-msgstr ""
+msgstr "Toeta arendajat"
 
 msgid "Translations"
-msgstr ""
+msgstr "Tõlked"
 
 msgid "Reviews"
-msgstr ""
+msgstr "Arvustused"
 
 msgid "No reviews yet!"
-msgstr ""
+msgstr "Keegi pole veel ühtegi arvustust kirjutanud!"
 
 msgid "Versions"
-msgstr ""
+msgstr "Versioonid"
 
 msgid "All Types"
-msgstr ""
+msgstr "Kõik tüübid"
 
 msgid "Apps"
-msgstr ""
+msgstr "Rakendused"
 
 msgid "Bookmarks"
-msgstr ""
+msgstr "Järjehoidjad"
 
 msgid "Web Apps"
-msgstr ""
+msgstr "Veebirakendused"
 
 msgid "Filters"
-msgstr ""
+msgstr "Filtrid"
 
 msgid "Show NSFW Apps"
-msgstr ""
+msgstr "Näita avalikku ruumi mittesobivaid rakendusi"
 
 msgid "No apps found"
-msgstr ""
+msgstr "Rakendusi ei leidu"
 
 msgid "Go back a page"
-msgstr ""
+msgstr "Tagasi ühe lehe võrra"
 
 msgid "Go to the next page"
-msgstr ""
+msgstr "Mine edasi järgmisele lehele"
 
 msgid "There was an error loading the app list. Please try again later."
-msgstr ""
+msgstr "Rakenduste loendi laadimisel tekkis viga. Palun proovi hiljem uuesti."
 
 msgid "Search"
-msgstr ""
+msgstr "Otsi"
 
 msgid "Sort by:"
-msgstr ""
+msgstr "Järjestus:"
 
 msgid "Sort Options"
-msgstr ""
+msgstr "Järjestuse valikud"
 
 msgid "Relevance"
-msgstr ""
+msgstr "Teemakohasus"
 
 msgid "Most Popular"
-msgstr ""
+msgstr "Populaarseimad"
 
 msgid "Least Popular"
-msgstr ""
+msgstr "Vähem populaarsed"
 
 msgid "Title (A-Z)"
-msgstr ""
+msgstr "Pealkiri (A..Z)"
 
 msgid "Title (Z-A)"
-msgstr ""
+msgstr "Pealkiri (Z..A)"
 
 msgid "Newest"
-msgstr ""
+msgstr "Uusim"
 
 msgid "Oldest"
-msgstr ""
+msgstr "Vanim"
 
 msgid "Latest Update"
-msgstr ""
+msgstr "Viimane uuendus"
 
 msgid "Oldest Update"
-msgstr ""
+msgstr "Vanim uuendus"
 
 msgid "Badge"
-msgstr ""
+msgstr "Reklaamsilt"
 
 msgid "OpenStore Badges"
-msgstr ""
+msgstr "OpenStore'i reklaamsildid"
 
 msgid ""
 "Promote your app on the OpenStore! Add these badges to your website, code "
@@ -487,85 +507,85 @@ msgid ""
 msgstr ""
 
 msgid "Login via GitHub"
-msgstr ""
+msgstr "Logi sisse GitHubi abil"
 
 msgid "Login via GitLab"
-msgstr ""
+msgstr "Logi sisse GitLabi abil"
 
 msgid "Login via Ubuntu One"
-msgstr ""
+msgstr "Logi sisse Ubuntu One'i abil"
 
 msgid "Manage your OpenStore profile information"
-msgstr ""
+msgstr "Halda oma OpenStore'i profiiliteavet"
 
 msgid "View public profile"
-msgstr ""
+msgstr "Vaata avalikku profiili"
 
 msgid "An error occurred while saving your profile"
-msgstr ""
+msgstr "Sinu profiili salvestamisel tekkis viga"
 
 msgid "Username"
-msgstr ""
+msgstr "Kasutajanimi"
 
 msgid "Username cannot be changed"
-msgstr ""
+msgstr "Kasutajanime ei saa muuta"
 
 msgid "Email"
-msgstr ""
+msgstr "E-posti aadress"
 
 msgid "Email is managed by your login provider"
-msgstr ""
+msgstr "E-posti aadressi haldab sinu sisselogimisteenusepakkuja"
 
 msgid "Avatar"
-msgstr ""
+msgstr "Tunnuspilt"
 
 msgid "Upload new avatar"
-msgstr ""
+msgstr "Laadi üles uus tunnuspilt"
 
 msgid "Profile picture"
-msgstr ""
+msgstr "Profiilipilt"
 
 msgid "JPG or PNG, max 2MB"
-msgstr ""
+msgstr "JPG või PNG, kuni 2MB"
 
 msgid "Biography"
-msgstr ""
+msgstr "Biograafia/elulugu"
 
 msgid "Short bio"
-msgstr ""
+msgstr "Lühike elulugu"
 
 msgid "Maximum 200 characters"
-msgstr ""
+msgstr "Kuni 200 tähemärki"
 
 msgid "Contact Links"
-msgstr ""
+msgstr "Kontaktide lingid"
 
 msgid "Website URL"
-msgstr ""
+msgstr "Veebisaidi aadress"
 
 msgid "GitHub Profile URL"
-msgstr ""
+msgstr "GitHubi profiili võrguaadress"
 
 msgid "GitLab Profile URL"
-msgstr ""
+msgstr "GitLabi profiili võrguaadress"
 
 msgid "UBports Forum Username"
-msgstr ""
+msgstr "Kasutajanimi UBportsi foorumis"
 
 msgid "Donation URL"
-msgstr ""
+msgstr "Rahalise toetuse aadress"
 
 msgid "Saving..."
-msgstr ""
+msgstr "Salvestan..."
 
 msgid "Save"
-msgstr ""
+msgstr "Salvesta"
 
 msgid "Submit Your App to the OpenStore"
-msgstr ""
+msgstr "Lisa oma rakendus OpenStore'i"
 
 msgid "Rules for Submission"
-msgstr ""
+msgstr "Rakenduse lisamise reeglid"
 
 msgid ""
 "Apps not requiring manual review can be submitted by logging in with the "
@@ -573,7 +593,7 @@ msgid ""
 msgstr ""
 
 msgid "You are only allowed to publish apps that you have permission to distribute."
-msgstr ""
+msgstr "Sa võid avaldada rakendusi, mille levitamiseks sul on õigus."
 
 msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
@@ -586,7 +606,7 @@ msgid ""
 msgstr ""
 
 msgid "You must read over the content policy detailed below."
-msgstr ""
+msgstr "Sa pead lugema läbi alljärgnevad sisureeglid."
 
 msgid "Rules for Submissions Requiring Manual Review"
 msgstr ""
@@ -616,7 +636,7 @@ msgid ""
 msgstr ""
 
 msgid "OpenStore App Content Policy"
-msgstr ""
+msgstr "OpenStore'i rakenduse sisureeglid"
 
 msgid ""
 "One of the main goals of the OpenStore is to provide a safe app store for "
@@ -628,42 +648,52 @@ msgid ""
 msgstr ""
 
 msgid "Prohibited Apps"
-msgstr ""
+msgstr "Keelatud rakendused"
 
 msgid "Sexually Explicit Content"
-msgstr ""
+msgstr "Varjamatu seksuaalne sisu"
 
 msgid ""
 "Apps containing or promoting sexually explicit content are not allowed. "
 "This includes, but is not limited to, pornography and services promoting "
 "sexually explicit content."
 msgstr ""
+"Varjamatu seksuaalse sisuga rakendused pole lubatud. Sealhulgas, aga mitte "
+"ainult pornograafia ja teenused, mis reklaamivad vastavat varjamata sisu."
 
 msgid "Child Endangerment"
-msgstr ""
+msgstr "Ohtlik lastele"
 
 msgid ""
 "Apps containing or promoting child abuse or child sexual abuse are strictly "
 "prohibited."
 msgstr ""
+"Rakendused, mis sisaldavad lastevastast vägivalda või seksuaalset "
+"ärakasutamist või reklaamivad, tutvustavad või viitavad sellele, on rangelt "
+"keelatud."
 
 msgid "Violence"
-msgstr ""
+msgstr "Vägivald"
 
 msgid ""
 "Apps containing or promoting gratuitous violence are not allowed. This "
 "includes, but is not limited to, violence, terrorism, bomb/weapon making, "
 "self harm, and grotesque imagery."
 msgstr ""
+"Rakendused, mis sisaldavad asjatut vägivalda, on keelatud. Sealhulgas, aga "
+"mitte ainult vägivaldsus, terrorism, lõhkeaine kasutamine, pommide ja "
+"relvade valmistamine, enesevigastamine ja grotesksed pildid."
 
 msgid "Harassment, Bullying, or Hate Speech"
-msgstr ""
+msgstr "Häirimine, kiusamine või vihakõne"
 
 msgid "App containing or promoting any of the above are strictly prohibited."
 msgstr ""
+"Keelatud on rakendus, mis sisaldab mõnda ülaltoodust või reklaamib/tutvustab "
+"seda."
 
 msgid "Gambling"
-msgstr ""
+msgstr "Hasartmängud"
 
 msgid ""
 "Apps containing gambling involving real world money transactions are not "
@@ -672,13 +702,13 @@ msgid ""
 msgstr ""
 
 msgid "Illegal Activities"
-msgstr ""
+msgstr "Illegaalsed tegevused"
 
 msgid "Apps promoting illegal activities (based on USA law) are not allowed."
 msgstr ""
 
 msgid "Malware"
-msgstr ""
+msgstr "Pahavara"
 
 msgid ""
 "Apps that are found to be stealing the users data, trying to escalate their "
@@ -687,31 +717,31 @@ msgid ""
 msgstr ""
 
 msgid "User profile on the OpenStore"
-msgstr ""
+msgstr "Kasutajaprofiil OpenStore'is"
 
 msgid "Website"
-msgstr ""
+msgstr "Veebisait"
 
 msgid "GitHub"
-msgstr ""
+msgstr "GitHub"
 
 msgid "GitLab"
-msgstr ""
+msgstr "GitLab"
 
 msgid "UBports Forum"
-msgstr ""
+msgstr "UBportsi foorum"
 
 msgid "new"
-msgstr ""
+msgstr "uus"
 
 msgid "app"
-msgstr ""
+msgstr "rakendus"
 
 msgid "bookmark"
-msgstr ""
+msgstr "järjehoidja"
 
 msgid "webapp"
-msgstr ""
+msgstr "veebirakendus"
 
 msgid "View all apps by this user"
-msgstr ""
+msgstr "Vaata selle kasutaja kõiki rakendusi"
