@@ -2,146 +2,148 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2017-06-20 01:45:+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2025-10-25 08:02+0000\n"
+"Last-Translator: Priit Jõerüüt <jrthwlate@users.noreply.hosted.weblate.org>\n"
+"Language-Team: Estonian <https://hosted.weblate.org/projects/open-store-io/"
+"openstore-api/et/>\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.14.1-dev\n"
 
 msgid "Accessibility"
-msgstr ""
+msgstr "Hõlbustus"
 
 msgid "Books & Comics"
-msgstr ""
+msgstr "Raamatud ja koomiksid"
 
 msgid "Business & Finance"
-msgstr ""
+msgstr "Äri ja rahandus"
 
 msgid "Communication & Social"
-msgstr ""
+msgstr "Suhtlus ja sotsiaalmeedia"
 
 msgid "Developer Tools"
-msgstr ""
+msgstr "Arendustarvikud"
 
 msgid "Education & Reference"
-msgstr ""
+msgstr "Haridus ja teabeotsing"
 
 msgid "Entertainment"
-msgstr ""
+msgstr "Meelelahutus"
 
 msgid "Food & Drink"
-msgstr ""
+msgstr "Toit ja jook"
 
 # Discovery section category name
 msgid "Games"
-msgstr ""
+msgstr "Mängud"
 
 msgid "Graphics"
-msgstr ""
+msgstr "Graafika"
 
 msgid "Health & Fitness"
-msgstr ""
+msgstr "Tervis ja vormisolek"
 
 msgid "Lifestyle"
-msgstr ""
+msgstr "Elustiil"
 
 msgid "Media & Video"
-msgstr ""
+msgstr "Meedia ja video"
 
 msgid "Music & Audio"
-msgstr ""
+msgstr "Muusika ja helimaailm"
 
 msgid "News & Magazines"
-msgstr ""
+msgstr "Uudised ja ajakirjad"
 
 msgid "Personalisation"
-msgstr ""
+msgstr "Isiklikustamine"
 
 msgid "Productivity"
-msgstr ""
+msgstr "Tarbetarkvara"
 
 msgid "Science & Engineering"
-msgstr ""
+msgstr "Teadus ja tehnika"
 
 msgid "Shopping"
-msgstr ""
+msgstr "Ostlemine"
 
 msgid "Sports"
-msgstr ""
+msgstr "Sport"
 
 msgid "Travel & Weather"
-msgstr ""
+msgstr "Reisimine ja ilmaennustus"
 
 # Discovery section category name
 msgid "Utilities"
-msgstr ""
+msgstr "Tarvikud"
 
 # This is text to go on a button that will say "Download from the\nOpenStore" (where \n is a line break)
 msgid "Download from the"
-msgstr ""
+msgstr "Laadi alla rakendustepoest"
 
 # Discovery section category name
 msgid "New and Updated Apps"
-msgstr ""
+msgstr "Uued ja uuendatud rakendused"
 
 # Discovery section category tagline for "New and Updated Apps"
 msgid "Exciting new apps & updates"
-msgstr ""
+msgstr "Põnevad uued rakendused ja täiendused"
 
 # Discovery section category name
 msgid "Health & Wellness"
-msgstr ""
+msgstr "Tervis ja heaolu"
 
 # Discovery section category tagline for "Health & Wellness"
 msgid "An apple a day..."
-msgstr ""
+msgstr "Üks õun päevas..."
 
 # Discovery section category name
 msgid "Cross Platform Apps"
-msgstr ""
+msgstr "Mitmel platvormil toimivad rakendused"
 
 # Discovery section category tagline for "Cross Platform Apps"
 msgid "Find these apps anywhere"
-msgstr ""
+msgstr "Leiad neid rakendusi mitmest kohast"
 
 # Discovery section category name
 msgid "Essential Apps"
-msgstr ""
+msgstr "Põhirakendused"
 
 # Discovery section category tagline for "Essential Apps"
 msgid "Check these out first"
-msgstr ""
+msgstr "Esmalt vaata neid"
 
 # Discovery section category name
 msgid "Dev Tools & Reference"
-msgstr ""
+msgstr "Arendusvahendid ja -materjalid"
 
 # Discovery section category tagline for "Dev Tools & Reference"
 msgid "Talk is cheap. Show me the code."
-msgstr ""
+msgstr "Jutt on ikka hea küll... Näita nüüd lähtekoodi."
 
 # Discovery section category name
 msgid "Most Loved"
-msgstr ""
+msgstr "Suurimad lemmikud"
 
 # Discovery section category tagline for "Most Loved"
 msgid "Apps with the highest ratings"
-msgstr ""
+msgstr "Parimate hinnangutega rakendused"
 
 # Discovery section category tagline for "Utilities"
 msgid "It is essential to have good tools"
-msgstr ""
+msgstr "Korralikud tarvikud on väga olulised"
 
 # Discovery section category name
 msgid "Tools"
-msgstr ""
+msgstr "Tarvikud"
 
 # Discovery section category tagline for "Tools"
 msgid "Even the simplest tools can empower people to do great things"
-msgstr ""
+msgstr "Ka lihtsaimad tarvikud võivad aidata suuri asju korda saata"
 
 # Discovery section category name
 msgid "Toolbox"
