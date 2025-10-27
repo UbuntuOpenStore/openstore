@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2017-06-20 01:45:+0000\n"
-"PO-Revision-Date: 2025-10-25 08:02+0000\n"
+"PO-Revision-Date: 2025-10-28 09:03+0000\n"
 "Last-Translator: Priit Jõerüüt <jrthwlate@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Estonian <https://hosted.weblate.org/projects/open-store-io/"
 "openstore-api/et/>\n"
@@ -147,92 +147,94 @@ msgstr "Ka lihtsaimad tarvikud võivad aidata suuri asju korda saata"
 
 # Discovery section category name
 msgid "Toolbox"
-msgstr ""
+msgstr "Tööriistakast"
 
 # Discovery section category tagline for "Toolbox"
 msgid "It's not the thing itself, but how you use it."
-msgstr ""
+msgstr "Küsimus pole vidinas endas, vaid selles, kuidas sa teda kasutad."
 
 # Discovery section category tagline for "Games"
 msgid "We are all our own worst enemy. But also, our best teacher."
-msgstr ""
+msgstr "Me oleme iseendi suurimad vaenlased. Aga ka parimad õpetajad."
 
 # Discovery section category name
 msgid "Fun Games"
-msgstr ""
+msgstr "Mängud oma lõbuks"
 
 # Discovery section category tagline for "Fun Games"
 msgid "Cause I always play to win!"
-msgstr ""
+msgstr "Ma mängin alati võidu nimel!"
 
 # Discovery section category name
 msgid "Best Games"
-msgstr ""
+msgstr "Parimad mängud"
 
 # Discovery section category tagline for "Best Games"
 msgid "Didn't we have some fun though?"
-msgstr ""
+msgstr "Kas meil mitte polnud täna lõbus olemine?"
 
 # Discovery section category name
 msgid "Awesome Games"
-msgstr ""
+msgstr "Fantastilised mängud"
 
 # Discovery section category tagline for "Awesome Games"
 msgid "It's dangerous to go alone, take this!"
-msgstr ""
+msgstr "Natuke hirmutav on seda teed üksi minna. Aga vaata, kas julged!"
 
 # Discovery section category name
 msgid "Game Helpers"
-msgstr ""
+msgstr "Mängude abitarvikud"
 
 # Discovery section category tagline for "Game Helpers"
 msgid "No matter what the game, everyone can agree, games are fun."
 msgstr ""
+"Kõik ju nõustuvad sellega, et mis iganes mänguga pole tegemist, on see alati "
+"lõbus."
 
 # Discovery section category name
 msgid "News"
-msgstr ""
+msgstr "Uudised"
 
 # Discovery section category tagline for "News"
 msgid "News is only the first rough draft of history"
-msgstr ""
+msgstr "Uudised pole muud, kui ajaloo esimene tugev tõmbetuul"
 
 # Discovery section category name
 msgid "Godot Games"
-msgstr ""
+msgstr "Godot'i mängud"
 
 # Discovery section category tagline for "Godot Games"
 msgid "The game engine you waited for"
-msgstr ""
+msgstr "Mängumootor, mida oled ammu tahtnud kasutada"
 
 # Discovery section category name
 msgid "Fediverse"
-msgstr ""
+msgstr "Födiversum"
 
 # Discovery section category tagline for "Fediverse"
 msgid "To infinity and beyond!"
-msgstr ""
+msgstr "Lõpmatuseni ja natuke sealt veel edasi!"
 
 # Discovery section category name
 msgid "Chat Connection"
-msgstr ""
+msgstr "Vestlusrakendused"
 
 # Discovery section category tagline for "Chat Connection"
 msgid "Don't forget to text mom!"
-msgstr ""
+msgstr "Ära unusta emale kirjutada!"
 
 # Discovery section category name
 msgid "RSS Feed Readers"
-msgstr ""
+msgstr "RSS-uudislugejad"
 
 # Discovery section category tagline for "RSS Feed Readers"
 msgid "RSS is dead, long live RSS!"
-msgstr ""
+msgstr "RSS on surnud, aga elagu ta kaua ning olgu tal ikka palju jaksu!"
 
 # Discovery section category name
 msgid "Core Apps"
-msgstr ""
+msgstr "Tuumikrakendused"
 
 # Discovery section category tagline for "Core Apps"
 msgid "There is an app for that"
-msgstr ""
+msgstr "Iga ülesande jaoks on olemas mõni rakendus"
