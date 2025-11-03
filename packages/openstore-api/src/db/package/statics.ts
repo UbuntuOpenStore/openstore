@@ -342,8 +342,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     filters: PackageRequestFilters,
     full = false,
   ): Promise<{ pkgs: HydratedPackage[]; count: number }> {
-    const results = await packageSearchInstance.search(filters, filters.sort, filters.skip, filters.limit);
-    const hits = results.body.hits.hits.map((hit: any) => hit._source);
+    const { hits, count } = await packageSearchInstance.search(filters, filters.sort, filters.skip, filters.limit);
 
     const ids = hits.map((pkg: any) => pkg.id);
     let pkgs = [];
@@ -367,7 +366,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
 
     return {
       pkgs,
-      count: results.body.hits.total.value,
+      count,
     };
   };
 

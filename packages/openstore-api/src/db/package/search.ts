@@ -210,7 +210,7 @@ export class PackageSearch {
     return query;
   }
 
-  search(filters: PackageRequestFilters, sort: string = 'relevance', skip: number = 0, limit: number = 30) {
+  async search(filters: PackageRequestFilters, sort: string = 'relevance', skip: number = 0, limit: number = 30) {
     let sortTerm = '';
     let direction = 'asc';
     if (sort && sort !== 'relevance') {
@@ -257,7 +257,12 @@ export class PackageSearch {
       request.body!.sort = [s];
     }
 
-    return this.client.search(request);
+    const results = await this.client.search(request);
+
+    return {
+      hits: results.body.hits.hits.map((hit: any) => hit._source),
+      count: results.body.hits.total.value,
+    };
   }
 
   removeIndex() {

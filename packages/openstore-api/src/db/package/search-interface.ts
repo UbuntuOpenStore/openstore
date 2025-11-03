@@ -6,7 +6,7 @@ export interface PackageSearchInterface {
   upsert: (item: HydratedPackage) => Promise<HydratedPackage>;
   remove: (item: HydratedPackage) => Promise<HydratedPackage>;
   bulk: (upserts: HydratedPackage[], removals?: HydratedPackage[]) => Promise<any>;
-  search: (filters: PackageRequestFilters, sort?: string, skip?: number, limit?: number) => Promise<any>;
+  search: (filters: PackageRequestFilters, sort?: string, skip?: number, limit?: number) => Promise<{ hits: any[]; count: number }>;
   parseFilters: (filters: PackageRequestFilters) => any;
   removeIndex: () => Promise<any>;
   createIndex: () => Promise<any>;

@@ -1,4 +1,4 @@
-import { MeiliSearch } from 'meilisearch';
+import { MeiliSearch, type SearchParams } from 'meilisearch';
 import { config, logger } from '../../utils';
 import { type HydratedPackage, type IPackage, type PackageRequestFilters } from './types';
 import type { PackageSearchInterface } from './search-interface';
@@ -28,9 +28,9 @@ const PROPERTIES: (keyof IPackage)[] = [
 const SEARCH_FIELDS = [
   'search_name',
   'tagline',
-  'description',
   'keywords',
-  'author',
+  'description',
+  //  'author',
 ];
 
 function sanitizeId(id: string): string {
@@ -50,7 +50,7 @@ export class PackageSearch implements PackageSearchInterface {
   }
 
   convert(item: HydratedPackage): Record<string, any> {
-    const doc: Partial<IPackage> & { search_name?: string; originalId?: string } = {};
+    const doc: Partial<IPackage> & { search_name?: string; originalId?: string; rating_bucket?: number } = {};
 
     // Store the original ID for reference
     doc.originalId = item.id;
@@ -75,6 +75,16 @@ export class PackageSearch implements PackageSearchInterface {
     }
     else {
       doc.keywords = [];
+    }
+
+    /*
+      Map calculated_rating -> rating_bucket using logarithmic buckets (25 -> 1, 50 -> 2, 100 -> 3, etc.).
+      For relevant searching, this gives a boost to higher rated packages without over-prioritizing small differences in rating.
+    */
+    const rating = item.calculated_rating ?? 0;
+    doc.rating_bucket = 0;
+    if (rating > 0) {
+      doc.rating_bucket = Math.max(0, Math.floor(Math.log2(rating / 25)) + 1);
     }
 
     return doc;
@@ -159,15 +169,23 @@ export class PackageSearch implements PackageSearchInterface {
   }
 
   async search(filters: PackageRequestFilters, sort: string = 'relevance', skip: number = 0, limit: number = 30) {
-    const searchParams: any = {
+    const searchParams: SearchParams = {
       offset: skip,
       limit,
       attributesToRetrieve: ['*'],
+
+      // For debugging ranking
+      // showRankingScore: true,
+      // showRankingScoreDetails: true,
     };
 
-    if (sort && sort !== 'relevance') {
+    if (sort) {
       let sortField = sort;
       let sortDirection: 'asc' | 'desc' = 'asc';
+      if (sort === 'relevance') {
+        sortField = 'rating_bucket';
+        sortDirection = 'desc';
+      }
 
       if (sort.charAt(0) === '-') {
         sortDirection = 'desc';
@@ -182,12 +200,12 @@ export class PackageSearch implements PackageSearchInterface {
       searchParams.filter = filterQueries;
     }
 
-    logger.debug('Meilisearch search query:', filters.search || '', 'with params:', JSON.stringify(searchParams, null, 2));
+    logger.debug(`Meilisearch search query: ${JSON.stringify(searchParams)}`);
 
     const results = await this.client.index(this.indexName).search(filters.search || '', searchParams);
 
     // Map back the sanitized IDs to the original IDs
-    if (results.hits && results.hits.length > 0) {
+    if (results.hits.length > 0) {
       results.hits = results.hits.map(hit => {
         if (hit.originalId) {
           hit.id = hit.originalId;
@@ -196,7 +214,10 @@ export class PackageSearch implements PackageSearchInterface {
       });
     }
 
-    return results;
+    return {
+      hits: results.hits,
+      count: results.estimatedTotalHits ?? results.hits.length,
+    };
   }
 
   async removeIndex(): Promise<any> {
@@ -238,13 +259,14 @@ export class PackageSearch implements PackageSearchInterface {
         'updated_date',
         'published_date',
         'calculated_rating',
+        'rating_bucket',
       ],
       rankingRules: [
         'words',
         'typo',
         'proximity',
-        'attribute',
         'sort',
+        'attribute',
         'exactness',
       ],
     });
