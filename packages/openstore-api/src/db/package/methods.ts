@@ -331,7 +331,13 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     for (const screenshot of this.screenshots) {
       const filename = screenshot.replace(regex, '');
       if (!updatedScreenshots.includes(filename)) {
-        await fs.unlink(`${config.screenshot_dir}/${filename}`);
+        try {
+          await fs.unlink(`${config.screenshot_dir}/${filename}`);
+        }
+        catch (error) {
+          // Ignore errors if file doesn't exist or can't be removed
+          console.warn(`Failed to remove screenshot ${filename}:`, error);
+        }
       }
     }
     this.screenshots = updatedScreenshots;
@@ -601,31 +607,31 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [
-          ...downloads,
-          ...this.architectures.map((arch) => {
-            if (!Object.values(Architecture).includes(arch)) {
-              return null; // Filter out unsupported arches like i386 (legacy apps)
-            }
-            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-            if (downloadRevisionData) {
-              const download = {
-                ...downloadRevisionData.toObject(),
-                _id: undefined,
-                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
-                installedSize: toBytes(downloadRevisionData.filesize),
-                downloadSize: downloadRevisionData.downloadSize ?? 0,
-                // TODO deprecate
-                filesize: toBytes(downloadRevisionData.filesize),
-              };
-              delete download._id;
-              return download;
-            }
-            return null;
-          }),
-        ];
-      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+          return [
+            ...downloads,
+            ...this.architectures.map((arch) => {
+              if (!Object.values(Architecture).includes(arch)) {
+                return null; // Filter out unsupported arches like i386 (legacy apps)
+              }
+              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+              if (downloadRevisionData) {
+                const download = {
+                  ...downloadRevisionData.toObject(),
+                  _id: undefined,
+                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                  download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                  installedSize: toBytes(downloadRevisionData.filesize),
+                  downloadSize: downloadRevisionData.downloadSize ?? 0,
+                  // TODO deprecate
+                  filesize: toBytes(downloadRevisionData.filesize),
+                };
+                delete download._id;
+                return download;
+              }
+              return null;
+            }),
+          ];
+        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
@@ -688,7 +694,13 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
     if (screenshotFiles.length > screenshotLimit) {
       for (let i = screenshotLimit; i < screenshotFiles.length; i++) {
-        await fs.unlink(screenshotFiles[i].path);
+        try {
+          await fs.unlink(screenshotFiles[i].path);
+        }
+        catch (error) {
+          // Ignore errors if file doesn't exist or can't be removed
+          console.warn(`Failed to remove screenshot ${screenshotFiles[i].path}:`, error);
+        }
       }
     }
 
@@ -698,7 +710,13 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       const ext = path.extname(file.originalname);
       if (!['.png', '.jpg', '.jpeg'].includes(ext)) {
         // Reject anything not an image we support
-        await fs.unlink(file.path);
+        try {
+          await fs.unlink(file.path);
+        }
+        catch (error) {
+          // Ignore errors if file doesn't exist or can't be removed
+          console.warn(`Failed to remove screenshot ${file.path}:`, error);
+        }
       }
       else {
         const id = v4();
