@@ -69,6 +69,6 @@ deploy:
     - echo $VERSION
     - npm run build -w openstore-api
     - npm run build -w openstore-web
-    - tar -czf ../openstore_$VERSION.tar.gz --exclude .npm --exclude docker .
+    - tar -czf ../openstore_$VERSION.tar.gz --exclude .npm --exclude docker --exclude .git .
     - scp ../openstore_$VERSION.tar.gz brian@ssh.open-store.io:/srv/openstore-next/
     - ssh brian@ssh.open-store.io "/srv/openstore/post-deploy.sh $VERSION"
