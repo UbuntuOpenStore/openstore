@@ -26,7 +26,7 @@ async function generateFeed(req: Request, res: Response, updates: boolean) {
     pkgs.forEach((pkg) => {
       let changelog = '';
       let description = pkg.description ? `<br/>${pkg.description}` : '';
-      let title = `New ${titleCase(pkg.types[0])}: ${pkg.name}`;
+      let title = `New ${titleCase(pkg.types[0] ?? 'App')}: ${pkg.name}`;
       if (updates) {
         changelog = pkg.changelog ? `<br/><br/>Changelog:<br/>${pkg.changelog}` : '';
         changelog = changelog.replace('\n', '<br/>');
