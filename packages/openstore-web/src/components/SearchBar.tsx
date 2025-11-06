@@ -2,22 +2,32 @@ import { useStore } from '@nanostores/preact';
 import { searchTerm, searchTermInitialized } from '@/stores';
 import SvgSearch from './icons/Search';
 import { useDebouncedCallback } from 'use-debounce';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { cn } from '@/lib/utils';
 
-const SearchBar = ({ messages, isDark }: { messages: { search: string }, isDark: boolean}) => {
+const SearchBar = ({ messages, isDark, isSearchPage }: { messages: { search: string }, isDark: boolean, isSearchPage?: boolean }) => {
   const term = useStore(searchTerm);
   const initialized = useStore(searchTermInitialized);
+  const [localValue, setLocalValue] = useState('');
 
   useEffect(() => {
     if (!initialized) {
       const hash = new URLSearchParams(document.location.hash.substring(1));
-      searchTerm.set(hash.get('search') ?? '');
+      const initialTerm = hash.get('search') ?? '';
+      searchTerm.set(initialTerm);
+      setLocalValue(initialTerm);
       searchTermInitialized.set(true);
     }
   }, [initialized]);
 
-  const debounceSetTerm = useDebouncedCallback((value: string) => {
+  // Update local value when store term changes (for search page)
+  useEffect(() => {
+    if (isSearchPage) {
+      setLocalValue(term);
+    }
+  }, [term, isSearchPage]);
+
+  const performSearch = (value: string) => {
     searchTerm.set(value);
 
     if (!document.location.pathname.startsWith('/apps/')) {
@@ -27,7 +37,29 @@ const SearchBar = ({ messages, isDark }: { messages: { search: string }, isDark:
 
       document.location.replace(`/apps/#${updateHash.toString()}`)
     }
-  }, 300);
+  };
+
+  const debounceSetTerm = useDebouncedCallback(performSearch, 300);
+
+  const handleInput = (value: string) => {
+    setLocalValue(value);
+
+    if (isSearchPage) {
+      // On search page, use debounced search
+      debounceSetTerm(value);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch(localValue);
+    }
+  };
+
+  const handleSearchClick = () => {
+    performSearch(localValue);
+  };
 
   return (
     <div class="relative max-w-sm w-full h-full">
@@ -39,11 +71,19 @@ const SearchBar = ({ messages, isDark }: { messages: { search: string }, isDark:
           "w-full h-full py-2 px-4 pr-10 rounded-full border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent",
           isDark ? 'text-white' : 'text-black',
         )}
-        value={term}
-        onInput={(e) => debounceSetTerm(e.currentTarget.value)}
+        value={localValue}
+        onInput={(e) => handleInput(e.currentTarget.value)}
+        onKeyDown={handleKeyDown}
       />
 
-      <SvgSearch class="h-5 w-5 text-gray-500 absolute right-3 top-1/2 transform -translate-y-1/2" />
+      <button
+        type="button"
+        onClick={handleSearchClick}
+        aria-label="Submit search"
+        class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+      >
+        <SvgSearch class="h-5 w-5 text-gray-500" />
+      </button>
     </div>
   );
 };

@@ -204,7 +204,7 @@ const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) 
         </div>
 
         <div class="md:hidden">
-          <SearchBar isDark={false} messages={messages} />
+          <SearchBar isDark={false} messages={messages} isSearchPage />
         </div>
 
         <div class="md:mx-4">
