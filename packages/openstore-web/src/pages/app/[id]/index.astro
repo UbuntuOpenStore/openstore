@@ -313,6 +313,10 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
         <SvgDate />
       </IconListItem>
 
+      <IconListItem label={t("Current Version")} value={app.version}>
+        <SvgInfo />
+      </IconListItem>
+
       <IconListItem label={t("Total Downloads")} value={numberFormatter.format(app.totalDownloads)}>
         <SvgSave />
       </IconListItem>
@@ -373,7 +377,7 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
         <>
           {reviews.map((review, index) => (
             <div>
-              <Review review={review} />
+              <Review review={review} currentVersion={app.version} />
 
               {index < reviews.length - 1 && <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mt-4" />}
             </div>

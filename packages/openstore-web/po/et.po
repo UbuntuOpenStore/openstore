@@ -61,7 +61,7 @@ msgstr "Logi välja"
 msgid "Login"
 msgstr "Logi sisse"
 
-msgid "Reviwed %{date} for version %{version}"
+msgid "Reviewed %{date} for version %{version}"
 msgstr "Versioon %{version}, arvustatud %{date}"
 
 msgid "The open source app store for Ubuntu Touch"

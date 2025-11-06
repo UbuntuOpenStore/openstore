@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-09-26T02:55:19.730Z\n"
-"PO-Revision-Date: 2025-09-26T02:55:19.730Z\n"
+"POT-Creation-Date: 2025-11-06T15:44:47.850Z\n"
+"PO-Revision-Date: 2025-11-06T15:44:47.850Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -56,8 +56,11 @@ msgstr "Logout"
 msgid "Login"
 msgstr "Login"
 
-msgid "Reviwed %{date} for version %{version}"
-msgstr "Reviwed %{date} for version %{version}"
+msgid "Reviewed %{date} for version %{version}"
+msgstr "Reviewed %{date} for version %{version}"
+
+msgid "(older version)"
+msgstr "(older version)"
 
 msgid "The open source app store for Ubuntu Touch"
 msgstr "The open source app store for Ubuntu Touch"
@@ -414,6 +417,9 @@ msgstr "Published Date"
 
 msgid "Updated Date"
 msgstr "Updated Date"
+
+msgid "Current Version"
+msgstr "Current Version"
 
 msgid "Total Downloads"
 msgstr "Total Downloads"

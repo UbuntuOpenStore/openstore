@@ -614,5 +614,5 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-msgid "Reviwed %{date} for version %{version}"
+msgid "Reviewed %{date} for version %{version}"
 msgstr ""
