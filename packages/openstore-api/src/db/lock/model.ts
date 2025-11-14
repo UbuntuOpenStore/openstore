@@ -19,41 +19,44 @@ const lockSchema = new Schema<ILock, LockModel>({
 lockSchema.index({ name: 1 }, { unique: true });
 
 lockSchema.statics.acquire = async function (name: string) {
-  let lock: HydratedLock = new this({
-    name,
-    expire: Date.now() + TIMEOUT,
-    inserted: Date.now(),
-  });
-
+  let lock: HydratedLock | null = null;
   let retries = MAX_RETRIES;
+
   while (retries > 0) {
     const now = Date.now();
 
     // Remove expired locks
     await this.findOneAndRemove({ name, expire: { $lt: new Date(now) } });
 
-    lock = new this({
+    const newLock = new this({
       name,
       expire: now + TIMEOUT,
       inserted: now,
     });
 
     try {
-      await lock.save();
-      retries = 0;
+      await newLock.save();
+      lock = newLock;
       logger.debug('Lock acquired');
+      break;
     }
     catch (err) {
       if (err?.code === 11000) {
         // a lock already exists, try again
         logger.debug(`Lock exists, going to wait (retries: ${retries})`);
         retries--;
-        await sleep(WAIT_TIME);
+        if (retries > 0) {
+          await sleep(WAIT_TIME);
+        }
       }
       else {
         throw err;
       }
     }
+  }
+
+  if (!lock) {
+    throw new Error(`Failed to acquire lock "${name}" after ${MAX_RETRIES} attempts`);
   }
 
   return lock;

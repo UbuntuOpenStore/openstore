@@ -36,11 +36,18 @@ export type ReviewSummary = {
 export function clickReview(file: string, exceptions: string[]): Promise<ReviewSummary> {
   return new Promise((resolve, reject) => {
     const command = `${config.clickreview.command} --json ${file}`;
-    childProcess.exec(command, {
+    const proc = childProcess.exec(command, {
       env: {
         PYTHONPATH: config.clickreview.pythonpath,
       },
     }, (err, stdout, stderr) => {
+      if (err) {
+        console.error(stdout, stderr, err);
+        captureException(err, '');
+        reject(new UserError('Unable to process the click for review'));
+        return;
+      }
+
       let reviewData: ReviewData;
       try {
         reviewData = JSON.parse(stdout);
@@ -89,6 +96,12 @@ export function clickReview(file: string, exceptions: string[]): Promise<ReviewS
         errorMessages,
         warningMessages,
       });
+    });
+
+    // Ensure cleanup on uncaught errors
+    proc.on('error', (err) => {
+      captureException(err, '');
+      reject(new UserError('Click review process error'));
     });
   });
 }

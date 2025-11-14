@@ -4,7 +4,7 @@ import fsPromise from 'fs/promises';
 import fs from 'fs';
 import { Architecture, type HydratedPackage } from '../db/package/types';
 import { Package } from '../db/package';
-import { success, getData, apiLinks, asyncErrorWrapper, getDataArray, getDataBoolean } from '../utils';
+import { success, getData, apiLinks, asyncErrorWrapper, getDataArray, getDataBoolean, logger, captureException } from '../utils';
 import { fetchPublishedPackage } from '../middleware';
 import { NotFoundError, UserError } from '../exceptions';
 import reviews from './reviews';
@@ -89,7 +89,21 @@ async function download(req: Request, res: Response) {
   res.setHeader('Content-Disposition', `attachment; filename=${req.pkg.id as string}_${revisionData.version}_${arch}.click`);
 
   // TODO let nginx handle this, making this just a 302
-  fs.createReadStream(revisionData.download_url).pipe(res);
+  const fileStream = fs.createReadStream(revisionData.download_url);
+
+  fileStream.on('error', (err) => {
+    logger.error('Error streaming file:', err);
+    captureException(err, req.originalUrl);
+    if (!res.headersSent) {
+      res.status(500).end();
+    }
+  });
+
+  req.on('close', () => {
+    fileStream.destroy();
+  });
+
+  fileStream.pipe(res);
 
   await Package.incrementDownload(req.pkg._id, revisionIndex);
 }
