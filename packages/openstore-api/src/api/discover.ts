@@ -1,6 +1,9 @@
 /* eslint-disable no-param-reassign */
 import shuffle from 'shuffle-array';
 import express, { type Request, type Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
 
 import { Package } from '../db/package';
 import { Architecture, type Channel, PackageType } from '../db/package/types';
@@ -10,11 +13,46 @@ import { serializeRatings } from '../db/package/methods';
 import discoverJSON from './json/discover_apps.json';
 import { type DiscoverHighlight, type DiscoverData } from './types';
 import { handleChannel } from '../utils/channels';
+import { config } from '../utils/config';
 
 const router = express.Router();
 
-const discoverCache: { [key: string]: DiscoverData } = {};
-const discoverDate: { [key: string]: Date } = {};
+const CACHE_DIR = path.join(config.cache_dir, 'discover');
+const CACHE_DURATION_MS = 600000; // 10 minutes
+
+type CachedData = {
+  data: DiscoverData;
+  timestamp: number;
+  frameworks: string[];
+};
+
+async function getCachedData(cacheKey: string): Promise<CachedData | null> {
+  try {
+    const cacheFile = path.join(CACHE_DIR, `${cacheKey}.json`);
+    const content = await fs.readFile(cacheFile, 'utf-8');
+    return JSON.parse(content);
+  }
+  catch (error) {
+    // Cache miss or read error
+    return null;
+  }
+}
+
+async function setCachedData(cacheKey: string, data: DiscoverData, frameworks: string[]): Promise<void> {
+  try {
+    const cacheFile = path.join(CACHE_DIR, `${cacheKey}.json`);
+    const cachedData: CachedData = {
+      data,
+      timestamp: Date.now(),
+      frameworks,
+    };
+    await fs.mkdir(CACHE_DIR, { recursive: true });
+    await fs.writeFile(cacheFile, JSON.stringify(cachedData), 'utf-8');
+  }
+  catch (error) {
+    console.error('Failed to write cache file:', error);
+  }
+}
 
 const NEW_AND_UPDATED = 'New and Updated Apps';
 const POPULAR = 'Most Loved';
@@ -250,13 +288,18 @@ router.get('/', asyncErrorWrapper(async (req: Request, res: Response) => {
     architecture = Architecture.ARMHF;
   }
 
-  const cacheKey = `${channel}-${architecture}-${JSON.stringify(frameworks)}`;
+  // Use hash for frameworks to avoid filename length issues with long framework lists
+  const frameworksHash = frameworks.length > 0
+    ? crypto.createHash('md5').update(JSON.stringify(frameworks)).digest('hex')
+    : 'none';
+  const cacheKey = `${channel}-${architecture}-${frameworksHash}`;
 
-  const now = new Date();
+  const now = Date.now();
+  const cachedData = await getCachedData(cacheKey);
+
   if (
-    !discoverDate[cacheKey] ||
-    (now.getTime() - discoverDate[cacheKey].getTime()) > 600000 ||
-    !discoverCache[cacheKey]
+    !cachedData ||
+    (now - cachedData.timestamp) > CACHE_DURATION_MS
   ) { // Cache miss (10 minutes)
     const discover: DiscoverData = JSON.parse(JSON.stringify(discoverJSON));
     await getHighlights(discover, channel, architecture, frameworks, req.apiVersion);
@@ -272,13 +315,12 @@ router.get('/', asyncErrorWrapper(async (req: Request, res: Response) => {
       };
     });
 
-    discoverCache[cacheKey] = discover;
-    discoverDate[cacheKey] = now;
+    await setCachedData(cacheKey, discover, frameworks);
 
     success(res, translateDiscover(lang, discover));
   }
   else { // Cache hit
-    const discover: DiscoverData = JSON.parse(JSON.stringify(discoverCache[cacheKey]));
+    const discover: DiscoverData = JSON.parse(JSON.stringify(cachedData.data));
     await refreshRatings(discover);
 
     success(res, translateDiscover(lang, discover));

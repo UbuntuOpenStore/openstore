@@ -1,6 +1,8 @@
 import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
+import fs from 'fs/promises';
+import path from 'path';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import factory from '../tests/factory';
 import * as api from '.';
@@ -10,6 +12,7 @@ import { Package } from '../db/package';
 import { RatingCount } from '../db/rating_count';
 import { Architecture, Channel, ChannelArchitecture, PackageType } from '../db/package/types';
 import discoverJSON from './json/discover_apps.json';
+import { config } from '../utils/config';
 
 describe('Discover API', () => {
   const route = '/api/v3/discover/';
@@ -27,6 +30,16 @@ describe('Discover API', () => {
 
   beforeEach(async () => {
     await cleanMongoose();
+
+    // Clean up cache files
+    const cacheDir = path.join(config.cache_dir, 'discover');
+    try {
+      const files = await fs.readdir(cacheDir);
+      await Promise.all(files.map((file) => fs.unlink(path.join(cacheDir, file))));
+    }
+    catch (error) {
+      // Don't worry about errors
+    }
 
     await Promise.all([
       factory.package({

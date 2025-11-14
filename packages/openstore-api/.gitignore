@@ -10,3 +10,4 @@ config-file.json
 dist
 .env
 tsconfig.tsbuildinfo
+.cache/
