@@ -41,12 +41,12 @@ const router = express.Router();
 
 router.get('/', authenticate, asyncErrorWrapper(async (req: Request, res: Response) => {
   const users = await User.find({});
-  success(res, users.map((user) => user.serialize(req.user?.role === 'admin', false)));
+  success(res, users.map((user) => user.serialize(req.user?.role === 'admin', false, req.user?.role === 'admin')));
 }, 'Could not fetch user list at this time'));
 
 router.get('/me', authenticate, asyncErrorWrapper(async (req: Request, res: Response) => {
   if (req.user) {
-    success(res, req.user.serialize(true, true));
+    success(res, req.user.serialize(true, true, true));
   }
   else {
     throw new AuthenticationError();
@@ -73,7 +73,7 @@ router.put('/me', authenticate, upload.single('avatar'), asyncErrorWrapper(async
 
   const isAdmin = req.user.role === 'admin';
   await req.user.updateProfile(updateData, isAdmin);
-  success(res, req.user.serialize(true, true));
+  success(res, req.user.serialize(true, true, true));
 }, 'Could not update user profile at this time'));
 
 router.get('/:id', asyncErrorWrapper(async (req: Request, res: Response) => {
@@ -87,7 +87,7 @@ router.get('/:id', asyncErrorWrapper(async (req: Request, res: Response) => {
     throw new NotFoundError(USER_NOT_FOUND);
   }
 
-  success(res, user.serialize(false, false));
+  success(res, user.serialize(false, false, false));
 }, 'Could not fetch user at this time'));
 
 router.put('/:id', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, res: Response) => {
@@ -114,7 +114,7 @@ router.put('/:id', authenticate, adminOnly, asyncErrorWrapper(async (req: Reques
   };
 
   await user.updateProfile(updateData, isAdmin);
-  success(res, user.serialize(isAdmin, false));
+  success(res, user.serialize(isAdmin, false, isAdmin));
 }, 'Could not update user at this time'));
 
 export default router;

@@ -35,7 +35,7 @@ export interface UserSerializeOutput extends Omit<IUser, 'apikey'> {
 }
 
 export interface IUserMethods {
-  serialize: (includeRole: boolean, includeApiKey: boolean) => UserSerializeOutput;
+  serialize: (includeRole: boolean, includeApiKey: boolean, includeEmail: boolean) => UserSerializeOutput;
   updateProfile: (data: ProfileUpdateData, isAdmin: boolean) => Promise<void>;
 }
 

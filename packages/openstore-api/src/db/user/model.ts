@@ -23,10 +23,9 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   description: { type: String, maxlength: 200 },
 });
 
-userSchema.method('serialize', function (includeRole: boolean, includeApiKey: boolean) {
+userSchema.method('serialize', function (includeRole: boolean, includeApiKey: boolean, includeEmail: boolean) {
   const userData: Record<string, any> = {
     _id: this._id,
-    email: this.email,
     name: this.name ? this.name : this.username,
     username: this.username,
     language: this.language,
@@ -45,6 +44,10 @@ userSchema.method('serialize', function (includeRole: boolean, includeApiKey: bo
 
   if (includeApiKey) {
     userData.apikey = this.apikey;
+  }
+
+  if (includeEmail) {
+    userData.email = this.email;
   }
 
   return userData;

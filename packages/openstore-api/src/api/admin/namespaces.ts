@@ -29,7 +29,7 @@ router.get('/', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, 
     const serialized = namespace.serialize();
     return {
       ...serialized,
-      owner: owner ? owner.serialize(false, false) : null,
+      owner: owner ? owner.serialize(false, false, false) : null,
     };
   }));
 
@@ -76,7 +76,7 @@ router.post('/', authenticate, adminOnly, asyncErrorWrapper(async (req: Request,
 
   success(res, {
     ...reservedNamespace.serialize(),
-    owner: owner.serialize(false, false),
+    owner: owner.serialize(false, false, false),
   });
 }));
 
@@ -112,7 +112,7 @@ router.put('/:id', authenticate, adminOnly, asyncErrorWrapper(async (req: Reques
 
   success(res, {
     ...reservedNamespace.serialize(),
-    owner: owner ? owner.serialize(false, false) : null,
+    owner: owner ? owner.serialize(false, false, false) : null,
   });
 }));
 
