@@ -93,6 +93,18 @@ describe('Manage', () => {
         assert.equal(res.body.data.packages.length, 1);
         assert.equal(res.body.data.packages[0].id, package1.id);
       });
+
+      test('can filter to see only their own apps with publisher_id', async () => {
+        const userId: string = user._id.toString();
+        const testRoute = `${route}&publisher_id=${userId}`;
+        const res = await request(app).get(testRoute).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.count, 1);
+        assert.equal(res.body.data.packages.length, 1);
+        assert.equal(res.body.data.packages[0].id, package1.id);
+        assert.equal(res.body.data.packages[0].maintainer, user._id.toString());
+      });
     });
 
     describe('community user', () => {

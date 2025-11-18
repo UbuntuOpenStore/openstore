@@ -1,21 +1,15 @@
 ---
-import Loading from "@/components/Loading";
-import ManageList from "@/components/manage/ManageList.astro";
+import ManageList from "@/components/manage/ManageList";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getUser } from "@/lib/user";
 
 export const prerender = false;
 
-const url = new URL(Astro.request.url);
-const term = url.searchParams.get("search") ?? "";
-const hashPage = parseInt(url.searchParams.get("page") ?? "0");
-const currentPage = isNaN(hashPage) || hashPage < 0 ? 0 : hashPage;
-
-if (url.searchParams.has("key")) {
+if (Astro.url.searchParams.has("key")) {
   const expires = new Date();
   expires.setDate(expires.getDate() + 14);
 
-  Astro.cookies.set("apikey", url.searchParams.get("key")!, { expires, path: "/" });
+  Astro.cookies.set("apikey", Astro.url.searchParams.get("key")!, { expires, path: "/" });
   return Astro.redirect("/manage/");
 }
 
@@ -35,8 +29,6 @@ if (!user) {
   <section class="section space-y-4 grow">
     <h1 class="text-4xl">Welcome {user.name || user.username}</h1>
 
-    <ManageList term={term} currentPage={currentPage} server:defer>
-      <Loading slot="fallback" />
-    </ManageList>
+    <ManageList apikey={apikey} isAdmin={user.role === "admin"} userId={user._id} client:only="preact" />
   </section>
 </BaseLayout>
