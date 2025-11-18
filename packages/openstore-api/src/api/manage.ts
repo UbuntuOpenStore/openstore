@@ -54,7 +54,7 @@ router.get('/', authenticate, userRole, asyncErrorWrapper(async (req: Request, r
   const pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip, false);
   const count = await Package.countByFilters(filters, false);
 
-  const formatted = pkgs.map((pkg) => pkg.serialize());
+  const formatted = pkgs.map((pkg) => pkg.serialize(undefined, undefined, undefined, undefined, true));
   const { next, previous } = apiLinks(req.originalUrl, formatted.length, filters.limit, filters.skip);
   success(res, { count, next, previous, packages: formatted });
 }, 'Could not fetch app list at this time'));
@@ -63,7 +63,7 @@ router.get('/', authenticate, userRole, asyncErrorWrapper(async (req: Request, r
  * Get one app belonging to the logged in user.
  */
 router.get('/:id', authenticate, userRole, fetchPackage(), canManage, async (req: Request, res: Response) => {
-  success(res, req.pkg.serialize());
+  success(res, req.pkg.serialize(undefined, undefined, undefined, undefined, true));
 });
 
 /**
@@ -103,7 +103,7 @@ router.post(
     pkg.maintainer_name = req.user!.name ? req.user!.name : req.user!.username;
     pkg = await pkg.save();
 
-    success(res, pkg.serialize());
+    success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
   },
   'There was an error creating your app, please try again later'),
 );
@@ -168,7 +168,7 @@ router.put(
       await packageSearchInstance.remove(pkg);
     }
 
-    success(res, pkg.serialize());
+    success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
   },
   'There was an error updating your app, please try again later'),
 );
@@ -354,7 +354,7 @@ router.post(
       }
 
       await Lock.release(lock, req);
-      success(res, pkg.serialize());
+      success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
     }
     catch (err) {
       if (lock) {

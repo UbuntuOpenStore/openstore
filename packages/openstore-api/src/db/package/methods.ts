@@ -484,6 +484,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     channel: Channel = DEFAULT_CHANNEL,
     frameworks: string[] = [],
     apiVersion = 4,
+    fullChangelog = false,
   ): SerializedPackage {
     // Clean up languages that got screwed up by click-parser
     let languages = this.languages ? this.languages.sort() : [];
@@ -534,7 +535,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     }
 
     let changelog = this.changelog || '';
-    if (this.version_changelogs && this.version_changelogs.length > 0) {
+    if (!fullChangelog && this.version_changelogs && this.version_changelogs.length > 0) {
       if (revisionData) {
         const found = this.version_changelogs.find(vc => vc.version === revisionData.version);
         if (found) {
@@ -550,7 +551,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       architectures: this.architectures.filter((arch) => Object.values(Architecture).includes(arch)) || [],
       category: this.category || '',
       changelog,
-      version_changelogs: (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version)),
+      version_changelogs: fullChangelog
+        ? (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version))
+        : (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version)).slice(0, 5),
       channels: this.channels || [DEFAULT_CHANNEL],
       channel_architectures: this.channel_architectures || [],
       device_compatibilities: this.device_compatibilities || [],

@@ -281,7 +281,8 @@ export interface IPackageMethods {
     architecture?: Architecture,
     channel?: Channel,
     frameworks?: string[],
-    apiVersion?: number
+    apiVersion?: number,
+    fullChangelog?: boolean
   ) => SerializedPackage;
   updateScreenshotFiles: (screenshotFiles: File[]) => Promise<void>;
   updateBannerFile: (bannerFile: File) => Promise<boolean>;
