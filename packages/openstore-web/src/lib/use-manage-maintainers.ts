@@ -2,10 +2,14 @@ import { useEffect, useState } from "preact/hooks";
 import { UserListSchema, type UserData } from "./schema";
 import { getClientApiKey } from "./utils";
 
-export const useManageMaintainers = () => {
+export const useManageMaintainers = (isAdmin: boolean) => {
   const [maintainers, setMaintainers] = useState<(UserData & { display_name: string })[]>([]);
 
   useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
     const apikey = getClientApiKey();
     fetch(`${import.meta.env.PUBLIC_API_URL}api/users?apikey=${apikey}`, { headers: { 'X-Source': 'openstore-web-next' } }).then((res) => {
       if (res.status === 200) {
@@ -52,7 +56,7 @@ export const useManageMaintainers = () => {
         setMaintainers(maintainerList);
       }
     });
-  }, []);
+  }, [isAdmin]);
 
   return maintainers;
 }

@@ -8,7 +8,7 @@ import { useManageMaintainers } from "@/lib/use-manage-maintainers";
 
 const ManagePage = ({ id, user }: { id: string, user: UserData }) => {
   const [app, loading, status, refreshApp] = useManageApp(id);
-  const maintainers = useManageMaintainers();
+  const maintainers = useManageMaintainers(user.role === 'admin');
 
   if (!app && loading) {
     return (
