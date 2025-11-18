@@ -62,9 +62,11 @@ const ogImageAlt = imageAlt || "OpenStore logo";
     }
   </Head>
 
-  <body class="antialiased text-primary tracking-tight bg-white flex flex-col justify-between h-full">
+  <body class="antialiased text-primary tracking-tight bg-white flex flex-col min-h-screen">
     <Header />
-    <slot />
+    <main class="flex-1">
+      <slot />
+    </main>
     <Footer />
 
     <script is:inline>
