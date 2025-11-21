@@ -14,7 +14,7 @@ await initializeI18N(Astro.currentLocale);
   title="OpenStore"
   pageTitle={`${t("About")} | OpenStore`}
   description={t("The open source app store for Ubuntu Touch")}
-  schema={generateSchema(t("About"), [{ name: "About", path: "/about/" }])}
+  schema={generateSchema(Astro.url.href, [{ name: "About", path: "/about/" }])}
 >
   <section class="section space-y-4">
     <h1 class="text-4xl">{t("About the OpenStore")}</h1>

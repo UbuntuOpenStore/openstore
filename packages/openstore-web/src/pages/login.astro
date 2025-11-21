@@ -23,7 +23,7 @@ const next = `${import.meta.env.SITE}manage/`;
   title="OpenStore"
   pageTitle={`${t("Login")} | OpenStore`}
   description={t("The open source app store for Ubuntu Touch")}
-  schema={generateSchema(t("Login"), [{ name: "Login", path: "/login/" }])}
+  schema={generateSchema(Astro.url.href, [{ name: "Login", path: "/login/" }])}
 >
   <section class="section space-y-4 text-center">
     <h1 class="text-4xl">{t("Login")}</h1>
