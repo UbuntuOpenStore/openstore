@@ -124,7 +124,7 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
   title={app.name}
   pageTitle={`${app.name} | OpenStore`}
   description={app.tagline}
-  schema={generateSchema(app.name, [{ name: "Apps", path: "/apps/" }, { name: app.name, path: `/app/${app.id}/` }], app)}
+  schema={generateSchema(Astro.url.href, [{ name: "Apps", path: "/apps/" }, { name: app.name, path: `/app/${app.id}/` }], app)}
 >
   {app.category && (
     <section class="section flex">
@@ -336,37 +336,39 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
       )}
     </IconList>
 
-    <IconList
-      title={t("Links")}
-    >
-      {app.source && (
-        <IconListItem label={t("Source Code")} value={`<a href="${app.source}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.source)}</a>`}>
-          <SvgSource />
-        </IconListItem>
-        )
-      }
+    {(app.source || app.support_url || app.donate_url || app.translation_url) && (
+      <IconList
+        title={t("Links")}
+      >
+        {app.source && (
+          <IconListItem label={t("Source Code")} value={`<a href="${app.source}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.source)}</a>`}>
+            <SvgSource />
+          </IconListItem>
+          )
+        }
 
-      {app.support_url && (
-        <IconListItem label={t("Support")} value={`<a href="${app.support_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.support_url)}</a>`}>
-          <SvgUser />
-        </IconListItem>
-        )
-      }
+        {app.support_url && (
+          <IconListItem label={t("Support")} value={`<a href="${app.support_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.support_url)}</a>`}>
+            <SvgUser />
+          </IconListItem>
+          )
+        }
 
-      {app.donate_url && (
-        <IconListItem label={t("Donate")} value={`<a href="${app.donate_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.donate_url)}</a>`}>
-          <SvgHeart />
-        </IconListItem>
-        )
-      }
+        {app.donate_url && (
+          <IconListItem label={t("Donate")} value={`<a href="${app.donate_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.donate_url)}</a>`}>
+            <SvgHeart />
+          </IconListItem>
+          )
+        }
 
-      {app.translation_url && (
-        <IconListItem label={t("Translations")} value={`<a href="${app.translation_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.translation_url)}</a>`}>
-          <SvgGlobe />
-        </IconListItem>
-        )
-      }
-    </IconList>
+        {app.translation_url && (
+          <IconListItem label={t("Translations")} value={`<a href="${app.translation_url}" class="underline" rel="noopener noreferrer nofollow">${domainFormatter(app.translation_url)}</a>`}>
+            <SvgGlobe />
+          </IconListItem>
+          )
+        }
+      </IconList>
+    )}
   </section>
 
   <section class="section flex flex-col gap-4 items-stretch">
