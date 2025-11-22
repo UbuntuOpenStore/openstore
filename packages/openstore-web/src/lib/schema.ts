@@ -207,3 +207,27 @@ export const NamespaceSchema = z.object({
 export type NamespaceData = z.infer<typeof NamespaceSchema>;
 
 export const NamespaceListSchema = z.array(NamespaceSchema);
+
+// Admin Discover Schemas
+export const AdminHighlightSchema = z.object({
+  id: z.string().min(1, 'Highlight id cannot be empty'),
+  description: z.string().min(1, 'Highlight description cannot be empty'),
+});
+
+export type AdminHighlightData = z.infer<typeof AdminHighlightSchema>;
+
+export const AdminCategorySchema = z.object({
+  name: z.string().min(1, 'Category name cannot be empty'),
+  tagline: z.string().min(1, 'Category tagline cannot be empty'),
+  referral: z.string().default(''),
+  ids: z.array(z.string().min(1, 'Category ids cannot be empty')).min(1, 'Category must have at least one id'),
+});
+
+export type AdminCategoryData = z.infer<typeof AdminCategorySchema>;
+
+export const AdminDiscoverDataSchema = z.object({
+  highlights: z.array(AdminHighlightSchema).min(1, 'Must have at least one highlight'),
+  categories: z.array(AdminCategorySchema).min(1, 'Must have at least one category'),
+});
+
+export type AdminDiscoverData = z.infer<typeof AdminDiscoverDataSchema>;
