@@ -8,9 +8,9 @@ import crypto from 'crypto';
 import { Package } from '../db/package';
 import { Architecture, type Channel, PackageType } from '../db/package/types';
 import { RatingCount } from '../db/rating_count';
+import { Discover } from '../db/discover';
 import { success, getData, getDataArray, setLang, gettext, asyncErrorWrapper } from '../utils';
 import { serializeRatings } from '../db/package/methods';
-import discoverJSON from './json/discover_apps.json';
 import { type DiscoverHighlight, type DiscoverData } from './types';
 import { handleChannel } from '../utils/channels';
 import { config } from '../utils/config';
@@ -272,7 +272,7 @@ function translateDiscover(lang: string, discover: DiscoverData) {
 }
 
 /**
- * Get highlighted apps based on the data in ./json/discover_apps.json
+ * Get highlighted apps based on the data stored in the database
  * This consists of a list of highlighted apps that have a banner image
  * and a list of categories that have several apps inside of them.
  * There are two static categories: one for new and updated apps
@@ -301,7 +301,18 @@ router.get('/', asyncErrorWrapper(async (req: Request, res: Response) => {
     !cachedData ||
     (now - cachedData.timestamp) > CACHE_DURATION_MS
   ) { // Cache miss (10 minutes)
-    const discover: DiscoverData = JSON.parse(JSON.stringify(discoverJSON));
+    const discoverData = await Discover.getDiscoverData();
+    if (!discoverData) {
+      throw new Error('No discover data found in database');
+    }
+
+    const discover: DiscoverData = {
+      highlights: JSON.parse(JSON.stringify(discoverData.highlights)),
+      categories: JSON.parse(JSON.stringify(discoverData.categories)),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      highlight: {} as DiscoverHighlight, // Will be set by getHighlights
+    };
+
     await getHighlights(discover, channel, architecture, frameworks, req.apiVersion);
     await getCategoryApps(discover, channel, architecture, frameworks, req.apiVersion);
     await getNewAndUpdatedApps(discover, channel, architecture, frameworks, req.apiVersion);

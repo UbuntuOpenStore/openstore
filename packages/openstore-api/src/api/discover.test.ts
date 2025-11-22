@@ -10,8 +10,8 @@ import { type App } from 'supertest/types';
 
 import { Package } from '../db/package';
 import { RatingCount } from '../db/rating_count';
+import { Discover } from '../db/discover';
 import { Architecture, Channel, ChannelArchitecture, PackageType } from '../db/package/types';
-import discoverJSON from './json/discover_apps.json';
 import { config } from '../utils/config';
 
 describe('Discover API', () => {
@@ -41,10 +41,36 @@ describe('Discover API', () => {
       // Don't worry about errors
     }
 
+    // Test data for discover
+    const testHighlights = [
+      {
+        id: 'test.highlight.app',
+        description: 'A test highlight app',
+      },
+    ];
+
+    const testCategories = [
+      {
+        name: 'Test Category 1',
+        tagline: 'Test tagline 1',
+        referral: 'TestCategory1',
+        ids: ['test.app.1'],
+      },
+      {
+        name: 'Test Category 2',
+        tagline: 'Test tagline 2',
+        referral: 'TestCategory2',
+        ids: ['test.app.2', 'test.app.3', 'test.app.4'],
+      },
+    ];
+
+    // Seed database with discover data
+    await Discover.updateDiscoverData(testHighlights, testCategories);
+
     await Promise.all([
       factory.package({
         published: true,
-        id: discoverJSON.highlights[0].id,
+        id: 'test.highlight.app',
         architectures: [Architecture.ALL],
         channels: [Channel.FOCAL],
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
@@ -55,7 +81,7 @@ describe('Discover API', () => {
       }),
       factory.package({
         published: true,
-        id: discoverJSON.categories[1].ids[0],
+        id: 'test.app.2',
         architectures: [Architecture.ALL],
         channels: [Channel.FOCAL],
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
@@ -67,7 +93,7 @@ describe('Discover API', () => {
       }),
       factory.package({
         published: true,
-        id: discoverJSON.categories[1].ids[1],
+        id: 'test.app.3',
         architectures: [Architecture.ALL],
         channels: [Channel.FOCAL],
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
@@ -79,7 +105,7 @@ describe('Discover API', () => {
       }),
       factory.package({
         published: true,
-        id: discoverJSON.categories[1].ids[2],
+        id: 'test.app.4',
         architectures: [Architecture.ALL],
         channels: [Channel.FOCAL],
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
