@@ -10,7 +10,7 @@
     "type-check": "tsc --noemit",
     "lint": "eslint ./src/**/*.ts ./src/*/*/*.ts --fix",
     "lint:nofix": "eslint ./src/**/*.ts ./src/*/*/*.ts",
-    "lint:json": "jsonlint -q ./src/api/json/category_icons.json && jsonlint -q ./src/api/json/discover_apps.json",
+    "lint:json": "jsonlint -q ./src/api/json/category_icons.json",
     "test": "NODE_ENV=testing node -r tsconfig-paths/register -r ts-node/register -r dotenv/config --test-concurrency=1 --test",
     "test:ci": "NODE_ENV=ci node -r tsconfig-paths/register -r ts-node/register -r dotenv/config --test-concurrency=1 --test src/**/*.test.ts",
     "test:snapshot": "SNAPSHOT_TEST=true NODE_ENV=testing node -r tsconfig-paths/register -r ts-node/register -r dotenv/config --test-concurrency=1 --test src/tests/snapshots.test.ts",
