@@ -51,6 +51,29 @@ function toBytes(filesizeKb: number) {
   return filesizeKb * 1024;
 }
 
+export function extractPathsFromClickData(data: ClickParserData): { readPaths: string[]; writePaths: string[] } {
+  let writePaths: string[] = [];
+  let readPaths: string[] = [];
+
+  for (const app of data.apps) {
+    if (Object.keys(app.apparmor).length > 0) {
+      if (app.apparmor.write_path && Array.isArray(app.apparmor.write_path)) {
+        writePaths = writePaths.concat(
+          app.apparmor.write_path.map((p: string) => p.replace('/home/phablet', '~').replace('@{HOME}', '~')),
+        );
+      }
+
+      if (app.apparmor.read_path && Array.isArray(app.apparmor.read_path)) {
+        readPaths = readPaths.concat(
+          app.apparmor.read_path.map((p: string) => p.replace('/home/phablet', '~').replace('@{HOME}', '~')),
+        );
+      }
+    }
+  }
+
+  return { readPaths, writePaths };
+}
+
 export function serializeRatings(ratingCounts: HydratedRatingCount[]) {
   const ratings = {
     THUMBS_UP: 0,
@@ -127,26 +150,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       version: data.version,
     };
 
-    let writePaths: string[] = [];
-    let readPaths: string[] = [];
     let qmlImports: { module: string; version: string }[] = [];
     data.apps.forEach((app) => {
       const hook: { [key: string]: any } = {};
 
       if (Object.keys(app.apparmor).length > 0) {
         hook.apparmor = app.apparmor;
-
-        if (hook.apparmor.write_path && Array.isArray(hook.apparmor.write_path)) {
-          writePaths = writePaths.concat(
-            hook.apparmor.write_path.map((path: string) => path.replace('/home/phablet', '~').replace('@{HOME}', '~')),
-          );
-        }
-
-        if (hook.apparmor.read_path && Array.isArray(hook.apparmor.read_path)) {
-          readPaths = readPaths.concat(
-            hook.apparmor.read_path.map((path: string) => path.replace('/home/phablet', '~').replace('@{HOME}', '~')),
-          );
-        }
       }
 
       if (Object.keys(app.desktop).length > 0) {
@@ -199,8 +208,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.types = this.type_override ? [this.type_override] : data.types;
     this.languages = data.languages;
     this.qml_imports = qmlImports;
-    this.read_paths = readPaths;
-    this.write_paths = writePaths;
 
     // Don't overwrite the these if they already exists
     this.name = this.name ? this.name : data.title;
@@ -385,6 +392,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     installedSize: number,
     downloadSize: number,
     permissions: string[] = [],
+    readPaths: string[] = [],
+    writePaths: string[] = [],
   ) {
     this.revisions.push({
       revision: this.next_revision,
@@ -399,9 +408,39 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       downloadSize,
       created_date: (new Date()).toISOString(),
       permissions,
+      read_paths: readPaths,
+      write_paths: writePaths,
     });
 
     this.updated_date = (new Date()).toISOString();
+  });
+
+  packageSchema.method<HydratedPackage>('updateRevision', function (
+    revisionNumber: number,
+    framework: string,
+    url: string,
+    downloadSha512: string,
+    installedSize: number,
+    downloadSize: number,
+    permissions: string[] = [],
+    readPaths: string[] = [],
+    writePaths: string[] = [],
+  ) {
+    const revisionIndex = this.revisions.findIndex((rev) => rev.revision === revisionNumber);
+
+    if (revisionIndex === -1) {
+      throw new UserError(`Revision ${revisionNumber} not found`);
+    }
+
+    const revision = this.revisions[revisionIndex];
+    revision.framework = framework;
+    revision.download_url = url;
+    revision.download_sha512 = downloadSha512;
+    revision.filesize = installedSize;
+    revision.downloadSize = downloadSize;
+    revision.permissions = permissions;
+    revision.read_paths = readPaths;
+    revision.write_paths = writePaths;
   });
 
   packageSchema.method<HydratedPackage>('getClickFilePath', function (channel: Channel, arch: Architecture, version: string) {
@@ -595,8 +634,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       publisher_id: this.maintainer || '',
       review_exceptions: this.review_exceptions ?? [],
       permissions: [] as string[],
-      read_paths: this.read_paths ?? [],
-      write_paths: this.write_paths ?? [],
+      read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
+      write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
 
       // Deprecated, remove in the next major version
       author: this.author || '',
@@ -611,31 +650,31 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [
-          ...downloads,
-          ...this.architectures.map((arch) => {
-            if (!Object.values(Architecture).includes(arch)) {
-              return null; // Filter out unsupported arches like i386 (legacy apps)
-            }
-            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-            if (downloadRevisionData) {
-              const download = {
-                ...downloadRevisionData.toObject(),
-                _id: undefined,
-                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
-                installedSize: toBytes(downloadRevisionData.filesize),
-                downloadSize: downloadRevisionData.downloadSize ?? 0,
-                // TODO deprecate
-                filesize: toBytes(downloadRevisionData.filesize),
-              };
-              delete download._id;
-              return download;
-            }
-            return null;
-          }),
-        ];
-      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+          return [
+            ...downloads,
+            ...this.architectures.map((arch) => {
+              if (!Object.values(Architecture).includes(arch)) {
+                return null; // Filter out unsupported arches like i386 (legacy apps)
+              }
+              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+              if (downloadRevisionData) {
+                const download = {
+                  ...downloadRevisionData.toObject(),
+                  _id: undefined,
+                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                  download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                  installedSize: toBytes(downloadRevisionData.filesize),
+                  downloadSize: downloadRevisionData.downloadSize ?? 0,
+                  // TODO deprecate
+                  filesize: toBytes(downloadRevisionData.filesize),
+                };
+                delete download._id;
+                return download;
+              }
+              return null;
+            }),
+          ];
+        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
@@ -827,14 +866,15 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       }
     }
 
-    // Only update the data from the parsed click if it's for the default channel or if it's the first one
-    const data = (channel === DEFAULT_CHANNEL || this.revisions.length === 0) ? parseData : null;
     const downloadSha512 = await sha512Checksum(filePath);
     const downloadSize = (await fs.stat(filePath)).size;
 
-    if (data) {
-      this.updateFromClick(data);
+    // Only update the data from the parsed click if it's for the default channel or if it's the first one
+    if (channel === DEFAULT_CHANNEL || this.revisions.length === 0) {
+      this.updateFromClick(parseData);
     }
+
+    const { readPaths, writePaths } = extractPathsFromClickData(parseData);
 
     const localFilePath = this.getClickFilePath(channel, architecture, version);
     await fs.copyFile(filePath, localFilePath);
@@ -850,6 +890,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       parseData.installedSize,
       downloadSize,
       parseData.permissions,
+      readPaths,
+      writePaths,
     );
 
     if (parseData.icon) {

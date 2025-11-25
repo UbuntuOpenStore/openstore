@@ -279,6 +279,8 @@ describe('Package', () => {
               revision: 2,
               version: '1.0.0',
               permissions: [],
+              read_paths: [],
+              write_paths: [],
             },
             {
               architecture: Architecture.ARMHF,
@@ -294,6 +296,8 @@ describe('Package', () => {
               revision: 1,
               version: '1.0.0',
               permissions: [],
+              read_paths: [],
+              write_paths: [],
             },
           ],
           filesize: 10240,
@@ -333,6 +337,8 @@ describe('Package', () => {
               revision: 1,
               version: '1.0.0',
               permissions: [],
+              read_paths: [],
+              write_paths: [],
             },
             {
               architecture: Architecture.ARM64,
@@ -348,6 +354,8 @@ describe('Package', () => {
               revision: 2,
               version: '1.0.0',
               permissions: [],
+              read_paths: [],
+              write_paths: [],
             },
           ],
         });
@@ -384,6 +392,8 @@ describe('Package', () => {
             revision: 1,
             version: '1.0.0',
             permissions: [],
+            read_paths: [],
+            write_paths: [],
           },
           {
             architecture: Architecture.ARM64,
@@ -399,6 +409,8 @@ describe('Package', () => {
             revision: 2,
             version: '1.0.1',
             permissions: [],
+            read_paths: [],
+            write_paths: [],
           },
         ]);
 
@@ -418,6 +430,8 @@ describe('Package', () => {
             revision: 1,
             version: '1.0.0',
             permissions: [],
+            read_paths: [],
+            write_paths: [],
           },
         ]);
 
@@ -437,6 +451,8 @@ describe('Package', () => {
             revision: 2,
             version: '1.0.1',
             permissions: [],
+            read_paths: [],
+            write_paths: [],
           },
         ]);
       });

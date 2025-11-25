@@ -58,6 +58,8 @@ export interface IRevision {
   downloadSize: number;
   created_date: string;
   permissions: string[];
+  read_paths?: string[];
+  write_paths?: string[];
 }
 
 export type HydratedRevision = HydratedDocument<IRevision>;
@@ -127,6 +129,8 @@ export type SerializedPackage = {
   filesize: number;
   permissions: string[];
   review_exceptions: string[];
+  read_paths?: string[];
+  write_paths?: string[];
 };
 
 export type SerializedPackageSlim = {
@@ -213,8 +217,6 @@ export interface IPackage {
     module: string;
     version: string;
   }[];
-  read_paths?: string[];
-  write_paths?: string[];
   review_exceptions?: string[];
   skip_review?: boolean;
   published?: boolean;
@@ -271,6 +273,19 @@ export interface IPackageMethods {
     installedSize: number,
     downloadSize: number,
     permissions?: string[],
+    readPaths?: string[],
+    writePaths?: string[],
+  ) => void;
+  updateRevision: (
+    revisionNumber: number,
+    framework: string,
+    url: string,
+    downloadSha512: string,
+    installedSize: number,
+    downloadSize: number,
+    permissions?: string[],
+    readPaths?: string[],
+    writePaths?: string[],
   ) => void;
   getClickFilePath: (channel: Channel, arch: Architecture, version: string) => string;
   getIconFilePath: (ext: string) => string;

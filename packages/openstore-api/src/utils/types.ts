@@ -14,6 +14,8 @@ export type ClickParserApp = {
     policy_groups: string[];
     policy_version: number;
     template?: string;
+    write_path?: string[];
+    read_path?: string[];
   };
   contentHub: {
     [key: string]: string[];
