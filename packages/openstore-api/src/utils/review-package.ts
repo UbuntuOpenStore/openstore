@@ -41,7 +41,8 @@ export function clickReview(file: string, exceptions: string[]): Promise<ReviewS
         PYTHONPATH: config.clickreview.pythonpath,
       },
     }, (err, stdout, stderr) => {
-      if (err) {
+      // Exit codes 2 and 3 are acceptable (warnings/errors found but output is valid)
+      if (err && err.code !== 2 && err.code !== 3) {
         console.error(stdout, stderr, err);
         captureException(err, '');
         reject(new UserError('Unable to process the click for review'));
