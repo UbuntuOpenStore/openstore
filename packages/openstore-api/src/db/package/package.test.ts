@@ -465,6 +465,43 @@ describe('Package', () => {
           },
         ]);
       });
+
+      test('uses desktop_names_override when set', () => {
+        const testPkg = new Package({
+          id: 'test.app',
+          name: 'Test App',
+          channels: [DEFAULT_CHANNEL],
+          architectures: [Architecture.ARMHF],
+          author: 'Test',
+          channel_architectures: [ChannelArchitecture.FOCAL_ARMHF],
+          device_compatibilities: [`${ChannelArchitecture.FOCAL_ARMHF}:ubuntu-sdk-20.04`],
+        });
+
+        testPkg.createNextRevision(
+          '1.0.0',
+          Channel.FOCAL,
+          Architecture.ARMHF,
+          'ubuntu-sdk-20.04',
+          'url',
+          'shasum',
+          10,
+          8,
+          undefined, // permissions
+          undefined, // readPaths
+          undefined, // writePaths
+          ['app.desktop', 'other.desktop'], // desktopNames
+        );
+
+        assert.equal(testPkg.revisions.length, 1);
+        assert.deepEqual(testPkg.revisions[0].desktop_names, ['app.desktop', 'other.desktop']);
+
+        let serialized = testPkg.serialize(Architecture.ARMHF, DEFAULT_CHANNEL, [], 4);
+        assert.deepEqual(serialized.desktop_names, ['app.desktop', 'other.desktop']);
+
+        testPkg.desktop_names_override = ['custom.desktop'];
+        serialized = testPkg.serialize(Architecture.ARMHF, DEFAULT_CHANNEL, [], 4);
+        assert.deepEqual(serialized.desktop_names, ['custom.desktop']);
+      });
     });
 
     describe('serializeRatings', () => {

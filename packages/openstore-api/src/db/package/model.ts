@@ -55,6 +55,7 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   manifest: {}, // TODO deprecate, put what is needed from the manifest into the revision data
   types: [String],
   type_override: String,
+  desktop_names_override: [String],
   languages: [String],
   architectures: [String], // TODO deprecate, get from the revisions where appropriate
   channel_architectures: [String], // A list of channel:architecture that the app supports

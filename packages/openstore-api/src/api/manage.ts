@@ -139,6 +139,7 @@ router.put(
       delete req.body.maintainer;
       delete req.body.locked;
       delete req.body.type_override;
+      delete req.body.desktop_names_override;
     }
 
     const published = (req.body.published === 'true' || req.body.published === true);

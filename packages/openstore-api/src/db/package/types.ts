@@ -210,6 +210,7 @@ export interface IPackage {
   manifest?: { [key: string]: any };
   types: PackageType[];
   type_override?: PackageType;
+  desktop_names_override?: string[];
   languages: string[];
   architectures: Architecture[];
   channel_architectures: ChannelArchitecture[];
@@ -251,6 +252,7 @@ export interface BodyUpdate {
   keywords?: string[] | string;
   nsfw?: boolean | string;
   type_override?: PackageType;
+  desktop_names_override?: string[] | string;
   maintainer?: string;
 }
 
