@@ -394,6 +394,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     permissions: string[] = [],
     readPaths: string[] = [],
     writePaths: string[] = [],
+    desktopNames: string[] = [],
   ) {
     this.revisions.push({
       revision: this.next_revision,
@@ -410,6 +411,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       permissions,
       read_paths: readPaths,
       write_paths: writePaths,
+      desktop_names: desktopNames,
     });
 
     this.updated_date = (new Date()).toISOString();
@@ -425,6 +427,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     permissions: string[] = [],
     readPaths: string[] = [],
     writePaths: string[] = [],
+    desktopNames: string[] = [],
   ) {
     const revisionIndex = this.revisions.findIndex((rev) => rev.revision === revisionNumber);
 
@@ -441,6 +444,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     revision.permissions = permissions;
     revision.read_paths = readPaths;
     revision.write_paths = writePaths;
+    revision.desktop_names = desktopNames;
   });
 
   packageSchema.method<HydratedPackage>('getClickFilePath', function (channel: Channel, arch: Architecture, version: string) {
@@ -636,6 +640,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       permissions: revisionData ? (revisionData.permissions ?? []) : [],
       read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
       write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
+      desktop_names: revisionData ? (revisionData.desktop_names ?? []) : [],
 
       // Deprecated, remove in the next major version
       author: this.author || '',
@@ -879,6 +884,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       parseData.permissions,
       readPaths,
       writePaths,
+      parseData.apps
+        .filter((app) => app.type === 'app')
+        .map((app) => app.name),
     );
 
     if (parseData.icon) {

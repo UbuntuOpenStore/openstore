@@ -21,6 +21,7 @@ const revisionSchema = new Schema<IRevision, RevisionModel>({
   permissions: [String],
   read_paths: [String],
   write_paths: [String],
+  desktop_names: [String],
 });
 
 const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({

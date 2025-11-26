@@ -281,6 +281,7 @@ describe('Package', () => {
               permissions: [],
               read_paths: [],
               write_paths: [],
+              desktop_names: [],
             },
             {
               architecture: Architecture.ARMHF,
@@ -298,6 +299,7 @@ describe('Package', () => {
               permissions: [],
               read_paths: [],
               write_paths: [],
+              desktop_names: [],
             },
           ],
           filesize: 10240,
@@ -319,6 +321,7 @@ describe('Package', () => {
           permissions: [],
           read_paths: [],
           write_paths: [],
+          desktop_names: [],
           version: '1.0.0',
           download: null,
           download_sha512: '',
@@ -339,6 +342,7 @@ describe('Package', () => {
               permissions: [],
               read_paths: [],
               write_paths: [],
+              desktop_names: [],
             },
             {
               architecture: Architecture.ARM64,
@@ -356,6 +360,7 @@ describe('Package', () => {
               permissions: [],
               read_paths: [],
               write_paths: [],
+              desktop_names: [],
             },
           ],
         });
@@ -394,6 +399,7 @@ describe('Package', () => {
             permissions: [],
             read_paths: [],
             write_paths: [],
+            desktop_names: [],
           },
           {
             architecture: Architecture.ARM64,
@@ -411,6 +417,7 @@ describe('Package', () => {
             permissions: [],
             read_paths: [],
             write_paths: [],
+            desktop_names: [],
           },
         ]);
 
@@ -432,6 +439,7 @@ describe('Package', () => {
             permissions: [],
             read_paths: [],
             write_paths: [],
+            desktop_names: [],
           },
         ]);
 
@@ -453,6 +461,7 @@ describe('Package', () => {
             permissions: [],
             read_paths: [],
             write_paths: [],
+            desktop_names: [],
           },
         ]);
       });

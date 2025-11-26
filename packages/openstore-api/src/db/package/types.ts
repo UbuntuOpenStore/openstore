@@ -60,6 +60,7 @@ export interface IRevision {
   permissions: string[];
   read_paths?: string[];
   write_paths?: string[];
+  desktop_names?: string[];
 }
 
 export type HydratedRevision = HydratedDocument<IRevision>;
@@ -131,6 +132,7 @@ export type SerializedPackage = {
   review_exceptions: string[];
   read_paths?: string[];
   write_paths?: string[];
+  desktop_names?: string[];
 };
 
 export type SerializedPackageSlim = {
@@ -275,6 +277,7 @@ export interface IPackageMethods {
     permissions?: string[],
     readPaths?: string[],
     writePaths?: string[],
+    desktopNames?: string[],
   ) => void;
   updateRevision: (
     revisionNumber: number,
@@ -286,6 +289,7 @@ export interface IPackageMethods {
     permissions?: string[],
     readPaths?: string[],
     writePaths?: string[],
+    desktopNames?: string[],
   ) => void;
   getClickFilePath: (channel: Channel, arch: Architecture, version: string) => string;
   getIconFilePath: (ext: string) => string;

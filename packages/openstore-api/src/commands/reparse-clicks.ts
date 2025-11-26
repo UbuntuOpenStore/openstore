@@ -41,6 +41,9 @@ Package.find(query).then(async (pkgs) => {
             parseData.permissions,
             readPaths,
             writePaths,
+            parseData.apps
+              .filter((app) => app.type === 'app')
+              .map((app) => app.name),
           );
 
           updatedCount++;
