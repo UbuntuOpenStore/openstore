@@ -558,7 +558,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         downloadSize: rData.downloadSize ?? 0,
         architecture: rData.architecture ?? 'armhf',
 
-        // TODO deprecate
+        // deprecated, remove in next version of the api
         filesize: toBytes(rData.filesize),
       };
 
@@ -633,7 +633,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       publisher: this.author || '',
       publisher_id: this.maintainer || '',
       review_exceptions: this.review_exceptions ?? [],
-      permissions: [] as string[],
+      permissions: revisionData ? (revisionData.permissions ?? []) : [],
       read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
       write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
 
@@ -665,7 +665,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
                   download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
                   installedSize: toBytes(downloadRevisionData.filesize),
                   downloadSize: downloadRevisionData.downloadSize ?? 0,
-                  // TODO deprecate
+
+                  // deprecated, remove in next version of the api
                   filesize: toBytes(downloadRevisionData.filesize),
                 };
                 delete download._id;
@@ -686,7 +687,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
           return 1;
         }
 
-        // TODO is this hack still needed?
         // Make sure the current architecture is last to not break old versions of the app
         if (a.architecture === architecture) {
           return 1;
@@ -706,19 +706,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       else {
         json.downloads = jsonDownloads;
       }
-
-      const permissions = new Set<string>();
-      jsonDownloads.filter((download) => (
-        download.channel === channel
-      )).forEach((download) => {
-        json.latestDownloads += download.downloads;
-
-        // TODO include read/write paths (save these on the revision)
-        for (const permission of download.permissions) {
-          permissions.add(permission);
-        }
-      });
-      json.permissions = Array.from(permissions);
 
       this.revisions.forEach((revision) => {
         json.totalDownloads += revision.downloads;

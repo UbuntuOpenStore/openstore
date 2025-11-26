@@ -33,8 +33,6 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
   };
 
   packageSchema.statics.stats = async function (): Promise<PackageStats> {
-    // TODO refactor to support multiple channels
-
     const [categoryStats, typeStats, frameworkStats, archStats] = await Promise.all([
       this.categoryStats(Object.values(Channel)),
       this.aggregate([
