@@ -115,7 +115,6 @@ const isTrustedApp =
   app.id.startsWith("com.canonical.") ||
   app.id.startsWith("ubports.") ||
   app.id.startsWith("openstore.");
-const isProprietary = app.license.toLowerCase() === "proprietary";
 
 const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#search=publisher:${app.publisher}`;
 ---
@@ -262,7 +261,7 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
 
     <div class="card">
       {
-        isProprietary ? (
+        app.license.toLowerCase() === "proprietary" ? (
           <>
             <h2 class="text-xl text-center mb-4">{t("Proprietary")}</h2>
 
@@ -273,6 +272,31 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
             <p>
               {t("This app's source code is not available and has not been reviewed by the community. There is no accountability for what this app does or how it is developed. Please install at your own risk")}
             </p>
+          </>
+        ) : app.license.toLowerCase() === "proprietary, source available" ? (
+          <>
+            <h2 class="text-xl text-center mb-4">{t("Proprietary, Source Available")}</h2>
+
+            <CircleIcon outerClass="bg-yellow-500/70 mb-4" innerClass="bg-yellow-200">
+              <SvgInfo />
+            </CircleIcon>
+
+            <p>
+              {
+                app.source ?
+                  <>{t("This app's source code is available for transparent viewing. However, the license may restrict modification and redistribution unlike open source software.")}</> :
+                  <>{t("This app's source code may be available for transparent viewing. However, the license may restrict modification and redistribution unlike open source software.")}</>
+              }
+            </p>
+
+            <div class="text-center">
+              {app.source && (
+                <a href={app.source} class="underline" rel="noopener noreferrer nofollow">{t("View source")}</a>
+                <a href={app.source} class="inline-block -mb-1" rel="noopener noreferrer nofollow">
+                  <SvgExternalLink />
+                </a>
+              )}
+            </div>
           </>
         ) : (
           <>

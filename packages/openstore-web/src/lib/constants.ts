@@ -25,6 +25,7 @@ export const CATEGORIES = [
 
 export const LICENSES = [
   'Proprietary',
+  'Proprietary, Source Available',
   'Apache License',
   'BSD License (Simplified)',
   'Creative Commons - No Rights Reserved',
