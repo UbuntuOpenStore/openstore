@@ -20,11 +20,6 @@ let configuration = {
     uri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017',
     database: process.env.MONGODB_DB || 'openstore',
   },
-  searchProvider: (process.env.SEARCH_PROVIDER || 'meilisearch') as 'elasticsearch' | 'meilisearch',
-  elasticsearch: {
-    uri: process.env.ELASTICSEARCH_URI || 'http://127.0.0.1:9200/',
-    index: process.env.ELASTICSEARCH_INDEX || 'openstore_packages',
-  },
   meilisearch: {
     uri: process.env.MEILISEARCH_URI || 'http://127.0.0.1:7700/',
     apiKey: process.env.MEILISEARCH_API_KEY || 'masterKey',
@@ -65,11 +60,6 @@ if (process.env.NODE_ENV === 'testing') {
       host: process.env.SNAPSHOT_TEST === 'true' ? 'https://open-store.io' : configuration.server.host,
       port: 8888,
     },
-    elasticsearch: {
-      uri: 'http://127.0.0.1:9200/',
-      index: process.env.SNAPSHOT_TEST === 'true' ? 'openstore_packages' : 'openstore_test',
-    },
-    searchProvider: (process.env.SEARCH_PROVIDER || 'elasticsearch') as 'elasticsearch' | 'meilisearch',
     meilisearch: {
       uri: 'http://127.0.0.1:7700/',
       apiKey: 'masterKey',

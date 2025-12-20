@@ -13,7 +13,7 @@ The OpenStore is the official app store for the Ubuntu Touch mobile OS. The repo
 ### API (packages/openstore-api)
 
 - **Framework**: Express.js with TypeScript
-- **Database**: MongoDB for storage, Elasticsearch for search functionality
+- **Database**: MongoDB for storage, Meilisearch for search functionality
 - **Auth**: Passport.js with GitHub, GitLab, and API key authentication
 - **API Versions**: Supports multiple API versions (v3, v4) for backward compatibility
 - **Core Models**:
@@ -114,4 +114,4 @@ Apps in the OpenStore track compatibility with:
 - `/packages/openstore-api/src/db/package/model.ts`: Package model definition
 - `/packages/openstore-web/astro.config.mjs`: Astro configuration
 - `/packages/openstore-web/src/pages/`: Frontend routes
-- `/docker-compose.yml`: Development services (MongoDB, Elasticsearch, nginx)
+- `/docker-compose.yml`: Development services (MongoDB, Meilisearch, nginx)

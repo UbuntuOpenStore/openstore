@@ -6,15 +6,6 @@ services:
     volumes:
       - ./.data/db:/data/db
 
-  elasticsearch:
-    image: elasticsearch:7.10.1
-    ports:
-      - "9200:9200"
-    volumes:
-      - ./.data/elasticsearch:/usr/share/elasticsearch/data
-    environment:
-      - discovery.type=single-node
-
   meilisearch:
     image: getmeili/meilisearch:v1.21
     ports:
