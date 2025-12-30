@@ -9,7 +9,7 @@ import { config } from '../utils';
 import limitedApps from './limited-apps.json';
 
 const MAX_REVISIONS = 3;
-const MIN_FILES_CHECK = 20;
+const MIN_FILES_CHECK = 10;
 
 const architectures = Object.values(Architecture);
 const channels = Object.values(Channel);
