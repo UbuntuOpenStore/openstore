@@ -1,6 +1,7 @@
 ---
 import Loading from "@/components/Loading";
 import ProfileForm from "@/components/manage/ProfileForm";
+import ApiKeyDisplay from "@/components/manage/ApiKeyDisplay";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getUser, invalidateUserCache } from "@/lib/user";
 import { initializeI18N } from "@/lib/i18n";
@@ -71,4 +72,21 @@ await initializeI18N(Astro.currentLocale);
   >
     <Loading slot="fallback" />
   </ProfileForm>
+
+  <div class="my-6">
+    <ApiKeyDisplay
+      apiKey={apikey}
+      messages={{
+        apiKey: t("API Key"),
+        yourApiKey: t("Your API Key"),
+        showApiKey: t("Show API Key"),
+        hideApiKey: t("Hide API Key"),
+        copyToClipboard: t("Copy to clipboard"),
+        copied: t("Copied!"),
+        keepSecure: t("Keep your API key secure and do not share it with others"),
+        allowsAccess: t("This key allows access to your account"),
+      }}
+      client:only="preact"
+    />
+  </div>
 </BaseLayout>

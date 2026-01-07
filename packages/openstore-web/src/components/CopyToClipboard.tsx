@@ -25,7 +25,7 @@ const CopyToClipboard = ({ code }: { code: string }) => {
         <Button
           variant="ghost"
           size="icon"
-          class="m-2 shrink-0"
+          class="m-2 shrink-0 cursor-pointer"
           onClick={copyToClipboard}
           aria-label={isCopied ? "Copied to clipboard" : "Copy to clipboard"}
         >

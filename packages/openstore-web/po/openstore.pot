@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-12-04T04:09:59.187Z\n"
-"PO-Revision-Date: 2025-12-04T04:09:59.187Z\n"
+"POT-Creation-Date: 2026-01-07T03:56:49.324Z\n"
+"PO-Revision-Date: 2026-01-07T03:56:49.324Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -576,6 +576,30 @@ msgstr "Manage your OpenStore profile information"
 
 msgid "View public profile"
 msgstr "View public profile"
+
+msgid "API Key"
+msgstr "API Key"
+
+msgid "Your API Key"
+msgstr "Your API Key"
+
+msgid "Show API Key"
+msgstr "Show API Key"
+
+msgid "Hide API Key"
+msgstr "Hide API Key"
+
+msgid "Copy to clipboard"
+msgstr "Copy to clipboard"
+
+msgid "Copied!"
+msgstr "Copied!"
+
+msgid "Keep your API key secure and do not share it with others"
+msgstr "Keep your API key secure and do not share it with others"
+
+msgid "This key allows access to your account"
+msgstr "This key allows access to your account"
 
 msgid "An error occurred while saving your profile"
 msgstr "An error occurred while saving your profile"
