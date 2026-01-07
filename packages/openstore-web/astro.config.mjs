@@ -23,7 +23,7 @@ for (const locale of localesJson) {
 // https://astro.build/config
 export default defineConfig({
   site: SITE ?? "https://open-store.io/",
-  trailingSlash: "ignore",
+  trailingSlash: "always",
   integrations: [
     preact({ compat: true }),
     sentry({
@@ -54,7 +54,7 @@ export default defineConfig({
   prefetch: {
     prefetchAll: false,
   },
-  output: "static",
+  output: "server",
   adapter: node({
     mode: "standalone",
   }),

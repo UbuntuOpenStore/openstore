@@ -5,62 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-01-07T03:56:49.324Z\n"
-"PO-Revision-Date: 2026-01-07T03:56:49.324Z\n"
-
-msgid "New!"
-msgstr "New!"
-
-msgid "App"
-msgstr "App"
-
-msgid "Bookmark"
-msgstr "Bookmark"
-
-msgid "Web App"
-msgstr "Web App"
-
-msgid "Report an Issue"
-msgstr "Report an Issue"
-
-msgid "Chat with us on Telegram"
-msgstr "Chat with us on Telegram"
-
-msgid "Site Status"
-msgstr "Site Status"
-
-msgid "Search..."
-msgstr "Search..."
-
-msgid "Submit"
-msgstr "Submit"
-
-msgid "Browse"
-msgstr "Browse"
-
-msgid "Categories"
-msgstr "Categories"
-
-msgid "About"
-msgstr "About"
-
-msgid "Profile"
-msgstr "Profile"
-
-msgid "Manage Apps"
-msgstr "Manage Apps"
-
-msgid "Logout"
-msgstr "Logout"
-
-msgid "Login"
-msgstr "Login"
-
-msgid "Reviewed %{date} for version %{version}"
-msgstr "Reviewed %{date} for version %{version}"
-
-msgid "(older version)"
-msgstr "(older version)"
+"POT-Creation-Date: 2026-01-07T04:44:06.666Z\n"
+"PO-Revision-Date: 2026-01-07T04:44:06.666Z\n"
 
 msgid "The open source app store for Ubuntu Touch"
 msgstr "The open source app store for Ubuntu Touch"
@@ -74,6 +20,9 @@ msgid ""
 msgstr ""
 "The app or page you are looking for could not be found. Try using the "
 "search bar."
+
+msgid "About"
+msgstr "About"
 
 msgid "About the OpenStore"
 msgstr "About the OpenStore"
@@ -352,6 +301,18 @@ msgstr "Webview"
 msgid "Full System Access"
 msgstr "Full System Access"
 
+msgid "New!"
+msgstr "New!"
+
+msgid "App"
+msgstr "App"
+
+msgid "Bookmark"
+msgstr "Bookmark"
+
+msgid "Web App"
+msgstr "Web App"
+
 msgid "Download"
 msgstr "Download"
 
@@ -547,6 +508,9 @@ msgstr "Latest Update"
 msgid "Oldest Update"
 msgstr "Oldest Update"
 
+msgid "Categories"
+msgstr "Categories"
+
 msgid "Badge"
 msgstr "Badge"
 
@@ -562,6 +526,9 @@ msgstr ""
 "repository, social media, or anywhere on the internet. The badges are "
 "available in several different languages and in both PNG and SVG formats."
 
+msgid "Login"
+msgstr "Login"
+
 msgid "Login via GitHub"
 msgstr "Login via GitHub"
 
@@ -571,35 +538,14 @@ msgstr "Login via GitLab"
 msgid "Login via Ubuntu One"
 msgstr "Login via Ubuntu One"
 
+msgid "Profile"
+msgstr "Profile"
+
 msgid "Manage your OpenStore profile information"
 msgstr "Manage your OpenStore profile information"
 
 msgid "View public profile"
 msgstr "View public profile"
-
-msgid "API Key"
-msgstr "API Key"
-
-msgid "Your API Key"
-msgstr "Your API Key"
-
-msgid "Show API Key"
-msgstr "Show API Key"
-
-msgid "Hide API Key"
-msgstr "Hide API Key"
-
-msgid "Copy to clipboard"
-msgstr "Copy to clipboard"
-
-msgid "Copied!"
-msgstr "Copied!"
-
-msgid "Keep your API key secure and do not share it with others"
-msgstr "Keep your API key secure and do not share it with others"
-
-msgid "This key allows access to your account"
-msgstr "This key allows access to your account"
 
 msgid "An error occurred while saving your profile"
 msgstr "An error occurred while saving your profile"
@@ -660,6 +606,33 @@ msgstr "Saving..."
 
 msgid "Save"
 msgstr "Save"
+
+msgid "API Key"
+msgstr "API Key"
+
+msgid "Your API Key"
+msgstr "Your API Key"
+
+msgid "Show API Key"
+msgstr "Show API Key"
+
+msgid "Hide API Key"
+msgstr "Hide API Key"
+
+msgid "Copy to clipboard"
+msgstr "Copy to clipboard"
+
+msgid "Copied!"
+msgstr "Copied!"
+
+msgid "Keep your API key secure and do not share it with others"
+msgstr "Keep your API key secure and do not share it with others"
+
+msgid "This key allows access to your account"
+msgstr "This key allows access to your account"
+
+msgid "Submit"
+msgstr "Submit"
 
 msgid "Submit Your App to the OpenStore"
 msgstr "Submit Your App to the OpenStore"
@@ -853,3 +826,30 @@ msgstr "webapp"
 
 msgid "View all apps by this user"
 msgstr "View all apps by this user"
+
+msgid "Report an Issue"
+msgstr "Report an Issue"
+
+msgid "Chat with us on Telegram"
+msgstr "Chat with us on Telegram"
+
+msgid "Site Status"
+msgstr "Site Status"
+
+msgid "Search..."
+msgstr "Search..."
+
+msgid "Browse"
+msgstr "Browse"
+
+msgid "Manage Apps"
+msgstr "Manage Apps"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Reviewed %{date} for version %{version}"
+msgstr "Reviewed %{date} for version %{version}"
+
+msgid "(older version)"
+msgstr "(older version)"

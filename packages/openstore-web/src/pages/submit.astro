@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import SubmitAppForm from "@/components/manage/SubmitAppForm";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { initializeI18N } from "@/lib/i18n";
@@ -31,7 +33,9 @@ await initializeI18N(Astro.currentLocale);
         }
       </li>
       <li>
-        <a href="/telegram">{t("Apps requiring manual review must be submitted by contacting an admin in our telegram group.")}</a>
+        <a href="/telegram" class="underline"
+          >{t("Apps requiring manual review must be submitted by contacting an admin in our telegram group.")}</a
+        >
       </li>
       <li>{t("You must read over the content policy detailed below.")}</li>
     </ul>
@@ -40,7 +44,7 @@ await initializeI18N(Astro.currentLocale);
 
     <ul class="list-disc ml-6">
       <li>
-        <a href="/telegram">
+        <a href="/telegram" class="underline">
           {t("Send us a link to a repository for your app to our telegram group along with some instructions on how to build it.")}
         </a>
       </li>
