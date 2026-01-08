@@ -51,6 +51,11 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
 
       const versionChangelogs: AppData['version_changelogs'] = [];
 
+      // Helper function to strip 'v' prefix from version strings
+      const normalizeVersion = (version: string): string => {
+        return version.replace(/^v/, '');
+      };
+
       for (const [key, value] of entries) {
         if (key === 'screenshot_files') {
           if (screenshotFileCount < 5) {
@@ -64,14 +69,16 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         else if (key.startsWith('version_changelogs[') && key.endsWith(']')) {
           const versionMatch = key.match(/\[(.*?)\]/);
           if (versionMatch && versionMatch[1] && typeof value === 'string') {
-            versionChangelogs.push({ version: versionMatch[1], changelog: value } );
+            const version = normalizeVersion(versionMatch[1]);
+            versionChangelogs.push({ version, changelog: value } );
           }
         }
         else if (key.startsWith('new_version_') && typeof value === 'string') {
           const id = key.replace('new_version_', '');
           const changelog = formData.get(`new_changelog_${id}`);
           if (value && changelog && typeof changelog === 'string') {
-            versionChangelogs.push({ version: value, changelog });
+            const version = normalizeVersion(value);
+            versionChangelogs.push({ version, changelog });
           }
         }
         else if (!key.startsWith('new_changelog_')) {
