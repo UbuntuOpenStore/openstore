@@ -9,6 +9,7 @@ import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { getClientApiKey } from "@/lib/utils";
 import DeleteApp from "./DeleteApp";
+import SvgExternalLink from "../icons/ExternalLink";
 
 type ManageAppFormProps = {
   user: UserData,
@@ -129,7 +130,12 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
     <form class="space-y-4" onSubmit={save}>
       <section class="section space-y-4">
         <div class="form-group">
-          <label for="published" class="form-label">Published</label>
+          <label for="published" class="form-label">
+            Published
+            {app.published && (
+              <a href={`/app/${app.id}/`} target="_blank"><SvgExternalLink class="inline-block w-4 h-4 ml-1 mt-[-5px]" /></a>
+            )}
+          </label>
           <Switch id="published" name="published" defaultChecked={app.published} />
         </div>
       </section>
