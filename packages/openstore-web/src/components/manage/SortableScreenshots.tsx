@@ -38,11 +38,11 @@ const SortableScreenshots = ({ screenshots, onUpdate }: SortableScreenshotsProps
 
         onUpdate(arrayMove(screenshots, oldIndex, newIndex));
     }
-  }, []);
+  }, [screenshots, onUpdate]);
 
   const removeScreenshot = useCallback((screenshot: string) => {
     onUpdate(screenshots.filter((ss) => ss !== screenshot));
-  }, []);
+  }, [screenshots, onUpdate]);
 
   return (
     <div class="flex flex-row gap-4 overflow-auto">
