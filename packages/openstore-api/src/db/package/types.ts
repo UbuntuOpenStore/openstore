@@ -224,7 +224,7 @@ export type PackageRequestFilters = {
   sort?: string;
   types?: AppType[];
   ids?: string[];
-  package_types?: PackageType[];
+  packageTypes?: PackageType[];
   frameworks?: string[] | string;
   architecture?: Architecture;
   architectures?: Architecture[];

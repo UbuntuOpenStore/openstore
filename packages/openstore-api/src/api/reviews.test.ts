@@ -9,7 +9,7 @@ import { type App } from 'supertest/types';
 import { Package } from '../db/package';
 import { Ratings, Review } from '../db/review';
 import { recalculatePackageRatings } from '../db/rating_count/utils';
-import { Architecture, Channel } from '../db/package/types';
+import { Architecture, Channel, PackageType, SourceStore } from '../db/package/types';
 import * as messages from '../utils/error-messages';
 
 describe('Reviews', () => {
@@ -273,6 +273,23 @@ describe('Reviews', () => {
       assert.equal(review?.redacted, false);
       assert.equal(review?.pkg.toString(), package1._id.toString());
       assert.equal(review?.user.toString(), user1._id.toString());
+    });
+
+    test('prevents reviews for snap packages', async () => {
+      await factory.package({
+        id: 'snap.package',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+      });
+
+      const snapRoute = `/api/v4/apps/snap.package/reviews?apikey=${user1.apikey}`;
+      const res = await request(app).post(snapRoute)
+        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
+        .expect(400);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, messages.SNAP_REVIEW_NOT_SUPPORTED);
     });
   });
 });

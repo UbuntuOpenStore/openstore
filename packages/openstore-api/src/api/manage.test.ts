@@ -8,6 +8,7 @@ import { type App } from 'supertest/types';
 
 import path from 'path';
 import { Package } from '../db/package';
+import { PackageType, SourceStore } from '../db/package/types';
 import { packageSearchInstance } from '../db/package/search-factory';
 import * as messages from '../utils/error-messages';
 
@@ -181,6 +182,21 @@ describe('Manage', () => {
 
       test('can not see other apps', async () => {
         await request(app).get(`/api/v3/manage/${package2.id}?apikey=${user.apikey}`).expect(403);
+      });
+
+      test('cannot manage snap packages', async () => {
+        const snapPackage = await factory.package({
+          id: 'snap.package',
+          published: true,
+          maintainer: user._id.toString(),
+          package_type: PackageType.SNAP,
+          source_store: SourceStore.SNAPCRAFT,
+        });
+
+        const res = await request(app).get(`/api/v3/manage/${snapPackage.id}?apikey=${user.apikey}`).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.SNAP_MANAGEMENT_NOT_SUPPORTED);
       });
 
       test('fails gracefully', async (t) => {

@@ -31,6 +31,7 @@ describe('Package', () => {
 
       assert.deepEqual(parsed, {
         types: [AppType.APP],
+        packageTypes: [PackageType.CLICK],
         architectures: [Architecture.ALL],
         limit: 100,
         skip: 20,
@@ -68,6 +69,34 @@ describe('Package', () => {
       assert.throws(() => Package.parseRequestFilters({
         query: { architecture: Architecture.ARMHF },
       } as any), UserError);
+    });
+
+    test('defaults to click package type when not specified', () => {
+      const parsed = Package.parseRequestFilters({
+        query: {},
+      } as any);
+      assert.deepEqual(parsed.packageTypes, [PackageType.CLICK]);
+    });
+
+    test('handles package_type parameter', () => {
+      const parsed = Package.parseRequestFilters({
+        query: { package_type: PackageType.SNAP },
+      } as any);
+      assert.deepEqual(parsed.packageTypes, [PackageType.SNAP]);
+    });
+
+    test('handles multiple package_types', () => {
+      const parsed = Package.parseRequestFilters({
+        query: { package_type: `${PackageType.CLICK},${PackageType.SNAP}` },
+      } as any);
+      assert.deepEqual(parsed.packageTypes, [PackageType.CLICK, PackageType.SNAP]);
+    });
+
+    test('handles both package_type and package_types', () => {
+      const parsed = Package.parseRequestFilters({
+        query: { package_type: PackageType.CLICK, package_types: PackageType.SNAP },
+      } as any);
+      assert.deepEqual(parsed.packageTypes, [PackageType.SNAP, PackageType.CLICK]);
     });
   });
 
@@ -113,6 +142,16 @@ describe('Package', () => {
 
       assert.deepEqual(parsed, {
         channel_architectures: { $in: [ChannelArchitecture.FOCAL_ARMHF, ChannelArchitecture.FOCAL_ALL] },
+      });
+    });
+
+    test('parses package_types filter', () => {
+      const parsed = Package.parseFilters({
+        packageTypes: [PackageType.CLICK, PackageType.SNAP],
+      });
+
+      assert.deepEqual(parsed, {
+        package_type: { $in: [PackageType.CLICK, PackageType.SNAP] },
       });
     });
   });

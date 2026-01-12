@@ -23,6 +23,7 @@ const PROPERTIES: (keyof IPackage)[] = [
   'types',
   'updated_date',
   'calculated_rating',
+  'package_type',
 ];
 
 const SEARCH_FIELDS = [
@@ -124,11 +125,16 @@ export class PackageSearch implements PackageSearchInterface {
     return { success: true };
   }
 
-  parseFilters({ types, ids, frameworks, architectures, category, author, channel, nsfw }: PackageRequestFilters): string[] {
+  parseFilters({ types, ids, packageTypes, frameworks, architectures, category, author, channel, nsfw }: PackageRequestFilters): string[] {
     const filters: string[] = [];
 
     if (types && types.length > 0) {
       filters.push(`types IN ["${types.join('","')}"]`);
+    }
+
+    if (packageTypes && packageTypes.length > 0) {
+      const packageTypesStr = packageTypes.join('","');
+      filters.push(`package_type IN ["${packageTypesStr}"]`);
     }
 
     if (ids && ids.length > 0) {
@@ -253,6 +259,7 @@ export class PackageSearch implements PackageSearchInterface {
         'id',
         'channel_architectures',
         'device_compatibilities',
+        'package_type',
       ],
       sortableAttributes: [
         'name',

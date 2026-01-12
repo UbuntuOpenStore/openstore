@@ -38,3 +38,7 @@ export const CANNOT_REVIEW_OWN_APP = 'Reviewing your own app is not allowed';
 export const REVIEW_REDACTED = 'Redacted reviews cannot be edited';
 
 export const USER_NOT_FOUND = 'User not found';
+
+export const SNAP_DOWNLOAD_NOT_SUPPORTED = 'Downloads are not supported for snap packages';
+export const SNAP_REVIEW_NOT_SUPPORTED = 'Reviews are not supported for snap packages';
+export const SNAP_MANAGEMENT_NOT_SUPPORTED = 'Snap packages cannot be managed through this API';

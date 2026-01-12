@@ -19,6 +19,7 @@ import {
   type IPackageMethods,
   type HydratedPackage,
   type AppType,
+  PackageType,
 } from './types';
 import { packageSearchInstance } from './search-factory';
 import { RatingCount } from '../rating_count/model';
@@ -138,6 +139,16 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       ...getDataArray(req, 'type'),
     ];
 
+    // Parse package_type parameter, defaulting to 'click' for backward compatibility
+    const packageTypeParams = [
+      ...getDataArray(req, 'package_types'),
+      // Handle non-pluralized form
+      ...getDataArray(req, 'package_type'),
+    ];
+    const packageTypes = packageTypeParams.length > 0
+      ? uniq(packageTypeParams) as PackageType[]
+      : [PackageType.CLICK];
+
     const architecture = getData(req, 'architecture').toLowerCase() as Architecture;
     let architectures: Architecture[] = [];
     if (architecture) {
@@ -174,6 +185,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       skip: getDataInt(req, 'skip', 0),
       sort: getData(req, 'sort', 'relevance'),
       types: uniq(types) as AppType[],
+      packageTypes,
       ids: getDataArray(req, 'apps'),
       frameworks: getDataArray(req, 'frameworks'),
       architectures,
@@ -189,6 +201,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
   packageSchema.statics.parseFilters = function ({
     types,
     ids,
+    packageTypes,
     frameworks,
     architecture, // TODO can this be removed?
     architectures,
@@ -205,6 +218,12 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     if (types && types.length > 0) {
       query.types = {
         $in: types,
+      };
+    }
+
+    if (packageTypes && packageTypes.length > 0) {
+      query.package_type = {
+        $in: packageTypes,
       };
     }
 

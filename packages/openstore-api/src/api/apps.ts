@@ -2,13 +2,13 @@ import express, { type Request, type Response } from 'express';
 
 import fsPromise from 'fs/promises';
 import fs from 'fs';
-import { Architecture, type HydratedPackage } from '../db/package/types';
+import { Architecture, type HydratedPackage, PackageType } from '../db/package/types';
 import { Package } from '../db/package';
 import { success, getData, apiLinks, asyncErrorWrapper, getDataArray, getDataBoolean, logger, captureException } from '../utils';
 import { fetchPublishedPackage } from '../middleware';
 import { NotFoundError, UserError } from '../exceptions';
 import reviews from './reviews';
-import { DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH } from '../utils/error-messages';
+import { DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH, SNAP_DOWNLOAD_NOT_SUPPORTED } from '../utils/error-messages';
 import { handleChannel } from '../utils/channels';
 
 const router = express.Router();
@@ -68,6 +68,11 @@ router.get('/:id', fetchPublishedPackage(true), async (req: Request, res: Respon
  * Gets the download for a given package for the given channel and architecture.
  */
 async function download(req: Request, res: Response) {
+  // Prevent downloads for snap packages
+  if (req.pkg.package_type === PackageType.SNAP) {
+    throw new UserError(SNAP_DOWNLOAD_NOT_SUPPORTED);
+  }
+
   const channel = handleChannel(req.params.channel);
 
   const arch = req.params.arch ? req.params.arch.toLowerCase() as Architecture : Architecture.ARMHF;

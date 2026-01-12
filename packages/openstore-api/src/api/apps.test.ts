@@ -7,7 +7,7 @@ import * as api from '.';
 import { type App } from 'supertest/types';
 
 import path from 'node:path';
-import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL } from '../db/package/types';
+import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
 import { Package } from '../db/package/model';
 import * as messages from '../utils/error-messages';
 
@@ -206,6 +206,13 @@ describe('Apps API', () => {
       assert.equal(res.body.data.count, 1);
       assert.equal(res.body.data.packages[0].id, package1.id);
     });
+
+    test('filters by package_type (defaults to click)', async () => {
+      const res = await request(app).get(route).expect(200);
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.packages.length, 2);
+      assert.equal(res.body.data.count, 2);
+    });
   });
 
   describe('GET app download', () => {
@@ -310,6 +317,20 @@ describe('Apps API', () => {
       assert.ok(res.body.success);
       assert.equal(res.body.data.version_changelogs.length, 3);
       assert.equal(res.body.data.changelog, 'Major update');
+    });
+
+    test('prevents downloads for snap packages', async () => {
+      const snapPackage = await factory.package({
+        id: 'snap.package',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}/download/${DEFAULT_CHANNEL}/armhf`).expect(400);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, messages.SNAP_DOWNLOAD_NOT_SUPPORTED);
     });
   });
 });
