@@ -523,6 +523,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       types: this.types || [],
       updated_date: this.updated_date || '',
       ratings: this.serializeRatings(),
+      package_type: this.package_type,
+      source_store: this.source_store,
 
       // Deprecated, remove in the next major version
       framework: '',
@@ -661,6 +663,15 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
       write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
       desktop_names: desktopNames,
+      package_type: this.package_type,
+      source_store: this.source_store,
+      snap_data: this.snap_data
+        ? {
+            channels: this.snap_data.channels,
+            confinement: this.snap_data.confinement,
+            base: this.snap_data.base,
+          }
+        : undefined,
 
       // Deprecated, remove in the next major version
       author: this.author || '',

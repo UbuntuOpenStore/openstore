@@ -11,7 +11,7 @@ import { type App } from 'supertest/types';
 import { Package } from '../db/package';
 import { RatingCount } from '../db/rating_count';
 import { Discover } from '../db/discover';
-import { Architecture, Channel, ChannelArchitecture, PackageType } from '../db/package/types';
+import { Architecture, Channel, ChannelArchitecture, AppType } from '../db/package/types';
 import { config } from '../utils/config';
 
 describe('Discover API', () => {
@@ -76,7 +76,7 @@ describe('Discover API', () => {
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
         published_date: (new Date()).toISOString(),
-        types: [PackageType.APP],
+        types: [AppType.APP],
         banner: 'test.svg',
       }),
       factory.package({
@@ -88,7 +88,7 @@ describe('Discover API', () => {
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
         published_date: '2021-01-01T13:35:16.095Z',
         updated_date: '2021-01-01T13:35:16.095Z',
-        types: [PackageType.APP],
+        types: [AppType.APP],
         banner: 'test.svg',
       }),
       factory.package({
@@ -100,7 +100,7 @@ describe('Discover API', () => {
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-16.04`],
         published_date: '2021-01-01T13:35:16.095Z',
         updated_date: '2021-01-01T13:35:16.095Z',
-        types: [PackageType.APP],
+        types: [AppType.APP],
         banner: 'test.svg',
       }),
       factory.package({
@@ -111,7 +111,7 @@ describe('Discover API', () => {
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-16.04`],
         published_date: (new Date()).toISOString(),
-        types: [PackageType.APP],
+        types: [AppType.APP],
         banner: 'test.svg',
       }),
     ]);

@@ -2,7 +2,15 @@ import { Schema, model } from 'mongoose';
 import { setupMethods } from './methods';
 import { setupVirtuals } from './virtuals';
 import { setupStatics } from './statics';
-import { type RevisionModel, type PackageModel, type IRevision, type IPackageMethods, type IPackage } from './types';
+import {
+  type RevisionModel,
+  type PackageModel,
+  type IRevision,
+  type IPackageMethods,
+  type IPackage,
+  PackageType,
+  SourceStore,
+} from './types';
 
 const revisionSchema = new Schema<IRevision, RevisionModel>({
   revision: Number,
@@ -22,6 +30,9 @@ const revisionSchema = new Schema<IRevision, RevisionModel>({
   read_paths: [String],
   write_paths: [String],
   desktop_names: [String],
+  snap_data: {
+    grade: String,
+  },
 });
 
 const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
@@ -64,6 +75,16 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   qml_imports: [],
   review_exceptions: [String],
   skip_review: Boolean,
+
+  // Package source and type
+  package_type: { type: String, default: PackageType.CLICK },
+  source_store: { type: String, default: SourceStore.OPENSTORE },
+  external_id: String,
+  snap_data: {
+    channels: [String],
+    confinement: String,
+    base: String,
+  },
 
   // Publication metadata
   published: Boolean,

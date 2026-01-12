@@ -6,10 +6,22 @@ import { type HydratedRatingCount } from '../rating_count/types';
 
 export type SearchProvider = 'elasticsearch' | 'meilisearch';
 
-export enum PackageType {
+export enum AppType {
   APP = 'app',
   WEBAPP = 'webapp',
   WEBAPP_PLUS = 'webapp+',
+}
+
+// Package source types
+export enum PackageType {
+  CLICK = 'click',
+  SNAP = 'snap',
+}
+
+// Package source stores
+export enum SourceStore {
+  OPENSTORE = 'openstore',
+  SNAPCRAFT = 'snapcraft',
 }
 
 export enum Channel {
@@ -45,6 +57,27 @@ export type File = {
   size: number;
 };
 
+export enum SnapConfinement {
+  STRICT = 'strict',
+  CLASSIC = 'classic',
+  DEVMODE = 'devmode',
+}
+
+export enum SnapGrade {
+  STABLE = 'stable',
+  DEVEL = 'devel',
+}
+
+export type RevisionSnapData = {
+  grade: SnapGrade;
+};
+
+export type SnapData = {
+  channels: string[]; // stable, candidate, beta, edge
+  confinement: SnapConfinement;
+  base: string; // e.g., core22
+};
+
 export interface IRevision {
   revision: number;
   version: string;
@@ -61,6 +94,7 @@ export interface IRevision {
   read_paths?: string[];
   write_paths?: string[];
   desktop_names?: string[];
+  snap_data?: RevisionSnapData;
 }
 
 export type HydratedRevision = HydratedDocument<IRevision>;
@@ -75,6 +109,16 @@ export type SerializedRatings = {
   HAPPY: number;
   NEUTRAL: number;
   BUGGY: number;
+};
+
+export type SerializedSnapData = {
+  grade?: SnapGrade;
+};
+
+export type SerializedPackageSnapData = {
+  channels?: string[];
+  confinement?: SnapConfinement;
+  base?: string;
 };
 
 export type SerializedPackage = {
@@ -114,8 +158,10 @@ export type SerializedPackage = {
   video_url: string;
   translation_url: string;
   tagline: string;
-  types: PackageType[];
+  types: AppType[];
   updated_date: string;
+  package_type: PackageType;
+  source_store: SourceStore;
   languages: string[];
   revisions: IRevision[];
   totalDownloads: number;
@@ -133,6 +179,7 @@ export type SerializedPackage = {
   read_paths?: string[];
   write_paths?: string[];
   desktop_names?: string[];
+  snap_data?: SerializedPackageSnapData;
 };
 
 export type SerializedPackageSlim = {
@@ -152,8 +199,10 @@ export type SerializedPackageSlim = {
   nsfw?: boolean;
   published_date?: string;
   tagline?: string;
-  types?: PackageType[];
+  types?: AppType[];
   updated_date?: string;
+  package_type?: PackageType;
+  source_store?: SourceStore;
   ratings?: SerializedRatings;
 };
 
@@ -173,8 +222,9 @@ export type PackageRequestFilters = {
   limit?: number;
   skip?: number;
   sort?: string;
-  types?: PackageType[];
+  types?: AppType[];
   ids?: string[];
+  package_types?: PackageType[];
   frameworks?: string[] | string;
   architecture?: Architecture;
   architectures?: Architecture[];
@@ -208,9 +258,13 @@ export interface IPackage {
   maintainer_name?: string;
   author?: string;
   manifest?: { [key: string]: any };
-  types: PackageType[];
-  type_override?: PackageType;
+  types: AppType[];
+  type_override?: AppType;
   desktop_names_override?: string[];
+  package_type: PackageType;
+  source_store: SourceStore;
+  external_id?: string;
+  snap_data?: SnapData;
   languages: string[];
   architectures: Architecture[];
   channel_architectures: ChannelArchitecture[];
@@ -251,7 +305,7 @@ export interface BodyUpdate {
   screenshots?: string[] | string;
   keywords?: string[] | string;
   nsfw?: boolean | string;
-  type_override?: PackageType;
+  type_override?: AppType;
   desktop_names_override?: string[] | string;
   maintainer?: string;
 }

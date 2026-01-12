@@ -18,7 +18,7 @@ import {
   type IPackage,
   type IPackageMethods,
   type HydratedPackage,
-  type PackageType,
+  type AppType,
 } from './types';
 import { packageSearchInstance } from './search-factory';
 import { RatingCount } from '../rating_count/model';
@@ -173,7 +173,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       limit,
       skip: getDataInt(req, 'skip', 0),
       sort: getData(req, 'sort', 'relevance'),
-      types: uniq(types) as PackageType[],
+      types: uniq(types) as AppType[],
       ids: getDataArray(req, 'apps'),
       frameworks: getDataArray(req, 'frameworks'),
       architectures,

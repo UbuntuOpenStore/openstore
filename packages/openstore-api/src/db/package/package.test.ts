@@ -2,7 +2,7 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { Package } from '.';
-import { Architecture, Channel, PackageType, DEFAULT_CHANNEL, ChannelArchitecture } from './types';
+import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
 import { serializeRatings } from './methods';
 import { Ratings } from '../review/constants';
 import { UserError } from '../../exceptions';
@@ -13,8 +13,8 @@ describe('Package', () => {
     test('parses a request', () => {
       const parsed = Package.parseRequestFilters({
         query: {
-          types: PackageType.APP,
-          type: PackageType.APP,
+          types: AppType.APP,
+          type: AppType.APP,
           architecture: Architecture.ALL,
           limit: '100',
           skip: '20',
@@ -30,7 +30,7 @@ describe('Package', () => {
       } as any);
 
       assert.deepEqual(parsed, {
-        types: [PackageType.APP],
+        types: [AppType.APP],
         architectures: [Architecture.ALL],
         limit: 100,
         skip: 20,
@@ -48,8 +48,8 @@ describe('Package', () => {
 
     test('handles types and type', () => {
       assert.deepEqual(Package.parseRequestFilters({
-        query: { type: PackageType.APP, types: PackageType.WEBAPP },
-      } as any).types, [PackageType.WEBAPP, PackageType.APP]);
+        query: { type: AppType.APP, types: AppType.WEBAPP },
+      } as any).types, [AppType.WEBAPP, AppType.APP]);
     });
 
     test('adds arch all when the arch is not all', () => {
@@ -74,7 +74,7 @@ describe('Package', () => {
   describe('parseFilters', () => {
     test('parses filters, with arch/channel/frameworks specified', () => {
       const parsed = Package.parseFilters({
-        types: [PackageType.APP, PackageType.WEBAPP],
+        types: [AppType.APP, AppType.WEBAPP],
         ids: ['foo.bar'],
         frameworks: ['ubuntu-16.04'],
         architectures: [Architecture.ARMHF, Architecture.ALL],
@@ -88,7 +88,7 @@ describe('Package', () => {
       });
 
       assert.deepEqual(parsed, {
-        types: { $in: [PackageType.APP, PackageType.WEBAPP] },
+        types: { $in: [AppType.APP, AppType.WEBAPP] },
         id: { $in: ['foo.bar'] },
         device_compatibilities: {
           $in: [
@@ -135,7 +135,7 @@ describe('Package', () => {
         nsfw: false,
         published_date: now,
         tagline: 'such wow',
-        types: [PackageType.APP],
+        types: [AppType.APP],
         updated_date: now,
         changelog: 'some changes',
         donate_url: 'https://example.com/donate',
@@ -200,6 +200,8 @@ describe('Package', () => {
           tagline: 'such wow',
           types: ['app'],
           updated_date: now,
+          package_type: 'click',
+          source_store: 'openstore',
           ratings: {
             BUGGY: 0,
             HAPPY: 0,
@@ -252,6 +254,13 @@ describe('Package', () => {
           tagline: 'such wow',
           types: ['app'],
           updated_date: now,
+          package_type: PackageType.CLICK,
+          source_store: SourceStore.OPENSTORE,
+          snap_data: {
+            base: undefined,
+            channels: [],
+            confinement: undefined,
+          },
           calculated_rating: 0,
           ratings: {
             BUGGY: 0,
