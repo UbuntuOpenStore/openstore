@@ -343,7 +343,6 @@ describe('Snap Scraper Utils', () => {
 
       const result = transformSnapToPackage(v2Data, v1Data, 'music-and-audio');
 
-      // Test basic fields
       assert.equal(result.id, 'snap.vlc');
       assert.equal(result.name, 'VLC');
       assert.equal(result.tagline, 'The ultimate media player');
@@ -352,7 +351,6 @@ describe('Snap Scraper Utils', () => {
       assert.equal(result.source_store, SourceStore.SNAPCRAFT);
       assert.equal(result.external_id, 'vlc');
 
-      // Test category mapping
       assert.equal(result.category, 'Music & Audio');
 
       assert.equal(result.license, 'GNU GPL v2');
@@ -361,24 +359,27 @@ describe('Snap Scraper Utils', () => {
       assert.ok(result.architectures?.includes(Architecture.AMD64));
       assert.ok(result.architectures?.includes(Architecture.ARM64));
 
-      // Test revisions
+      assert.equal(result.channel_architectures?.length, 2);
+      assert.ok(result.channel_architectures?.includes('focal:amd64' as any));
+      assert.ok(result.channel_architectures?.includes('focal:arm64' as any));
+
+      assert.equal(result.device_compatibilities?.length, 2);
+      assert.ok(result.device_compatibilities?.includes('focal:amd64:ubuntu-touch-24.04-1.x'));
+      assert.ok(result.device_compatibilities?.includes('focal:arm64:ubuntu-touch-24.04-1.x'));
+
       assert.equal(result.revisions?.length, 2);
 
-      // Test snap_data
       assert.equal(result.snap_data?.confinement, 'strict');
       assert.equal(result.snap_data?.base, 'core18');
       assert.equal(result.snap_data?.channels.length, 1);
       assert.ok(result.snap_data?.channels.includes('stable'));
 
-      // Test screenshots and icon
       assert.equal(result.screenshots?.length, 2);
       assert.equal(result.icon, 'https://example.com/icon.png');
 
-      // Test publisher info
       assert.equal(result.author, 'VideoLAN');
       assert.equal(result.maintainer_name, 'VideoLAN');
 
-      // Test URLs
       assert.equal(result.support_url, 'https://www.videolan.org/support/');
       assert.equal(result.source, 'https://www.videolan.org/vlc/');
     });

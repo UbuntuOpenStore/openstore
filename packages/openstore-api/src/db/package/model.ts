@@ -32,6 +32,7 @@ const revisionSchema = new Schema<IRevision, RevisionModel>({
   desktop_names: [String],
   snap_data: {
     grade: String,
+    risk: String,
   },
 });
 

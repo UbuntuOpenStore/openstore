@@ -1,6 +1,7 @@
 import {
   Architecture,
-  type Channel,
+  Channel,
+  type ChannelArchitecture,
   PackageType,
   SourceStore,
   type SnapConfinement,
@@ -318,12 +319,17 @@ export function transformSnapToPackage(
 
   const channelsSet = new Set<string>();
   const architecturesSet = new Set<Architecture>();
+  const channelArchitecturesSet = new Set<ChannelArchitecture>();
+  const deviceCompatibilitiesSet = new Set<string>();
 
   v2Data['channel-map'].forEach((channelMap) => {
     channelsSet.add(channelMap.channel.risk);
     const openStoreArch = ARCH_MAPPING[channelMap.channel.architecture];
     if (openStoreArch) {
       architecturesSet.add(openStoreArch);
+      const channelArch = `${Channel.FOCAL}:${openStoreArch}` as ChannelArchitecture;
+      channelArchitecturesSet.add(channelArch);
+      deviceCompatibilitiesSet.add(`${Channel.FOCAL}:${openStoreArch}:ubuntu-touch-24.04-1.x`);
     }
   });
 
@@ -334,7 +340,7 @@ export function transformSnapToPackage(
       revision: channelMap.revision,
       version: channelMap.version,
       downloads: 0,
-      channel: channelMap.channel.risk as unknown as Channel,
+      channel: Channel.FOCAL, // Setting as a constant so it'll show for nobel devices
       download_url: null,
       download_sha512: '',
       architecture: arch,
@@ -345,6 +351,7 @@ export function transformSnapToPackage(
       permissions: [],
       snap_data: {
         grade: SnapGrade.STABLE,
+        risk: channelMap.channel.risk,
       },
     };
   });
@@ -377,12 +384,14 @@ export function transformSnapToPackage(
     types: [AppType.APP],
     languages: [],
     architectures: Array.from(architecturesSet),
+    channels: [Channel.FOCAL],
+    channel_architectures: Array.from(channelArchitecturesSet),
+    device_compatibilities: Array.from(deviceCompatibilitiesSet),
     locked: false,
     published: true,
     published_date: stableRevision?.['created-at'] || v2Data['channel-map'][0]?.['created-at'] || new Date().toISOString(),
     updated_date: stableRevision?.channel['released-at'] || v2Data['channel-map'][0]?.channel['released-at'] || new Date().toISOString(),
     revisions: revisions as unknown as IPackage['revisions'],
-    channels: [],
     icon: v1Data?.icon_url || '',
     package_type: PackageType.SNAP,
     source_store: SourceStore.SNAPCRAFT,

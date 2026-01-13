@@ -4,7 +4,7 @@ import { type Schema } from 'mongoose';
 import path from 'path';
 
 import { config } from '../../utils';
-import { DEFAULT_CHANNEL, type HydratedPackage, type IPackage, type IPackageMethods, type PackageModel } from './types';
+import { DEFAULT_CHANNEL, PackageType, type HydratedPackage, type IPackage, type IPackageMethods, type PackageModel } from './types';
 
 const DEFAULT_VERSION = '0.0.0';
 
@@ -27,6 +27,11 @@ export function setupVirtuals(packageSchema: Schema<IPackage, PackageModel, IPac
   packageSchema.virtual<HydratedPackage>('icon_url').get(function (): string {
     if (!this.icon) {
       return `${config.server.host}/icons/404.png`;
+    }
+
+    // For snap packages, the icon field contains an external URL
+    if (this.package_type === PackageType.SNAP) {
+      return this.icon;
     }
 
     let version = DEFAULT_VERSION;

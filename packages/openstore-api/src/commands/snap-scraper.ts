@@ -12,7 +12,7 @@ import {
 
 const DELAY_BETWEEN_REQUESTS = 150;
 
-async function syncSnapPackages(options: { limit?: number; search?: string } = {}) {
+async function syncSnapPackages(options: { limit?: number; search?: string; force?: boolean } = {}) {
   console.log('Starting snap package sync...');
   let totalSynced = 0;
   let totalSkipped = 0;
@@ -51,6 +51,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string } = {
           const existingLatestRevision = existingPackage.revisions[existingPackage.revisions.length - 1];
 
           if (
+            !options.force &&
             latestStableRevision &&
             existingLatestRevision &&
             latestStableRevision.version === existingLatestRevision.version
@@ -90,7 +91,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string } = {
 }
 
 const args = process.argv.slice(2);
-const options: { limit?: number; search?: string } = {};
+const options: { limit?: number; search?: string; force?: boolean } = {};
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--limit' && args[i + 1]) {
@@ -100,6 +101,9 @@ for (let i = 0; i < args.length; i++) {
   else if (args[i] === '--search' && args[i + 1]) {
     options.search = args[i + 1];
     i++;
+  }
+  else if (args[i] === '--force') {
+    options.force = true;
   }
 }
 

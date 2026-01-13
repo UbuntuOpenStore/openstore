@@ -70,6 +70,7 @@ export enum SnapGrade {
 
 export type RevisionSnapData = {
   grade: SnapGrade;
+  risk: string;
 };
 
 export type SnapData = {
@@ -113,6 +114,7 @@ export type SerializedRatings = {
 
 export type SerializedSnapData = {
   grade?: SnapGrade;
+  risk?: string;
 };
 
 export type SerializedPackageSnapData = {

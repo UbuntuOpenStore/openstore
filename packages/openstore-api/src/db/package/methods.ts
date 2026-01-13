@@ -39,6 +39,7 @@ import {
   type IPackageMethods,
   type HydratedPackage,
   type HydratedRevision,
+  PackageType,
 } from './types';
 import { User } from '../user';
 import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
@@ -638,6 +639,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       published: !!this.published,
       locked: !!this.locked,
       screenshots: this.screenshots.map((file) => {
+        // For snap packages, screenshots are already external URLs
+        if (this.package_type === PackageType.SNAP) {
+          return file;
+        }
         return `${config.server.host}/screenshots/${file}`;
       }),
       source: this.source || '',
@@ -698,7 +703,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
                 ...downloadRevisionData.toObject(),
                 _id: undefined,
                 architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                download_url: this.getDownloadUrl(channel, arch, downloadRevisionData.version),
+                download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
                 installedSize: toBytes(downloadRevisionData.filesize),
                 downloadSize: downloadRevisionData.downloadSize ?? 0,
 
