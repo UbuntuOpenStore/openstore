@@ -11,7 +11,6 @@ async function migratePackages() {
   console.log('Starting package migration...');
 
   try {
-    // Count packages without source_store or package_type
     const packagesNeedingMigration = await Package.countDocuments({
       $or: [
         { source_store: { $exists: false } },
@@ -26,7 +25,6 @@ async function migratePackages() {
       process.exit(0);
     }
 
-    // Update all packages without source_store/package_type to be OpenStore click packages
     const result = await Package.updateMany(
       {
         $or: [
@@ -46,7 +44,6 @@ async function migratePackages() {
     console.log(`  - Matched: ${result.matchedCount} packages`);
     console.log(`  - Modified: ${result.modifiedCount} packages`);
 
-    // Verify migration
     const remainingPackages = await Package.countDocuments({
       $or: [
         { source_store: { $exists: false } },
@@ -59,7 +56,6 @@ async function migratePackages() {
       process.exit(1);
     }
 
-    // Show summary
     const clickCount = await Package.countDocuments({ package_type: PackageType.CLICK });
     const snapCount = await Package.countDocuments({ package_type: PackageType.SNAP });
     const totalCount = await Package.countDocuments({});

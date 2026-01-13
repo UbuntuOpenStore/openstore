@@ -7,7 +7,7 @@ import * as api from '.';
 import { type App } from 'supertest/types';
 
 import path from 'node:path';
-import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
+import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, type SerializedPackage, SourceStore } from '../db/package/types';
 import { Package } from '../db/package/model';
 import * as messages from '../utils/error-messages';
 
@@ -229,10 +229,10 @@ describe('Apps API', () => {
       assert.ok(res.body.success);
       assert.equal(res.body.data.packages.length, 2);
       assert.equal(res.body.data.count, 2);
-      // Verify all returned packages are click packages
-      res.body.data.packages.forEach((pkg: any) => {
+
+      for (const pkg of res.body.data.packages) {
         assert.equal(pkg.package_type, PackageType.CLICK);
-      });
+      }
     });
 
     test('filters by package_type=snap', async () => {
@@ -260,10 +260,10 @@ describe('Apps API', () => {
       assert.ok(res.body.success);
       assert.equal(res.body.data.packages.length, 2);
       assert.equal(res.body.data.count, 2);
-      // Verify all returned packages are snap packages
-      res.body.data.packages.forEach((pkg: any) => {
+
+      for (const pkg of res.body.data.packages) {
         assert.equal(pkg.package_type, PackageType.SNAP);
-      });
+      }
     });
 
     test('filters by multiple package_types', async () => {

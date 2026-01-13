@@ -6,6 +6,7 @@ import {
   SourceStore,
   type SnapConfinement,
   SnapGrade,
+  SnapChannel,
   type IPackage,
   type IRevision,
   AppType,
@@ -41,6 +42,13 @@ export const ARCH_MAPPING: Record<string, Architecture> = {
   arm64: Architecture.ARM64,
   armhf: Architecture.ARMHF,
   all: Architecture.ALL,
+};
+
+export const SNAP_CHANNEL_MAPPING: Record<string, SnapChannel> = {
+  stable: SnapChannel.STABLE,
+  candidate: SnapChannel.CANDIDATE,
+  beta: SnapChannel.BETA,
+  edge: SnapChannel.EDGE,
 };
 
 function mapLicense(spdxLicense: string): string {
@@ -317,13 +325,16 @@ export function transformSnapToPackage(
 ): Partial<IPackage> {
   const snapId = `snap.${v2Data.name}`;
 
-  const channelsSet = new Set<string>();
+  const channelsSet = new Set<SnapChannel>();
   const architecturesSet = new Set<Architecture>();
   const channelArchitecturesSet = new Set<ChannelArchitecture>();
   const deviceCompatibilitiesSet = new Set<string>();
 
   v2Data['channel-map'].forEach((channelMap) => {
-    channelsSet.add(channelMap.channel.risk);
+    const snapChannel = SNAP_CHANNEL_MAPPING[channelMap.channel.risk];
+    if (snapChannel) {
+      channelsSet.add(snapChannel);
+    }
     const openStoreArch = ARCH_MAPPING[channelMap.channel.architecture];
     if (openStoreArch) {
       architecturesSet.add(openStoreArch);

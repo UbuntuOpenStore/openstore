@@ -12,13 +12,11 @@ export enum AppType {
   WEBAPP_PLUS = 'webapp+',
 }
 
-// Package source types
 export enum PackageType {
   CLICK = 'click',
   SNAP = 'snap',
 }
 
-// Package source stores
 export enum SourceStore {
   OPENSTORE = 'openstore',
   SNAPCRAFT = 'snapcraft',
@@ -63,6 +61,13 @@ export enum SnapConfinement {
   DEVMODE = 'devmode',
 }
 
+export enum SnapChannel {
+  STABLE = 'stable',
+  CANDIDATE = 'candidate',
+  BETA = 'beta',
+  EDGE = 'edge',
+}
+
 export enum SnapGrade {
   STABLE = 'stable',
   DEVEL = 'devel',
@@ -74,7 +79,7 @@ export type RevisionSnapData = {
 };
 
 export type SnapData = {
-  channels: string[]; // stable, candidate, beta, edge
+  channels: SnapChannel[];
   confinement: SnapConfinement;
   base: string; // e.g., core22
 };
@@ -118,7 +123,7 @@ export type SerializedSnapData = {
 };
 
 export type SerializedPackageSnapData = {
-  channels?: string[];
+  channels?: SnapChannel[];
   confinement?: SnapConfinement;
   base?: string;
 };

@@ -11,7 +11,7 @@ import {
   type SnapV2Response,
   type SnapV1Response,
 } from './snap-scraper';
-import { Architecture, PackageType, SourceStore } from '../db/package/types';
+import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/package/types';
 
 describe('Snap Scraper Utils', () => {
   describe('fetchSnaps', () => {
@@ -372,7 +372,7 @@ describe('Snap Scraper Utils', () => {
       assert.equal(result.snap_data?.confinement, 'strict');
       assert.equal(result.snap_data?.base, 'core18');
       assert.equal(result.snap_data?.channels.length, 1);
-      assert.ok(result.snap_data?.channels.includes('stable'));
+      assert.ok(result.snap_data?.channels.includes(SnapChannel.STABLE));
 
       assert.equal(result.screenshots?.length, 2);
       assert.equal(result.icon, 'https://example.com/icon.png');
@@ -550,9 +550,9 @@ describe('Snap Scraper Utils', () => {
       const result = transformSnapToPackage(v2Data, null, 'games');
 
       assert.equal(result.snap_data?.channels.length, 3);
-      assert.ok(result.snap_data?.channels.includes('stable'));
-      assert.ok(result.snap_data?.channels.includes('beta'));
-      assert.ok(result.snap_data?.channels.includes('edge'));
+      assert.ok(result.snap_data?.channels.includes(SnapChannel.STABLE));
+      assert.ok(result.snap_data?.channels.includes(SnapChannel.BETA));
+      assert.ok(result.snap_data?.channels.includes(SnapChannel.EDGE));
       assert.equal(result.revisions?.length, 3);
     });
 

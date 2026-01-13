@@ -133,8 +133,7 @@ export class PackageSearch implements PackageSearchInterface {
     }
 
     if (packageTypes && packageTypes.length > 0) {
-      const packageTypesStr = packageTypes.join('","');
-      filters.push(`package_type IN ["${packageTypesStr}"]`);
+      filters.push(`package_type IN ["${packageTypes.join('","')}"]`);
     }
 
     if (ids && ids.length > 0) {
