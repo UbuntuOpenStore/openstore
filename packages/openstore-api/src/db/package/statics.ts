@@ -38,7 +38,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       this.categoryStats(Object.values(Channel)),
       this.aggregate([
         {
-          $match: { published: true, channels: { $in: Object.values(Channel) } },
+          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
         }, {
           $group: {
             _id: '$types',
@@ -50,7 +50,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       ]),
       this.aggregate([
         {
-          $match: { published: true, channels: { $in: Object.values(Channel) } },
+          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
         }, {
           $group: {
             _id: '$framework',
@@ -62,7 +62,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       ]),
       this.aggregate([
         {
-          $match: { published: true, channels: { $in: Object.values(Channel) } },
+          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
         }, {
           $group: {
             _id: '$architectures',
@@ -111,7 +111,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
   };
 
   packageSchema.statics.categoryStats = async function (channels: Channel[]): Promise<CategoryStat[]> {
-    const match: FilterQuery<IPackage> = { published: true };
+    const match: FilterQuery<IPackage> = { published: true, package_type: PackageType.CLICK };
     if (channels) {
       match.channels = { $in: channels };
     }
