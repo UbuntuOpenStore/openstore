@@ -1,5 +1,6 @@
 import 'db'; // Make sure the database connection gets setup
-import { Package } from '../db/package';
+import { type HydratedPackage, Package } from '../db/package';
+import { PackageSearch as MeilisearchPackageSearch } from '../db/package/search-meilisearch';
 import {
   fetchSnaps,
   fetchSnapDetailsV2,
@@ -11,6 +12,8 @@ import {
 } from '../utils/snap-scraper';
 
 const DELAY_BETWEEN_REQUESTS = 150;
+
+const meilisearchSearch = new MeilisearchPackageSearch();
 
 async function syncSnapPackages(options: { limit?: number; search?: string; force?: boolean } = {}) {
   console.log('Starting snap package sync...');
@@ -46,6 +49,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
         const category = v1Data?.links?.website ? 'utilities' : 'utilities';
         const packageData = transformSnapToPackage(v2Data, v1Data, category);
 
+        let savedPackage: HydratedPackage;
         if (existingPackage) {
           const latestStableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
           const existingLatestRevision = existingPackage.revisions[existingPackage.revisions.length - 1];
@@ -62,13 +66,16 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
           }
 
           Object.assign(existingPackage, packageData);
-          await existingPackage.save();
+          savedPackage = await existingPackage.save();
           console.log(`  Updated: ${snap.name}`);
         }
         else {
-          await Package.create(packageData);
+          savedPackage = await Package.create(packageData);
           console.log(`  Created: ${snap.name}`);
         }
+
+        await meilisearchSearch.upsert(savedPackage);
+        console.log(`  Indexed in Meilisearch: ${snap.name}`);
 
         totalSynced++;
       }
