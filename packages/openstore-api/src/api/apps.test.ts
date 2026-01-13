@@ -213,6 +213,78 @@ describe('Apps API', () => {
       assert.equal(res.body.data.packages.length, 2);
       assert.equal(res.body.data.count, 2);
     });
+
+    test('filters by package_type=click explicitly', async () => {
+      // Create a snap package
+      await factory.package({
+        id: 'snap.firefox',
+        name: 'Firefox',
+        author: 'Mozilla',
+        published: true,
+        category: 'Utilities',
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+      });
+
+      const res = await request(app).get(`${route}?package_type=click`).expect(200);
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.packages.length, 2);
+      assert.equal(res.body.data.count, 2);
+      // Verify all returned packages are click packages
+      res.body.data.packages.forEach((pkg: any) => {
+        assert.equal(pkg.package_type, PackageType.CLICK);
+      });
+    });
+
+    test('filters by package_type=snap', async () => {
+      // Create snap packages
+      const snap1 = await factory.package({
+        id: 'snap.firefox',
+        name: 'Firefox',
+        author: 'Mozilla',
+        published: true,
+        category: 'Utilities',
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+      });
+
+      const snap2 = await factory.package({
+        id: 'snap.vlc',
+        name: 'VLC',
+        author: 'VideoLAN',
+        published: true,
+        category: 'Entertainment',
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+      });
+
+      const res = await request(app).get(`${route}?package_type=snap`).expect(200);
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.packages.length, 2);
+      assert.equal(res.body.data.count, 2);
+      // Verify all returned packages are snap packages
+      res.body.data.packages.forEach((pkg: any) => {
+        assert.equal(pkg.package_type, PackageType.SNAP);
+      });
+    });
+
+    test('filters by multiple package_types', async () => {
+      // Create a snap package
+      await factory.package({
+        id: 'snap.firefox',
+        name: 'Firefox',
+        author: 'Mozilla',
+        published: true,
+        category: 'Utilities',
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+      });
+
+      const res = await request(app).get(`${route}?package_type=click,snap`).expect(200);
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.packages.length, 3);
+      assert.equal(res.body.data.count, 3);
+    });
   });
 
   describe('GET app download', () => {
