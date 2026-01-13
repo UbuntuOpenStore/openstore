@@ -19,20 +19,21 @@ const DELAY_BETWEEN_REQUESTS = 150;
 export const CATEGORY_MAPPING: Record<string, string> = {
   'art-and-design': 'Graphics',
   'books-and-reference': 'Books & Comics',
-  development: 'Developer Tools',
   'devices-and-iot': 'Utilities',
+  'health-and-fitness': 'Health & Fitness',
+  'music-and-audio': 'Music & Audio',
+  'news-and-weather': 'News & Magazines',
+  'photo-and-video': 'Media & Video',
+  'server-and-cloud': 'Developer Tools',
+  development: 'Developer Tools',
   education: 'Education & Reference',
   entertainment: 'Entertainment',
   finance: 'Business & Finance',
   games: 'Games',
-  'health-and-fitness': 'Health & Fitness',
-  'music-and-audio': 'Music & Audio',
-  'news-and-weather': 'News & Magazines',
   personalisation: 'Personalisation',
-  'photo-and-video': 'Media & Video',
   productivity: 'Productivity',
+  science: 'Education & Reference',
   security: 'Utilities',
-  'server-and-cloud': 'Developer Tools',
   social: 'Communication & Social',
   utilities: 'Utilities',
 };
@@ -198,13 +199,13 @@ export async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function fetchSnaps(searchQuery = '', limit?: number, fetchFn = fetch): Promise<SnapSearchResult[]> {
+export async function fetchSnaps(category = '', limit?: number, fetchFn = fetch): Promise<SnapSearchResult[]> {
   const allSnaps: SnapSearchResult[] = [];
   const seenIds = new Set<string>();
 
   const url = new URL('https://api.snapcraft.io/v2/snaps/find');
-  if (searchQuery) {
-    url.searchParams.set('q', searchQuery);
+  if (category) {
+    url.searchParams.set('category', category);
   }
 
   const response = await fetchFn(url.toString(), {
@@ -217,7 +218,7 @@ export async function fetchSnaps(searchQuery = '', limit?: number, fetchFn = fet
   if (!response.ok) {
     if (response.status === 429) {
       await sleep(5000);
-      return await fetchSnaps(searchQuery, limit, fetchFn);
+      return await fetchSnaps(category, limit, fetchFn);
     }
     if (response.status === 400 || response.status === 404) {
       return [];
@@ -249,23 +250,14 @@ export async function discoverSnaps(limit?: number, fetchFn = fetch): Promise<Sn
   const allSnaps: SnapSearchResult[] = [];
   const seenIds = new Set<string>();
 
-  const searchTerms = [
-    '',
-    'app', 'game', 'tool', 'server', 'editor', 'browser',
-    'media', 'video', 'audio', 'photo', 'image',
-    'development', 'dev', 'code', 'ide', 'terminal',
-    'productivity', 'office', 'note', 'calendar',
-    'communication', 'chat', 'email', 'social',
-    'utility', 'system', 'network', 'security',
-    'database', 'cloud', 'docker', 'kubernetes',
-  ];
+  const categories = Object.keys(CATEGORY_MAPPING);
 
-  for (const term of searchTerms) {
+  for (const category of categories) {
     if (limit && allSnaps.length >= limit) {
       break;
     }
 
-    const snaps = await fetchSnaps(term, limit ? limit - allSnaps.length : undefined, fetchFn);
+    const snaps = await fetchSnaps(category, limit ? limit - allSnaps.length : undefined, fetchFn);
     await sleep(DELAY_BETWEEN_REQUESTS);
 
     for (const snap of snaps) {

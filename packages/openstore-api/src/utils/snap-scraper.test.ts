@@ -15,7 +15,7 @@ import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/packa
 
 describe('Snap Scraper Utils', () => {
   describe('fetchSnaps', () => {
-    test('should fetch and return snap search results', async () => {
+    test('should fetch and return snaps by category', async () => {
       const mockResponse = {
         results: [
           { name: 'vlc', 'snap-id': 'id1' },
@@ -23,12 +23,15 @@ describe('Snap Scraper Utils', () => {
         ],
       };
 
-      const mockFetch = mock.fn(async () => ({
-        ok: true,
-        json: async () => mockResponse,
-      })) as any;
+      const mockFetch = mock.fn(async (url: string) => {
+        assert.ok(url.includes('category=games'));
+        return {
+          ok: true,
+          json: async () => mockResponse,
+        };
+      }) as any;
 
-      const results = await fetchSnaps('vlc', undefined, mockFetch);
+      const results = await fetchSnaps('games', undefined, mockFetch);
 
       assert.equal(results.length, 2);
       assert.equal(results[0].name, 'vlc');
@@ -50,7 +53,7 @@ describe('Snap Scraper Utils', () => {
         json: async () => mockResponse,
       })) as any;
 
-      const results = await fetchSnaps('browser', 2, mockFetch);
+      const results = await fetchSnaps('productivity', 2, mockFetch);
 
       assert.equal(results.length, 2);
     });
@@ -68,7 +71,7 @@ describe('Snap Scraper Utils', () => {
         json: async () => mockResponse,
       })) as any;
 
-      const results = await fetchSnaps('vlc', undefined, mockFetch);
+      const results = await fetchSnaps('entertainment', undefined, mockFetch);
 
       assert.equal(results.length, 1);
       assert.equal(results[0].name, 'vlc');
@@ -80,7 +83,7 @@ describe('Snap Scraper Utils', () => {
         status: 404,
       })) as any;
 
-      const results = await fetchSnaps('nonexistent', undefined, mockFetch);
+      const results = await fetchSnaps('nonexistent-category', undefined, mockFetch);
 
       assert.equal(results.length, 0);
     });
@@ -91,7 +94,7 @@ describe('Snap Scraper Utils', () => {
         status: 400,
       })) as any;
 
-      const results = await fetchSnaps('invalid', undefined, mockFetch);
+      const results = await fetchSnaps('invalid-category', undefined, mockFetch);
 
       assert.equal(results.length, 0);
     });
@@ -104,7 +107,7 @@ describe('Snap Scraper Utils', () => {
       })) as any;
 
       await assert.rejects(
-        async () => await fetchSnaps('vlc', undefined, mockFetch),
+        async () => await fetchSnaps('games', undefined, mockFetch),
         { message: /Failed to fetch snaps/ },
       );
     });
@@ -612,11 +615,14 @@ describe('Snap Scraper Utils', () => {
   });
 
   describe('discoverSnaps', () => {
-    test('should discover snaps across multiple search terms', async () => {
+    test('should discover snaps across multiple categories', async () => {
       let callCount = 0;
       const mockFetch = mock.fn(async (url: string) => {
         callCount++;
-        // Return different results for different search terms
+        // Verify URL contains category parameter
+        assert.ok(url.includes('category='));
+
+        // Return different results for different categories
         const results = callCount === 1
           ? [{ name: 'snap1', 'snap-id': 'id1' }]
           : [{ name: 'snap2', 'snap-id': 'id2' }];
@@ -630,10 +636,10 @@ describe('Snap Scraper Utils', () => {
       const results = await discoverSnaps(10, mockFetch);
 
       assert.ok(results.length > 0);
-      assert.ok(mockFetch.mock.calls.length > 1); // Should make multiple calls
+      assert.ok(mockFetch.mock.calls.length > 1); // Should make multiple calls for different categories
     });
 
-    test('should deduplicate across search terms', async () => {
+    test('should deduplicate across categories', async () => {
       const mockFetch = mock.fn(async () => ({
         ok: true,
         json: async () => ({
@@ -647,6 +653,31 @@ describe('Snap Scraper Utils', () => {
 
       // All results have the same snap-id, so should only get 1 unique snap
       assert.equal(results.length, 1);
+    });
+
+    test('should iterate through all categories from CATEGORY_MAPPING', async () => {
+      const categoriesUsed = new Set<string>();
+      const mockFetch = mock.fn(async (url: string) => {
+        const urlObj = new URL(url);
+        const category = urlObj.searchParams.get('category');
+        if (category) {
+          categoriesUsed.add(category);
+        }
+
+        return {
+          ok: true,
+          json: async () => ({ results: [] }),
+        };
+      }) as any;
+
+      await discoverSnaps(undefined, mockFetch);
+
+      const expectedCategories = Object.keys(CATEGORY_MAPPING);
+      assert.equal(categoriesUsed.size, expectedCategories.length);
+
+      expectedCategories.forEach((cat) => {
+        assert.ok(categoriesUsed.has(cat), `Category ${cat} should be used`);
+      });
     });
   });
 

@@ -7,7 +7,7 @@ import * as api from '.';
 import { type App } from 'supertest/types';
 
 import path from 'node:path';
-import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, type SerializedPackage, SourceStore } from '../db/package/types';
+import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
 import { Package } from '../db/package/model';
 import * as messages from '../utils/error-messages';
 
