@@ -6,7 +6,7 @@ import path from 'path';
 import crypto from 'crypto';
 
 import { Package } from '../db/package';
-import { Architecture, type Channel, AppType } from '../db/package/types';
+import { Architecture, type Channel, AppType, PackageType } from '../db/package/types';
 import { RatingCount } from '../db/rating_count';
 import { Discover } from '../db/discover';
 import { success, getData, getDataArray, setLang, gettext, asyncErrorWrapper } from '../utils';
@@ -73,6 +73,7 @@ async function getHighlights(
     architectures: [architecture, Architecture.ALL],
     frameworks,
     published: true,
+    packageTypes: [PackageType.CLICK],
   });
 
   discover.highlights = shuffle(discover.highlights.map((highlight) => {
@@ -113,6 +114,7 @@ async function getNewAndUpdatedApps(
       frameworks,
       nsfw: [null, false],
       types: [AppType.APP],
+      packageTypes: [PackageType.CLICK],
     }, '-published_date', 8),
 
     Package.findByFilters({
@@ -122,6 +124,7 @@ async function getNewAndUpdatedApps(
       frameworks,
       nsfw: [null, false],
       types: [AppType.APP],
+      packageTypes: [PackageType.CLICK],
     }, '-updated_date', 8),
   ]);
 
@@ -188,6 +191,7 @@ async function getCategoryApps(
       architectures: [architecture, Architecture.ALL],
       frameworks,
       published: true,
+      packageTypes: [PackageType.CLICK],
     });
   }));
 
@@ -219,6 +223,7 @@ async function getPopularApps(
     frameworks,
     nsfw: [null, false],
     types: [AppType.APP],
+    packageTypes: [PackageType.CLICK],
   }, '-calculated_rating', 8);
 
   const popularCategory = discover.categories.find((category) => (category.name === POPULAR));

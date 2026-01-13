@@ -215,7 +215,6 @@ describe('Apps API', () => {
     });
 
     test('filters by package_type=click explicitly', async () => {
-      // Create a snap package
       await factory.package({
         id: 'snap.firefox',
         name: 'Firefox',
@@ -237,8 +236,7 @@ describe('Apps API', () => {
     });
 
     test('filters by package_type=snap', async () => {
-      // Create snap packages
-      const snap1 = await factory.package({
+      await factory.package({
         id: 'snap.firefox',
         name: 'Firefox',
         author: 'Mozilla',
@@ -248,7 +246,7 @@ describe('Apps API', () => {
         source_store: SourceStore.SNAPCRAFT,
       });
 
-      const snap2 = await factory.package({
+      await factory.package({
         id: 'snap.vlc',
         name: 'VLC',
         author: 'VideoLAN',
@@ -269,7 +267,6 @@ describe('Apps API', () => {
     });
 
     test('filters by multiple package_types', async () => {
-      // Create a snap package
       await factory.package({
         id: 'snap.firefox',
         name: 'Firefox',

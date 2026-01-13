@@ -11,7 +11,7 @@ import { type App } from 'supertest/types';
 import { Package } from '../db/package';
 import { RatingCount } from '../db/rating_count';
 import { Discover } from '../db/discover';
-import { Architecture, Channel, ChannelArchitecture, AppType } from '../db/package/types';
+import { Architecture, Channel, ChannelArchitecture, AppType, PackageType, SourceStore } from '../db/package/types';
 import { config } from '../utils/config';
 
 describe('Discover API', () => {
@@ -192,5 +192,36 @@ describe('Discover API', () => {
 
     // Verify that ratings get refreshed on a cache hit
     assert.equal(getCountsByIdsSpy.mock.callCount(), 1);
+  });
+
+  test('excludes snap packages from discover', async () => {
+    await factory.package({
+      published: true,
+      id: 'snap.firefox',
+      name: 'Firefox Snap',
+      architectures: [Architecture.ALL],
+      channels: [Channel.FOCAL],
+      channel_architectures: [ChannelArchitecture.FOCAL_ALL],
+      device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
+      published_date: (new Date()).toISOString(),
+      types: [AppType.APP],
+      package_type: PackageType.SNAP,
+      source_store: SourceStore.SNAPCRAFT,
+      banner: 'test.svg',
+    });
+
+    const res = await request(app).get(route).expect(200);
+
+    assert.ok(res.body.success);
+
+    for (const category of res.body.data.categories) {
+      for (const app of category.apps) {
+        assert.notEqual(app.id, 'snap.firefox');
+      }
+    }
+
+    for (const highlight of res.body.data.highlights) {
+      assert.notEqual(highlight.app.id, 'snap.firefox');
+    }
   });
 });
