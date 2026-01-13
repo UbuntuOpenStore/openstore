@@ -275,21 +275,36 @@ describe('Reviews', () => {
       assert.equal(review?.user.toString(), user1._id.toString());
     });
 
-    test('prevents reviews for snap packages', async () => {
+    test('allows reviews for snap packages', async () => {
       await factory.package({
         id: 'snap.package',
         published: true,
         package_type: PackageType.SNAP,
         source_store: SourceStore.SNAPCRAFT,
+        maintainer: user2._id.toString(),
+        revisions: [
+          {
+            revision: 1,
+            version: '1.0.0',
+            channel: Channel.FOCAL,
+            architecture: Architecture.ALL,
+            framework: 'ubuntu-touch-24.04-1.x',
+            download_url: null,
+          },
+        ],
       });
 
       const snapRoute = `/api/v4/apps/snap.package/reviews?apikey=${user1.apikey}`;
       const res = await request(app).post(snapRoute)
         .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(400);
+        .expect(200);
 
-      assert.equal(res.body.success, false);
-      assert.equal(res.body.message, messages.SNAP_REVIEW_NOT_SUPPORTED);
+      assert.ok(res.body.success);
+
+      const review = await Review.findOne({ user: user1._id, pkg: (await Package.findOne({ id: 'snap.package' }))?._id });
+      assert.equal(review?.body, 'great app');
+      assert.equal(review?.version, '1.0.0');
+      assert.equal(review?.rating, 'THUMBS_UP');
     });
   });
 });

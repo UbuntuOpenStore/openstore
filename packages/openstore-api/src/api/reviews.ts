@@ -12,9 +12,7 @@ import {
   INVALID_RATING,
   VERSION_NOT_FOUND,
   CANNOT_REVIEW_OWN_APP,
-  SNAP_REVIEW_NOT_SUPPORTED,
 } from '../utils/error-messages';
-import { PackageType } from '../db/package/types';
 
 const router = express.Router({ mergeParams: true });
 
@@ -46,11 +44,6 @@ router.get(
  * Update or create a review
  */
 async function upsertReview(req: Request, res: Response) {
-  if (req.pkg.package_type === PackageType.SNAP) {
-    error(res, SNAP_REVIEW_NOT_SUPPORTED, 400);
-    return;
-  }
-
   if (!req.body.version || !req.body.rating) {
     error(res, PARAMETER_MISSING, 400);
     return;

@@ -348,7 +348,7 @@ export function transformSnapToPackage(
       filesize: Math.round(channelMap.download.size / 1024),
       downloadSize: channelMap.download.size,
       created_date: channelMap['created-at'],
-      permissions: [],
+      permissions: ['unknown'],
       snap_data: {
         grade: SnapGrade.STABLE,
         risk: channelMap.channel.risk,
