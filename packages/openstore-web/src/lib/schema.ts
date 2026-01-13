@@ -92,6 +92,15 @@ export const AppSchema = z.object({
 
 export type AppData = z.infer<typeof AppSchema>;
 
+export const PackageStatsSchema = z.object({
+  categories: z.record(z.number()),
+  types: z.record(z.number()),
+  frameworks: z.record(z.number()),
+  architectures: z.record(z.number()),
+});
+
+export type PackageStatsData = z.infer<typeof PackageStatsSchema>;
+
 export const AppManageSchema = AppSchema.extend({
   published: z.boolean(),
   locked: z.boolean(),

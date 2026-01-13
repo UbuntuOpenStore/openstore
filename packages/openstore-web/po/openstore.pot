@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-01-09T21:25:25.970Z\n"
-"PO-Revision-Date: 2026-01-09T21:25:25.970Z\n"
+"POT-Creation-Date: 2026-01-13T20:24:20.097Z\n"
+"PO-Revision-Date: 2026-01-13T20:24:20.097Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -28,6 +28,9 @@ msgstr "Chat with us on Telegram"
 
 msgid "Site Status"
 msgstr "Site Status"
+
+msgid "Stats"
+msgstr "Stats"
 
 msgid "Search..."
 msgstr "Search..."
@@ -660,6 +663,30 @@ msgstr "Keep your API key secure and do not share it with others"
 
 msgid "This key allows access to your account"
 msgstr "This key allows access to your account"
+
+msgid "None"
+msgstr "None"
+
+msgid "OpenStore statistics"
+msgstr "OpenStore statistics"
+
+msgid "OpenStore Statistics"
+msgstr "OpenStore Statistics"
+
+msgid "Total Apps"
+msgstr "Total Apps"
+
+msgid "Apps by Type"
+msgstr "Apps by Type"
+
+msgid "Apps by Architecture"
+msgstr "Apps by Architecture"
+
+msgid "Apps by Category"
+msgstr "Apps by Category"
+
+msgid "Apps by Framework"
+msgstr "Apps by Framework"
 
 msgid "Submit Your App to the OpenStore"
 msgstr "Submit Your App to the OpenStore"

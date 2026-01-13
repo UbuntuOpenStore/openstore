@@ -1,5 +1,6 @@
 ---
 import { initializeI18N } from "@/lib/i18n";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 import { t } from "i18next";
 import LanguageSelect from "./LanguageSelect";
 
@@ -29,6 +30,7 @@ await initializeI18N(Astro.currentLocale);
         <a href="https://gitlab.com/theopenstore/openstore/-/issues" class="text-ubuntu-orange">{t("Report an Issue")}</a>
         <a href="/telegram" class="text-ubuntu-orange">{t("Chat with us on Telegram")}</a>
         <a href="https://stats.uptimerobot.com/R6Z8mtJ8P" class="text-ubuntu-orange">{t("Site Status")}</a>
+        <a href={getRelativeLocaleUrl(Astro.currentLocale, "/stats/")} class="text-ubuntu-orange">{t("Stats")}</a>
       </div>
 
       <div class="text-sm flex flex-col mt-4 md:mt-0">
