@@ -1,0 +1,112 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
+import { generateSchema } from "@/lib/json-schema";
+import { PackageStatsSchema } from "@/lib/schema";
+import { APP_TYPE_OPTIONS } from "@/lib/constants";
+
+await initializeI18N(Astro.currentLocale);
+
+const statsResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/stats`, {
+  headers: { "X-Source": "openstore-web-next" },
+});
+const statsData = await statsResponse.json();
+const { categories, types, frameworks, architectures } = PackageStatsSchema.parse(statsData.data);
+
+const filteredTypes = Object.fromEntries(Object.entries(types).filter(([type]) => type !== "push"));
+const filteredArchitectures = Object.fromEntries(Object.entries(architectures).filter(([arch]) => arch !== "i386"));
+
+const numberFormatter = new Intl.NumberFormat(Astro.currentLocale);
+
+const sortByCount = (obj: Record<string, number>) => {
+  return Object.entries(obj).sort(([, a], [, b]) => b - a);
+};
+
+const sortedCategories = sortByCount(categories);
+const sortedTypes = sortByCount(filteredTypes);
+const sortedFrameworks = sortByCount(frameworks);
+const sortedArchitectures = sortByCount(filteredArchitectures);
+
+const totalApps = Object.values(categories as Record<string, number>).reduce((sum, count) => sum + count, 0);
+
+const formatNumber = (num: number) => numberFormatter.format(num);
+const formatCategory = (category: string) => category || t("None");
+const formatFramework = (framework: string) => (!framework || framework === "null" ? "none" : framework);
+const formatAppType = (type: string) => {
+  const option = APP_TYPE_OPTIONS.find((opt) => opt.value === type);
+  return option ? option.label : type;
+};
+---
+
+<BaseLayout
+  title={`${t("Stats")} | OpenStore`}
+  pageTitle={`${t("Stats")} | OpenStore`}
+  description={t("OpenStore statistics")}
+  schema={generateSchema(Astro.url.href, [{ name: "Stats", path: "/stats/" }])}
+>
+  <section class="section space-y-6">
+    <div>
+      <h1 class="text-4xl mb-2">{t("OpenStore Statistics")}</h1>
+      <p class="text-xl text-muted-foreground">{t("Total Apps")}: {formatNumber(totalApps)}</p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="border rounded-lg p-4">
+        <h2 class="text-2xl font-semibold mb-4">{t("Apps by Type")}</h2>
+        <div class="space-y-2">
+          {
+            sortedTypes.map(([type, count]) => (
+              <div class="flex justify-between items-center py-1">
+                <span>{formatAppType(type)}</span>
+                <span class="font-mono text-muted-foreground">{formatNumber(count)}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="border rounded-lg p-4">
+        <h2 class="text-2xl font-semibold mb-4">{t("Apps by Architecture")}</h2>
+        <div class="space-y-2">
+          {
+            sortedArchitectures.map(([arch, count]) => (
+              <div class="flex justify-between items-center py-1">
+                <span class="font-mono">{arch}</span>
+                <span class="font-mono text-muted-foreground">{formatNumber(count)}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="border rounded-lg p-4">
+        <h2 class="text-2xl font-semibold mb-4">{t("Apps by Category")}</h2>
+        <div class="space-y-2">
+          {
+            sortedCategories.map(([category, count]) => (
+              <div class="flex justify-between items-center py-1">
+                <span class="capitalize">{formatCategory(category)}</span>
+                <span class="font-mono text-muted-foreground">{formatNumber(count)}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="border rounded-lg p-4">
+        <h2 class="text-2xl font-semibold mb-4">{t("Apps by Framework")}</h2>
+        <div class="space-y-2">
+          {
+            sortedFrameworks.map(([framework, count]) => (
+              <div class="flex justify-between items-center py-1">
+                <span class="font-mono text-sm">{formatFramework(framework)}</span>
+                <span class="font-mono text-muted-foreground">{formatNumber(count)}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
