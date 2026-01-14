@@ -84,6 +84,7 @@ const PERMISSION_LABELS = {
   video: t('Video'),
   webview: t('Webview'),
   unconfined: t('Full System Access'),
+  unknown: t('Unknown Permissions'),
 };
 
 const RESTRICTED_PERMISSIONS = new Set([
@@ -99,6 +100,7 @@ const RESTRICTED_PERMISSIONS = new Set([
   "video_files",
   "video_files_read",
   "unconfined",
+  "unknown",
 ]);
 
 const dateFormatter = new Intl.DateTimeFormat(Astro.currentLocale ?? 'en', {
@@ -150,6 +152,7 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
 
         <AppTypeBadges
           types={app.types}
+          packageType={app.package_type}
           messages={{
             new: t("New!"),
             app: t("App"),
@@ -174,9 +177,11 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
         client:only="preact"
       />
 
-      <a href={`openstore://${app.id}`} title={t("Install via the OpenStore app")} class="btn w-full bg-ubuntu-orange text-white font-bold"
-        >{t("Install")}</a
-      >
+      {app.downloads.length > 0 && (
+        <a href={`openstore://${app.id}`} title={t("Install via the OpenStore app")} class="btn w-full bg-ubuntu-orange text-white font-bold"
+          >{t("Install")}</a
+        >
+      )}
     </div>
   </section>
 

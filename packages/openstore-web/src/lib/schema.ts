@@ -70,6 +70,7 @@ export const AppSchema = z.object({
   video_url: z.string(),
   translation_url: z.string(),
   types: z.array(z.string()),
+  package_type: z.string(),
   updated_date: z.coerce.date(),
   languages: z.array(z.string()),
   revisions: z.array(AppRevisionSchema),
@@ -135,6 +136,7 @@ export const SlimAppSchema = z.object({
   icon: z.string(),
   nsfw: z.boolean(),
   types: z.array(z.string()),
+  package_type: z.string(),
   ratings: z.object({
     [RatingType.THUMBS_UP]: z.number(),
     [RatingType.THUMBS_DOWN]: z.number(),

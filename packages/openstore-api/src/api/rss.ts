@@ -2,6 +2,7 @@ import RSS from 'rss';
 import express, { type Request, type Response } from 'express';
 
 import { Package } from '../db/package';
+import { PackageType } from '../db/package/types';
 import { logger, config, error, captureException, titleCase } from '../utils';
 
 const router = express.Router();
@@ -21,7 +22,7 @@ async function generateFeed(req: Request, res: Response, updates: boolean) {
 
   try {
     const sort = updates ? '-updated_date' : '-published_date';
-    const pkgs = await Package.findByFilters({ published: true }, sort, 10);
+    const pkgs = await Package.findByFilters({ published: true, packageTypes: [PackageType.CLICK] }, sort, 10);
 
     pkgs.forEach((pkg) => {
       let changelog = '';

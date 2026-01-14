@@ -2,7 +2,14 @@ import { AppType, type AppData } from "@/lib/schema";
 
 const ALL_TYPES: string[] = [AppType.APP, AppType.BOOKMARK, AppType.WEBAPP];
 
-const AppTypeBadges = ({ types, publishedDate, messages }: { types: AppData['types'], publishedDate?: string, messages: { new: string, app: string, bookmark: string, webapp: string } }) => {
+type AppTypeBadgesProps = {
+  types: AppData['types'],
+  packageType: AppData['package_type'],
+  publishedDate?: string,
+  messages: { new: string, app: string, bookmark: string, webapp: string }
+};
+
+const AppTypeBadges = ({ types, packageType, publishedDate, messages }: AppTypeBadgesProps) => {
   let isNew = false;
 
   if (publishedDate) {
@@ -17,6 +24,12 @@ const AppTypeBadges = ({ types, publishedDate, messages }: { types: AppData['typ
       {isNew && (
         <span class="rounded-lg bg-ubuntu-orange text-white px-1.5 py-1 text-xs">
           {messages.new}
+        </span>
+      )}
+
+      {packageType !== 'click' && (
+        <span class="rounded-lg bg-ubuntu-purple text-white px-1.5 py-1 text-xs">
+          {packageType.charAt(0).toUpperCase() + packageType.slice(1)}
         </span>
       )}
 

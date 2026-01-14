@@ -25,7 +25,7 @@ const AppList = ({ apps, messages, currentLocale }: { apps: SlimAppData[], curre
 
               <TopRating ratings={app.ratings} />
 
-              <AppTypeBadges types={app.types} publishedDate={app.published_date} messages={messages} />
+              <AppTypeBadges types={app.types} packageType={app.package_type} publishedDate={app.published_date} messages={messages} />
             </div>
           </a>
         ))
