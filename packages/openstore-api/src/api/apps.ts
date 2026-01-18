@@ -4,7 +4,18 @@ import fsPromise from 'fs/promises';
 import fs from 'fs';
 import { Architecture, type HydratedPackage, PackageType } from '../db/package/types';
 import { Package } from '../db/package';
-import { success, getData, apiLinks, asyncErrorWrapper, getDataArray, getDataBoolean, logger, captureException } from '../utils';
+import {
+  success,
+  getData,
+  apiLinks,
+  asyncErrorWrapper,
+  getDataArray,
+  getDataBoolean,
+  logger,
+  captureException,
+  config,
+  error,
+} from '../utils';
 import { fetchPublishedPackage } from '../middleware';
 import { NotFoundError, UserError } from '../exceptions';
 import reviews from './reviews';
@@ -58,6 +69,11 @@ router.post('/', asyncErrorWrapper(apps, 'Could not fetch app list at this time'
  * Get one app and return a serialized version.
  */
 router.get('/:id', fetchPublishedPackage(true), async (req: Request, res: Response) => {
+  if (!config.allowed_package_types.includes(req.pkg.package_type)) {
+    error(res, 'Package type not available', 404);
+    return;
+  }
+
   const arch = getData(req, 'architecture', Architecture.ARMHF) as Architecture;
   const channel = handleChannel(getData(req, 'channel'));
   const frameworks = getDataArray(req, 'frameworks', []);
@@ -75,7 +91,7 @@ async function download(req: Request, res: Response) {
 
   const channel = handleChannel(req.params.channel);
 
-  const arch = req.params.arch ? req.params.arch.toLowerCase() as Architecture : Architecture.ARMHF;
+  const arch = req.params.arch ? (req.params.arch.toLowerCase() as Architecture) : Architecture.ARMHF;
   if (!Object.values(Architecture).includes(arch)) {
     throw new UserError(INVALID_ARCH);
   }

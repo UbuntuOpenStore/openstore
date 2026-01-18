@@ -1,4 +1,5 @@
 import path from 'path';
+import { PackageType } from '../db/package/types';
 
 let configuration = {
   data_dir: process.env.DATA_DIR || './.data/clicks',
@@ -7,6 +8,7 @@ let configuration = {
   avatar_dir: process.env.AVATAR_DIR || './.data/avatars',
   banner_dir: process.env.BANNER_DIR || './.data/banners',
   cache_dir: process.env.CACHE_DIR || './.data/cache',
+  allowed_package_types: (process.env.ALLOWED_PACKAGE_TYPES || PackageType.CLICK).split(',').filter(Boolean) as PackageType[],
   server: {
     ip: process.env.NODEJS_IP || '0.0.0.0',
     port: parseInt(process.env.PORT || process.env.NODEJS_PORT || '6543', 10),
