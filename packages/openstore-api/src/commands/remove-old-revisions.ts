@@ -3,51 +3,49 @@ import fs from 'fs';
 import path from 'path';
 
 import 'db'; // Make sure the database connection gets setup
-import { Architecture, Channel } from '../db/package/types';
 import { Package } from '../db/package';
 import { config } from '../utils';
 import limitedApps from './limited-apps.json';
 
 const MAX_REVISIONS = 3;
 const MIN_FILES_CHECK = 10;
+const DRY_RUN = process.argv.includes('--dry-run');
 
-const architectures = Object.values(Architecture);
-const channels = Object.values(Channel);
-const keys: string[] = [];
-for (const arch of architectures) {
-  for (const channel of channels) {
-    keys.push(`${channel}-${arch}`);
-  }
+if (DRY_RUN) {
+  console.log('Running in DRY RUN mode - no files will be deleted and no database changes will be made');
 }
 
 Package.find({ id: { $in: limitedApps } }).then((pkgs) => {
   return Promise.all(pkgs.map((pkg) => {
     if (pkg.revisions) {
-      const fileCounts = keys.reduce<{ [key: string]: number }>((acc, current) => {
-        return { ...acc, [current]: 0 };
-      }, {});
+      const fileCounts: { [key: string]: number } = {};
 
       const keepFiles: string[] = [];
       for (let i = (pkg.revisions.length - 1); i >= 0; i--) {
         const revision = pkg.revisions[i];
-        const key = `${revision.channel}-${revision.architecture}`;
+        const key = `${revision.channel}-${revision.architecture}-${revision.framework}`;
+        if (!fileCounts[key]) {
+          fileCounts[key] = 0;
+        }
         if (revision.download_url) {
           fileCounts[key]++;
           if (fileCounts[key] > MAX_REVISIONS) {
-            console.log(`[${pkg.id as string}] removing ${revision.download_url}`);
+            console.log(`[${pkg.id as string}] ${DRY_RUN ? '[DRY RUN] would remove' : 'removing'} ${revision.download_url}`);
 
-            try {
-              fs.unlinkSync(revision.download_url);
-            }
-            catch (err) {
-              if (err.message.includes('no such file or directory')) {
-                console.log(err.message);
+            if (!DRY_RUN) {
+              try {
+                fs.unlinkSync(revision.download_url);
               }
-              else {
-                throw err;
+              catch (err) {
+                if (err.message.includes('no such file or directory')) {
+                  console.log(err.message);
+                }
+                else {
+                  throw err;
+                }
               }
+              revision.download_url = null;
             }
-            revision.download_url = null;
           }
           else if (fs.existsSync(revision.download_url)) {
             keepFiles.push(revision.download_url);
@@ -74,12 +72,17 @@ Package.find({ id: { $in: limitedApps } }).then((pkgs) => {
 
       for (let i = 0; i < extraFiles.length; i++) {
         const file = path.join(config.data_dir, extraFiles[i]);
-        console.log(`[${pkg.id as string}] removing extra file ${file}`);
-        fs.unlinkSync(file);
+        console.log(`[${pkg.id as string}] ${DRY_RUN ? '[DRY RUN] would remove' : 'removing'} extra file ${file}`);
+        if (!DRY_RUN) {
+          fs.unlinkSync(file);
+        }
       }
 
-      pkg.updateCalculatedProperties();
-      return pkg.save();
+      if (!DRY_RUN) {
+        pkg.updateCalculatedProperties();
+        return pkg.save();
+      }
+      return pkg;
     }
 
     return pkg;
