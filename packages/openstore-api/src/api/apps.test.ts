@@ -10,6 +10,7 @@ import path from 'node:path';
 import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
 import { Package } from '../db/package/model';
 import * as messages from '../utils/error-messages';
+import { config } from '../utils/config';
 
 describe('Apps API', () => {
   const route = '/api/v3/apps/';
@@ -86,6 +87,76 @@ describe('Apps API', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(mockFindOneByFilters.mock.callCount(), 1);
+    });
+
+    test('returns 404 for package type not in allowed list', async function () {
+      const originalAllowedTypes = config.allowed_package_types;
+      config.allowed_package_types = [PackageType.CLICK];
+
+      const snapPackage = await factory.package({
+        id: 'snap.test',
+        name: 'Test Snap',
+        author: 'Test Author',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        channels: [DEFAULT_CHANNEL],
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}`).expect(404);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, 'Package type not available');
+
+      // Restore original config
+      config.allowed_package_types = originalAllowedTypes;
+    });
+
+    test('allows access when package_type param matches app package type', async function () {
+      const originalAllowedTypes = config.allowed_package_types;
+      config.allowed_package_types = [PackageType.CLICK];
+
+      const snapPackage = await factory.package({
+        id: 'snap.test',
+        name: 'Test Snap',
+        author: 'Test Author',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        channels: [DEFAULT_CHANNEL],
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}?package_type=snap`).expect(200);
+
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.id, snapPackage.id);
+      assert.equal(res.body.data.package_type, PackageType.SNAP);
+
+      // Restore original config
+      config.allowed_package_types = originalAllowedTypes;
+    });
+
+    test('returns 404 when package_type param does not match app package type', async function (t) {
+      const originalAllowedTypes = config.allowed_package_types;
+      config.allowed_package_types = [PackageType.CLICK];
+
+      const snapPackage = await factory.package({
+        id: 'snap.test',
+        name: 'Test Snap',
+        author: 'Test Author',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        channels: [DEFAULT_CHANNEL],
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}?package_type=click`).expect(404);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, 'Package type not available');
+
+      // Restore original config
+      config.allowed_package_types = originalAllowedTypes;
     });
   });
 

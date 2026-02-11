@@ -69,7 +69,14 @@ router.post('/', asyncErrorWrapper(apps, 'Could not fetch app list at this time'
  * Get one app and return a serialized version.
  */
 router.get('/:id', fetchPublishedPackage(true), async (req: Request, res: Response) => {
-  if (!config.allowed_package_types.includes(req.pkg.package_type)) {
+  // Allow access if either:
+  // 1. Package type is in the allowed list, OR
+  // 2. Request explicitly specifies package_type that matches the app's package_type
+  const requestedPackageTypes = [
+    ...getDataArray(req, 'package_types'),
+    ...getDataArray(req, 'package_type'),
+  ];
+  if (!config.allowed_package_types.includes(req.pkg.package_type) && !requestedPackageTypes.includes(req.pkg.package_type)) {
     error(res, 'Package type not available', 404);
     return;
   }
