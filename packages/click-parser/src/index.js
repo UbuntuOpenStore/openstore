@@ -52,10 +52,13 @@ function extractIcon(fileData, data, callback) {
 }
 
 function parseJsonFile(stream, callback) {
+  let data = '';
   stream.on('data', (fdata) => {
-    const str = fdata.toString();
-    if (utils.isJson(str)) {
-      callback(JSON.parse(str));
+    data += fdata.toString();
+  });
+  stream.on('end', () => {
+    if (utils.isJson(data)) {
+      callback(JSON.parse(data));
     }
     else {
       callback();
@@ -64,28 +67,39 @@ function parseJsonFile(stream, callback) {
 }
 
 function parseXmlFile(stream, callback) {
+  let data = '';
   stream.on('data', (fdata) => {
-    const str = fdata.toString();
-    xml2js.parseString(str, {
-      explicitArray: false,
-      mergeAttrs: true,
-      normalizeTags: true,
-      normalize: true,
-    }, (err, result) => {
-      if (err) {
-        callback();
+    data += fdata.toString();
+  });
+  stream.on('end', () => {
+    xml2js.parseString(
+      data,
+      {
+        explicitArray: false,
+        mergeAttrs: true,
+        normalizeTags: true,
+        normalize: true,
+      },
+      (err, result) => {
+        if (err) {
+          callback();
+        }
+        else {
+          callback(result);
+        }
       }
-      else {
-        callback(result);
-      }
-    });
+    );
   });
 }
 
 function parseIniFile(stream, callback) {
+  let fileData = '';
   stream.on('data', (fdata) => {
+    fileData += fdata.toString();
+  });
+  stream.on('end', () => {
     const data = {};
-    const desktop = fdata.toString().split('\n');
+    const desktop = fileData.split('\n');
 
     const other = [];
     desktop.forEach((line) => {
@@ -94,7 +108,10 @@ function parseIniFile(stream, callback) {
         const pos = lline.indexOf('=');
         if (pos > -1) {
           const key = lline.substring(0, pos).trim();
-          const value = line.trim().substring(pos + 1).trim();
+          const value = line
+            .trim()
+            .substring(pos + 1)
+            .trim();
           data[key] = value;
         }
         else {
