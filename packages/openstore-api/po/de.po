@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: openstore-web\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2017-06-20 01:45:+0000\n"
-"PO-Revision-Date: 2020-12-18 15:57+0000\n"
-"Last-Translator: Kai Goldbeck <kaiuwe.goldbeck@mailbox.org>\n"
-"Language-Team: German <https://translate.ubports.com/projects/openstore/"
+"PO-Revision-Date: 2026-03-01 17:09+0000\n"
+"Last-Translator: Daniel Frost <one@frostinfo.de>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/open-store-io/"
 "openstore-api/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.11.3\n"
+"X-Generator: Weblate 5.16.1-dev\n"
 "X-Launchpad-Export-Date: 2017-06-21 14:52+0000\n"
 
 msgid "Accessibility"
@@ -154,86 +154,81 @@ msgstr ""
 
 # Discovery section category tagline for "Toolbox"
 msgid "It's not the thing itself, but how you use it."
-msgstr ""
+msgstr "Es ist nicht immer die Sache selbst, sondern wie du sie verwendest."
 
 # Discovery section category tagline for "Games"
 msgid "We are all our own worst enemy. But also, our best teacher."
 msgstr ""
+"Wir selbst sind unser schlimmster Feind, aber auch unser bester Lehrmeister."
 
-#, fuzzy
-#| msgid "Games"
 msgid "Fun Games"
-msgstr "Spiele"
+msgstr "Spielspaß"
 
 # Discovery section category tagline for "Fun Games"
 msgid "Cause I always play to win!"
-msgstr ""
+msgstr "Ich spiele um zu gewinnen!"
 
-#, fuzzy
-#| msgid "Games"
 msgid "Best Games"
-msgstr "Spiele"
+msgstr "Beste Spiele"
 
 # Discovery section category tagline for "Best Games"
 msgid "Didn't we have some fun though?"
-msgstr ""
+msgstr "Hatten wir nicht jede Menge Spaß?"
 
 # Discovery section category name
 msgid "Awesome Games"
-msgstr ""
+msgstr "Geniale Spiele"
 
 # Discovery section category tagline for "Awesome Games"
 msgid "It's dangerous to go alone, take this!"
-msgstr ""
+msgstr "Es ist gefährlich allein unterwegs zu sein, nimm das hier mit!"
 
 # Discovery section category name
 msgid "Game Helpers"
-msgstr ""
+msgstr "Spielunterstützung"
 
 # Discovery section category tagline for "Game Helpers"
 msgid "No matter what the game, everyone can agree, games are fun."
-msgstr ""
+msgstr "Egal welches Spiel, wir sind uns alle einig, Spiele machen Spaß."
 
 # Discovery section category name
 msgid "News"
-msgstr ""
+msgstr "Nachrichten"
 
 # Discovery section category tagline for "News"
 msgid "News is only the first rough draft of history"
-msgstr ""
+msgstr "Nachrichten sind nur der erste grobe Entwurf für die Geschichte"
 
-#, fuzzy
-#| msgid "Games"
 msgid "Godot Games"
-msgstr "Spiele"
+msgstr "Godot Spiele"
 
 # Discovery section category tagline for "Godot Games"
 msgid "The game engine you waited for"
-msgstr ""
+msgstr "Die Game-Engine auf die du nur gewartet hast"
 
 # Discovery section category name
 msgid "Fediverse"
-msgstr ""
+msgstr "Fediverse"
 
 # Discovery section category tagline for "Fediverse"
 msgid "To infinity and beyond!"
-msgstr ""
+msgstr "Bis zur Unendlichkeit und zurück!"
 
 # Discovery section category name
 msgid "Chat Connection"
-msgstr ""
+msgstr "Chat‑Netzwerk"
 
 # Discovery section category tagline for "Chat Connection"
 msgid "Don't forget to text mom!"
-msgstr ""
+msgstr "Vergiss nicht Oma zu schreiben!"
 
 # Discovery section category name
 msgid "RSS Feed Readers"
-msgstr ""
+msgstr "RSS-Feed Leser"
 
 # Discovery section category tagline for "RSS Feed Readers"
 msgid "RSS is dead, long live RSS!"
-msgstr ""
+msgstr "RSS ist tot, lang lebe RSS!"
 
 # Discovery section category name
 msgid "Core Apps"
