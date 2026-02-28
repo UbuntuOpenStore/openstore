@@ -12,15 +12,15 @@ msgstr ""
 "MIME-Version: 1.0 Content-Type: text/plain; charset=UTF-8 Content-Transfer-"
 "Encoding: 8bit Plural-Forms: nplurals=2; plural=n != 1; X-Generator: Weblate "
 "5.5-dev\n"
-"PO-Revision-Date: 2025-11-14 21:51+0000\n"
+"PO-Revision-Date: 2026-03-01 17:09+0000\n"
 "Last-Translator: Daniel Frost <one@frostinfo.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/open-store-io/"
 "openstore-web-next/de/>\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.15-dev\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.16.1-dev\n"
 
 msgid ""
 "*This app contains NSFW content, to view the description and "
@@ -713,10 +713,8 @@ msgstr "Veröffentlicht"
 msgid "Push Notifications"
 msgstr "Push-Benachrichtigungen"
 
-#, fuzzy
-#| msgid "Read Picture Files"
 msgid "Read Document Files"
-msgstr "Bilddateien lesen"
+msgstr "Dokumente lesen"
 
 msgid "Read Music Files"
 msgstr "Musikdateien lesen"
@@ -739,10 +737,8 @@ msgstr "Eingeschränkte Zugriffsrechte"
 msgid "Review Exceptions"
 msgstr ""
 
-#, fuzzy
-#| msgid "Webview"
 msgid "Reviews"
-msgstr "Webinhalte anzeigen"
+msgstr "Reviews"
 
 msgid "Revision"
 msgstr "Revision"
@@ -801,10 +797,8 @@ msgstr "Sortieren nach"
 msgid "Source"
 msgstr "Quelle"
 
-#, fuzzy
-#| msgid "Source"
 msgid "Source Code"
-msgstr "Quelle"
+msgstr "Quellcode"
 
 msgid "Source URL"
 msgstr "Quellverweis"
@@ -1027,10 +1021,8 @@ msgstr "Übersetzte Sprachen"
 msgid "Translation URL"
 msgstr "Übersetzte Sprachen"
 
-#, fuzzy
-#| msgid "Translation Languages"
 msgid "Translations"
-msgstr "Übersetzte Sprachen"
+msgstr "Übersetzung"
 
 msgid "Try searching for something else"
 msgstr "Versuche es nochmal mit anderen Suchbegriffen"
@@ -1048,12 +1040,10 @@ msgid "Uncategorized"
 msgstr "Nicht kategorisiert"
 
 msgid "Unrestricted read access to:"
-msgstr ""
+msgstr "Uneingeschränkter Zugriff auf:"
 
-#, fuzzy
-#| msgid "Restricted permission"
 msgid "Unrestricted write access to:"
-msgstr "Eingeschränkte Zugriffsrechte"
+msgstr "Uneingeschränkter Schreibzugriff auf:"
 
 msgid "Updated"
 msgstr "Aktualisiert"
