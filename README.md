@@ -24,7 +24,7 @@ technology! Donate on [Liberapay](https://liberapay.com/OpenStore/).
 ## Development
 
 - Make sure Docker, Docker Compose, and Node.js are all installed
-  - We recommend using [Volta](https://volta.sh/) to manage Node.js versions
+  - We recommend using [Mise](https://mise.jdx.dev/) to manage Node.js versions
 - Add `127.0.0.1   local.open-store.io` to your `/etc/hosts` file
 - Start the database and proxy: `docker compose up -d`
 - Start the api: `npm run dev -w openstore-api`

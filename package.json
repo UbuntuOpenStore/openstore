@@ -15,8 +15,5 @@
   "scripts": {
     "test": "npm run test -w openstore-api",
     "clean": "rm -rf packages/*/dist"
-  },
-  "volta": {
-    "node": "22.19.0"
   }
 }

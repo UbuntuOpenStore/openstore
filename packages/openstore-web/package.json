@@ -54,9 +54,6 @@
     "react": "npm:@preact/compat@latest",
     "react-dom": "npm:@preact/compat@latest"
   },
-  "volta": {
-    "node": "22.19.0"
-  },
   "devDependencies": {
     "@svgr/cli": "^8.1.0"
   }
