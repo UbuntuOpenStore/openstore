@@ -275,9 +275,9 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
 
                           <div class="flex-shrink-0 md:w-[180px] text-left md:text-right">
                             <div class="text-gray-600">
-                              Total Downloads: <span class="font-bold">{app.totalDownloads.toLocaleString()}</span>
+                              Total Downloads: <span class="font-bold">{app.totalDownloads?.toLocaleString() ?? 0}</span>
                             </div>
-                            <div class="text-sm text-gray-500">Latest: {app.latestDownloads.toLocaleString()}</div>
+                            <div class="text-sm text-gray-500">Latest: {app.latestDownloads?.toLocaleString() ?? 0}</div>
                           </div>
                         </a>
                       ))}
