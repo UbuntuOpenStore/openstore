@@ -30,6 +30,9 @@ const router = express.Router();
  */
 async function apps(req: Request, res: Response) {
   const filters = Package.parseRequestFilters(req);
+  // Apps API always filters for published apps only, ignore any published parameter from the request
+  filters.published = true;
+
   let count = 0;
   let pkgs: HydratedPackage[] = [];
 
@@ -41,9 +44,8 @@ async function apps(req: Request, res: Response) {
     count = results.count;
   }
   else {
-    const publishedFilters = { ...filters, published: true };
-    pkgs = await Package.findByFilters(publishedFilters, publishedFilters.sort, publishedFilters.limit, publishedFilters.skip);
-    count = await Package.countByFilters(publishedFilters);
+    pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip);
+    count = await Package.countByFilters(filters);
   }
 
   const arch = getData(req, 'architecture', Architecture.ARMHF) as Architecture;

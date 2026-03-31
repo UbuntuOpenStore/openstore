@@ -13,14 +13,15 @@ import { useCallback, useState } from "preact/hooks";
 type ManageFilterDialogProps = {
   type: AppType | undefined;
   owner: 'me' | undefined;
+  published: boolean | undefined;
   isAdmin: boolean;
-  onChange: (type: AppType | undefined, owner: 'me' | undefined) => void;
+  onChange: (type: AppType | undefined, owner: 'me' | undefined, published: boolean | undefined) => void;
 };
 
-const ManageFilterDialog = ({ type, owner, isAdmin, onChange } : ManageFilterDialogProps) => {
+const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange } : ManageFilterDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const onChangeWrapper = useCallback((newType: AppType | undefined, newowner: 'me' | undefined) => {
-    onChange(newType, newowner);
+  const onChangeWrapper = useCallback((newType: AppType | undefined, newowner: 'me' | undefined, newPublished: boolean | undefined) => {
+    onChange(newType, newowner, newPublished);
     setIsOpen(false);
   }, [onChange]);
 
@@ -39,23 +40,42 @@ const ManageFilterDialog = ({ type, owner, isAdmin, onChange } : ManageFilterDia
               <h3 class="font-bold text-black">Filter by Type</h3>
 
               <div class="flex items-center space-x-2">
-                <input type="radio" checked={!type} onClick={() => onChangeWrapper(undefined, owner)} id="all" />
+                <input type="radio" checked={!type} onClick={() => onChangeWrapper(undefined, owner, published)} id="all" />
                 <label for="all">All Types</label>
               </div>
 
               <div class="flex items-center space-x-2">
-                <input type="radio" checked={type === AppType.APP} onClick={() => onChangeWrapper(AppType.APP, owner)} id="apps" />
+                <input type="radio" checked={type === AppType.APP} onClick={() => onChangeWrapper(AppType.APP, owner, published)} id="apps" />
                 <label for="apps">Apps</label>
               </div>
 
               <div class="flex items-center space-x-2">
-                <input type="radio" checked={type === AppType.BOOKMARK} onClick={() => onChangeWrapper(AppType.BOOKMARK, owner)} id="bookmarks" />
+                <input type="radio" checked={type === AppType.BOOKMARK} onClick={() => onChangeWrapper(AppType.BOOKMARK, owner, published)} id="bookmarks" />
                 <label for="bookmarks">Bookmarks</label>
               </div>
 
               <div class="flex items-center space-x-2">
-                <input type="radio" checked={type === AppType.WEBAPP} onClick={() => onChangeWrapper(AppType.WEBAPP, owner)} id="web-apps" />
+                <input type="radio" checked={type === AppType.WEBAPP} onClick={() => onChangeWrapper(AppType.WEBAPP, owner, published)} id="web-apps" />
                 <label for="web-apps">Web Apps</label>
+              </div>
+
+              <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full" />
+
+              <h3 class="font-bold text-black">Filter by Status</h3>
+
+              <div class="flex items-center space-x-2">
+                <input type="radio" checked={published === undefined} onClick={() => onChangeWrapper(type, owner, undefined)} id="all-status" />
+                <label for="all-status">All Apps</label>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <input type="radio" checked={published === true} onClick={() => onChangeWrapper(type, owner, true)} id="published" />
+                <label for="published">Published</label>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <input type="radio" checked={published === false} onClick={() => onChangeWrapper(type, owner, false)} id="not-published" />
+                <label for="not-published">Not Published</label>
               </div>
 
               {isAdmin && (
@@ -65,12 +85,12 @@ const ManageFilterDialog = ({ type, owner, isAdmin, onChange } : ManageFilterDia
                   <h3 class="font-bold text-black">Filter by Owner</h3>
 
                   <div class="flex items-center space-x-2">
-                    <input type="radio" checked={!owner} onClick={() => onChangeWrapper(type, undefined)} id="all-apps" />
+                    <input type="radio" checked={!owner} onClick={() => onChangeWrapper(type, undefined, published)} id="all-apps" />
                     <label for="all-apps">All Apps</label>
                   </div>
 
                   <div class="flex items-center space-x-2">
-                    <input type="radio" checked={owner === 'me'} onClick={() => onChangeWrapper(type, 'me')} id="my-apps" />
+                    <input type="radio" checked={owner === 'me'} onClick={() => onChangeWrapper(type, 'me', published)} id="my-apps" />
                     <label for="my-apps">My Apps Only</label>
                   </div>
                 </>

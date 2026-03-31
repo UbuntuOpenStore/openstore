@@ -53,6 +53,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
     sort: hashParams.get("sort") ?? DEFAULT_SORT,
     type: hashParams.get("type") as AppType | undefined,
     owner: hashParams.get("owner") as "me" | undefined,
+    published: hashParams.get("published") === "true" ? true : hashParams.get("published") === "false" ? false : undefined,
   });
   const [apps, setApps] = useState<SlimAppData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -78,6 +79,10 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
       url.searchParams.append("publisher_id", userId);
     }
 
+    if (query.published !== undefined) {
+      url.searchParams.append("published", query.published.toString());
+    }
+
     const updateParams = new URLSearchParams();
     if (query.search) {
       updateParams.append("search", query.search);
@@ -90,6 +95,9 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
     }
     if (query.owner) {
       updateParams.append("owner", query.owner);
+    }
+    if (query.published !== undefined) {
+      updateParams.append("published", query.published.toString());
     }
     if (page > 0) {
       updateParams.append("page", page.toString());
@@ -127,8 +135,8 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
     setQuery((previous) => ({ ...previous, sort: value }));
   }, []);
 
-  const setFilters = useCallback((type: AppType | undefined, owner: "me" | undefined) => {
-    setQuery((previous) => ({ ...previous, type, owner }));
+  const setFilters = useCallback((type: AppType | undefined, owner: "me" | undefined, published: boolean | undefined) => {
+    setQuery((previous) => ({ ...previous, type, owner, published }));
   }, []);
 
   // Debounce search input
@@ -162,7 +170,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
             </div>
           </div>
 
-          <ManageFilterDialog type={query.type} owner={query.owner} isAdmin={isAdmin} onChange={setFilters} />
+          <ManageFilterDialog type={query.type} owner={query.owner} published={query.published} isAdmin={isAdmin} onChange={setFilters} />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

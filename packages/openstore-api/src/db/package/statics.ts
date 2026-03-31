@@ -180,6 +180,8 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       throw new UserError(MISSING_CHANNEL_ARCH);
     }
 
+    const published = getDataBooleanOrUndefined(req, 'published');
+
     return {
       limit,
       skip: getDataInt(req, 'skip', 0),
@@ -195,6 +197,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       search: getData(req, 'search'),
       channel,
       nsfw,
+      published,
     };
   };
 
@@ -289,7 +292,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       query.maintainer = publisherId;
     }
 
-    if (published) {
+    if (published !== undefined) {
       query.published = published;
     }
 
