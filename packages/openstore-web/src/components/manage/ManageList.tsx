@@ -2,14 +2,22 @@ import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { AppSearchSchema, AppType, type SlimAppData } from "@/lib/schema";
 import Pagination from "../Pagination";
 import SvgSpinner from "../icons/Spinner";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import * as Sentry from "@sentry/astro";
 import SvgSearch from "../icons/Search";
 import ManageFilterDialog from "./ManageFilterDialog";
+import TopRating from "../apps/TopRating";
 
 const PAGE_SIZE = 32;
-const DEFAULT_SORT = 'name';
+const DEFAULT_SORT = "name";
 
 type ManageListProps = {
   apikey: string;
@@ -18,28 +26,28 @@ type ManageListProps = {
 };
 
 const SORT_OPTIONS = [
-    { value: "name", label: "Title (A-Z)" },
-    { value: "-name", label: "Title (Z-A)" },
-    { value: "-calculated_rating", label: "Most Popular" },
-    { value: "calculated_rating", label: "Least Popular" },
-    { value: "-published_date", label: "Newest" },
-    { value: "published_date", label: "Oldest" },
-    { value: "-updated_date", label: "Latest Update" },
-    { value: "updated_date", label: "Oldest Update" },
-  ];
+  { value: "name", label: "Title (A-Z)" },
+  { value: "-name", label: "Title (Z-A)" },
+  { value: "-calculated_rating", label: "Most Popular" },
+  { value: "calculated_rating", label: "Least Popular" },
+  { value: "-published_date", label: "Newest" },
+  { value: "published_date", label: "Oldest" },
+  { value: "-updated_date", label: "Latest Update" },
+  { value: "updated_date", label: "Oldest Update" },
+];
 
 const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
-  const urlPage = parseInt(hashParams.get('page') ?? '0');
+  const urlPage = parseInt(hashParams.get("page") ?? "0");
 
   const [page, setPage] = useState(isNaN(urlPage) ? 0 : urlPage);
   const [totalPages, setTotalPages] = useState(0);
-  const [localSearch, setLocalSearch] = useState(hashParams.get('search') || '');
+  const [localSearch, setLocalSearch] = useState(hashParams.get("search") || "");
   const [query, setQuery] = useState({
-    search: hashParams.get('search') || '',
-    sort: hashParams.get('sort') ?? DEFAULT_SORT,
-    type: hashParams.get('type') as AppType | undefined,
-    owner: hashParams.get('owner') as 'me' | undefined,
+    search: hashParams.get("search") || "",
+    sort: hashParams.get("sort") ?? DEFAULT_SORT,
+    type: hashParams.get("type") as AppType | undefined,
+    owner: hashParams.get("owner") as "me" | undefined,
   });
   const [apps, setApps] = useState<SlimAppData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,39 +58,39 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
 
     const skip = page * PAGE_SIZE;
     const url = new URL(`${import.meta.env.PUBLIC_API_URL}api/v3/manage`);
-    url.searchParams.append('apikey', apikey);
-    url.searchParams.append('limit', PAGE_SIZE.toString());
-    url.searchParams.append('skip', skip.toString());
-    url.searchParams.append('sort', query.sort);
-    url.searchParams.append('search', query.search);
+    url.searchParams.append("apikey", apikey);
+    url.searchParams.append("limit", PAGE_SIZE.toString());
+    url.searchParams.append("skip", skip.toString());
+    url.searchParams.append("sort", query.sort);
+    url.searchParams.append("search", query.search);
 
     if (query.type) {
-      url.searchParams.append('type', query.type);
+      url.searchParams.append("type", query.type);
     }
 
-    if (query.owner === 'me') {
-      url.searchParams.append('publisher_id', userId);
+    if (query.owner === "me") {
+      url.searchParams.append("publisher_id", userId);
     }
 
     const updateParams = new URLSearchParams();
     if (query.search) {
-      updateParams.append('search', query.search);
+      updateParams.append("search", query.search);
     }
     if (query.sort !== DEFAULT_SORT) {
-      updateParams.append('sort', query.sort);
+      updateParams.append("sort", query.sort);
     }
     if (query.type) {
-      updateParams.append('type', query.type);
+      updateParams.append("type", query.type);
     }
     if (query.owner) {
-      updateParams.append('owner', query.owner);
+      updateParams.append("owner", query.owner);
     }
     if (page > 0) {
-      updateParams.append('page', page.toString());
+      updateParams.append("page", page.toString());
     }
 
-    const newHash = updateParams.size > 0 ? `#${updateParams.toString()}` : '';
-    window.history.replaceState({}, '', window.location.pathname + window.location.search + newHash);
+    const newHash = updateParams.size > 0 ? `#${updateParams.toString()}` : "";
+    window.history.replaceState({}, "", window.location.pathname + window.location.search + newHash);
 
     try {
       const response = await fetch(url, { headers: { "X-Source": "openstore-web-next" } });
@@ -91,8 +99,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
 
       setApps(search.packages);
       setTotalPages(Math.ceil(data.count / PAGE_SIZE));
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
       Sentry.captureException(err);
 
@@ -114,7 +121,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
     setQuery((previous) => ({ ...previous, sort: value }));
   }, []);
 
-  const setFilters = useCallback((type: AppType | undefined, owner: 'me' | undefined) => {
+  const setFilters = useCallback((type: AppType | undefined, owner: "me" | undefined) => {
     setQuery((previous) => ({ ...previous, type, owner }));
   }, []);
 
@@ -149,12 +156,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
             </div>
           </div>
 
-          <ManageFilterDialog
-            type={query.type}
-            owner={query.owner}
-            isAdmin={isAdmin}
-            onChange={setFilters}
-          />
+          <ManageFilterDialog type={query.type} owner={query.owner} isAdmin={isAdmin} onChange={setFilters} />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -180,9 +182,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
       </div>
 
       {error ? (
-        <div class="h-full text-2xl text-red">
-          There was an error loading the app list. Please try again later.
-        </div>
+        <div class="h-full text-2xl text-red">There was an error loading the app list. Please try again later.</div>
       ) : (
         <>
           {loading ? (
@@ -209,6 +209,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
                           <div class="text-md md:text-lg text-ellipsis line-clamp-2 font-bold break-all">{app.name}</div>
 
                           <p>{app.publisher}</p>
+                          <TopRating ratings={app.ratings} />
                           <p class={app.published ? "text-ubuntu-purple" : "text-gray-400"}>
                             {app.published ? "Published" : "Not Published"}
                           </p>
@@ -230,9 +231,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
                   )}
                 </>
               ) : (
-                <div class="h-full text-2xl">
-                  No apps found
-                </div>
+                <div class="h-full text-2xl">No apps found</div>
               )}
             </>
           )}
