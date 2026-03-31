@@ -15,6 +15,9 @@ import * as Sentry from "@sentry/astro";
 import SvgSearch from "../icons/Search";
 import ManageFilterDialog from "./ManageFilterDialog";
 import TopRating from "../apps/TopRating";
+import Ratings from "../apps/Ratings";
+import SvgGrid from "../icons/Grid";
+import SvgList from "../icons/List";
 
 const PAGE_SIZE = 32;
 const DEFAULT_SORT = "name";
@@ -24,6 +27,8 @@ type ManageListProps = {
   isAdmin: boolean;
   userId: string;
 };
+
+type ViewMode = "grid" | "list";
 
 const SORT_OPTIONS = [
   { value: "name", label: "Title (A-Z)" },
@@ -52,6 +57,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
   const [apps, setApps] = useState<SlimAppData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   useMemo(async () => {
     setLoading(true);
@@ -160,8 +166,9 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" class="whitespace-nowrap">
-                Sort by: {SORT_OPTIONS.find((option) => option.value === query.sort)!.label}
+              <Button variant="outline" class="whitespace-nowrap min-w-[120px]">
+                <span class="hidden md:inline">Sort by: </span>
+                {SORT_OPTIONS.find((option) => option.value === query.sort)!.label}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-56 mr-4">
@@ -174,6 +181,15 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            variant="outline"
+            onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+            title={viewMode === "grid" ? "Switch to list view" : "Switch to grid view"}
+            class="px-4 py-2"
+          >
+            {viewMode === "grid" ? <SvgList class="h-4 w-4" /> : <SvgGrid class="h-4 w-4" />}
+          </Button>
         </div>
 
         <a href="/submit/" class="btn bg-ubuntu-orange text-white inline-block">
@@ -193,30 +209,72 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
             <>
               {apps.length > 0 ? (
                 <>
-                  <div class="grid grid-cols-2 md:grid-cols-4">
-                    {apps.map((app) => (
-                      <a href={`/manage/${app.id}/`} class="flex flex-row gap-4 max-w-xl mb-4 py-2 px-1 md:p-4" key={app.id}>
-                        <img
-                          class="rounded-2xl max-w-[64px] max-h-[64px]"
-                          src={app.icon}
-                          alt=""
-                          width="64"
-                          height="64"
-                          loading="lazy"
-                          style={`view-transition-name: app-${app.id.replace(/\./g, "-")}`}
-                        />
-                        <div>
-                          <div class="text-md md:text-lg text-ellipsis line-clamp-2 font-bold break-all">{app.name}</div>
+                  {viewMode === "grid" ? (
+                    <div class="grid grid-cols-2 md:grid-cols-4">
+                      {apps.map((app) => (
+                        <a href={`/manage/${app.id}/`} class="flex flex-row gap-4 max-w-xl mb-4 py-2 px-1 md:p-4" key={app.id}>
+                          <img
+                            class="rounded-2xl max-w-[64px] max-h-[64px]"
+                            src={app.icon}
+                            alt=""
+                            width="64"
+                            height="64"
+                            loading="lazy"
+                            style={`view-transition-name: app-${app.id.replace(/\./g, "-")}`}
+                          />
+                          <div>
+                            <div class="text-md md:text-lg text-ellipsis line-clamp-2 font-bold break-all">{app.name}</div>
 
-                          <p>{app.publisher}</p>
-                          <TopRating ratings={app.ratings} />
-                          <p class={app.published ? "text-ubuntu-purple" : "text-gray-400"}>
-                            {app.published ? "Published" : "Not Published"}
-                          </p>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
+                            <p>{app.publisher}</p>
+                            <TopRating ratings={app.ratings} />
+                            <p class={app.published ? "text-ubuntu-purple" : "text-gray-400"}>
+                              {app.published ? "Published" : "Not Published"}
+                            </p>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <div class="space-y-2">
+                      {apps.map((app) => (
+                        <a
+                          href={`/manage/${app.id}/`}
+                          class="flex flex-col md:flex-row gap-4 md:items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                          key={app.id}
+                        >
+                          <div class="flex flex-row gap-4 items-start md:items-center flex-1 min-w-0">
+                            <img
+                              class="rounded-2xl flex-shrink-0"
+                              src={app.icon}
+                              alt=""
+                              width="64"
+                              height="64"
+                              loading="lazy"
+                              style={`view-transition-name: app-${app.id.replace(/\./g, "-")}`}
+                            />
+                            <div class="flex-1 min-w-0">
+                              <div class="text-lg font-bold break-words">{app.name}</div>
+                              <p class="text-gray-600">{app.publisher}</p>
+                              <p class={app.published ? "text-ubuntu-purple" : "text-gray-400"}>
+                                {app.published ? "Published" : "Not Published"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="flex-shrink-0 md:w-80">
+                            <Ratings app={app} />
+                          </div>
+
+                          <div class="flex-shrink-0 md:w-[180px] text-left md:text-right">
+                            <div class="text-gray-600">
+                              Total Downloads: <span class="font-bold">{app.totalDownloads.toLocaleString()}</span>
+                            </div>
+                            <div class="text-sm text-gray-500">Latest: {app.latestDownloads.toLocaleString()}</div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  )}
 
                   {totalPages > 1 && (
                     <Pagination

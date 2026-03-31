@@ -147,6 +147,8 @@ export const SlimAppSchema = z.object({
   published: z.boolean().optional(),
   publisher: z.string(),
   published_date: z.string().optional(),
+  totalDownloads: z.number(),
+  latestDownloads: z.number(),
 });
 
 export type SlimAppData = z.infer<typeof SlimAppSchema>;
