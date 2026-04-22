@@ -1,20 +1,14 @@
-import {useSortable} from '@dnd-kit/sortable';
-import {CSS} from '@dnd-kit/utilities';
-import SvgClose from '../icons/Close';
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import SvgClose from "../icons/Close";
 
 type SortableScreenshotItemProps = {
   screenshot: string;
   onRemove: () => void;
-}
+};
 
 const SortableScreenshotItem = ({ screenshot, onRemove }: SortableScreenshotItemProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: screenshot  });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: screenshot });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -27,12 +21,12 @@ const SortableScreenshotItem = ({ screenshot, onRemove }: SortableScreenshotItem
         <SvgClose />
       </div>
 
-      <div {...attributes as any} {...listeners} class="cursor-move">
+      <div {...(attributes as any)} {...listeners} class="cursor-move">
         <img src={screenshot} alt="" loading="lazy" class="max-h-64 max-w-64 h-auto w-auto rounded-2xl block border border-primary" />
         <input type="hidden" name="screenshots" value={screenshot} />
       </div>
     </div>
   );
-}
+};
 
 export default SortableScreenshotItem;

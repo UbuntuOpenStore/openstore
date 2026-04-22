@@ -3,7 +3,7 @@ import SvgHome from "../icons/Home";
 import Ratings from "../apps/Ratings";
 import ManageMenu from "./ManageMenu";
 
-const ManageHeaders = ({ app, breadcrumb }: { app: AppManageData, breadcrumb: string }) => {
+const ManageHeaders = ({ app, breadcrumb }: { app: AppManageData; breadcrumb: string }) => {
   return (
     <>
       <section class="section flex justify-between items-center">
@@ -12,8 +12,18 @@ const ManageHeaders = ({ app, breadcrumb }: { app: AppManageData, breadcrumb: st
             <SvgHome />
           </a>
 
-          <div class="ml-1">/ <a href="/manage/" class="underline">Manage</a></div>
-          <div class="ml-1 text-ellipsis inline-block max-w-32 md:max-w-64 whitespace-nowrap overflow-hidden">/ <a href={`/manage/${app.id}/`} class="underline">{app.name}</a></div>
+          <div class="ml-1">
+            /{" "}
+            <a href="/manage/" class="underline">
+              Manage
+            </a>
+          </div>
+          <div class="ml-1 text-ellipsis inline-block max-w-32 md:max-w-64 whitespace-nowrap overflow-hidden">
+            /{" "}
+            <a href={`/manage/${app.id}/`} class="underline">
+              {app.name}
+            </a>
+          </div>
           <div class="ml-1">/ {breadcrumb}</div>
         </div>
 
@@ -21,14 +31,12 @@ const ManageHeaders = ({ app, breadcrumb }: { app: AppManageData, breadcrumb: st
       </section>
 
       <section class="section space-y-4">
-        <h1 class="text-4xl">
-          Manage {app.name}
-        </h1>
+        <h1 class="text-4xl">Manage {app.name}</h1>
 
         <Ratings app={app} />
       </section>
     </>
   );
-}
+};
 
 export default ManageHeaders;

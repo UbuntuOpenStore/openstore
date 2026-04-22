@@ -8,7 +8,7 @@ import { cn, getClientApiKey } from "@/lib/utils";
 import SvgSave from "../icons/Save";
 
 type RevisionFormProps = {
-  app: AppManageData,
+  app: AppManageData;
 };
 
 type FileState = {
@@ -21,27 +21,25 @@ type FileState = {
 function uploadFile(url: string, fileUploadData: FormData, progressCallback: (progress: number) => void) {
   return new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.upload.addEventListener('progress', (event) => {
+    xhr.upload.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
         const progress = Math.round((event.loaded / event.total) * 100);
         progressCallback(progress);
       }
     });
 
-    xhr.addEventListener('load', () => {
+    xhr.addEventListener("load", () => {
       if (xhr.status >= 200 && xhr.status <= 299) {
         resolve();
-      }
-      else {
+      } else {
         let errorBody: Record<string, unknown> = {};
         try {
           errorBody = JSON.parse(xhr.responseText);
-        }
-        catch (e) {}
+        } catch (e) {}
         console.log(xhr.responseText, errorBody);
 
-        let message = 'An unknown error has occurred';
-        if (errorBody && typeof errorBody.message === 'string') {
+        let message = "An unknown error has occurred";
+        if (errorBody && typeof errorBody.message === "string") {
           message = errorBody.message;
         }
 
@@ -49,10 +47,10 @@ function uploadFile(url: string, fileUploadData: FormData, progressCallback: (pr
       }
     });
 
-    xhr.addEventListener('error', () => reject('Network Error'));
-    xhr.addEventListener('abort', () => reject('Upload Aborted'));
+    xhr.addEventListener("error", () => reject("Network Error"));
+    xhr.addEventListener("abort", () => reject("Upload Aborted"));
 
-    xhr.open('POST', url);
+    xhr.open("POST", url);
     xhr.send(fileUploadData);
   });
 }
@@ -67,22 +65,24 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
       setProcessing(true);
 
       const formData = new FormData(e.currentTarget);
-      const changelog = formData.get('changelog');
-      const formFiles = formData.getAll('files') as File[];
+      const changelog = formData.get("changelog");
+      const formFiles = formData.getAll("files") as File[];
 
-      setFiles(formFiles.map((formFile) => ({
-        name: formFile.name,
-        progress: 0,
-        success: false,
-      })));
+      setFiles(
+        formFiles.map((formFile) => ({
+          name: formFile.name,
+          progress: 0,
+          success: false,
+        }))
+      );
 
       const url = `${import.meta.env.PUBLIC_API_URL}api/v3/manage/${app.id}/revision?apikey=${getClientApiKey()}`;
       let uploadedChangelog = false;
       for (const formFile of formFiles) {
         const fileUploadData = new FormData();
-        fileUploadData.append('file', formFile, formFile.name);
+        fileUploadData.append("file", formFile, formFile.name);
         if (!uploadedChangelog && changelog) {
-          fileUploadData.append('changelog', changelog);
+          fileUploadData.append("changelog", changelog);
           uploadedChangelog = true;
         }
 
@@ -90,33 +90,35 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
           setFiles((files) => {
             return files.map((file) => {
               if (file.name === formFile.name) {
-                return { ...file, progress }
-              }
-
-              return file;
-            });
-          });
-        }).then(() => {
-          setFiles((files) => {
-            return files.map((file) => {
-              if (file.name === formFile.name) {
-                return { ...file, success: true }
-              }
-
-              return file;
-            });
-          });
-        }).catch((error: string) => {
-          setFiles((files) => {
-            return files.map((file) => {
-              if (file.name === formFile.name) {
-                return { ...file, error }
+                return { ...file, progress };
               }
 
               return file;
             });
           });
         })
+          .then(() => {
+            setFiles((files) => {
+              return files.map((file) => {
+                if (file.name === formFile.name) {
+                  return { ...file, success: true };
+                }
+
+                return file;
+              });
+            });
+          })
+          .catch((error: string) => {
+            setFiles((files) => {
+              return files.map((file) => {
+                if (file.name === formFile.name) {
+                  return { ...file, error };
+                }
+
+                return file;
+              });
+            });
+          });
       }
     }
   }, []);
@@ -127,25 +129,25 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
     return (
       <section class="section space-y-4 h-full">
         {files.map((file) => (
-            <div class={cn(
-              'border-2 rounded flex px-6 py-4 gap-4',
-              file.progress === 0 && 'bg-gray-400 border-gray-500',
-              file.progress > 0 && !file.success && !file.error && 'bg-blue-400 border-blue-500',
-              file.success && 'bg-green-400 border-green-500',
-              file.error && 'bg-red-400 border-red-500',
-            )}>
-              {file.progress === 0 && <SvgSave class="rotate-180" />}
-              {file.progress > 0 && !file.success && !file.error && <SvgSpinner class="animate-spin text-blue-600" />}
-              {file.success && <SvgCheck class="text-green-600" />}
-              {file.error && <SvgClose class="text-red-600" />}
+          <div
+            class={cn(
+              "border-2 rounded flex px-6 py-4 gap-4",
+              file.progress === 0 && "bg-gray-400 border-gray-500",
+              file.progress > 0 && !file.success && !file.error && "bg-blue-400 border-blue-500",
+              file.success && "bg-green-400 border-green-500",
+              file.error && "bg-red-400 border-red-500"
+            )}
+          >
+            {file.progress === 0 && <SvgSave class="rotate-180" />}
+            {file.progress > 0 && !file.success && !file.error && <SvgSpinner class="animate-spin text-blue-600" />}
+            {file.success && <SvgCheck class="text-green-600" />}
+            {file.error && <SvgClose class="text-red-600" />}
 
-              <div>
-                <p>
-                  {file.name}
-                </p>
-                {file.error && <p>{file.error}</p>}
-              </div>
+            <div>
+              <p>{file.name}</p>
+              {file.error && <p>{file.error}</p>}
             </div>
+          </div>
         ))}
 
         {allFinished && (
@@ -161,7 +163,9 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
     <form class="space-y-4 h-full" onSubmit={save}>
       <section class="section space-y-4">
         <div class="form-group">
-          <label for="files" class="form-label">Click Files</label>
+          <label for="files" class="form-label">
+            Click Files
+          </label>
           <div class="w-full">
             <input
               type="file"
@@ -174,16 +178,16 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
             />
           </div>
         </div>
-        <p class="text-xs text-gray-500 text-right">
-          More than one file can be uploaded at a time
-        </p>
+        <p class="text-xs text-gray-500 text-right">More than one file can be uploaded at a time</p>
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
 
       <section class="section space-y-4">
         <div class="form-group">
-          <label for="changelog" class="form-label">Changelog</label>
+          <label for="changelog" class="form-label">
+            Changelog
+          </label>
           <textarea id="changelog" name="changelog" class="form-input" rows={4}></textarea>
         </div>
       </section>
@@ -197,6 +201,6 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
       </section>
     </form>
   );
-}
+};
 
 export default RevisionForm;

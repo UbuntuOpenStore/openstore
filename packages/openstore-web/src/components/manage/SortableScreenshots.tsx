@@ -1,27 +1,14 @@
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  horizontalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import SortableScreenshotItem from './SortableScreenshotItem';
-import { useCallback } from 'preact/hooks';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import SortableScreenshotItem from "./SortableScreenshotItem";
+import { useCallback } from "preact/hooks";
 
 type SortableScreenshotsProps = {
-  screenshots: string[],
-  onUpdate: (screenshots: string[]) => void,
+  screenshots: string[];
+  onUpdate: (screenshots: string[]) => void;
 };
 
 const SortableScreenshots = ({ screenshots, onUpdate }: SortableScreenshotsProps) => {
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -29,37 +16,38 @@ const SortableScreenshots = ({ screenshots, onUpdate }: SortableScreenshotsProps
     })
   );
 
-  const handleDragEnd = useCallback((event: any) => {
-    const {active, over} = event;
+  const handleDragEnd = useCallback(
+    (event: any) => {
+      const { active, over } = event;
 
-    if (active.id !== over.id) {
+      if (active.id !== over.id) {
         const oldIndex = screenshots.indexOf(active.id);
         const newIndex = screenshots.indexOf(over.id);
 
         onUpdate(arrayMove(screenshots, oldIndex, newIndex));
-    }
-  }, [screenshots, onUpdate]);
+      }
+    },
+    [screenshots, onUpdate]
+  );
 
-  const removeScreenshot = useCallback((screenshot: string) => {
-    onUpdate(screenshots.filter((ss) => ss !== screenshot));
-  }, [screenshots, onUpdate]);
+  const removeScreenshot = useCallback(
+    (screenshot: string) => {
+      onUpdate(screenshots.filter((ss) => ss !== screenshot));
+    },
+    [screenshots, onUpdate]
+  );
 
   return (
     <div class="flex flex-row gap-4 overflow-auto">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={screenshots}
-          strategy={horizontalListSortingStrategy}
-        >
-          {screenshots.map(screenshot => <SortableScreenshotItem key={screenshot} screenshot={screenshot} onRemove={() => removeScreenshot(screenshot)} />)}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={screenshots} strategy={horizontalListSortingStrategy}>
+          {screenshots.map((screenshot) => (
+            <SortableScreenshotItem key={screenshot} screenshot={screenshot} onRemove={() => removeScreenshot(screenshot)} />
+          ))}
         </SortableContext>
       </DndContext>
     </div>
   );
-}
+};
 
 export default SortableScreenshots;

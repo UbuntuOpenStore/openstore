@@ -1,4 +1,4 @@
-import SvgClose from '../icons/Close';
+import SvgClose from "../icons/Close";
 
 const ManageError = ({ status }: { status: number }) => {
   return (
@@ -15,6 +15,6 @@ const ManageError = ({ status }: { status: number }) => {
       </div>
     </section>
   );
-}
+};
 
 export default ManageError;

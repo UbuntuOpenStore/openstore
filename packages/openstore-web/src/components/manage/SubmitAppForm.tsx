@@ -8,7 +8,7 @@ import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
 const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined }) => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const apikey = getClientApiKey();
   const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
@@ -16,30 +16,29 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
     if (e.currentTarget.reportValidity()) {
       setSaving(true);
       setSuccess(false);
-      setError('');
+      setError("");
 
       const formData = new FormData(e.currentTarget);
       const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/manage/?apikey=${apikey}`, {
         method: "POST",
         body: JSON.stringify({
-          id: formData.get('id'),
-          name: formData.get('name'),
+          id: formData.get("id"),
+          name: formData.get("name"),
         }),
         headers: {
-          'Content-Type': 'application/json',
-          'X-Source': 'openstore-web-next',
-        }
+          "Content-Type": "application/json",
+          "X-Source": "openstore-web-next",
+        },
       });
 
       if (response.ok) {
         setSuccess(true);
 
-        location.pathname = `/manage/${formData.get('id')}/`;
-      }
-      else {
-        const errorBody = await response.json()
-        let message = 'An unknown error has occurred';
-        if (errorBody && typeof errorBody.message === 'string') {
+        location.pathname = `/manage/${formData.get("id")}/`;
+      } else {
+        const errorBody = await response.json();
+        let message = "An unknown error has occurred";
+        if (errorBody && typeof errorBody.message === "string") {
           message = errorBody.message;
         }
 
@@ -53,7 +52,9 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
   if (!apikey) {
     return (
       <p>
-        <a href={getRelativeLocaleUrl(currentLocale, "/login/")} class="underline">You must be logged in to submit your app.</a>
+        <a href={getRelativeLocaleUrl(currentLocale, "/login/")} class="underline">
+          You must be logged in to submit your app.
+        </a>
       </p>
     );
   }
@@ -64,7 +65,9 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
 
       <section class="section space-y-4">
         <div class="form-group">
-          <label for="id" class="form-label">App Name</label>
+          <label for="id" class="form-label">
+            App Name
+          </label>
           <input id="id" name="id" type="text" required class="form-input" />
         </div>
 
@@ -77,7 +80,9 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
         </div>
 
         <div class="form-group">
-          <label for="name" class="form-label">App Title</label>
+          <label for="name" class="form-label">
+            App Title
+          </label>
           <input id="name" name="name" type="text" required class="form-input" />
         </div>
       </section>
@@ -87,7 +92,6 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
       <section class="section flex gap-4 items-center">
         <button type="submit" class="btn bg-ubuntu-orange text-white font-bold cursor-pointer" disabled={saving}>
           Save
-
           {saving && <SvgSpinner class="animate-spin ml-2" />}
         </button>
 
@@ -99,9 +103,7 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
               <SvgClose class="text-red-600" />
               <div>
                 Failed to update your app:
-                <p>
-                  {error}
-                </p>
+                <p>{error}</p>
               </div>
             </div>
           </>
@@ -109,6 +111,6 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
       </section>
     </form>
   );
-}
+};
 
 export default SubmitAppForm;

@@ -4,19 +4,15 @@ import ManageError from "./ManageError";
 import Loading from "../Loading";
 import { useManageApp } from "@/lib/use-manage-app";
 
-const BadgePage = ({ id }: { id: string}) => {
+const BadgePage = ({ id }: { id: string }) => {
   const [app, loading, status] = useManageApp(id);
 
   if (loading) {
-    return (
-      <Loading />
-    )
+    return <Loading />;
   }
 
   if (!app) {
-    return (
-      <ManageError status={status} />
-    )
+    return <ManageError status={status} />;
   }
 
   return (
@@ -32,6 +28,6 @@ const BadgePage = ({ id }: { id: string}) => {
       </section>
     </>
   );
-}
+};
 
 export default BadgePage;

@@ -8,19 +8,15 @@ const CHANNEL_MAP = {
   [Channel.FOCAL as string]: "Stable",
 };
 
-const StatsPage = ({ id }: { id: string}) => {
+const StatsPage = ({ id }: { id: string }) => {
   const [app, loading, status] = useManageApp(id);
 
   if (loading) {
-    return (
-      <Loading />
-    )
+    return <Loading />;
   }
 
   if (!app) {
-    return (
-      <ManageError status={status} />
-    )
+    return <ManageError status={status} />;
   }
 
   const revisions = app.revisions.toSorted((a, b) => {
@@ -47,27 +43,27 @@ const StatsPage = ({ id }: { id: string}) => {
           </thead>
           <tbody>
             <tr class="border-b-1 border-b-gray-300 font-extrabold">
-              <td colspan={5} class="p-1">Total</td>
+              <td colspan={5} class="p-1">
+                Total
+              </td>
               <td class="text-right p-1">{app.totalDownloads.toLocaleString()}</td>
             </tr>
 
-            {
-              revisions.map((revision) => (
-                <tr class="border-b-1 border-b-gray-300 text-center even:bg-gray-50">
-                  <td class="text-left p-1">{revision.revision}</td>
-                  <td>{CHANNEL_MAP[revision.channel] ?? revision.channel}</td>
-                  <td>{revision.architecture}</td>
-                  <td>{revision.framework}</td>
-                  <td>{revision.version}</td>
-                  <td class="text-right p-1">{revision.downloads.toLocaleString()}</td>
-                </tr>
-              ))
-            }
+            {revisions.map((revision) => (
+              <tr class="border-b-1 border-b-gray-300 text-center even:bg-gray-50">
+                <td class="text-left p-1">{revision.revision}</td>
+                <td>{CHANNEL_MAP[revision.channel] ?? revision.channel}</td>
+                <td>{revision.architecture}</td>
+                <td>{revision.framework}</td>
+                <td>{revision.version}</td>
+                <td class="text-right p-1">{revision.downloads.toLocaleString()}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </section>
     </>
   );
-}
+};
 
 export default StatsPage;

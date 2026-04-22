@@ -1,15 +1,15 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { getRelativeLocaleUrl, localeSlugToCode, removeLocaleFromPath } from "@/lib/utils"
-import localesJson from '@/locales.json';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { getRelativeLocaleUrl, localeSlugToCode, removeLocaleFromPath } from "@/lib/utils";
+import localesJson from "@/locales.json";
 import SvgGlobe from "./icons/Globe";
 
-const LanguageSelect = ({ currentLocale, currentPath }: { currentLocale: string | undefined, currentPath: string }) => {
+const LanguageSelect = ({ currentLocale, currentPath }: { currentLocale: string | undefined; currentPath: string }) => {
   const code = localeSlugToCode(currentLocale);
   const currentLanguage = localesJson.find((locale) => locale.code === code);
   let path = removeLocaleFromPath(currentPath);
-  if (path.startsWith('/manage/')) {
-    path = '/';
+  if (path.startsWith("/manage/")) {
+    path = "/";
   }
 
   return (
@@ -22,16 +22,15 @@ const LanguageSelect = ({ currentLocale, currentPath }: { currentLocale: string 
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" class="max-h-64 overflow-auto">
         {localesJson.map((locale) => (
-          <DropdownMenuItem
-            key={locale.slug}
-            asChild
-          >
-            <a href={getRelativeLocaleUrl(locale.slug, path)} class="cursor-pointer">{locale.name}</a>
+          <DropdownMenuItem key={locale.slug} asChild>
+            <a href={getRelativeLocaleUrl(locale.slug, path)} class="cursor-pointer">
+              {locale.name}
+            </a>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
+  );
+};
 
 export default LanguageSelect;

@@ -23,10 +23,10 @@ const LANGUAGES = [
   { code: "sv", label: "Swedish" },
 ];
 
-const BadgeSelect = ({ appId, currentLocale }: { appId?: string, currentLocale?: string }) => {
+const BadgeSelect = ({ appId, currentLocale }: { appId?: string; currentLocale?: string }) => {
   const code = localeSlugToCode(currentLocale);
   const defaultLanguage = LANGUAGES.find((lang) => lang.code === code);
-  const [language, setLanguage] = useState(defaultLanguage?.code ?? 'en_US');
+  const [language, setLanguage] = useState(defaultLanguage?.code ?? "en_US");
 
   const appUrl = `${import.meta.env.SITE}app/${appId}/`;
   const svgUrl = `${import.meta.env.SITE}badges/${language}.svg`;
@@ -46,7 +46,9 @@ const BadgeSelect = ({ appId, currentLocale }: { appId?: string, currentLocale?:
           onInput={(e) => setLanguage(e.currentTarget.value)}
         >
           {LANGUAGES.map(({ code, label }) => (
-            <option value={code} key={code}>{label}</option>
+            <option value={code} key={code}>
+              {label}
+            </option>
           ))}
         </select>
       </div>
@@ -100,6 +102,6 @@ const BadgeSelect = ({ appId, currentLocale }: { appId?: string, currentLocale?:
       </div>
     </>
   );
-}
+};
 
 export default BadgeSelect;

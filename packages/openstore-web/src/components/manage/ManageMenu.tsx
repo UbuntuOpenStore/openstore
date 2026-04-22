@@ -13,13 +13,29 @@ const ManageMenu = ({ id }: { id: string }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem asChild><a href={baseUrl} className="cursor-pointer">Edit</a></DropdownMenuItem>
-        <DropdownMenuItem asChild><a href={`${baseUrl}revision/`} className="cursor-pointer">New Revision</a></DropdownMenuItem>
-        <DropdownMenuItem asChild><a href={`${baseUrl}stats/`} className="cursor-pointer">Stats</a></DropdownMenuItem>
-        <DropdownMenuItem asChild><a href={`${baseUrl}badge/`} className="cursor-pointer">Badge</a></DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={baseUrl} className="cursor-pointer">
+            Edit
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={`${baseUrl}revision/`} className="cursor-pointer">
+            New Revision
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={`${baseUrl}stats/`} className="cursor-pointer">
+            Stats
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={`${baseUrl}badge/`} className="cursor-pointer">
+            Badge
+          </a>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
 
 export default ManageMenu;

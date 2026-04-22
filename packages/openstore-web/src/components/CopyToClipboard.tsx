@@ -1,27 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { useState } from 'preact/hooks';
+import { useState } from "preact/hooks";
 import SvgCheck from "./icons/Check";
 import SvgCopy from "./icons/Copy";
 
 const CopyToClipboard = ({ code }: { code: string }) => {
-  const [isCopied, setIsCopied] = useState(false)
+  const [isCopied, setIsCopied] = useState(false);
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(code)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 2000)
+      await navigator.clipboard.writeText(code);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err)
+      console.error("Failed to copy text: ", err);
     }
-  }
+  };
 
   return (
     <div class="relative rounded-lg overflow-hidden border border-border">
       <div class="flex items-center">
-        <pre class="p-4 text-sm font-mono bg-muted text-foreground overflow-x-auto grow">
-          {code}
-        </pre>
+        <pre class="p-4 text-sm font-mono bg-muted text-foreground overflow-x-auto grow">{code}</pre>
         <Button
           variant="ghost"
           size="icon"
@@ -33,7 +31,7 @@ const CopyToClipboard = ({ code }: { code: string }) => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default CopyToClipboard;

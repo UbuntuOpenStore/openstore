@@ -1,10 +1,10 @@
-import { useState, useCallback, useRef } from 'preact/hooks';
-import SvgSpinner from '../icons/Spinner';
-import SvgCheck from '../icons/Check';
-import SvgClose from '../icons/Close';
-import type { UserData } from '@/lib/schema';
-import { getClientApiKey } from '@/lib/utils';
-import type { JSX } from 'preact/jsx-runtime';
+import { useState, useCallback, useRef } from "preact/hooks";
+import SvgSpinner from "../icons/Spinner";
+import SvgCheck from "../icons/Check";
+import SvgClose from "../icons/Close";
+import type { UserData } from "@/lib/schema";
+import { getClientApiKey } from "@/lib/utils";
+import type { JSX } from "preact/jsx-runtime";
 
 type ProfileFormProps = {
   user: UserData;
@@ -35,61 +35,64 @@ type ProfileFormProps = {
 const ProfileForm = ({ user, messages }: ProfileFormProps) => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement | null>(null);
 
-  const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (e.currentTarget.reportValidity()) {
-      setSaving(true);
-      setSuccess(false);
-      setError('');
+  const save = useCallback(
+    async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (e.currentTarget.reportValidity()) {
+        setSaving(true);
+        setSuccess(false);
+        setError("");
 
-      const formData = new FormData(e.currentTarget);
+        const formData = new FormData(e.currentTarget);
 
-      // Convert GitHub username to URL
-      const githubUsername = formData.get('github_username');
-      if (githubUsername) {
-        formData.delete('github_username');
-        formData.append('github_profile_url', `https://github.com/${githubUsername}`);
-      }
-
-      // Convert GitLab username to URL
-      const gitlabUsername = formData.get('gitlab_username');
-      if (gitlabUsername) {
-        formData.delete('gitlab_username');
-        formData.append('gitlab_profile_url', `https://gitlab.com/${gitlabUsername}`);
-      }
-
-      try {
-        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/me?apikey=${getClientApiKey()}`, {
-          method: 'PUT',
-          body: formData,
-          headers: { 'X-Source': 'openstore-web-next' }
-        });
-
-        if (response.ok) {
-          setSuccess(true);
-
-          if (fileRef.current) {
-            fileRef.current.value = '';
-          }
-        } else {
-          const errorBody = await response.json();
-          let message = messages.errorOccurred;
-          if (errorBody && typeof errorBody.message === 'string') {
-            message = errorBody.message;
-          }
-          setError(message);
+        // Convert GitHub username to URL
+        const githubUsername = formData.get("github_username");
+        if (githubUsername) {
+          formData.delete("github_username");
+          formData.append("github_profile_url", `https://github.com/${githubUsername}`);
         }
-      } catch (err) {
-        setError(messages.errorOccurred);
-        console.error(err);
-      } finally {
-        setSaving(false);
+
+        // Convert GitLab username to URL
+        const gitlabUsername = formData.get("gitlab_username");
+        if (gitlabUsername) {
+          formData.delete("gitlab_username");
+          formData.append("gitlab_profile_url", `https://gitlab.com/${gitlabUsername}`);
+        }
+
+        try {
+          const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/me?apikey=${getClientApiKey()}`, {
+            method: "PUT",
+            body: formData,
+            headers: { "X-Source": "openstore-web-next" },
+          });
+
+          if (response.ok) {
+            setSuccess(true);
+
+            if (fileRef.current) {
+              fileRef.current.value = "";
+            }
+          } else {
+            const errorBody = await response.json();
+            let message = messages.errorOccurred;
+            if (errorBody && typeof errorBody.message === "string") {
+              message = errorBody.message;
+            }
+            setError(message);
+          }
+        } catch (err) {
+          setError(messages.errorOccurred);
+          console.error(err);
+        } finally {
+          setSaving(false);
+        }
       }
-    }
-  }, [messages]);
+    },
+    [messages]
+  );
 
   return (
     <form class="space-y-4" onSubmit={save}>
@@ -98,13 +101,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
           <label for="username" class="form-label">
             {messages.username}
           </label>
-          <input
-            id="username"
-            type="text"
-            readOnly
-            value={user.username}
-            class="form-input bg-gray-100"
-          />
+          <input id="username" type="text" readOnly value={user.username} class="form-input bg-gray-100" />
         </div>
         <p class="mt-1 text-xs text-gray-500 text-right">{messages.usernameCannotBeChanged}</p>
 
@@ -112,13 +109,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
           <label for="email" class="form-label">
             {messages.email}
           </label>
-          <input
-            id="email"
-            type="email"
-            readOnly
-            value={user.email || ''}
-            class="form-input bg-gray-100"
-          />
+          <input id="email" type="email" readOnly value={user.email || ""} class="form-input bg-gray-100" />
         </div>
         <p class="mt-1 text-xs text-gray-500 text-right">{messages.emailManagedByProvider}</p>
       </section>
@@ -135,14 +126,10 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
           <div class="flex items-center gap-4">
             <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
               {user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={messages.profilePicture}
-                  class="w-full h-full object-cover"
-                />
+                <img src={user.avatar} alt={messages.profilePicture} class="w-full h-full object-cover" />
               ) : (
                 <div class="w-full h-full flex items-center justify-center text-gray-400">
-                  {user.username?.substring(0, 1).toUpperCase() || 'U'}
+                  {user.username?.substring(0, 1).toUpperCase() || "U"}
                 </div>
               )}
             </div>
@@ -168,14 +155,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
           <label for="description" class="form-label">
             {messages.shortBio}
           </label>
-          <textarea
-            id="description"
-            name="description"
-            rows={3}
-            maxLength={200}
-            class="form-input"
-            defaultValue={user.description || ''}
-          />
+          <textarea id="description" name="description" rows={3} maxLength={200} class="form-input" defaultValue={user.description || ""} />
         </div>
         <p class="mt-1 text-xs text-gray-500 text-right">{messages.maximumChars}</p>
       </section>
@@ -195,7 +175,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             type="url"
             placeholder="https://example.com"
             class="form-input"
-            defaultValue={user.website_url || ''}
+            defaultValue={user.website_url || ""}
           />
         </div>
 
@@ -209,7 +189,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             type="text"
             placeholder="username"
             class="form-input"
-            defaultValue={user.github_profile_url ? user.github_profile_url.replace('https://github.com/', '') : ''}
+            defaultValue={user.github_profile_url ? user.github_profile_url.replace("https://github.com/", "") : ""}
           />
         </div>
 
@@ -223,7 +203,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             type="text"
             placeholder="username"
             class="form-input"
-            defaultValue={user.gitlab_profile_url ? user.gitlab_profile_url.replace('https://gitlab.com/', '') : ''}
+            defaultValue={user.gitlab_profile_url ? user.gitlab_profile_url.replace("https://gitlab.com/", "") : ""}
           />
         </div>
 
@@ -237,7 +217,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             type="text"
             placeholder="username"
             class="form-input"
-            defaultValue={user.ubports_forum_username || ''}
+            defaultValue={user.ubports_forum_username || ""}
           />
         </div>
 
@@ -251,7 +231,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             type="url"
             placeholder="https://example.com/donate"
             class="form-input"
-            defaultValue={user.donation_url || ''}
+            defaultValue={user.donation_url || ""}
           />
         </div>
       </section>
@@ -277,10 +257,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             <div class="bg-red-400 border-2 border-red-500 rounded flex px-6 py-4 gap-4">
               <SvgClose class="text-red-600" />
               <div>
-                {messages.errorOccurred}:
-                <p>
-                  {error}
-                </p>
+                {messages.errorOccurred}:<p>{error}</p>
               </div>
             </div>
           </>

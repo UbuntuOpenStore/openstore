@@ -6,6 +6,6 @@ const Loading = () => {
       <SvgSpinner class="animate-spin w-12 h-12 text-ubuntu-purple mx-auto" />
     </div>
   );
-}
+};
 
 export default Loading;

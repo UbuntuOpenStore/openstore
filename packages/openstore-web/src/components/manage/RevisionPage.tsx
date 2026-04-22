@@ -4,19 +4,15 @@ import Loading from "../Loading";
 import { useManageApp } from "@/lib/use-manage-app";
 import RevisionForm from "./RevisionForm";
 
-const RevisionPage = ({ id }: { id: string}) => {
+const RevisionPage = ({ id }: { id: string }) => {
   const [app, loading, status] = useManageApp(id);
 
   if (loading) {
-    return (
-      <Loading />
-    )
+    return <Loading />;
   }
 
   if (!app) {
-    return (
-      <ManageError status={status} />
-    )
+    return <ManageError status={status} />;
   }
 
   return (
@@ -28,6 +24,6 @@ const RevisionPage = ({ id }: { id: string}) => {
       </div>
     </>
   );
-}
+};
 
 export default RevisionPage;

@@ -6,20 +6,16 @@ import ManageAppForm from "./ManageAppForm";
 import type { UserData } from "@/lib/schema";
 import { useManageMaintainers } from "@/lib/use-manage-maintainers";
 
-const ManagePage = ({ id, user }: { id: string, user: UserData }) => {
+const ManagePage = ({ id, user }: { id: string; user: UserData }) => {
   const [app, loading, status, refreshApp] = useManageApp(id);
-  const maintainers = useManageMaintainers(user.role === 'admin');
+  const maintainers = useManageMaintainers(user.role === "admin");
 
   if (!app && loading) {
-    return (
-      <Loading />
-    )
+    return <Loading />;
   }
 
   if (!app) {
-    return (
-      <ManageError status={status} />
-    )
+    return <ManageError status={status} />;
   }
 
   return (
@@ -46,23 +42,19 @@ const ManagePage = ({ id, user }: { id: string, user: UserData }) => {
                 <td>{app.publisher || "None"}</td>
               </tr>
 
-              {
-                app.published_date && (
-                  <tr class="border-b-1 border-b-gray-300">
-                    <td class="p-2 font-bold">Published Date</td>
-                    <td>{new Date(app.published_date).toLocaleString()}</td>
-                  </tr>
-                )
-              }
+              {app.published_date && (
+                <tr class="border-b-1 border-b-gray-300">
+                  <td class="p-2 font-bold">Published Date</td>
+                  <td>{new Date(app.published_date).toLocaleString()}</td>
+                </tr>
+              )}
 
-              {
-                app.updated_date && (
-                  <tr class="border-b-1 border-b-gray-300">
-                    <td class="p-2 font-bold">Updated Date</td>
-                    <td>{new Date(app.updated_date).toLocaleString()}</td>
-                  </tr>
-                )
-              }
+              {app.updated_date && (
+                <tr class="border-b-1 border-b-gray-300">
+                  <td class="p-2 font-bold">Updated Date</td>
+                  <td>{new Date(app.updated_date).toLocaleString()}</td>
+                </tr>
+              )}
 
               <tr class="border-b-1 border-b-gray-300">
                 <td class="p-2 font-bold">{app.architectures.length > 1 ? "Architectures" : "Architecture"}</td>
@@ -79,6 +71,6 @@ const ManagePage = ({ id, user }: { id: string, user: UserData }) => {
       </div>
     </>
   );
-}
+};
 
 export default ManagePage;
