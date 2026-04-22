@@ -1,16 +1,43 @@
-const ar = require('ar');
+const crypto = require('node:crypto');
 const fs = require('fs');
 const path = require('path');
-const streamifier = require('streamifier');
-const tar = require('tar');
+const { Readable } = require('node:stream');
 const tarstream = require('tar-stream');
-const uuid = require('uuid');
 const xml2js = require('xml2js');
 const zlib = require('zlib');
-const utf8 = require('utf8');
 
 const App = require('./app');
 const utils = require('./utils');
+
+function parseArArchive(buffer) {
+  const MAGIC = '!<arch>\n';
+  if (buffer.slice(0, 8).toString('ascii') !== MAGIC) {
+    throw new Error('Not a valid AR archive');
+  }
+
+  const files = [];
+  let offset = 8;
+  while (offset < buffer.length) {
+    if (offset + 60 > buffer.length) {
+      break;
+    }
+
+    const name = buffer.slice(offset, offset + 16).toString('ascii').trimEnd();
+    const size = parseInt(buffer.slice(offset + 48, offset + 58).toString('ascii').trim(), 10);
+    offset += 60;
+
+    const fileData = buffer.slice(offset, offset + size);
+    offset += size;
+
+    if (size % 2 !== 0) {
+      offset += 1; // pad to even byte boundary
+    }
+
+    files.push({ name, fileData });
+  }
+
+  return files;
+}
 
 // TODO detect indicators
 
@@ -20,7 +47,7 @@ function extractIcon(fileData, data, callback) {
     iconpath = `./${data.iconpath}`;
   }
 
-  const write = path.join('/tmp', `${uuid.v4()}${path.extname(data.iconpath).toLowerCase()}`);
+  const write = path.join('/tmp', `${crypto.randomUUID()}${path.extname(data.iconpath).toLowerCase()}`);
   const f = fs.createWriteStream(write)
     .on('finish', () => {
       data.icon = write;
@@ -28,27 +55,31 @@ function extractIcon(fileData, data, callback) {
     });
 
   let found = false;
-  streamifier.createReadStream(fileData)
+  const iconExtract = tarstream.extract();
+  iconExtract.on('entry', (header, stream, cb) => {
+    if (header.name === iconpath) {
+      found = true;
+      stream.pipe(f);
+      stream.on('end', cb);
+    }
+    else {
+      stream.on('end', cb);
+      stream.resume();
+    }
+  });
+  iconExtract.on('finish', () => {
+    if (!found) {
+      callback(null, data);
+    }
+  });
+
+  Readable.from(fileData)
     .on('error', (err) => {
       console.error(err);
       callback(null, data);
     })
     .pipe(zlib.Unzip())
-    .pipe(new tar.Parse())
-    .on('entry', (entry) => {
-      if (entry.path === iconpath) {
-        entry.pipe(f);
-        found = true;
-      }
-      else {
-        entry.resume();
-      }
-    })
-    .on('end', () => {
-      if (!found) {
-        callback(null, data);
-      }
-    });
+    .pipe(iconExtract);
 }
 
 function parseJsonFile(stream, callback) {
@@ -146,7 +177,7 @@ function parseQmlImports(str) {
 function parseData(fileData, data, icon, callback) {
   let potentialOgraWebapp = false;
 
-  streamifier.createReadStream(fileData)
+  Readable.from(fileData)
     .pipe(zlib.Unzip())
     .pipe(tarstream.extract())
     .on('entry', (header, stream, cb) => {
@@ -385,7 +416,7 @@ function parseControl(control, fileData, icon, callback) {
     files: [],
   };
 
-  streamifier.createReadStream(control)
+  Readable.from(control)
     .pipe(zlib.Unzip())
     .pipe(tarstream.extract())
     .on('entry', (header, stream, cb) => {
@@ -449,16 +480,13 @@ function parseControl(control, fileData, icon, callback) {
         maintainer = data.manifest.maintainer.replace(/<.*>/, '').trim();
         try {
           // Ensure that special characters are properly encoded
-          maintainer = utf8.decode(maintainer);
+          const decoded = Buffer.from(maintainer, 'latin1').toString('utf8');
+          if (!decoded.includes('\uFFFD')) {
+            maintainer = decoded;
+          }
         }
         catch (e) {
-          if (
-            e.message !== 'Invalid UTF-8 detected' &&
-                e.message !== 'Invalid continuation byte' &&
-                e.message !== 'Invalid byte index'
-          ) {
-            throw e;
-          }
+          // ignore encoding errors, keep original maintainer string
         }
       }
 
@@ -493,13 +521,13 @@ module.exports = function parseClickPackage(filepath, iconOrCallback, callback) 
     let dataFile = null;
     let controlFile = null;
 
-    const archive = new ar.Archive(fs.readFileSync(filepath));
-    archive.getFiles().forEach((file) => {
-      if (file.name() === 'data.tar.gz') {
-        dataFile = file.fileData();
+    const arFiles = parseArArchive(fs.readFileSync(filepath));
+    arFiles.forEach((file) => {
+      if (file.name === 'data.tar.gz') {
+        dataFile = file.fileData;
       }
-      else if (file.name() === 'control.tar.gz') {
-        controlFile = file.fileData();
+      else if (file.name === 'control.tar.gz') {
+        controlFile = file.fileData;
       }
     });
 
