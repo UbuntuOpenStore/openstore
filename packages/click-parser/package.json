@@ -34,12 +34,12 @@
   "dependencies": {
     "ar": "0.0.1",
     "streamifier": "^0.1.1",
-    "tar": "^6.2.0",
-    "tar-stream": "^3.1.6",
+    "tar": "^7.5.13",
+    "tar-stream": "^3.1.8",
     "utf8": "^3.0.0",
-    "uuid": "^9.0.1",
+    "uuid": "^14.0.0",
     "xml2js": "^0.6.2",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "eslint": "^8.57.1",
