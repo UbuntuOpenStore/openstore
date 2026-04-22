@@ -10,6 +10,7 @@ import SvgClose from "../icons/Close";
 import { getClientApiKey } from "@/lib/utils";
 import DeleteApp from "./DeleteApp";
 import SvgExternalLink from "../icons/ExternalLink";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
 
 type ManageAppFormProps = {
   user: UserData;
@@ -24,6 +25,8 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
   const [error, setError] = useState("");
   const [screenshots, setScreenshots] = useState(app.screenshots);
   const [newVersionChangelogs, setNewVersionChangelogs] = useState<Array<{ id: number; version: string; changelog: string }>>([]);
+  const [removedVersions, setRemovedVersions] = useState<Set<string>>(new Set());
+  const [confirmRemoveVersion, setConfirmRemoveVersion] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>();
 
   const addNewVersionChangelog = useCallback(() => {
@@ -33,6 +36,27 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
   const removeVersionChangelog = useCallback((id: number) => {
     setNewVersionChangelogs((prev) => prev.filter((item) => item.id !== id));
   }, []);
+
+  const removeExistingVersionChangelog = useCallback((version: string) => {
+    setRemovedVersions((prev) => new Set([...prev, version]));
+    setConfirmRemoveVersion(null);
+  }, []);
+
+  const handleOpenConfirmRemove = useCallback((version: string) => {
+    setConfirmRemoveVersion(version);
+  }, []);
+
+  const handleCancelConfirmRemove = useCallback(() => {
+    setConfirmRemoveVersion(null);
+  }, []);
+
+  const handleConfirmRemoveDialogOpenChange = useCallback((open: boolean) => {
+    if (!open) setConfirmRemoveVersion(null);
+  }, []);
+
+  const handleConfirmRemove = useCallback(() => {
+    if (confirmRemoveVersion) removeExistingVersionChangelog(confirmRemoveVersion);
+  }, [confirmRemoveVersion, removeExistingVersionChangelog]);
 
   const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -96,6 +120,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         const appData = AppManageSchema.parse((await response.json()).data);
         setScreenshots(appData.screenshots);
         setNewVersionChangelogs([]);
+        setRemovedVersions(new Set());
 
         if (fileRef.current) {
           fileRef.current.value = "";
@@ -119,6 +144,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
   }, []);
 
   return (
+    <>
     <form class="space-y-4" onSubmit={save}>
       <section class="section space-y-4">
         <div class="form-group">
@@ -187,7 +213,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
                       <h4 class="font-bold whitespace-nowrap">New Version</h4>
                       <button
                         type="button"
-                        class="text-sm text-red-600 hover:text-red-800"
+                        class="text-sm text-red-600 hover:text-red-800 cursor-pointer"
                         onClick={() => removeVersionChangelog(entry.id)}
                       >
                         <SvgClose class="w-4 h-4" />
@@ -211,10 +237,19 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
                 </div>
               ))}
 
-              {app.version_changelogs.map((versionChangelog) => (
+              {app.version_changelogs.filter((vc) => !removedVersions.has(vc.version)).map((versionChangelog) => (
                 <div key={versionChangelog.version} class="border-b pb-2 last:border-0 last:pb-0 flex items-start gap-4 mb-2">
-                  <div class="flex items-center gap-2 min-w-[120px]">
-                    <h4 class="font-bold whitespace-nowrap">v{versionChangelog.version}</h4>
+                  <div class="flex flex-col min-w-[120px] gap-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <h4 class="font-bold whitespace-nowrap">v{versionChangelog.version}</h4>
+                      <button
+                        type="button"
+                        class="text-sm text-red-600 hover:text-red-800 cursor-pointer"
+                        onClick={() => handleOpenConfirmRemove(versionChangelog.version)}
+                      >
+                        <SvgClose class="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                   <textarea
                     name={`version_changelogs[${versionChangelog.version}]`}
@@ -468,6 +503,35 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
         <DeleteApp app={app} />
       </section>
     </form>
+
+    <Dialog open={confirmRemoveVersion !== null} onOpenChange={handleConfirmRemoveDialogOpenChange}>
+      <DialogContent class="max-w-md">
+        <DialogHeader>
+          <DialogTitle class="text-red-600">Remove Changelog</DialogTitle>
+        </DialogHeader>
+
+        <div class="py-4">
+          <p>Are you sure you want to remove the changelog for <strong>v{confirmRemoveVersion}</strong>?</p>
+          <p class="text-red-600 mt-2">This will be applied when you save the form.</p>
+        </div>
+
+        <DialogFooter class="flex gap-2">
+          <button
+            class="btn bg-white text-black font-bold cursor-pointer border border-gray-200"
+            onClick={handleCancelConfirmRemove}
+          >
+            Cancel
+          </button>
+          <button
+            class="btn bg-red-600 text-white font-bold cursor-pointer"
+            onClick={handleConfirmRemove}
+          >
+            Remove
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 

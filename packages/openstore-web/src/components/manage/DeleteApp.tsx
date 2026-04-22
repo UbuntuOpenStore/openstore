@@ -60,7 +60,7 @@ const DeleteApp = ({ app }: { app: AppManageData }) => {
       </button>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent class="max-w-md">
           <DialogHeader>
             <DialogTitle class="text-red-600">Delete Application</DialogTitle>
           </DialogHeader>

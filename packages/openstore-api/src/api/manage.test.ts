@@ -981,23 +981,24 @@ describe('Manage', () => {
       assert.equal(updatedPkg.version_changelogs.find(vc => vc.version === '1.0.0')?.changelog, 'Updated initial release notes');
       assert.equal(updatedPkg.version_changelogs.find(vc => vc.version === '1.1.0')?.changelog, 'New version changelog');
 
-      // Test merging behavior by adding a new version without touching existing ones
-      const additionalChangelog = [
-        { version: '1.2.0', changelog: 'Another new version' },
+      // Test replace behavior: sending only a subset removes unlisted versions
+      const reducedChangelogs = [
+        { version: '1.0.0', changelog: 'Kept initial release notes' },
       ];
 
       const res2 = await request(app)
         .put(route)
-        .field('version_changelogs', JSON.stringify(additionalChangelog))
+        .field('version_changelogs', JSON.stringify(reducedChangelogs))
         .expect(200);
 
       assert.ok(res2.body.success);
-      assert.equal(res2.body.data.version_changelogs.length, 3);
+      assert.equal(res2.body.data.version_changelogs.length, 1);
 
-      const mergedPkg = await Package.findById(pkg._id);
-      assert.ok(mergedPkg);
-      assert.ok(mergedPkg.version_changelogs);
-      assert.equal(mergedPkg.version_changelogs.length, 3);
+      const replacedPkg = await Package.findById(pkg._id);
+      assert.ok(replacedPkg);
+      assert.ok(replacedPkg.version_changelogs);
+      assert.equal(replacedPkg.version_changelogs.length, 1);
+      assert.equal(replacedPkg.version_changelogs[0].version, '1.0.0');
     });
   });
 });
