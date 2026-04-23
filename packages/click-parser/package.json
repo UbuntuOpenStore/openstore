@@ -2,10 +2,19 @@
   "name": "click-parser",
   "version": "4.2.6",
   "description": "Extract data from Ubuntu's click packages",
-  "main": "src/index.js",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
   "scripts": {
-    "test": "node --test test/test.js",
-    "lint": "eslint src/*.js test/*.js bin/click-parser"
+    "build": "tsc",
+    "type-check": "tsc --noemit",
+    "test": "node -r ts-node/register --test test/test.ts",
+    "lint": "eslint src/*.ts test/*.ts bin/click-parser"
   },
   "bin": {
     "click-parser": "bin/click-parser"
@@ -36,7 +45,11 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@types/node": "^22.7.0",
+    "@types/xml2js": "^0.4.14",
     "eslint": "^8.57.1",
-    "eslint-config-bhdouglass": "^0.0.9"
+    "eslint-config-bhdouglass": "^0.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

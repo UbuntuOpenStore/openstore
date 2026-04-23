@@ -56,6 +56,15 @@ dpkg-build:
   script:
     - npm run build -w openstore-dpkg
 
+click-parser-check:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run lint -w click-parser
+    - npm run type-check -w click-parser
+    - npm run build -w click-parser
+    - npm run test -w click-parser
+
 deploy:
   stage: deploy
   only:
@@ -67,6 +76,7 @@ deploy:
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
     - VERSION=$(date +"%Y-%m-%d_%H-%M-%S")
     - echo $VERSION
+    - npm run build -w click-parser
     - npm run build -w openstore-api
     - npm run build -w openstore-web
     - tar -czf ../openstore_$VERSION.tar.gz --exclude .npm --exclude docker --exclude .git .

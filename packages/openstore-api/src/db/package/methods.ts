@@ -26,6 +26,7 @@ import { difference, omit } from 'lodash';
 import {
   type PackageModel,
   Architecture,
+  type AppType,
   type BodyUpdate,
   Channel,
   type SerializedRatings,
@@ -140,7 +141,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
   packageSchema.method<HydratedPackage>('updateFromClick', function (data: ClickParserData) {
     const manifest = {
       architecture: data.architecture,
-      changelog: data.changelog,
       description: data.description,
       framework: data.framework,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -199,19 +199,23 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       // Mongo will reject this if there are any `.`s
       manifest.hooks[app.name.replace(/\./g, '__')] = hook;
 
-      qmlImports = qmlImports.concat(app.qmlImports);
+      qmlImports = qmlImports.concat(
+        app.qmlImports.filter(
+          (importData): importData is { module: string; version: string } => !!importData.module && !!importData.version,
+        ),
+      );
     });
 
     this.architecture = data.architecture;
     // this.author = data.maintainer; < No longer updating the author from the click because that can be faked
-    this.id = data.name;
+    this.id = data.name ?? '';
     this.manifest = manifest;
-    this.types = this.type_override ? [this.type_override] : data.types;
+    this.types = this.type_override ? [this.type_override] : (data.types as AppType[]);
     this.languages = data.languages;
     this.qml_imports = qmlImports;
 
     // Don't overwrite the these if they already exists
-    this.name = this.name ? this.name : data.title;
+    this.name = this.name ? this.name : (data.title ?? '');
     this.description = this.description ? this.description : sanitize(data.description);
     this.tagline = this.tagline ? this.tagline : sanitize(data.description);
   });
@@ -829,7 +833,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
   packageSchema.method<HydratedPackage>('createRevisionFromClick', async function (filePath: string, channel: Channel, changelog?: string) {
     const parseData = await clickParser.parseClickPackage(filePath, true);
-    const { version, architecture } = parseData;
+    const { version } = parseData;
+    const architecture = parseData.architecture as Architecture;
     if (!parseData.name || !version || !architecture) {
       throw new UserError(MALFORMED_MANIFEST);
     }
@@ -907,10 +912,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       version,
       channel,
       architecture,
-      parseData.framework,
+      parseData.framework ?? '',
       localFilePath,
       downloadSha512,
-      parseData.installedSize,
+      parseData.installedSize ?? 0,
       downloadSize,
       parseData.permissions,
       readPaths,

@@ -2,7 +2,7 @@
 
 const { parseArgs } = require('node:util');
 
-const parse = require('../src/index');
+const parse = require('../dist/src/index').default;
 
 const { values, positionals } = parseArgs({
   args: process.argv.slice(2),

@@ -33,10 +33,10 @@ Package.find(query).then(async (pkgs) => {
 
           pkg.updateRevision(
             revision.revision,
-            parseData.framework,
+            parseData.framework ?? '',
             revision.download_url,
             downloadSha512,
-            parseData.installedSize,
+            parseData.installedSize ?? 0,
             downloadSize,
             parseData.permissions,
             readPaths,
