@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/theopenstore/openstore-api.git"
+    "url": "https://gitlab.com/theopenstore/openstore.git"
   },
   "author": "Brian Douglass",
   "license": "GPL-3.0",
