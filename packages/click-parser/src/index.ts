@@ -174,20 +174,20 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
 
     // Check per-app hook files — break after the first match across all apps
     for (const app of data.apps) {
-      const scopeIni = `${data.name}_${app.name}.ini`;
+      const scopeIni = `${data.name ?? ''}_${app.name}.ini`;
 
       if (app.hooks.desktop && entry.header.name === `./${app.hooks.desktop}`) {
         handled = true;
         const json = parseIniFile(entry.data);
         app.desktop = (json || {}) as Record<string, string>;
 
-        if (app.desktop.exec && (app.desktop.exec as string).startsWith('webapp-container')) {
+        if (app.desktop.exec?.startsWith('webapp-container')) {
           /*
           Check the arguments to webapp-container, if they contain
           an external url as the main url then assume it's a webapp.
           */
           let url: string | null = null;
-          const exec = (app.desktop.exec as string).replace(/  +/g, ' ').replace('webapp-container', '').trim();
+          const exec = (app.desktop.exec).replace(/  +/g, ' ').replace('webapp-container', '').trim();
           // Match spaces not encased in quotes: http://stackoverflow.com/a/16261693
           const execSplit = exec.match(/(?:[^\s"]+|"[^"]*")+/g);
           if (execSplit) {
@@ -204,44 +204,44 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
         }
 
         if (app.desktop.icon) {
-          data.iconpath = app.desktop.icon as string;
+          data.iconpath = app.desktop.icon;
         }
         break;
       }
 
       if (app.hooks.apparmor && entry.header.name === `./${app.hooks.apparmor}`) {
         handled = true;
-        app.apparmor = (parseJsonFile(entry.data) || {}) as App['apparmor'];
+        app.apparmor = (parseJsonFile(entry.data) ?? {}) as App['apparmor'];
         break;
       }
 
       if (app.hooks['content-hub'] && entry.header.name === `./${app.hooks['content-hub']}`) {
         handled = true;
-        app.contentHub = (parseJsonFile(entry.data) || {}) as Record<string, string[]>;
+        app.contentHub = (parseJsonFile(entry.data) ?? {}) as Record<string, string[]>;
         break;
       }
 
       if (app.hooks.urls && entry.header.name === `./${app.hooks.urls}`) {
         handled = true;
-        app.urlDispatcher = (parseJsonFile(entry.data) as unknown as Array<Record<string, string>>) || [];
+        app.urlDispatcher = (parseJsonFile(entry.data) as unknown as Array<Record<string, string>>) ?? [];
         break;
       }
 
       if (app.hooks['push-helper'] && entry.header.name === `./${app.hooks['push-helper']}`) {
         handled = true;
-        app.pushHelper = (parseJsonFile(entry.data) || {}) as Record<string, string>;
+        app.pushHelper = (parseJsonFile(entry.data) ?? {}) as Record<string, string>;
         break;
       }
 
       if (app.hooks['account-service'] && entry.header.name === `./${app.hooks['account-service']}`) {
         handled = true;
-        app.accountService = (await parseXmlFile(entry.data)) || {};
+        app.accountService = (await parseXmlFile(entry.data)) ?? {};
         break;
       }
 
       if (app.hooks['account-application'] && entry.header.name === `./${app.hooks['account-application']}`) {
         handled = true;
-        app.accountApplication = (await parseXmlFile(entry.data)) || {};
+        app.accountApplication = (await parseXmlFile(entry.data)) ?? {};
         break;
       }
 
@@ -251,7 +251,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
         app.scopeIni = (json || {}) as Record<string, string>;
         if (app.scopeIni.icon) {
           // Assume the icon is relative to the ini file
-          data.iconpath = entry.header.name.replace(scopeIni, app.scopeIni.icon as string).replace('./', '');
+          data.iconpath = entry.header.name.replace(scopeIni, app.scopeIni.icon).replace('./', '');
         }
         break;
       }
@@ -292,7 +292,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
   }
 
   if (icon && data.iconpath) {
-    return extractIcon(fileData, data);
+    return await extractIcon(fileData, data);
   }
 
   return data;
@@ -405,7 +405,7 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
     data.installedSize = parseInt(manifest['installed-size'], 10);
   }
 
-  return parseData(fileData, data, icon);
+  return await parseData(fileData, data, icon);
 }
 
 export default function parseClickPackage(
@@ -497,7 +497,7 @@ export default function parseClickPackage(
       // Deduplicate imports using a Set for O(1) lookups
       const seen = new Set<string>();
       app.qmlImports = app.qmlImports.filter((qmlImport) => {
-        const key = qmlImport.module + qmlImport.version;
+        const key = qmlImport.module + (qmlImport.version ?? '');
         if (seen.has(key)) {
           return false;
         }
@@ -517,11 +517,10 @@ export default function parseClickPackage(
   if (callback) {
     const cb = callback;
     promise.then(
-      (data) => cb(null, data),
-      (err: unknown) => cb(err),
+      (data) => { cb(null, data); },
+      (err: unknown) => { cb(err); },
     );
   }
 
   return promise;
 }
-

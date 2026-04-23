@@ -27,12 +27,14 @@ api-test:
   stage: check
   image: bhdouglass/openstore-ci
   script:
+    - npm run build -w click-parser
     - npm run test:ci -w openstore-api
 
 api-build:
   stage: check
   image: bhdouglass/openstore-ci
   script:
+    - npm run build -w click-parser
     - npm run type-check -w openstore-api
     - npm run build -w openstore-api
 
