@@ -1,10 +1,11 @@
 import crypto from 'node:crypto';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import tarstream from 'tar-stream';
 import xml2js from 'xml2js';
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 
 import { App } from './app';
 import { isJson } from './utils';
@@ -70,124 +71,93 @@ function parseArArchive(buffer: Buffer): ArFile[] {
     return files;
 }
 
-// TODO detect indicators
+async function streamToBuffer(stream: Readable): Promise<Buffer> {
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as string));
+    }
+    return Buffer.concat(chunks);
+}
 
-function extractIcon(fileData: Buffer, data: ParsedData, callback: (err: unknown, data?: ParsedData) => void): void {
-    let iconpath = data.iconpath as string;
-    if (iconpath.indexOf('./') !== 0) {
-        iconpath = `./${data.iconpath}`;
+async function parseJsonFile(stream: Readable): Promise<Record<string, unknown> | undefined> {
+    const str = (await streamToBuffer(stream)).toString();
+    return isJson(str) ? (JSON.parse(str) as Record<string, unknown>) : undefined;
+}
+
+async function parseXmlFile(stream: Readable): Promise<Record<string, unknown> | undefined> {
+    const str = (await streamToBuffer(stream)).toString();
+    try {
+        return (await xml2js.parseStringPromise(str, {
+            explicitArray: false,
+            mergeAttrs: true,
+            normalizeTags: true,
+            normalize: true,
+        })) as Record<string, unknown>;
+    }
+    catch {
+        return undefined;
+    }
+}
+
+async function parseIniFile(stream: Readable): Promise<Record<string, unknown>> {
+    const data: Record<string, unknown> = {};
+    const other: string[] = [];
+
+    for (const line of (await streamToBuffer(stream)).toString().split('\n')) {
+        const lline = line.toLowerCase().trim();
+        if (!(lline[0] === '[' && lline[lline.length - 1] === ']') && lline.length > 0) {
+            const pos = lline.indexOf('=');
+            if (pos > -1) {
+                data[lline.substring(0, pos).trim()] = line.trim().substring(pos + 1).trim();
+            }
+            else {
+                other.push(line);
+            }
+        }
     }
 
-    const write = path.join('/tmp', `${crypto.randomUUID()}${path.extname(data.iconpath as string).toLowerCase()}`);
-    const f = fs.createWriteStream(write)
-        .on('finish', () => {
+    if (other.length > 0) {
+        data.other = other;
+    }
+
+    return data;
+}
+
+// TODO detect indicators
+
+async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedData> {
+    let iconpath = data.iconpath as string;
+    if (!iconpath.startsWith('./')) {
+        iconpath = `./${iconpath}`;
+    }
+
+    const write = path.join('/tmp', `${crypto.randomUUID()}${path.extname(iconpath).toLowerCase()}`);
+
+    try {
+        let iconBuffer: Buffer | null = null;
+        const extract = tarstream.extract();
+
+        extract.on('entry', (header, stream, cb) => {
+            streamToBuffer(stream as unknown as Readable).then((buf) => {
+                if (header.name === iconpath) {
+                    iconBuffer = buf;
+                }
+                cb();
+            }, cb);
+        });
+
+        await pipeline(Readable.from(fileData), zlib.createUnzip(), extract as unknown as NodeJS.WritableStream);
+
+        if (iconBuffer) {
+            await fs.writeFile(write, iconBuffer);
             data.icon = write;
-            callback(null, data);
-        });
-
-    let found = false;
-    const iconExtract = tarstream.extract();
-    iconExtract.on('entry', (header, stream, cb) => {
-        if (header.name === iconpath) {
-            found = true;
-            stream.pipe(f);
-            stream.on('end', cb);
         }
-        else {
-            stream.on('end', cb);
-            stream.resume();
-        }
-    });
-    iconExtract.on('finish', () => {
-        if (!found) {
-            callback(null, data);
-        }
-    });
+    }
+    catch (err) {
+        console.error(err);
+    }
 
-    Readable.from(fileData)
-        .on('error', (err) => {
-            console.error(err);
-            callback(null, data);
-        })
-        .pipe(zlib.createUnzip())
-        .pipe(iconExtract);
-}
-
-function parseJsonFile(stream: NodeJS.ReadableStream, callback: (data?: Record<string, unknown>) => void): void {
-    let data = '';
-    stream.on('data', (fdata: Buffer) => {
-        data += fdata.toString();
-    });
-    stream.on('end', () => {
-        if (isJson(data)) {
-            callback(JSON.parse(data) as Record<string, unknown>);
-        }
-        else {
-            callback();
-        }
-    });
-}
-
-function parseXmlFile(stream: NodeJS.ReadableStream, callback: (data?: Record<string, unknown>) => void): void {
-    let data = '';
-    stream.on('data', (fdata: Buffer) => {
-        data += fdata.toString();
-    });
-    stream.on('end', () => {
-        xml2js.parseString(
-            data,
-            {
-                explicitArray: false,
-                mergeAttrs: true,
-                normalizeTags: true,
-                normalize: true,
-            },
-            (err, result) => {
-                if (err) {
-                    callback();
-                }
-                else {
-                    callback(result as Record<string, unknown>);
-                }
-            }
-        );
-    });
-}
-
-function parseIniFile(stream: NodeJS.ReadableStream, callback: (data: Record<string, unknown>) => void): void {
-    let fileData = '';
-    stream.on('data', (fdata: Buffer) => {
-        fileData += fdata.toString();
-    });
-    stream.on('end', () => {
-        const data: Record<string, unknown> = {};
-        const desktop = fileData.split('\n');
-
-        const other: string[] = [];
-        desktop.forEach((line) => {
-            const lline = line.toLowerCase().trim();
-            if (!(lline[0] === '[' && lline[lline.length - 1] === ']') && lline.length > 0) {
-                const pos = lline.indexOf('=');
-                if (pos > -1) {
-                    const key = lline.substring(0, pos).trim();
-                    const value = line
-                        .trim()
-                        .substring(pos + 1)
-                        .trim();
-                    data[key] = value;
-                }
-                else {
-                    other.push(line);
-                }
-            }
-        });
-
-        if (other.length > 0) {
-            data.other = other;
-        }
-
-        callback(data);
-    });
+    return data;
 }
 
 interface QmlImportResult {
@@ -196,247 +166,193 @@ interface QmlImportResult {
 }
 
 function parseQmlImports(str: string): QmlImportResult[] {
-    const split = str.split('\n');
-    return split.filter((line) => line.trim().startsWith('import ')).map((line) => {
+    return str.split('\n').filter((line) => line.trim().startsWith('import ')).map((line) => {
         const tokens = line.split(' ');
         const module = tokens[1].replace(/"/g, '');
         const isJs = module.endsWith('.js');
-        const version = isJs ? null : tokens[2];
-
-        return {
-            module,
-            version,
-        };
+        return { module, version: isJs ? null : tokens[2] };
     });
 }
 
-function parseData(
-    fileData: Buffer,
-    data: ParsedData,
-    icon: boolean,
-    callback: (err: unknown, data?: ParsedData) => void,
-): void {
+async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Promise<ParsedData> {
     let potentialOgraWebapp = false;
+    const extract = tarstream.extract();
 
-    Readable.from(fileData)
-        .pipe(zlib.createUnzip())
-        .pipe(tarstream.extract())
-        .on('entry', (header: tarstream.Headers, stream: NodeJS.ReadableStream, cb: tarstream.EntryCallback) => {
+    extract.on('entry', (header: tarstream.Headers, stream: NodeJS.ReadableStream, cb: tarstream.EntryCallback) => {
+        (async () => {
             const filename = header.name.replace('./', '');
             if (filename) {
                 data.files.push(filename);
             }
 
-            let found = false;
-            data.apps.forEach((app) => {
+            let handled = false;
+
+            // Check per-app hook files — break after the first match across all apps
+            for (const app of data.apps) {
                 const scopeIni = `${data.name}_${app.name}.ini`;
 
                 if (app.hooks.desktop && header.name === `./${app.hooks.desktop}`) {
-                    found = true;
-                    parseIniFile(stream, (json) => {
-                        app.desktop = (json || {}) as Record<string, string>;
+                    handled = true;
+                    const json = await parseIniFile(stream as unknown as Readable);
+                    app.desktop = (json || {}) as Record<string, string>;
 
-                        if (app.desktop.exec) {
-                            if ((app.desktop.exec as string).indexOf('webapp-container') === 0) {
-                                /*
-                                Check the arguments to webapp-container, if they contain
-                                an external url as the main url the assume it's a webapp.
-                                */
-
-                                let url: string | null = null;
-                                const exec = (app.desktop.exec as string).replace('  ', ' ').replace('webapp-container', '').trim();
-
-                                // Match spaces not encased in quotes: http://stackoverflow.com/a/16261693
-                                const execSplit = exec.match(/(?:[^\s"]+|"[^"]*")+/g);
-                                if (execSplit) {
-                                    execSplit.forEach((value) => {
-                                        if (
-                                            value && (
-                                                value.substring(0, 7) === 'http://' ||
-                                                value.substring(0, 8) === 'https://'
-                                            )
-                                        ) {
-                                            url = value;
-                                        }
-                                    });
-                                }
-
-                                if (url) {
-                                    app.type = 'webapp';
-                                    app.webappUrl = url;
+                    if (app.desktop.exec && (app.desktop.exec as string).startsWith('webapp-container')) {
+                        /*
+                        Check the arguments to webapp-container, if they contain
+                        an external url as the main url then assume it's a webapp.
+                        */
+                        let url: string | null = null;
+                        const exec = (app.desktop.exec as string).replace(/  +/g, ' ').replace('webapp-container', '').trim();
+                        // Match spaces not encased in quotes: http://stackoverflow.com/a/16261693
+                        const execSplit = exec.match(/(?:[^\s"]+|"[^"]*")+/g);
+                        if (execSplit) {
+                            for (const value of execSplit) {
+                                if (value && (value.startsWith('http://') || value.startsWith('https://'))) {
+                                    url = value;
                                 }
                             }
                         }
-
-                        if (app.desktop.icon) {
-                            data.iconpath = app.desktop.icon as string;
+                        if (url) {
+                            app.type = 'webapp';
+                            app.webappUrl = url;
                         }
+                    }
 
-                        cb();
-                    });
+                    if (app.desktop.icon) {
+                        data.iconpath = app.desktop.icon as string;
+                    }
+                    break;
                 }
-                else if (app.hooks.apparmor && header.name === `./${app.hooks.apparmor}`) {
-                    found = true;
-                    parseJsonFile(stream, (json) => {
-                        app.apparmor = (json || {}) as App['apparmor'];
-                        cb();
-                    });
-                }
-                else if (app.hooks['content-hub'] && header.name === `./${app.hooks['content-hub']}`) {
-                    found = true;
-                    parseJsonFile(stream, (json) => {
-                        app.contentHub = (json || {}) as Record<string, string[]>;
-                        cb();
-                    });
-                }
-                else if (app.hooks.urls && header.name === `./${app.hooks.urls}`) {
-                    found = true;
-                    parseJsonFile(stream, (json) => {
-                        app.urlDispatcher = (json as unknown as Array<Record<string, string>>) || [];
-                        cb();
-                    });
-                }
-                else if (app.hooks['push-helper'] && header.name === `./${app.hooks['push-helper']}`) {
-                    found = true;
-                    parseJsonFile(stream, (json) => {
-                        app.pushHelper = (json || {}) as Record<string, string>;
-                        cb();
-                    });
-                }
-                else if (app.hooks['account-service'] && header.name === `./${app.hooks['account-service']}`) {
-                    found = true;
-                    parseXmlFile(stream, (json) => {
-                        app.accountService = json || {};
-                        cb();
-                    });
-                }
-                else if (app.hooks['account-application'] && header.name === `./${app.hooks['account-application']}`) {
-                    found = true;
-                    parseXmlFile(stream, (json) => {
-                        app.accountApplication = json || {};
-                        cb();
-                    });
-                }
-                else if (app.type === 'scope' && header.name.indexOf(scopeIni, header.name.length - scopeIni.length) !== -1) {
-                    found = true;
-                    parseIniFile(stream, (json) => {
-                        app.scopeIni = (json || {}) as Record<string, string>;
 
-                        if (app.scopeIni.icon) {
-                            // Assume the icon is relative to the ini file
-                            data.iconpath = header.name.replace(scopeIni, app.scopeIni.icon as string).replace('./', '');
+                if (app.hooks.apparmor && header.name === `./${app.hooks.apparmor}`) {
+                    handled = true;
+                    app.apparmor = ((await parseJsonFile(stream as unknown as Readable)) || {}) as App['apparmor'];
+                    break;
+                }
+
+                if (app.hooks['content-hub'] && header.name === `./${app.hooks['content-hub']}`) {
+                    handled = true;
+                    app.contentHub = ((await parseJsonFile(stream as unknown as Readable)) || {}) as Record<string, string[]>;
+                    break;
+                }
+
+                if (app.hooks.urls && header.name === `./${app.hooks.urls}`) {
+                    handled = true;
+                    app.urlDispatcher = ((await parseJsonFile(stream as unknown as Readable)) as unknown as Array<Record<string, string>>) || [];
+                    break;
+                }
+
+                if (app.hooks['push-helper'] && header.name === `./${app.hooks['push-helper']}`) {
+                    handled = true;
+                    app.pushHelper = ((await parseJsonFile(stream as unknown as Readable)) || {}) as Record<string, string>;
+                    break;
+                }
+
+                if (app.hooks['account-service'] && header.name === `./${app.hooks['account-service']}`) {
+                    handled = true;
+                    app.accountService = (await parseXmlFile(stream as unknown as Readable)) || {};
+                    break;
+                }
+
+                if (app.hooks['account-application'] && header.name === `./${app.hooks['account-application']}`) {
+                    handled = true;
+                    app.accountApplication = (await parseXmlFile(stream as unknown as Readable)) || {};
+                    break;
+                }
+
+                if (app.type === 'scope' && header.name.endsWith(scopeIni)) {
+                    handled = true;
+                    const json = await parseIniFile(stream as unknown as Readable);
+                    app.scopeIni = (json || {}) as Record<string, string>;
+                    if (app.scopeIni.icon) {
+                        // Assume the icon is relative to the ini file
+                        data.iconpath = header.name.replace(scopeIni, app.scopeIni.icon as string).replace('./', '');
+                    }
+                    break;
+                }
+            }
+
+            // Global file handlers — stream is read once; relevant data applied to all matching apps
+            if (!handled) {
+                if (header.name === './webapp-properties.json') {
+                    const str = (await streamToBuffer(stream as unknown as Readable)).toString();
+                    if (isJson(str)) {
+                        const webappProperties = JSON.parse(str) as Record<string, unknown>;
+                        data.webappProperties = webappProperties;
+                        if (Array.isArray(webappProperties.scripts) && webappProperties.scripts.length > 0) {
+                            data.webappInject = true;
                         }
-
-                        cb();
-                    });
+                    }
                 }
-                else if ((app.type === 'app' || app.type === 'webapp+') && header.name === './config.js') {
+                else if (header.name === './config.js') {
                     /*
-                      Detect the Ogra's alternate webapp container.
-                      Detect both the presence of a config.js file and
-                      Main.qml file with certain parameters.
-                      */
-
-                    stream.on('data', (fdata: Buffer) => {
-                        const str = fdata.toString();
-
-                        if (
-                            str.indexOf('var webappName') >= 0 &&
-                            str.indexOf('var webappUrl') >= 0 &&
-                            str.indexOf('var webappUrlPattern') >= 0
-                        ) {
-                            if (potentialOgraWebapp) {
-                                app.type = 'webapp+';
-                            }
-                            else {
-                                potentialOgraWebapp = true;
+                    Detect Ogra's alternate webapp container.
+                    config.js contains webapp config vars; paired with qml/Main.qml WebView → webapp+.
+                    */
+                    const str = (await streamToBuffer(stream as unknown as Readable)).toString();
+                    if (str.includes('var webappName') && str.includes('var webappUrl') && str.includes('var webappUrlPattern')) {
+                        for (const app of data.apps) {
+                            if (app.type === 'app' || app.type === 'webapp+') {
+                                if (potentialOgraWebapp) {
+                                    app.type = 'webapp+';
+                                }
+                                else {
+                                    potentialOgraWebapp = true;
+                                }
+                                break;
                             }
                         }
-
-                        cb();
-                    });
-                }
-                else if ((app.type === 'app' || app.type === 'webapp+') && header.name === './qml/Main.qml') {
-                    // Detect the Ogra's alternate webapp container http://bazaar.launchpad.net/~ogra/alternate-webapp-container/trunk/files
-
-                    stream.on('data', (fdata: Buffer) => {
-                        const str = fdata.toString();
-
-                        if (str.indexOf('WebView') >= 0 || str.indexOf('WebEngineView') >= 0) {
-                            if (potentialOgraWebapp) {
-                                app.type = 'webapp+';
-                            }
-                            else {
-                                potentialOgraWebapp = true;
-                            }
-                        }
-
-                        app.qmlImports = app.qmlImports.concat(parseQmlImports(str));
-
-                        cb();
-                    });
+                    }
                 }
                 else if (header.name.endsWith('.qml')) {
-                    stream.on('data', (fdata: Buffer) => {
-                        const str = fdata.toString();
-                        app.qmlImports = app.qmlImports.concat(parseQmlImports(str));
+                    /*
+                    Collect QML imports from all .qml files across all apps.
+                    For qml/Main.qml, also apply Ogra webapp WebView detection.
+                    */
+                    const str = (await streamToBuffer(stream as unknown as Readable)).toString();
+                    const imports = parseQmlImports(str);
+                    const isMainQml = header.name === './qml/Main.qml';
 
-                        cb();
-                    });
-                }
-            });
-
-            if (!found) {
-                if (header.name === './webapp-properties.json') {
-                    stream.on('data', (fdata: Buffer) => {
-                        let webappProperties: string | Record<string, unknown> = fdata.toString();
-                        if (isJson(webappProperties)) {
-                            webappProperties = JSON.parse(webappProperties) as Record<string, unknown>;
-                            data.webappProperties = webappProperties;
-                            if (
-                                (webappProperties.scripts as unknown[]) &&
-                                (webappProperties.scripts as unknown[]).length > 0
-                            ) {
-                                data.webappInject = true;
+                    for (const app of data.apps) {
+                        if (isMainQml && (app.type === 'app' || app.type === 'webapp+')) {
+                            // Detect the Ogra's alternate webapp container http://bazaar.launchpad.net/~ogra/alternate-webapp-container/trunk/files
+                            if (str.includes('WebView') || str.includes('WebEngineView')) {
+                                if (potentialOgraWebapp) {
+                                    app.type = 'webapp+';
+                                }
+                                else {
+                                    potentialOgraWebapp = true;
+                                }
                             }
                         }
-
-                        cb();
-                    });
+                        app.qmlImports = app.qmlImports.concat(imports);
+                    }
                 }
-                else if (header.name.indexOf('LC_MESSAGES') >= 0 && header.name.indexOf('.mo') >= 0) {
+                else if (header.name.includes('LC_MESSAGES') && header.name.includes('.mo')) {
                     const langs = header.name.split('/');
                     const pos = langs.indexOf('LC_MESSAGES');
-                    let lang: string | null = null;
                     if (pos >= 1) {
-                        lang = langs[pos - 1].trim();
+                        const lang = langs[pos - 1].trim();
+                        if (lang && !data.languages.includes(lang)) {
+                            data.languages.push(lang);
+                        }
                     }
-
-                    if (lang && data.languages.indexOf(lang) === -1) {
-                        data.languages.push(lang);
-                    }
-
-                    cb();
+                    await streamToBuffer(stream as unknown as Readable); // drain
                 }
                 else {
-                    cb();
+                    await streamToBuffer(stream as unknown as Readable); // drain
                 }
             }
+        })().then(() => cb(), cb);
+    });
 
-            stream.resume();
-        })
-        .on('error', (err) => {
-            console.error(err);
-            callback(err);
-        })
-        .on('finish', () => {
-            if (icon && data.iconpath) {
-                extractIcon(fileData, data, callback);
-            }
-            else {
-                callback(null, data);
-            }
-        });
+    await pipeline(Readable.from(fileData), zlib.createUnzip(), extract as unknown as NodeJS.WritableStream);
+
+    if (icon && data.iconpath) {
+        return extractIcon(fileData, data);
+    }
+
+    return data;
 }
 
 interface Manifest {
@@ -452,12 +368,7 @@ interface Manifest {
     [key: string]: unknown;
 }
 
-function parseControl(
-    control: Buffer,
-    fileData: Buffer,
-    icon: boolean,
-    callback: (err: unknown, data?: ParsedData) => void,
-): void {
+async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): Promise<ParsedData> {
     const data: ParsedData & { manifest?: Manifest } = {
         apps: [],
         architecture: 'all',
@@ -480,100 +391,85 @@ function parseControl(
         files: [],
     };
 
-    Readable.from(control)
-        .pipe(zlib.createUnzip())
-        .pipe(tarstream.extract())
-        .on('entry', (header: tarstream.Headers, stream: NodeJS.ReadableStream, cb: tarstream.EntryCallback) => {
+    const extract = tarstream.extract();
+
+    extract.on('entry', (header: tarstream.Headers, stream: NodeJS.ReadableStream, cb: tarstream.EntryCallback) => {
+        (async () => {
             if (header.name === './manifest') {
-                let manifest = '';
-                stream.on('data', (fdata: Buffer) => {
-                    manifest += fdata.toString();
-                });
+                const manifestStr = (await streamToBuffer(stream as unknown as Readable)).toString();
 
-                stream.on('end', () => {
-                    if (isJson(manifest)) {
-                        data.manifest = JSON.parse(manifest) as Manifest;
+                if (!isJson(manifestStr)) {
+                    throw new Error('Manifest file is not in a json format');
+                }
 
-                        if (!data.manifest.hooks || Object.keys(data.manifest.hooks).length === 0) {
-                            cb(new Error('Manifest file does not have any hooks in it'));
-                        }
-                        else {
-                            Object.keys(data.manifest.hooks).forEach((name) => {
-                                const hook = (data.manifest as Manifest).hooks![name];
-                                const app = new App(name, hook);
+                data.manifest = JSON.parse(manifestStr) as Manifest;
 
-                                if (hook.desktop) {
-                                    app.type = 'app';
-                                }
-                                else if (hook.scope) {
-                                    app.type = 'scope';
-                                }
-                                else if (hook['push-helper']) {
-                                    app.type = 'push';
-                                }
+                if (!data.manifest.hooks || Object.keys(data.manifest.hooks).length === 0) {
+                    throw new Error('Manifest file does not have any hooks in it');
+                }
 
-                                data.apps.push(app);
-                            });
-
-                            cb();
-                        }
+                for (const [name, hook] of Object.entries(data.manifest.hooks)) {
+                    const app = new App(name, hook);
+                    if (hook.desktop) {
+                        app.type = 'app';
                     }
-                    else {
-                        cb(new Error('Manifest file is not in a json format'));
+                    else if (hook.scope) {
+                        app.type = 'scope';
                     }
-                });
+                    else if (hook['push-helper']) {
+                        app.type = 'push';
+                    }
+                    data.apps.push(app);
+                }
             }
             else {
-                cb();
+                await streamToBuffer(stream as unknown as Readable); // drain
             }
+        })().then(() => cb(), cb);
+    });
 
-            stream.resume();
-        })
-        .on('error', (err: Error) => {
-            callback(err);
-        })
-        .on('finish', () => {
-            const manifest = data.manifest as Manifest;
+    await pipeline(Readable.from(control), zlib.createUnzip(), extract as unknown as NodeJS.WritableStream);
 
-            let maintainerEmail = '';
-            let maintainer = '';
-            if (manifest.maintainer) {
-                const match = manifest.maintainer.match(/<.*>/);
-                if (match && match.length === 1) {
-                    maintainerEmail = match[0].replace('<', '').replace('>', '').trim();
-                }
+    const manifest = data.manifest as Manifest;
 
-                maintainer = manifest.maintainer.replace(/<.*>/, '').trim();
-                try {
-                    // Ensure that special characters are properly encoded
-                    const decoded = Buffer.from(maintainer, 'latin1').toString('utf8');
-                    if (!decoded.includes('\uFFFD')) {
-                        maintainer = decoded;
-                    }
-                }
-                catch (e) {
-                    // ignore encoding errors, keep original maintainer string
-                }
+    let maintainerEmail = '';
+    let maintainer = '';
+    if (manifest.maintainer) {
+        const match = manifest.maintainer.match(/<.*>/);
+        if (match && match.length === 1) {
+            maintainerEmail = match[0].replace('<', '').replace('>', '').trim();
+        }
+
+        maintainer = manifest.maintainer.replace(/<.*>/, '').trim();
+        try {
+            // Ensure that special characters are properly encoded
+            const decoded = Buffer.from(maintainer, 'latin1').toString('utf8');
+            if (!decoded.includes('\uFFFD')) {
+                maintainer = decoded;
             }
+        }
+        catch {
+            // ignore encoding errors, keep original maintainer string
+        }
+    }
 
-            if (manifest.architecture) {
-                data.architecture = manifest.architecture;
-            }
+    if (manifest.architecture) {
+        data.architecture = manifest.architecture;
+    }
 
-            data.description = manifest.description ?? '';
-            data.framework = manifest.framework ?? null;
-            data.maintainer = maintainer;
-            data.maintainerEmail = maintainerEmail;
-            data.name = manifest.name ?? null;
-            data.title = manifest.title ?? null;
-            data.version = manifest.version ?? null;
+    data.description = manifest.description ?? '';
+    data.framework = manifest.framework ?? null;
+    data.maintainer = maintainer;
+    data.maintainerEmail = maintainerEmail;
+    data.name = manifest.name ?? null;
+    data.title = manifest.title ?? null;
+    data.version = manifest.version ?? null;
 
-            if (manifest['installed-size']) {
-                data.installedSize = parseInt(manifest['installed-size'], 10);
-            }
+    if (manifest['installed-size']) {
+        data.installedSize = parseInt(manifest['installed-size'], 10);
+    }
 
-            parseData(fileData, data, icon, callback);
-        });
+    return parseData(fileData, data, icon);
 }
 
 export default function parseClickPackage(
@@ -581,127 +477,115 @@ export default function parseClickPackage(
     iconOrCallback: boolean | ((err: unknown, data?: ParsedData) => void) = false,
     callback?: (err: unknown, data?: ParsedData) => void,
 ): Promise<ParsedData> {
-    return new Promise((resolve, reject) => {
-        let icon: boolean = iconOrCallback as boolean;
-        if (typeof iconOrCallback === 'function' && !callback) {
-            callback = iconOrCallback;
-            icon = false;
-        }
+    let icon: boolean = iconOrCallback as boolean;
+    if (typeof iconOrCallback === 'function' && !callback) {
+        callback = iconOrCallback;
+        icon = false;
+    }
+
+    const promise = (async () => {
+        const fileBuffer = await fs.readFile(filepath);
+        const arFiles = parseArArchive(fileBuffer);
 
         let dataFile: Buffer | null = null;
         let controlFile: Buffer | null = null;
 
-        const arFiles = parseArArchive(fs.readFileSync(filepath));
-        arFiles.forEach((file) => {
+        for (const file of arFiles) {
             if (file.name === 'data.tar.gz') {
                 dataFile = file.fileData;
             }
             else if (file.name === 'control.tar.gz') {
                 controlFile = file.fileData;
             }
-        });
+        }
 
         if (dataFile === null || controlFile === null) {
-            const err = new Error('Malformed click package');
-            reject(err);
-            if (callback) {
-                callback(err);
-            }
+            throw new Error('Malformed click package');
         }
-        else {
-            parseControl(controlFile, dataFile, icon, (err, data) => {
-                if (err) {
-                    reject(err);
-                    if (callback) {
-                        callback(err);
+
+        const data = await parseControl(controlFile, dataFile, icon);
+
+        for (const app of data.apps) {
+            if (!data.types.includes(app.type)) {
+                data.types.push(app.type);
+            }
+
+            if (Object.keys(app.contentHub).length > 0) {
+                app.features.push('content_hub');
+            }
+
+            if (Object.keys(app.urlDispatcher).length > 0) {
+                app.features.push('url_dispatcher');
+            }
+
+            if (Object.keys(app.pushHelper).length > 0) {
+                app.features.push('push_helper');
+            }
+
+            if (Object.keys(app.accountService).length > 0) {
+                app.features.push('account_service');
+            }
+
+            if (app.type === 'webapp') {
+                app.webappProperties = data.webappProperties;
+                app.webappInject = data.webappInject;
+            }
+
+            const apparmor = app.apparmor as { policy_groups?: string[]; template?: string };
+            if (apparmor?.policy_groups) {
+                for (const permission of apparmor.policy_groups) {
+                    if (!data.permissions.includes(permission)) {
+                        data.permissions.push(permission);
                     }
                 }
-                else if (!data) {
-                    const noDataErr = new Error('Control data is undefined');
-                    reject(noDataErr);
-                    if (callback) {
-                        callback(noDataErr);
+            }
+
+            if (apparmor?.template === 'unconfined') {
+                data.permissions.push('unconfined');
+            }
+
+            if (app.urlDispatcher && Array.isArray(app.urlDispatcher)) {
+                for (const ud of app.urlDispatcher as Array<{ protocol?: string; 'domain-suffix'?: string }>) {
+                    if (ud.protocol) {
+                        let url = `${ud.protocol}://`;
+                        if (ud['domain-suffix']) {
+                            url += ud['domain-suffix'];
+                        }
+                        if (!data.urls.includes(url)) {
+                            data.urls.push(url);
+                        }
                     }
                 }
-                else {
-                    data.apps.forEach((app) => {
-                        if (data.types.indexOf(app.type) === -1) {
-                            data.types.push(app.type);
-                        }
+            }
 
-                        if (Object.keys(app.contentHub).length > 0) {
-                            app.features.push('content_hub');
-                        }
-
-                        if (Object.keys(app.urlDispatcher).length > 0) {
-                            app.features.push('url_dispatcher');
-                        }
-
-                        if (Object.keys(app.pushHelper).length > 0) {
-                            app.features.push('push_helper');
-                        }
-
-                        if (Object.keys(app.accountService).length > 0) {
-                            app.features.push('account_service');
-                        }
-
-                        if (app.type === 'webapp') {
-                            app.webappProperties = data.webappProperties;
-                            app.webappInject = data.webappInject;
-                        }
-
-                        const apparmor = app.apparmor as { policy_groups?: string[]; template?: string };
-                        if (apparmor && apparmor.policy_groups) {
-                            data.permissions = data.permissions.concat(apparmor.policy_groups.filter((permission) => {
-                                return data.permissions.indexOf(permission) < 0;
-                            }));
-                        }
-
-                        if (apparmor && apparmor.template === 'unconfined') {
-                            data.permissions.push('unconfined');
-                        }
-
-                        if (app.urlDispatcher && Array.isArray(app.urlDispatcher)) {
-                            (app.urlDispatcher as Array<{ protocol?: string; 'domain-suffix'?: string }>).forEach((ud) => {
-                                let url = '';
-                                if (ud.protocol) {
-                                    url = `${ud.protocol}://`;
-                                    if (ud['domain-suffix']) {
-                                        url += ud['domain-suffix'];
-                                    }
-
-                                    if (data.urls.indexOf(url) === -1) {
-                                        data.urls.push(url);
-                                    }
-                                }
-                            });
-                        }
-
-                        // Deduplicate imports
-                        const qmlImportMatch: string[] = [];
-                        const qmlImports = app.qmlImports.filter((qmlImport) => {
-                            const key = qmlImport.module + qmlImport.version;
-                            if (!qmlImportMatch.includes(key)) {
-                                qmlImportMatch.push(key);
-                                return true;
-                            }
-                            return false;
-                        });
-
-                        app.qmlImports = qmlImports;
-                    });
-
-                    delete data.iconpath;
-                    delete data.manifest;
-                    delete (data as Partial<ParsedData>).webappInject;
-                    delete (data as Partial<ParsedData>).webappProperties;
-
-                    resolve(data);
-                    if (callback) {
-                        callback(null, data);
-                    }
+            // Deduplicate imports using a Set for O(1) lookups
+            const seen = new Set<string>();
+            app.qmlImports = app.qmlImports.filter((qmlImport) => {
+                const key = qmlImport.module + qmlImport.version;
+                if (seen.has(key)) {
+                    return false;
                 }
+                seen.add(key);
+                return true;
             });
         }
-    });
+
+        delete data.iconpath;
+        delete data.manifest;
+        delete (data as Partial<ParsedData>).webappInject;
+        delete (data as Partial<ParsedData>).webappProperties;
+
+        return data;
+    })();
+
+    if (callback) {
+        const cb = callback;
+        promise.then(
+            (data) => cb(null, data),
+            (err: unknown) => cb(err),
+        );
+    }
+
+    return promise;
 }
+
