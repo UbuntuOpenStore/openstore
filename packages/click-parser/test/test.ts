@@ -185,10 +185,4 @@ describe('click-parser', () => {
         });
     });
 
-    test('parse ogra webapp click package', async () => {
-        const data = await parse(path.join(__dirname, '/test-ogra.bhdouglass_0.1_all.click'));
-
-        assert.equal(data.apps.length, 1);
-        assert.equal(data.apps[0].type, 'webapp+');
-    });
 });

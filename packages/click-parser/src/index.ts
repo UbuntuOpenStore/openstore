@@ -175,7 +175,6 @@ function parseQmlImports(str: string): QmlImportResult[] {
 }
 
 async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Promise<ParsedData> {
-    let potentialOgraWebapp = false;
     const extract = tarstream.extract();
 
     extract.on('entry', (header: tarstream.Headers, stream: NodeJS.ReadableStream, cb: tarstream.EntryCallback) => {
@@ -284,47 +283,12 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
                         }
                     }
                 }
-                else if (header.name === './config.js') {
-                    /*
-                    Detect Ogra's alternate webapp container.
-                    config.js contains webapp config vars; paired with qml/Main.qml WebView → webapp+.
-                    */
-                    const str = (await streamToBuffer(stream as unknown as Readable)).toString();
-                    if (str.includes('var webappName') && str.includes('var webappUrl') && str.includes('var webappUrlPattern')) {
-                        for (const app of data.apps) {
-                            if (app.type === 'app' || app.type === 'webapp+') {
-                                if (potentialOgraWebapp) {
-                                    app.type = 'webapp+';
-                                }
-                                else {
-                                    potentialOgraWebapp = true;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
                 else if (header.name.endsWith('.qml')) {
-                    /*
-                    Collect QML imports from all .qml files across all apps.
-                    For qml/Main.qml, also apply Ogra webapp WebView detection.
-                    */
+                    // Collect QML imports from all .qml files across all apps.
                     const str = (await streamToBuffer(stream as unknown as Readable)).toString();
                     const imports = parseQmlImports(str);
-                    const isMainQml = header.name === './qml/Main.qml';
 
                     for (const app of data.apps) {
-                        if (isMainQml && (app.type === 'app' || app.type === 'webapp+')) {
-                            // Detect the Ogra's alternate webapp container http://bazaar.launchpad.net/~ogra/alternate-webapp-container/trunk/files
-                            if (str.includes('WebView') || str.includes('WebEngineView')) {
-                                if (potentialOgraWebapp) {
-                                    app.type = 'webapp+';
-                                }
-                                else {
-                                    potentialOgraWebapp = true;
-                                }
-                            }
-                        }
                         app.qmlImports = app.qmlImports.concat(imports);
                     }
                 }
