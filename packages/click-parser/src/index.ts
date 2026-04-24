@@ -2,130 +2,56 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createGzipDecoder, unpackTar } from 'modern-tar';
-import xml2js from 'xml2js';
 
 import { App } from './app';
-import { isJson } from './utils';
+import type { QmlImport } from './app';
+import { bufferToWebReadableStream, isJson, parseArArchive, parseIniFile, parseJsonFile, parseXmlFile } from './utils';
 
 export { App } from './app';
 export type { QmlImport, Apparmor, Hooks } from './app';
 
-interface ArFile {
-  name: string;
-  fileData: Buffer;
+interface Manifest {
+  hooks?: Record<string, Record<string, string>>;
+  maintainer?: string;
+  architecture?: string;
+  description?: string;
+  framework?: string;
+  name?: string;
+  title?: string;
+  version?: string;
+  'installed-size'?: string;
+  [key: string]: unknown;
 }
 
 export interface ParsedData {
   apps: App[];
   architecture: string;
   description: string;
-  framework: string | null;
-  icon: string | null;
-  iconpath?: string | null;
-  maintainer: string | null;
-  maintainerEmail: string | null;
-  name: string | null;
+  framework?: string;
+  icon?: string;
+  iconpath?: string;
+  maintainer?: string;
+  maintainerEmail?: string;
+  name?: string;
   permissions: string[];
-  title: string | null;
+  title?: string;
   types: string[];
   urls: string[];
-  version: string | null;
-  installedSize: number | null;
+  version?: string;
+  installedSize?: number;
   webappInject: boolean;
   webappProperties: Record<string, unknown>;
   languages: string[];
   files: string[];
-  manifest?: Record<string, unknown>;
-}
-
-function parseArArchive(buffer: Buffer): ArFile[] {
-  const MAGIC = '!<arch>\n';
-  if (buffer.slice(0, 8).toString('ascii') !== MAGIC) {
-    throw new Error('Not a valid AR archive');
-  }
-
-  const files: ArFile[] = [];
-  let offset = 8;
-  while (offset < buffer.length) {
-    if (offset + 60 > buffer.length) {
-      break;
-    }
-
-    const name = buffer.slice(offset, offset + 16).toString('ascii').trimEnd();
-    const size = parseInt(buffer.slice(offset + 48, offset + 58).toString('ascii').trim(), 10);
-    offset += 60;
-
-    const fileData = buffer.slice(offset, offset + size);
-    offset += size;
-
-    if (size % 2 !== 0) {
-      offset += 1; // pad to even byte boundary
-    }
-
-    files.push({ name, fileData });
-  }
-
-  return files;
-}
-
-function bufferToWebReadableStream(buffer: Buffer): ReadableStream<Uint8Array> {
-  return new ReadableStream({
-    start(controller) {
-      controller.enqueue(buffer);
-      controller.close();
-    },
-  });
-}
-
-function parseJsonFile(data: Uint8Array | undefined): Record<string, unknown> | undefined {
-  if (!data) { return undefined; }
-  const str = Buffer.from(data).toString();
-  return isJson(str) ? (JSON.parse(str) as Record<string, unknown>) : undefined;
-}
-
-async function parseXmlFile(data: Uint8Array | undefined): Promise<Record<string, unknown> | undefined> {
-  if (!data) { return undefined; }
-  const str = Buffer.from(data).toString();
-  try {
-    return (await xml2js.parseStringPromise(str, {
-      explicitArray: false,
-      mergeAttrs: true,
-      normalizeTags: true,
-      normalize: true,
-    })) as Record<string, unknown>;
-  }
-  catch {
-    return undefined;
-  }
-}
-
-function parseIniFile(data: Uint8Array | undefined): Record<string, unknown> {
-  if (!data) { return {}; }
-  const result: Record<string, unknown> = {};
-  const other: string[] = [];
-
-  for (const line of Buffer.from(data).toString().split('\n')) {
-    const lline = line.toLowerCase().trim();
-    if (!(lline[0] === '[' && lline[lline.length - 1] === ']') && lline.length > 0) {
-      const pos = lline.indexOf('=');
-      if (pos > -1) {
-        result[lline.substring(0, pos).trim()] = line.trim().substring(pos + 1).trim();
-      }
-      else {
-        other.push(line);
-      }
-    }
-  }
-
-  if (other.length > 0) {
-    result.other = other;
-  }
-
-  return result;
+  manifest?: Manifest;
 }
 
 async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedData> {
-  let iconpath = data.iconpath as string;
+  if (!data.iconpath) {
+    return data;
+  }
+
+  let iconpath = data.iconpath;
   if (!iconpath.startsWith('./')) {
     iconpath = `./${iconpath}`;
   }
@@ -147,22 +73,18 @@ async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedDa
   return data;
 }
 
-interface QmlImportResult {
-  module: string;
-  version: string | null;
-}
-
-function parseQmlImports(str: string): QmlImportResult[] {
+function parseQmlImports(str: string): QmlImport[] {
   return str.split('\n').filter((line) => line.trim().startsWith('import ')).map((line) => {
     const tokens = line.split(' ');
     const module = tokens[1].replace(/"/g, '');
     const isJs = module.endsWith('.js');
-    return { module, version: isJs ? null : tokens[2] };
+    return { module, version: isJs ? undefined : tokens[2] };
   });
 }
 
 async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Promise<ParsedData> {
   const entries = await unpackTar(bufferToWebReadableStream(fileData).pipeThrough(createGzipDecoder()));
+  const languagesSet = new Set<string>(data.languages);
 
   for (const entry of entries) {
     const filename = entry.header.name.replace('./', '');
@@ -174,12 +96,10 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
 
     // Check per-app hook files — break after the first match across all apps
     for (const app of data.apps) {
-      const scopeIni = `${data.name ?? ''}_${app.name}.ini`;
-
       if (app.hooks.desktop && entry.header.name === `./${app.hooks.desktop}`) {
         handled = true;
         const json = parseIniFile(entry.data);
-        app.desktop = (json || {}) as Record<string, string>;
+        app.desktop = (json ?? {}) as Record<string, string>;
 
         if (app.desktop.exec?.startsWith('webapp-container')) {
           /*
@@ -187,7 +107,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
           an external url as the main url then assume it's a webapp.
           */
           let url: string | null = null;
-          const exec = (app.desktop.exec).replace(/  +/g, ' ').replace('webapp-container', '').trim();
+          const exec = app.desktop.exec.replace(/  +/g, ' ').replace('webapp-container', '').trim();
           // Match spaces not encased in quotes: http://stackoverflow.com/a/16261693
           const execSplit = exec.match(/(?:[^\s"]+|"[^"]*")+/g);
           if (execSplit) {
@@ -206,6 +126,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
         if (app.desktop.icon) {
           data.iconpath = app.desktop.icon;
         }
+
         break;
       }
 
@@ -223,7 +144,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
 
       if (app.hooks.urls && entry.header.name === `./${app.hooks.urls}`) {
         handled = true;
-        app.urlDispatcher = (parseJsonFile(entry.data) as unknown as Array<Record<string, string>>) ?? [];
+        app.urlDispatcher = (parseJsonFile(entry.data) as Array<Record<string, string>>) ?? [];
         break;
       }
 
@@ -242,17 +163,6 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
       if (app.hooks['account-application'] && entry.header.name === `./${app.hooks['account-application']}`) {
         handled = true;
         app.accountApplication = (await parseXmlFile(entry.data)) ?? {};
-        break;
-      }
-
-      if (app.type === 'scope' && entry.header.name.endsWith(scopeIni)) {
-        handled = true;
-        const json = parseIniFile(entry.data);
-        app.scopeIni = (json || {}) as Record<string, string>;
-        if (app.scopeIni.icon) {
-          // Assume the icon is relative to the ini file
-          data.iconpath = entry.header.name.replace(scopeIni, app.scopeIni.icon).replace('./', '');
-        }
         break;
       }
     }
@@ -283,13 +193,15 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
         const pos = langs.indexOf('LC_MESSAGES');
         if (pos >= 1) {
           const lang = langs[pos - 1].trim();
-          if (lang && !data.languages.includes(lang)) {
-            data.languages.push(lang);
+          if (lang) {
+            languagesSet.add(lang);
           }
         }
       }
     }
   }
+
+  data.languages = Array.from(languagesSet);
 
   if (icon && data.iconpath) {
     return await extractIcon(fileData, data);
@@ -298,36 +210,23 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
   return data;
 }
 
-interface Manifest {
-  hooks?: Record<string, Record<string, string>>;
-  maintainer?: string;
-  architecture?: string;
-  description?: string;
-  framework?: string;
-  name?: string;
-  title?: string;
-  version?: string;
-  'installed-size'?: string;
-  [key: string]: unknown;
-}
-
 async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): Promise<ParsedData> {
-  const data: ParsedData & { manifest?: Manifest } = {
+  const data: ParsedData = {
     apps: [],
     architecture: 'all',
     description: '',
-    framework: null,
-    icon: null,
-    iconpath: null,
-    maintainer: null,
-    maintainerEmail: null,
-    name: null,
+    framework: undefined,
+    icon: undefined,
+    iconpath: undefined,
+    maintainer: undefined,
+    maintainerEmail: undefined,
+    name: undefined,
     permissions: [],
-    title: null,
+    title: undefined,
     types: [],
     urls: [],
-    version: null,
-    installedSize: null,
+    version: undefined,
+    installedSize: undefined,
     webappInject: false,
     webappProperties: {},
     languages: [],
@@ -344,6 +243,7 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
         throw new Error('Manifest file is not in a json format');
       }
 
+      // TODO replace this with zod parsing
       data.manifest = JSON.parse(manifestStr) as Manifest;
 
       if (!data.manifest.hooks || Object.keys(data.manifest.hooks).length === 0) {
@@ -352,15 +252,6 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
 
       for (const [name, hook] of Object.entries(data.manifest.hooks)) {
         const app = new App(name, hook);
-        if (hook.desktop) {
-          app.type = 'app';
-        }
-        else if (hook.scope) {
-          app.type = 'scope';
-        }
-        else if (hook['push-helper']) {
-          app.type = 'push';
-        }
         data.apps.push(app);
       }
     }
@@ -394,12 +285,12 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
   }
 
   data.description = manifest.description ?? '';
-  data.framework = manifest.framework ?? null;
+  data.framework = manifest.framework;
   data.maintainer = maintainer;
   data.maintainerEmail = maintainerEmail;
-  data.name = manifest.name ?? null;
-  data.title = manifest.title ?? null;
-  data.version = manifest.version ?? null;
+  data.name = manifest.name;
+  data.title = manifest.title;
+  data.version = manifest.version;
 
   if (manifest['installed-size']) {
     data.installedSize = parseInt(manifest['installed-size'], 10);
@@ -408,119 +299,97 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
   return await parseData(fileData, data, icon);
 }
 
-export default function parseClickPackage(
+export default async function parseClickPackage(
   filepath: string,
-  iconOrCallback: boolean | ((err: unknown, data?: ParsedData) => void) = false,
-  callback?: (err: unknown, data?: ParsedData) => void,
+  extractIcon: boolean = false,
 ): Promise<ParsedData> {
-  let icon: boolean = iconOrCallback as boolean;
-  if (typeof iconOrCallback === 'function' && !callback) {
-    callback = iconOrCallback;
-    icon = false;
+  const fileBuffer = await fs.readFile(filepath);
+  const arFiles = parseArArchive(fileBuffer);
+
+  let dataFile: Buffer | null = null;
+  let controlFile: Buffer | null = null;
+
+  for (const file of arFiles) {
+    if (file.name === 'data.tar.gz') {
+      dataFile = file.fileData;
+    }
+    else if (file.name === 'control.tar.gz') {
+      controlFile = file.fileData;
+    }
   }
 
-  const promise = (async () => {
-    const fileBuffer = await fs.readFile(filepath);
-    const arFiles = parseArArchive(fileBuffer);
-
-    let dataFile: Buffer | null = null;
-    let controlFile: Buffer | null = null;
-
-    for (const file of arFiles) {
-      if (file.name === 'data.tar.gz') {
-        dataFile = file.fileData;
-      }
-      else if (file.name === 'control.tar.gz') {
-        controlFile = file.fileData;
-      }
-    }
-
-    if (dataFile === null || controlFile === null) {
-      throw new Error('Malformed click package');
-    }
-
-    const data = await parseControl(controlFile, dataFile, icon);
-
-    for (const app of data.apps) {
-      if (!data.types.includes(app.type)) {
-        data.types.push(app.type);
-      }
-
-      if (Object.keys(app.contentHub).length > 0) {
-        app.features.push('content_hub');
-      }
-
-      if (Object.keys(app.urlDispatcher).length > 0) {
-        app.features.push('url_dispatcher');
-      }
-
-      if (Object.keys(app.pushHelper).length > 0) {
-        app.features.push('push_helper');
-      }
-
-      if (Object.keys(app.accountService).length > 0) {
-        app.features.push('account_service');
-      }
-
-      if (app.type === 'webapp') {
-        app.webappProperties = data.webappProperties;
-        app.webappInject = data.webappInject;
-      }
-
-      const apparmor = app.apparmor as { policy_groups?: string[]; template?: string };
-      if (apparmor?.policy_groups) {
-        for (const permission of apparmor.policy_groups) {
-          if (!data.permissions.includes(permission)) {
-            data.permissions.push(permission);
-          }
-        }
-      }
-
-      if (apparmor?.template === 'unconfined') {
-        data.permissions.push('unconfined');
-      }
-
-      if (app.urlDispatcher && Array.isArray(app.urlDispatcher)) {
-        for (const ud of app.urlDispatcher as Array<{ protocol?: string; 'domain-suffix'?: string }>) {
-          if (ud.protocol) {
-            let url = `${ud.protocol}://`;
-            if (ud['domain-suffix']) {
-              url += ud['domain-suffix'];
-            }
-            if (!data.urls.includes(url)) {
-              data.urls.push(url);
-            }
-          }
-        }
-      }
-
-      // Deduplicate imports using a Set for O(1) lookups
-      const seen = new Set<string>();
-      app.qmlImports = app.qmlImports.filter((qmlImport) => {
-        const key = qmlImport.module + (qmlImport.version ?? '');
-        if (seen.has(key)) {
-          return false;
-        }
-        seen.add(key);
-        return true;
-      });
-    }
-
-    delete data.iconpath;
-    delete data.manifest;
-    delete (data as Partial<ParsedData>).webappInject;
-    delete (data as Partial<ParsedData>).webappProperties;
-
-    return data;
-  })();
-
-  if (callback) {
-    const cb = callback;
-    promise.then(
-      (data) => { cb(null, data); },
-      (err: unknown) => { cb(err); },
-    );
+  if (dataFile === null || controlFile === null) {
+    throw new Error('Malformed click package');
   }
 
-  return promise;
+  const data = await parseControl(controlFile, dataFile, extractIcon);
+
+  const typesSet = new Set<string>(data.types);
+  const permissionsSet = new Set<string>(data.permissions);
+  const urlsSet = new Set<string>(data.urls);
+
+  for (const app of data.apps) {
+    typesSet.add(app.type);
+
+    if (Object.keys(app.contentHub).length > 0) {
+      app.features.push('content_hub');
+    }
+
+    if (Object.keys(app.urlDispatcher).length > 0) {
+      app.features.push('url_dispatcher');
+    }
+
+    if (Object.keys(app.pushHelper).length > 0) {
+      app.features.push('push_helper');
+    }
+
+    if (Object.keys(app.accountService).length > 0) {
+      app.features.push('account_service');
+    }
+
+    if (app.type === 'webapp') {
+      app.webappProperties = data.webappProperties;
+      app.webappInject = data.webappInject;
+    }
+
+    const apparmor = app.apparmor;
+    if (apparmor?.policy_groups) {
+      for (const permission of apparmor.policy_groups) {
+        permissionsSet.add(permission);
+      }
+    }
+
+    if (apparmor?.template === 'unconfined') {
+      permissionsSet.add('unconfined');
+    }
+
+    if (app.urlDispatcher && Array.isArray(app.urlDispatcher)) {
+      for (const ud of app.urlDispatcher as Array<{ protocol?: string; 'domain-suffix'?: string }>) {
+        if (ud.protocol) {
+          let url = `${ud.protocol}://`;
+          if (ud['domain-suffix']) {
+            url += ud['domain-suffix'];
+          }
+          urlsSet.add(url);
+        }
+      }
+    }
+
+    // Deduplicate QML imports
+    const seen = new Set<string>();
+    app.qmlImports = app.qmlImports.filter((qmlImport) => {
+      const key = qmlImport.module + (qmlImport.version ?? '');
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  }
+
+  data.types = Array.from(typesSet);
+  data.permissions = Array.from(permissionsSet);
+  data.urls = Array.from(urlsSet);
+
+  return data;
 }

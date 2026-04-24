@@ -64,7 +64,7 @@ describe('click-parser', () => {
             },
           },
           webappProperties: {},
-          webappUrl: null,
+          webappUrl: undefined,
           webappInject: false,
           hooks: {
             'account-application': 'account-application.xml',
@@ -74,7 +74,6 @@ describe('click-parser', () => {
             desktop: 'test-qml.desktop',
             urls: 'url-dispatcher.json',
           },
-          scopeIni: {},
         },
         {
           name: 'test-qml-push-helper',
@@ -105,13 +104,12 @@ describe('click-parser', () => {
           accountService: {},
           accountApplication: {},
           webappProperties: {},
-          webappUrl: null,
+          webappUrl: undefined,
           webappInject: false,
           hooks: {
             apparmor: 'push-helper-apparmor.json',
             'push-helper': 'push-helper.json',
           },
-          scopeIni: {},
         },
       ],
       architecture: 'all',
@@ -130,7 +128,8 @@ describe('click-parser', () => {
         'push-helper.json',
       ],
       framework: 'ubuntu-sdk-15.04',
-      icon: null,
+      icon: undefined,
+      iconpath: 'test-qml.png',
       maintainer: 'Brian Douglass',
       maintainerEmail: 'bhdouglass@gmail.com',
       name: 'test-qml.bhdouglass',
@@ -141,6 +140,32 @@ describe('click-parser', () => {
       version: '0.1',
       languages: [],
       installedSize: 39,
+      webappInject: false,
+      webappProperties: {},
+      manifest: {
+        architecture: 'all',
+        description: 'description of test-qml',
+        framework: 'ubuntu-sdk-15.04',
+        hooks: {
+          'test-qml': {
+            'account-application': 'account-application.xml',
+            'account-service': 'account-service.xml',
+            apparmor: 'apparmor.json',
+            'content-hub': 'content-hub.json',
+            desktop: 'test-qml.desktop',
+            urls: 'url-dispatcher.json',
+          },
+          'test-qml-push-helper': {
+            apparmor: 'push-helper-apparmor.json',
+            'push-helper': 'push-helper.json',
+          },
+        },
+        'installed-size': '39',
+        maintainer: 'Brian Douglass <bhdouglass@gmail.com>',
+        name: 'test-qml.bhdouglass',
+        title: 'test-qml',
+        version: '0.1',
+      },
     });
   });
 
@@ -155,15 +180,7 @@ describe('click-parser', () => {
     const data = await parse(path.join(__dirname, '/test-scope.bhdouglass_0.1_armhf.click'));
 
     assert.equal(data.apps.length, 1);
-    assert.equal(data.apps[0].type, 'scope');
-    assert.deepEqual(data.apps[0].scopeIni, {
-      displayname: 'Test-scope Scope',
-      description: 'This is a Test-scope scope',
-      art: 'screenshot.png',
-      author: 'Firstname Lastname',
-      icon: 'icon.png',
-      'pageheader.logo': 'logo.png',
-    });
+    assert.equal(data.apps[0].type, 'app');
   });
 
   test('parse webapp click package', async () => {

@@ -6,7 +6,6 @@ export interface Hooks {
   'push-helper'?: string;
   'account-service'?: string;
   'account-application'?: string;
-  scope?: string;
   [key: string]: string | undefined;
 }
 
@@ -20,15 +19,14 @@ export interface Apparmor {
 
 export interface QmlImport {
   module: string;
-  version: string | null;
+  version?: string;
 }
 
 export class App {
   name: string;
-  type: string;
+  type: 'app' | 'webapp' | 'push';
   features: string[];
   desktop: Record<string, string>;
-  scopeIni: Record<string, string>;
   apparmor: Apparmor;
   contentHub: Record<string, string[]>;
   urlDispatcher: Array<Record<string, string>>;
@@ -37,16 +35,19 @@ export class App {
   accountApplication: Record<string, unknown>;
   webappProperties: Record<string, unknown>;
   webappInject: boolean;
-  webappUrl: string | null;
+  webappUrl?: string;
   hooks: Hooks;
   qmlImports: QmlImport[];
 
   constructor(name: string, hooks: Hooks) {
     this.name = name;
-    this.type = 'app'; // app, webapp, scope, push, webapp+
+    this.type = 'app';
+    if (hooks['push-helper']) {
+      this.type = 'push';
+    }
+
     this.features = [];
     this.desktop = {};
-    this.scopeIni = {};
     this.apparmor = {};
     this.contentHub = {};
     this.urlDispatcher = [];
@@ -55,7 +56,7 @@ export class App {
     this.accountApplication = {};
     this.webappProperties = {};
     this.webappInject = false;
-    this.webappUrl = null;
+    this.webappUrl = undefined;
     this.hooks = hooks;
     this.qmlImports = [];
   }
