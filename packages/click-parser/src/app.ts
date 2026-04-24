@@ -1,3 +1,7 @@
+import type { Apparmor, Desktop } from './schemas';
+
+export type { Apparmor };
+
 export interface Hooks {
   desktop?: string;
   apparmor?: string;
@@ -9,14 +13,6 @@ export interface Hooks {
   [key: string]: string | undefined;
 }
 
-export interface Apparmor {
-  policy_groups?: string[];
-  policy_version?: number;
-  template?: string;
-  write_path?: string[];
-  read_path?: string[];
-}
-
 export interface QmlImport {
   module: string;
   version?: string;
@@ -26,7 +22,7 @@ export class App {
   name: string;
   type: 'app' | 'webapp' | 'push';
   features: string[];
-  desktop: Record<string, string>;
+  desktop: Desktop;
   apparmor: Apparmor;
   contentHub: Record<string, string[]>;
   urlDispatcher: Array<Record<string, string>>;
@@ -47,8 +43,10 @@ export class App {
     }
 
     this.features = [];
-    this.desktop = {};
-    this.apparmor = {};
+    const desktop: Desktop = {};
+    this.desktop = desktop;
+    const apparmor: Apparmor = {};
+    this.apparmor = apparmor;
     this.contentHub = {};
     this.urlDispatcher = [];
     this.pushHelper = {};

@@ -5,23 +5,22 @@ import { createGzipDecoder, unpackTar } from 'modern-tar';
 
 import { App } from './app';
 import type { QmlImport } from './app';
-import { bufferToWebReadableStream, isJson, parseArArchive, parseIniFile, parseJsonFile, parseXmlFile } from './utils';
+import {
+  apparmorSchema,
+  contentHubSchema,
+  accountSchema,
+  manifestSchema,
+  pushHelperSchema,
+  urlDispatcherSchema,
+  webappPropertiesSchema,
+  desktopSchema,
+} from './schemas';
+import type { Manifest } from './schemas';
+import { bufferToWebReadableStream, parseArArchive, parseIniAs, parseJsonAs, parseXmlAs } from './utils';
 
 export { App } from './app';
 export type { QmlImport, Apparmor, Hooks } from './app';
-
-interface Manifest {
-  hooks?: Record<string, Record<string, string>>;
-  maintainer?: string;
-  architecture?: string;
-  description?: string;
-  framework?: string;
-  name?: string;
-  title?: string;
-  version?: string;
-  'installed-size'?: string;
-  [key: string]: unknown;
-}
+export type { Manifest } from './schemas';
 
 export interface ParsedData {
   apps: App[];
@@ -98,8 +97,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
     for (const app of data.apps) {
       if (app.hooks.desktop && entry.header.name === `./${app.hooks.desktop}`) {
         handled = true;
-        const json = parseIniFile(entry.data);
-        app.desktop = (json ?? {}) as Record<string, string>;
+        app.desktop = parseIniAs(entry.data, desktopSchema) ?? {};
 
         if (app.desktop.exec?.startsWith('webapp-container')) {
           /*
@@ -132,37 +130,37 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
 
       if (app.hooks.apparmor && entry.header.name === `./${app.hooks.apparmor}`) {
         handled = true;
-        app.apparmor = (parseJsonFile(entry.data) ?? {}) as App['apparmor'];
+        app.apparmor = parseJsonAs(entry.data, apparmorSchema) ?? {};
         break;
       }
 
       if (app.hooks['content-hub'] && entry.header.name === `./${app.hooks['content-hub']}`) {
         handled = true;
-        app.contentHub = (parseJsonFile(entry.data) ?? {}) as Record<string, string[]>;
+        app.contentHub = parseJsonAs(entry.data, contentHubSchema) ?? {};
         break;
       }
 
       if (app.hooks.urls && entry.header.name === `./${app.hooks.urls}`) {
         handled = true;
-        app.urlDispatcher = (parseJsonFile(entry.data) as Array<Record<string, string>>) ?? [];
+        app.urlDispatcher = parseJsonAs(entry.data, urlDispatcherSchema) ?? [];
         break;
       }
 
       if (app.hooks['push-helper'] && entry.header.name === `./${app.hooks['push-helper']}`) {
         handled = true;
-        app.pushHelper = (parseJsonFile(entry.data) ?? {}) as Record<string, string>;
+        app.pushHelper = parseJsonAs(entry.data, pushHelperSchema) ?? {};
         break;
       }
 
       if (app.hooks['account-service'] && entry.header.name === `./${app.hooks['account-service']}`) {
         handled = true;
-        app.accountService = (await parseXmlFile(entry.data)) ?? {};
+        app.accountService = await parseXmlAs(entry.data, accountSchema) ?? {};
         break;
       }
 
       if (app.hooks['account-application'] && entry.header.name === `./${app.hooks['account-application']}`) {
         handled = true;
-        app.accountApplication = (await parseXmlFile(entry.data)) ?? {};
+        app.accountApplication = await parseXmlAs(entry.data, accountSchema) ?? {};
         break;
       }
     }
@@ -170,9 +168,8 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
     // Global file handlers — data is available directly; relevant data applied to all matching apps
     if (!handled) {
       if (entry.header.name === './webapp-properties.json') {
-        const str = entry.data ? Buffer.from(entry.data).toString() : '';
-        if (isJson(str)) {
-          const webappProperties = JSON.parse(str) as Record<string, unknown>;
+        const webappProperties = parseJsonAs(entry.data, webappPropertiesSchema);
+        if (webappProperties) {
           data.webappProperties = webappProperties;
           if (Array.isArray(webappProperties.scripts) && webappProperties.scripts.length > 0) {
             data.webappInject = true;
@@ -239,12 +236,15 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
     if (entry.header.name === './manifest' && entry.data) {
       const manifestStr = Buffer.from(entry.data).toString();
 
-      if (!isJson(manifestStr)) {
+      let rawManifest: unknown;
+      try {
+        rawManifest = JSON.parse(manifestStr);
+      }
+      catch {
         throw new Error('Manifest file is not in a json format');
       }
 
-      // TODO replace this with zod parsing
-      data.manifest = JSON.parse(manifestStr) as Manifest;
+      data.manifest = manifestSchema.parse(rawManifest);
 
       if (!data.manifest.hooks || Object.keys(data.manifest.hooks).length === 0) {
         throw new Error('Manifest file does not have any hooks in it');
@@ -257,7 +257,7 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
     }
   }
 
-  const manifest = data.manifest as Manifest;
+  const manifest = data.manifest!;
 
   let maintainerEmail = '';
   let maintainer = '';

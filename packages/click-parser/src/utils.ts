@@ -1,18 +1,9 @@
+import type { z } from 'zod/v4';
 import xml2js from 'xml2js';
 
 interface ArFile {
   name: string;
   fileData: Buffer;
-}
-
-export function isJson(string: string): boolean {
-  try {
-    JSON.parse(string);
-    return true;
-  }
-  catch (e) {
-    return false;
-  }
 }
 
 export function parseArArchive(buffer: Buffer): ArFile[] {
@@ -113,4 +104,25 @@ export function parseIniFile(data: Uint8Array | undefined): Record<string, unkno
   }
 
   return result;
+}
+
+export function parseJsonAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
+  const raw = parseJsonFile(data);
+  if (raw === undefined) return undefined;
+  const result = schema.safeParse(raw);
+  return result.success ? result.data : undefined;
+}
+
+export async function parseXmlAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): Promise<T | undefined> {
+  const raw = await parseXmlFile(data);
+  if (raw === undefined) return undefined;
+  const result = schema.safeParse(raw);
+  return result.success ? result.data : undefined;
+}
+
+export function parseIniAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
+  const raw = parseIniFile(data);
+  if (raw === undefined) return undefined;
+  const result = schema.safeParse(raw);
+  return result.success ? result.data : undefined;
 }
