@@ -187,15 +187,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         hook['webapp-properties'] = app.webappProperties;
       }
 
-      if (Object.keys(app.scopeIni).length > 0) {
-        hook.scope = {};
-
-        Object.keys(app.scopeIni).forEach((key) => {
-          // Remove any ini properties with a `.` as mongo will reject them
-          hook.scope[key.replace(/\./g, '__')] = app.scopeIni[key];
-        });
-      }
-
       // Mongo will reject this if there are any `.`s
       manifest.hooks[app.name.replace(/\./g, '__')] = hook;
 

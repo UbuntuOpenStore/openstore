@@ -10,8 +10,8 @@ import { sha512Checksum } from '../utils';
 import { type FilterQuery } from 'mongoose';
 
 const query: FilterQuery<IPackage> = {};
-if (process.argv[2]) {
-  query.id = process.argv[2];
+if (process.argv[3]) {
+  query.id = process.argv[3];
 }
 
 Package.find(query).then(async (pkgs) => {
