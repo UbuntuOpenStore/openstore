@@ -1,5 +1,7 @@
 import { z } from 'zod/v4';
 
+import { descriptionToText } from './appstream-utils';
+
 export const manifestSchema = z.object({
   hooks: z.record(z.string(), z.record(z.string(), z.string())).optional(),
   maintainer: z.string().optional(),
@@ -42,3 +44,72 @@ export const desktopSchema = z.object({
 }).loose();
 
 export type Desktop = z.infer<typeof desktopSchema>;
+
+// xml2js with mergeAttrs:true+explicitArray:false yields single items or arrays depending on count.
+// asArray normalises both forms to a consistent array so every repeated field is T[].
+const asArray = (val: unknown): unknown[] | undefined =>
+  (val === null || val === undefined) ? undefined : Array.isArray(val) ? val : [val];
+
+export const appstreamLocalisedSchema = z.preprocess(
+  asArray,
+  z.array(z.union([
+    z.string(),
+    z.object({ _: z.string(), 'xml:lang': z.string().optional() }).loose(),
+  ])).optional(),
+);
+
+export type AppstreamLocalised = z.infer<typeof appstreamLocalisedSchema>;
+
+export const appstreamImageSchema = z.union([
+  z.string(),
+  z.object({
+    _: z.string().optional(),
+    type: z.string().optional(),
+  }).loose(),
+]);
+
+export type AppstreamImage = z.infer<typeof appstreamImageSchema>;
+
+export const appstreamScreenshotSchema = z.object({
+  image: z.preprocess(asArray, z.array(appstreamImageSchema).optional()),
+}).loose();
+
+export type AppstreamScreenshot = z.infer<typeof appstreamScreenshotSchema>;
+
+export const appstreamReleaseSchema = z.object({
+  version: z.string().optional(),
+  description: z.record(z.string(), z.unknown()).optional().transform(descriptionToText),
+}).loose();
+
+export type AppstreamRelease = z.infer<typeof appstreamReleaseSchema>;
+
+export const appstreamUrlSchema = z.object({
+  _: z.string().optional(),
+  type: z.string().optional(),
+}).loose();
+
+export type AppstreamUrl = z.infer<typeof appstreamUrlSchema>;
+
+export const appstreamSchema = z.object({
+  component: z.object({
+    name: appstreamLocalisedSchema,
+    summary: appstreamLocalisedSchema,
+    description: z.record(z.string(), z.unknown()).optional().transform(descriptionToText),
+    keywords: z.object({
+      keyword: z.preprocess(asArray, z.array(z.string()).optional()),
+    }).optional(),
+    screenshots: z.object({
+      screenshot: z.preprocess(asArray, z.array(appstreamScreenshotSchema).optional()),
+    }).optional(),
+    releases: z.object({
+      release: z.preprocess(asArray, z.array(appstreamReleaseSchema).optional()),
+    }).optional(),
+    url: z.preprocess(asArray, z.array(appstreamUrlSchema).optional()),
+    project_license: z.string().optional(),
+    categories: z.object({
+      category: z.preprocess(asArray, z.array(z.string()).optional()),
+    }).optional(),
+  }).loose(),
+}).loose();
+
+export type AppstreamData = z.infer<typeof appstreamSchema>;

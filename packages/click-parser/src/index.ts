@@ -14,13 +14,14 @@ import {
   urlDispatcherSchema,
   webappPropertiesSchema,
   desktopSchema,
+  appstreamSchema,
 } from './schemas';
-import type { Manifest } from './schemas';
+import type { Manifest, AppstreamData } from './schemas';
 import { bufferToWebReadableStream, parseArArchive, parseIniAs, parseJsonAs, parseXmlAs } from './utils';
 
 export { App } from './app';
 export type { QmlImport, Apparmor, Hooks } from './app';
-export type { Manifest } from './schemas';
+export type { Manifest, AppstreamData } from './schemas';
 
 export interface ParsedData {
   apps: App[];
@@ -43,6 +44,7 @@ export interface ParsedData {
   languages: string[];
   files: string[];
   manifest?: Manifest;
+  appstream?: AppstreamData;
 }
 
 async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedData> {
@@ -193,6 +195,18 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
           if (lang) {
             languagesSet.add(lang);
           }
+        }
+      }
+      else if (
+        (entry.header.name.startsWith('./usr/share/metainfo/') ||
+          entry.header.name.startsWith('./usr/share/appdata/')) &&
+        (entry.header.name.endsWith('.metainfo.xml') ||
+          entry.header.name.endsWith('.appdata.xml')) &&
+        !data.appstream
+      ) {
+        const parsed = await parseXmlAs(entry.data, appstreamSchema);
+        if (parsed) {
+          data.appstream = parsed;
         }
       }
     }
