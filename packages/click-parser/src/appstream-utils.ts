@@ -1,15 +1,21 @@
-import xml2js from 'xml2js';
+import { XMLBuilder } from 'fast-xml-parser';
 
 import type { AppstreamData, AppstreamLocalised } from './schemas';
 
-const descriptionBuilder = new xml2js.Builder({ headless: true, rootName: 'description', renderOpts: { pretty: false } });
+const descriptionBuilder = new XMLBuilder({
+  ignoreAttributes: false,
+  attributeNamePrefix: '',
+  textNodeName: '_',
+  suppressUnpairedNode: true,
+  format: false,
+});
 
 export function descriptionToText(raw: Record<string, unknown> | undefined): string | undefined {
   if (!raw) {
     return undefined;
   }
 
-  const text = descriptionBuilder.buildObject(raw).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const text = descriptionBuilder.build({ description: raw }).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   return text;
 }
 

@@ -159,13 +159,13 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
 
       if (app.hooks['account-service'] && entry.header.name === `./${app.hooks['account-service']}`) {
         handled = true;
-        app.accountService = await parseXmlAs(entry.data, accountSchema) ?? {};
+        app.accountService = parseXmlAs(entry.data, accountSchema) ?? {};
         break;
       }
 
       if (app.hooks['account-application'] && entry.header.name === `./${app.hooks['account-application']}`) {
         handled = true;
-        app.accountApplication = await parseXmlAs(entry.data, accountSchema) ?? {};
+        app.accountApplication = parseXmlAs(entry.data, accountSchema) ?? {};
         break;
       }
     }
@@ -207,7 +207,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
           entry.header.name.endsWith('.appdata.xml')) &&
         !data.appstream
       ) {
-        const parsed = await parseXmlAs(entry.data, appstreamSchema);
+        const parsed = parseXmlAs(entry.data, appstreamSchema);
         if (parsed) {
           data.appstream = transformAppstreamData(parsed);
         }

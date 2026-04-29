@@ -25,6 +25,6 @@
     "allowSyntheticDefaultImports": true,
     "useUnknownInCatchVariables": false,
     "declaration": true,
-    "typeRoots": ["./types", "./node_modules/@types/"]
+    "typeRoots": ["./types", "./node_modules/@types/", "../../node_modules/@types/"]
   }
 }
