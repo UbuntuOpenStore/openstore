@@ -1,14 +1,7 @@
 import type { z } from 'zod/v4';
 import { XMLParser } from 'fast-xml-parser';
 
-const xmlParser = new XMLParser({
-  ignoreAttributes: false,
-  attributeNamePrefix: '',
-  textNodeName: '_',
-  trimValues: true,
-  parseTagValue: false,
-  parseAttributeValue: false,
-});
+export { XMLParser };
 
 interface ArFile {
   name: string;
@@ -68,14 +61,14 @@ export function parseJsonFile(data: Uint8Array | undefined): unknown | undefined
   }
 }
 
-export function parseXmlFile(data: Uint8Array | undefined): Record<string, unknown> | undefined {
+export function parseXmlFile(data: Uint8Array | undefined, parser: XMLParser): Record<string, unknown> | undefined {
   if (!data) {
     return undefined;
   }
 
   const str = Buffer.from(data).toString();
   try {
-    return xmlParser.parse(str) as Record<string, unknown>;
+    return parser.parse(str) as Record<string, unknown>;
   }
   catch {
     return undefined;
@@ -117,8 +110,8 @@ export function parseJsonAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T
   return result.success ? result.data : undefined;
 }
 
-export function parseXmlAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
-  const raw = parseXmlFile(data);
+export function parseXmlAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>, parser: XMLParser): T | undefined {
+  const raw = parseXmlFile(data, parser);
   if (raw === undefined) return undefined;
   const result = schema.safeParse(raw);
   return result.success ? result.data : undefined;

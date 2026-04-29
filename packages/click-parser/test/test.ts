@@ -1,14 +1,17 @@
 import assert from 'node:assert';
+import fs from 'node:fs/promises';
 import path from 'path';
 import { test, describe } from 'node:test';
 
 import parse from '../src/index';
+import { parseAppstream } from '../src/appstream';
 
 describe('click-parser', () => {
   test('parse qml click package', async () => {
     const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_1.0.0_all.click'));
 
-    delete data.appstream; // TODO come back to this later
+    const appstream = data.appstream;
+    delete data.appstream;
 
     assert.deepEqual(data, {
       apps: [
@@ -192,6 +195,22 @@ describe('click-parser', () => {
         version: '1.0.0',
       },
     });
+
+    assert.ok(appstream, 'appstream data should exist');
+    assert.equal(appstream?.name.find((n) => n.lang === 'en')?.text, 'Weather');
+
+    const expectedEnDesc = [
+      'A small application that allows you to monitor the current weather conditions for your city, or anywhere in the world.',
+      /* eslint-disable-next-line max-len */
+      'It provides access to detailed forecasts, up to 7 days, with hourly details for the current and next day, using various internet services.',
+      /* eslint-disable-next-line max-len */
+      'It also optionally integrates with the GNOME Shell, allowing you to see the current conditions of the most recently searched cities by just typing the name in the Activities Overview.',
+    ].join('\n\n');
+
+    const enDesc = appstream?.description.find((d) => d.lang === 'en');
+    assert.ok(enDesc, 'English description should exist');
+    assert.equal(enDesc?.text, expectedEnDesc);
+    assert.ok((appstream?.description.length ?? 0) > 1, 'localized descriptions should exist for multiple languages');
   });
 
   test('parse html5 click package', async () => {
@@ -217,5 +236,42 @@ describe('click-parser', () => {
       /* eslint-disable-next-line max-len */
       'user-agent-override': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36',
     });
+  });
+
+  test('parse appstream metainfo xml', async () => {
+    const rawData = await fs.readFile(path.join(__dirname, 'org.freedesktop.appstream.cli.metainfo.xml'));
+    const data = parseAppstream(rawData);
+
+    assert.ok(data, 'appstream data should be parsed');
+
+    assert.equal(data.name.find((n) => n.lang === 'en')?.text, 'AppStream CLI');
+    assert.equal(data.name.find((n) => n.lang === 'de')?.text, 'AppStream CLI');
+    assert.ok(data.name.length > 1, 'name should have multiple localizations');
+
+    assert.equal(data.summary.find((s) => s.lang === 'en')?.text, 'An utility to work with AppStream metadata');
+    assert.equal(data.summary.find((s) => s.lang === 'de')?.text, 'Ein Dienstprogramm zum Arbeiten mit AppStream-Metadaten');
+
+    assert.equal(data.project_license, 'LGPL-2.1+');
+
+    // First paragraph (en) — plain text
+    const enChunks = data.description.find((d) => d.lang === 'en')?.text.split('\n\n');
+    assert.ok(enChunks, 'English description should exist');
+    assert.ok(enChunks[0].startsWith('AppStream is a metadata specification'), 'first paragraph should match');
+    // Second paragraph (en) contains <em>appstreamcli</em> → *appstreamcli*
+    assert.ok(enChunks[1].includes('*appstreamcli*'), 'em tag should be rendered as bold markdown');
+    assert.ok(data.description.length > 1, 'description should have multiple localizations');
+
+    assert.deepEqual(data.urls, [
+      { type: 'homepage', url: 'https://www.freedesktop.org/wiki/Distributions/AppStream/' },
+      { type: 'bugtracker', url: 'https://github.com/ximion/appstream/issues' },
+      { type: 'help', url: 'https://www.freedesktop.org/software/appstream/docs/chap-AppStream-ManualPages.html' },
+      { type: 'vcs-browser', url: 'https://github.com/ximion/appstream/' },
+    ]);
+
+    assert.ok(data.releases.length > 0, 'releases should be present');
+    assert.equal(data.releases[0].version, '1.0.2');
+    assert.ok((data.releases[0].description.find((d) => d.lang === 'en')?.text.length ?? 0) > 0, 'release description should be present');
+
+    assert.deepEqual(data.content_rating, { type: 'oars-1.1', content_attributes: [] });
   });
 });

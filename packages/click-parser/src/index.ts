@@ -14,17 +14,25 @@ import {
   urlDispatcherSchema,
   webappPropertiesSchema,
   desktopSchema,
-  appstreamSchema,
 } from './schemas';
 import type { Manifest } from './schemas';
-import { bufferToWebReadableStream, parseArArchive, parseIniAs, parseJsonAs, parseXmlAs } from './utils';
-import { transformAppstreamData } from './appstream-utils';
-import type { AppstreamExportData } from './appstream-utils';
+import { bufferToWebReadableStream, parseArArchive, parseIniAs, parseJsonAs, parseXmlAs, XMLParser } from './utils';
+import { parseAppstream } from './appstream';
+import type { AppstreamExportData } from './appstream';
+
+const accountXmlParser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: '',
+  textNodeName: '_',
+  trimValues: true,
+  parseTagValue: false,
+  parseAttributeValue: false,
+});
 
 export { App } from './app';
 export type { QmlImport, Apparmor, Hooks } from './app';
 export type { Manifest } from './schemas';
-export type { AppstreamExportData } from './appstream-utils';
+export type { AppstreamExportData } from './appstream';
 
 export interface ParsedData {
   apps: App[];
@@ -159,13 +167,13 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
 
       if (app.hooks['account-service'] && entry.header.name === `./${app.hooks['account-service']}`) {
         handled = true;
-        app.accountService = parseXmlAs(entry.data, accountSchema) ?? {};
+        app.accountService = parseXmlAs(entry.data, accountSchema, accountXmlParser) ?? {};
         break;
       }
 
       if (app.hooks['account-application'] && entry.header.name === `./${app.hooks['account-application']}`) {
         handled = true;
-        app.accountApplication = parseXmlAs(entry.data, accountSchema) ?? {};
+        app.accountApplication = parseXmlAs(entry.data, accountSchema, accountXmlParser) ?? {};
         break;
       }
     }
@@ -207,9 +215,9 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
           entry.header.name.endsWith('.appdata.xml')) &&
         !data.appstream
       ) {
-        const parsed = parseXmlAs(entry.data, appstreamSchema);
-        if (parsed) {
-          data.appstream = transformAppstreamData(parsed);
+        const appstream = parseAppstream(entry.data);
+        if (appstream) {
+          data.appstream = appstream;
         }
       }
     }
