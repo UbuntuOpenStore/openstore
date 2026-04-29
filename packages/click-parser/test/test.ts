@@ -6,7 +6,7 @@ import parse from '../src/index';
 
 describe('click-parser', () => {
   test('parse qml click package', async () => {
-    const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_0.1_all.click'));
+    const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_1.0.0_all.click'));
 
     assert.deepEqual(data, {
       apps: [
@@ -15,16 +15,16 @@ describe('click-parser', () => {
           type: 'app',
           features: ['content_hub', 'url_dispatcher', 'account_service'],
           desktop: {
-            name: 'test-qml',
-            exec: 'qmlscene $@ Main.qml',
-            icon: 'test-qml.png',
+            name: 'Test QML',
+            exec: 'qmlscene %U qml/Main.qml',
+            icon: 'assets/logo.svg',
             terminal: 'false',
             type: 'Application',
-            'x-ubuntu-touch': 'true',
+            'x-lomiri-touch': 'true',
           },
           apparmor: {
-            policy_groups: ['networking', 'webview'],
-            policy_version: 1.3,
+            policy_groups: [],
+            policy_version: 20.04,
           },
           contentHub: {
             source: ['pictures'],
@@ -39,11 +39,19 @@ describe('click-parser', () => {
           qmlImports: [
             {
               module: 'QtQuick',
-              version: '2.0',
+              version: '2.7',
             },
             {
-              module: 'Ubuntu.Components',
-              version: '1.1',
+              module: 'Lomiri.Components',
+              version: '1.3',
+            },
+            {
+              module: 'QtQuick.Layouts',
+              version: '1.3',
+            },
+            {
+              module: 'Qt.labs.settings',
+              version: '1.0',
             },
           ],
           accountService: {
@@ -69,7 +77,7 @@ describe('click-parser', () => {
           hooks: {
             'account-application': 'account-application.xml',
             'account-service': 'account-service.xml',
-            apparmor: 'apparmor.json',
+            apparmor: 'test-qml.apparmor',
             'content-hub': 'content-hub.json',
             desktop: 'test-qml.desktop',
             urls: 'url-dispatcher.json',
@@ -82,7 +90,7 @@ describe('click-parser', () => {
           desktop: {},
           apparmor: {
             policy_groups: ['push-notification-client'],
-            policy_version: 1.3,
+            policy_version: 20.04,
             template: 'ubuntu-push-helper',
           },
           contentHub: {},
@@ -94,11 +102,19 @@ describe('click-parser', () => {
           qmlImports: [
             {
               module: 'QtQuick',
-              version: '2.0',
+              version: '2.7',
             },
             {
-              module: 'Ubuntu.Components',
-              version: '1.1',
+              module: 'Lomiri.Components',
+              version: '1.3',
+            },
+            {
+              module: 'QtQuick.Layouts',
+              version: '1.3',
+            },
+            {
+              module: 'Qt.labs.settings',
+              version: '1.0',
             },
           ],
           accountService: {},
@@ -113,44 +129,46 @@ describe('click-parser', () => {
         },
       ],
       architecture: 'all',
-      description: 'description of test-qml',
+      description: 'A short description of your app',
       files: [
-        'url-dispatcher.json',
-        'account-service.xml',
-        'content-hub.json',
-        'test-qml.desktop',
-        'test-qml.png',
         'account-application.xml',
+        'account-service.xml',
+        'assets/',
+        'assets/logo.svg',
+        'content-hub.json',
         'push-helper-apparmor.json',
-        'pushHelper',
-        'Main.qml',
-        'apparmor.json',
         'push-helper.json',
+        'pushHelper',
+        'qml/',
+        'qml/Main.qml',
+        'test-qml.apparmor',
+        'test-qml.desktop',
+        'url-dispatcher.json',
       ],
-      framework: 'ubuntu-sdk-15.04',
+      framework: 'ubuntu-sdk-20.04.1',
       icon: undefined,
-      iconpath: 'test-qml.png',
+      iconpath: 'assets/logo.svg',
       maintainer: 'Brian Douglass',
       maintainerEmail: 'bhdouglass@gmail.com',
       name: 'test-qml.bhdouglass',
-      permissions: ['networking', 'webview', 'push-notification-client'],
-      title: 'test-qml',
+      permissions: ['push-notification-client'],
+      title: 'Test QML',
       types: ['app', 'push'],
       urls: ['http://example.com'],
-      version: '0.1',
+      version: '1.0.0',
       languages: [],
-      installedSize: 39,
+      installedSize: 28,
       webappInject: false,
       webappProperties: {},
       manifest: {
         architecture: 'all',
-        description: 'description of test-qml',
-        framework: 'ubuntu-sdk-15.04',
+        description: 'A short description of your app',
+        framework: 'ubuntu-sdk-20.04.1',
         hooks: {
           'test-qml': {
             'account-application': 'account-application.xml',
             'account-service': 'account-service.xml',
-            apparmor: 'apparmor.json',
+            apparmor: 'test-qml.apparmor',
             'content-hub': 'content-hub.json',
             desktop: 'test-qml.desktop',
             urls: 'url-dispatcher.json',
@@ -160,24 +178,17 @@ describe('click-parser', () => {
             'push-helper': 'push-helper.json',
           },
         },
-        'installed-size': '39',
+        'installed-size': '28',
         maintainer: 'Brian Douglass <bhdouglass@gmail.com>',
         name: 'test-qml.bhdouglass',
-        title: 'test-qml',
-        version: '0.1',
+        title: 'Test QML',
+        version: '1.0.0',
       },
     });
   });
 
   test('parse html5 click package', async () => {
-    const data = await parse(path.join(__dirname, 'test-html5.bhdouglass_0.1_all.click'));
-
-    assert.equal(data.apps.length, 1);
-    assert.equal(data.apps[0].type, 'app');
-  });
-
-  test('parse scope click package', async () => {
-    const data = await parse(path.join(__dirname, '/test-scope.bhdouglass_0.1_armhf.click'));
+    const data = await parse(path.join(__dirname, 'test-html.bhdouglass_1.0.0_all.click'));
 
     assert.equal(data.apps.length, 1);
     assert.equal(data.apps[0].type, 'app');

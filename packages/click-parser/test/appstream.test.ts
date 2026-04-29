@@ -102,7 +102,7 @@ async function buildClickPackage(extraDataFiles: Record<string, string | Buffer>
 
 describe('AppStream metainfo parsing', () => {
   test('existing clicks without metainfo return appstream: undefined', async () => {
-    const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_0.1_all.click'));
+    const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_1.0.0_all.click'));
     assert.equal(data.appstream, undefined);
   });
 

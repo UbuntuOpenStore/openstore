@@ -1,0 +1,24 @@
+{
+    "name": "test-qml.bhdouglass",
+    "description": "A short description of your app",
+    "architecture": "$ENV{ARCH}",
+    "title": "Test QML",
+    "hooks": {
+        "test-qml": {
+            "apparmor": "test-qml.apparmor",
+            "desktop":  "test-qml.desktop",
+            "content-hub": "content-hub.json",
+            "urls": "url-dispatcher.json",
+            "account-application": "account-application.xml",
+            "account-service": "account-service.xml"
+        },
+        "test-qml-push-helper": {
+            "apparmor": "push-helper-apparmor.json",
+            "push-helper": "push-helper.json"
+        }
+
+    },
+    "version": "1.0.0",
+    "maintainer": "Brian Douglass <bhdouglass@gmail.com>",
+    "framework" : "$ENV{CLICK_FRAMEWORK}"
+}
