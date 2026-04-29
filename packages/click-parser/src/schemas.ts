@@ -65,51 +65,69 @@ export const appstreamImageSchema = z.union([
   z.object({
     _: z.string().optional(),
     type: z.string().optional(),
-  }).loose(),
+  }),
 ]);
 
 export type AppstreamImage = z.infer<typeof appstreamImageSchema>;
 
 export const appstreamScreenshotSchema = z.object({
   image: z.preprocess(asArray, z.array(appstreamImageSchema).optional()),
-}).loose();
+});
 
 export type AppstreamScreenshot = z.infer<typeof appstreamScreenshotSchema>;
 
 export const appstreamReleaseSchema = z.object({
   version: z.string().optional(),
   description: z.record(z.string(), z.unknown()).optional().transform(descriptionToText),
-}).loose();
+});
 
 export type AppstreamRelease = z.infer<typeof appstreamReleaseSchema>;
 
 export const appstreamUrlSchema = z.object({
   _: z.string().optional(),
   type: z.string().optional(),
-}).loose();
+});
 
 export type AppstreamUrl = z.infer<typeof appstreamUrlSchema>;
 
+const appstreamComponentSchema = z.object({
+  type: z.string().optional(),
+  name: appstreamLocalisedSchema,
+  summary: appstreamLocalisedSchema,
+  description: z.record(z.string(), z.unknown()).optional().transform(descriptionToText),
+  keywords: z.object({
+    keyword: appstreamLocalisedSchema,
+  }).optional(),
+  screenshots: z.object({
+    screenshot: z.preprocess(asArray, z.array(appstreamScreenshotSchema).optional()),
+  }).optional(),
+  releases: z.object({
+    release: z.preprocess(asArray, z.array(appstreamReleaseSchema).optional()),
+  }).optional(),
+  url: z.preprocess(asArray, z.array(appstreamUrlSchema).optional()),
+  project_license: z.string().optional(),
+  categories: z.object({
+    category: z.preprocess(asArray, z.array(z.string()).optional()),
+  }).optional(),
+  content_rating: z.object({
+    type: z.string().optional(),
+    content_attribute: z.preprocess(asArray, z.array(z.object({
+      _: z.string().optional(),
+      id: z.string().optional(),
+    }))).optional(),
+  }).optional(),
+  custom: z.object({
+    value: z.preprocess(asArray, z.array(z.object({
+      _: z.string().optional(),
+      key: z.string().optional(),
+    }))).optional(),
+  }).optional(),
+});
+
 export const appstreamSchema = z.object({
-  component: z.object({
-    name: appstreamLocalisedSchema,
-    summary: appstreamLocalisedSchema,
-    description: z.record(z.string(), z.unknown()).optional().transform(descriptionToText),
-    keywords: z.object({
-      keyword: z.preprocess(asArray, z.array(z.string()).optional()),
-    }).optional(),
-    screenshots: z.object({
-      screenshot: z.preprocess(asArray, z.array(appstreamScreenshotSchema).optional()),
-    }).optional(),
-    releases: z.object({
-      release: z.preprocess(asArray, z.array(appstreamReleaseSchema).optional()),
-    }).optional(),
-    url: z.preprocess(asArray, z.array(appstreamUrlSchema).optional()),
-    project_license: z.string().optional(),
-    categories: z.object({
-      category: z.preprocess(asArray, z.array(z.string()).optional()),
-    }).optional(),
-  }).loose(),
-}).loose();
+  component: z.preprocess(asArray, z.array(appstreamComponentSchema)).transform(
+    (components) => components.find((c) => c.type === 'desktop-application') ?? components[0],
+  ),
+});
 
 export type AppstreamData = z.infer<typeof appstreamSchema>;

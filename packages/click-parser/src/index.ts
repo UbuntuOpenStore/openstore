@@ -16,12 +16,15 @@ import {
   desktopSchema,
   appstreamSchema,
 } from './schemas';
-import type { Manifest, AppstreamData } from './schemas';
+import type { Manifest } from './schemas';
 import { bufferToWebReadableStream, parseArArchive, parseIniAs, parseJsonAs, parseXmlAs } from './utils';
+import { transformAppstreamData } from './appstream-utils';
+import type { AppstreamExportData } from './appstream-utils';
 
 export { App } from './app';
 export type { QmlImport, Apparmor, Hooks } from './app';
-export type { Manifest, AppstreamData } from './schemas';
+export type { Manifest } from './schemas';
+export type { AppstreamExportData } from './appstream-utils';
 
 export interface ParsedData {
   apps: App[];
@@ -44,7 +47,7 @@ export interface ParsedData {
   languages: string[];
   files: string[];
   manifest?: Manifest;
-  appstream?: AppstreamData;
+  appstream?: AppstreamExportData;
 }
 
 async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedData> {
@@ -206,7 +209,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
       ) {
         const parsed = await parseXmlAs(entry.data, appstreamSchema);
         if (parsed) {
-          data.appstream = parsed;
+          data.appstream = transformAppstreamData(parsed);
         }
       }
     }

@@ -56,6 +56,7 @@ file(GLOB EXTRA_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.xml")
 if(EXTRA_XML_FILES)
     install(FILES ${EXTRA_XML_FILES} DESTINATION ${DATA_DIR})
 endif()
+install(FILES org.gnome.Weather.appdata.xml DESTINATION ${DATA_DIR}usr/share/metainfo/)
 
 add_subdirectory(po)
 

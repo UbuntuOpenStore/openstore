@@ -24,14 +24,11 @@ if (positionals.length !== 1) {
   process.exit(1);
 }
 else {
-  parse(positionals[0], !!values.icon, (err, data) => {
-    if (err) {
-      console.error('Failed to parse: ', err);
-      process.exit(1);
-    }
-    else {
-      console.log(JSON.stringify(data, null, 4));
-      process.exit(0);
-    }
+  parse(positionals[0], !!values.icon).then((data) => {
+    console.log(JSON.stringify(data, null, 4));
+    process.exit(0);
+  }).catch((err) => {
+    console.error('Failed to parse: ', err);
+    process.exit(1);
   });
 }
