@@ -4,11 +4,6 @@ import type { AppstreamData, AppstreamLocalised } from './schemas';
 
 const descriptionBuilder = new xml2js.Builder({ headless: true, rootName: 'description', renderOpts: { pretty: false } });
 
-function normalizeToArray(val: unknown): unknown[] {
-  if (val === null || val === undefined) return [];
-  return Array.isArray(val) ? val : [val];
-}
-
 export function descriptionToText(raw: Record<string, unknown> | undefined): string | undefined {
   if (!raw) {
     return undefined;
@@ -16,45 +11,6 @@ export function descriptionToText(raw: Record<string, unknown> | undefined): str
 
   const text = descriptionBuilder.buildObject(raw).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   return text;
-}
-
-function descriptionToLocalisedText(raw: Record<string, unknown> | undefined): AppstreamExportLocalised[] {
-  if (!raw) {
-    return [];
-  }
-
-  const langMap = new Map<string, string[]>();
-
-  function addText(lang: string, text: string) {
-    if (text) {
-      if (!langMap.has(lang)) langMap.set(lang, []);
-      langMap.get(lang)!.push(text);
-    }
-  }
-
-  for (const p of normalizeToArray(raw.p)) {
-    if (typeof p === 'string') {
-      addText('en', p);
-    }
-    else if (p && typeof p === 'object') {
-      const obj = p as Record<string, unknown>;
-      addText((obj['xml:lang'] as string) ?? 'en', String(obj._ ?? ''));
-    }
-  }
-
-  for (const listKey of ['ul', 'ol']) {
-    for (const list of normalizeToArray(raw[listKey])) {
-      if (list && typeof list === 'object') {
-        const listObj = list as Record<string, unknown>;
-        const lang = (listObj['xml:lang'] as string) ?? 'en';
-        for (const li of normalizeToArray(listObj.li)) {
-          addText(lang, typeof li === 'string' ? li : String((li as Record<string, unknown>)._ ?? ''));
-        }
-      }
-    }
-  }
-
-  return Array.from(langMap.entries(), ([lang, texts]) => ({ lang, text: texts.join(' ') }));
 }
 
 interface AppstreamExportLocalised {
@@ -104,6 +60,7 @@ function transformLocalised(items: AppstreamLocalised): AppstreamExportLocalised
 }
 
 export function transformAppstreamData(parsed: AppstreamData): AppstreamExportData {
+  // TODO if there are multiple components, use the first desktop-application one.
   const { component } = parsed;
 
   const screenshots: string[] = [];
@@ -119,7 +76,7 @@ export function transformAppstreamData(parsed: AppstreamData): AppstreamExportDa
   return {
     name: transformLocalised(component.name),
     summary: transformLocalised(component.summary),
-    description: descriptionToLocalisedText(component.description),
+    description: component.description ? [{ text: component.description, lang: 'en' }] : [],
     keywords: transformLocalised(component.keywords?.keyword),
     urls: (component.url ?? []).map((u) => ({ type: u.type ?? '', url: u._ ?? '' })),
     project_license: component.project_license ?? '',
