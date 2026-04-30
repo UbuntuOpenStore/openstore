@@ -43,6 +43,7 @@ import {
   type IPackageMethods,
   type HydratedPackage,
   type HydratedRevision,
+  type ContentRating,
   PackageType,
 } from './types';
 import { User } from '../user';
@@ -530,6 +531,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     readPaths: string[] = [],
     writePaths: string[] = [],
     desktopNames: string[] = [],
+    contentRating?: ContentRating,
   ) {
     this.revisions.push({
       revision: this.next_revision,
@@ -547,6 +549,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       read_paths: readPaths,
       write_paths: writePaths,
       desktop_names: desktopNames,
+      content_rating: contentRating,
     });
 
     this.updated_date = (new Date()).toISOString();
@@ -786,6 +789,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       permissions: revisionData ? (revisionData.permissions ?? []) : [],
       read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
       write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
+      content_rating: revisionData ? revisionData.content_rating : undefined,
       desktop_names: desktopNames,
       package_type: this.package_type,
       source_store: this.source_store,
@@ -1031,6 +1035,17 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
     const { readPaths, writePaths } = extractPathsFromClickData(parseData);
 
+    let contentRating: ContentRating | undefined;
+    if (parseData.appstream?.content_rating) {
+      const cr = parseData.appstream.content_rating;
+      if (cr.type === 'oars-1.0' || cr.type === 'oars-1.1') {
+        contentRating = {
+          type: cr.type,
+          content_attributes: cr.content_attributes ?? [],
+        };
+      }
+    }
+
     const localFilePath = this.getClickFilePath(channel, architecture, version);
     await fs.copyFile(filePath, localFilePath);
     await fs.unlink(filePath);
@@ -1050,6 +1065,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       parseData.apps
         .filter((app) => app.type === 'app')
         .map((app) => app.name),
+      contentRating,
     );
 
     if (parseData.icon) {

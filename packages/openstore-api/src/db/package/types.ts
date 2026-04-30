@@ -78,6 +78,14 @@ export type RevisionSnapData = {
   risk: string;
 };
 
+export type ContentRating = {
+  type: 'oars-1.0' | 'oars-1.1';
+  content_attributes: Array<{
+    value: string;
+    id: string;
+  }>;
+};
+
 export type SnapData = {
   channels: SnapChannel[];
   confinement: SnapConfinement;
@@ -101,6 +109,7 @@ export interface IRevision {
   write_paths?: string[];
   desktop_names?: string[];
   snap_data?: RevisionSnapData;
+  content_rating?: ContentRating;
 }
 
 export type HydratedRevision = HydratedDocument<IRevision>;
@@ -187,6 +196,7 @@ export type SerializedPackage = {
   write_paths?: string[];
   desktop_names?: string[];
   snap_data?: SerializedPackageSnapData;
+  content_rating?: ContentRating;
 };
 
 export type SerializedPackageSlim = {
@@ -341,6 +351,7 @@ export interface IPackageMethods {
     readPaths?: string[],
     writePaths?: string[],
     desktopNames?: string[],
+    contentRating?: ContentRating,
   ) => void;
   updateRevision: (
     revisionNumber: number,

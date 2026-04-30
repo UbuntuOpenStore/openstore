@@ -34,6 +34,10 @@ const revisionSchema = new Schema<IRevision, RevisionModel>({
     grade: String,
     risk: String,
   },
+  content_rating: {
+    type: { type: String },
+    content_attributes: [{ value: String, id: String }],
+  },
 });
 
 const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
