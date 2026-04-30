@@ -5,7 +5,10 @@ import path from 'path';
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 
+import { createHash } from 'crypto';
 import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
+import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory, extractAppstreamChangelogs }
+  from '../../utils/appstream-helpers';
 import { type HydratedRatingCount } from '../rating_count/types';
 import { v4 } from 'uuid';
 import {
@@ -138,7 +141,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     return { revisionData, revisionIndex };
   });
 
-  packageSchema.method<HydratedPackage>('updateFromClick', function (data: ClickParserData) {
+  packageSchema.method<HydratedPackage>('updateFromClick', async function (data: ClickParserData) {
     const manifest = {
       architecture: data.architecture,
       description: data.description,
@@ -209,6 +212,139 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.name = this.name ? this.name : (data.title ?? '');
     this.description = this.description ? this.description : sanitize(data.description);
     this.tagline = this.tagline ? this.tagline : sanitize(data.description);
+
+    // Apply AppStream metainfo data if present — it is the source of truth for mapped fields
+    if (data.appstream) {
+      const as = data.appstream;
+
+      const asName = getAppstreamLocalizedString(as.name);
+      if (asName) {
+        this.name = asName;
+      }
+
+      const asSummary = getAppstreamLocalizedString(as.summary);
+      if (asSummary) {
+        this.tagline = sanitize(asSummary);
+      }
+
+      const asDescription = getAppstreamLocalizedString(as.description);
+      if (asDescription) {
+        this.description = sanitize(asDescription);
+      }
+
+      const asKeywords = as.keywords
+        .filter((k) => k.lang === 'en')
+        .map((k) => k.text)
+        .filter(Boolean);
+      if (asKeywords.length > 0) {
+        this.keywords = asKeywords;
+      }
+
+      const incomingUrls = as.screenshots.slice(0, 5).filter((url) => isURL(url));
+
+      if (incomingUrls.length > 0) {
+        const urlHashFor = (url: string) => createHash('sha256').update(url).digest('hex').slice(0, 16);
+
+        // Partition existing screenshots: keep those matching an incoming URL's hash, delete the rest
+        const keptScreenshots: string[] = [];
+        const toDelete: string[] = [];
+        for (const filename of this.screenshots) {
+          if (incomingUrls.some((url) => filename.includes(`-screenshot-${urlHashFor(url)}`))) {
+            keptScreenshots.push(filename);
+          }
+          else {
+            toDelete.push(filename);
+          }
+        }
+
+        await Promise.all(toDelete.map((filename) =>
+          fs.unlink(`${config.screenshot_dir}/${filename}`).catch(() => { }),
+        ));
+
+        // Download only URLs not already present by hash
+        const urlsToDownload = incomingUrls.filter(
+          (url) => !keptScreenshots.some((f) => f.includes(`-screenshot-${urlHashFor(url)}`)),
+        );
+
+        const downloadResults = await Promise.all(urlsToDownload.map(async (url) => {
+          const urlHash = urlHashFor(url);
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              return null;
+            }
+
+            const contentType = response.headers.get('content-type') ?? '';
+            const extMap: Record<string, string> = {
+              'image/png': '.png',
+              'image/jpeg': '.jpg',
+              'image/webp': '.webp',
+            };
+            const ext = Object.entries(extMap).find(([mime]) => contentType.includes(mime))?.[1];
+            if (!ext) {
+              return null;
+            }
+
+            const tmpPath = path.join('/tmp', `${v4()}${ext}`);
+            await fs.writeFile(tmpPath, Buffer.from(await response.arrayBuffer()));
+
+            const filename = `${this.id as string}-screenshot-${urlHash}${ext}`;
+            await moveFile(tmpPath, `${config.screenshot_dir}/${filename}`);
+            return filename;
+          }
+          catch (err) {
+            console.warn(`Failed to download AppStream screenshot ${url}:`, err);
+            return null;
+          }
+        }));
+
+        // Assemble screenshots in original URL order
+        const newScreenshots: string[] = [];
+        for (const url of incomingUrls) {
+          const urlHash = urlHashFor(url);
+          const kept = keptScreenshots.find((f) => f.includes(`-screenshot-${urlHash}`));
+          if (kept) {
+            newScreenshots.push(kept);
+          }
+          else {
+            const downloaded = downloadResults[urlsToDownload.indexOf(url)];
+            if (downloaded) {
+              newScreenshots.push(downloaded);
+            }
+          }
+        }
+
+        this.screenshots = newScreenshots;
+      }
+
+      const asChangelogs = extractAppstreamChangelogs(as);
+      if (asChangelogs.length > 0) {
+        this.version_changelogs = asChangelogs;
+      }
+
+      for (const url of as.urls) {
+        if (url.type === 'homepage' && isURL(url.url)) {
+          this.support_url = url.url;
+        }
+        if (url.type === 'donation' && isURL(url.url)) {
+          this.donate_url = url.url;
+        }
+        if (url.type === 'translate' && isURL(url.url)) {
+          this.translation_url = url.url;
+        }
+      }
+
+      if (as.project_license) {
+        this.license = mapSpdxLicense(as.project_license);
+      }
+
+      if (as.categories.length > 0) {
+        const mappedCategory = mapAppstreamCategory(as.categories);
+        if (mappedCategory) {
+          this.category = mappedCategory;
+        }
+      }
+    }
   });
 
   packageSchema.method<HydratedPackage>('updateVideoUrl', function (url: string) {
@@ -655,10 +791,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       source_store: this.source_store,
       snap_data: this.snap_data
         ? {
-          channels: this.snap_data.channels,
-          confinement: this.snap_data.confinement,
-          base: this.snap_data.base,
-        }
+            channels: this.snap_data.channels,
+            confinement: this.snap_data.confinement,
+            base: this.snap_data.base,
+          }
         : undefined,
 
       // Deprecated, remove in the next major version
@@ -674,32 +810,32 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-          return [
-            ...downloads,
-            ...this.architectures.map((arch) => {
-              if (!Object.values(Architecture).includes(arch)) {
-                return null; // Filter out unsupported arches like i386 (legacy apps)
-              }
-              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-              if (downloadRevisionData) {
-                const download = {
-                  ...downloadRevisionData.toObject(),
-                  _id: undefined,
-                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                  download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
-                  installedSize: toBytes(downloadRevisionData.filesize),
-                  downloadSize: downloadRevisionData.downloadSize ?? 0,
+        return [
+          ...downloads,
+          ...this.architectures.map((arch) => {
+            if (!Object.values(Architecture).includes(arch)) {
+              return null; // Filter out unsupported arches like i386 (legacy apps)
+            }
+            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+            if (downloadRevisionData) {
+              const download = {
+                ...downloadRevisionData.toObject(),
+                _id: undefined,
+                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
+                installedSize: toBytes(downloadRevisionData.filesize),
+                downloadSize: downloadRevisionData.downloadSize ?? 0,
 
-                  // deprecated, remove in next version of the api
-                  filesize: toBytes(downloadRevisionData.filesize),
-                };
-                delete download._id;
-                return download;
-              }
-              return null;
-            }),
-          ];
-        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+                // deprecated, remove in next version of the api
+                filesize: toBytes(downloadRevisionData.filesize),
+              };
+              delete download._id;
+              return download;
+            }
+            return null;
+          }),
+        ];
+      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
@@ -890,7 +1026,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
     // Only update the data from the parsed click if it's for the default channel or if it's the first one
     if (channel === DEFAULT_CHANNEL || this.revisions.length === 0) {
-      this.updateFromClick(parseData);
+      await this.updateFromClick(parseData);
     }
 
     const { readPaths, writePaths } = extractPathsFromClickData(parseData);

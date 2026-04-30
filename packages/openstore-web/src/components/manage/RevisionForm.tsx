@@ -6,6 +6,7 @@ import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { cn, getClientApiKey } from "@/lib/utils";
 import SvgSave from "../icons/Save";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 type RevisionFormProps = {
   app: AppManageData;
@@ -161,6 +162,19 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
 
   return (
     <form class="space-y-4 h-full" onSubmit={save}>
+      <section class="section space-y-4">
+        <Alert>
+          <AlertTitle>AppStream Metainfo</AlertTitle>
+          <AlertDescription>
+            If your click package includes an AppStream metainfo file (<code>usr/share/metainfo/*.metainfo.xml</code>), the metadata it
+            contains (name, description, keywords, screenshots, changelogs, URLs, license, category) will <strong>overwrite</strong> the
+            values currently saved for this app. Manage those fields in your metainfo file rather than through the OpenStore.
+          </AlertDescription>
+        </Alert>
+      </section>
+
+      <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+
       <section class="section space-y-4">
         <div class="form-group">
           <label for="files" class="form-label">

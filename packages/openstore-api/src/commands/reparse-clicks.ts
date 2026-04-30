@@ -61,7 +61,7 @@ Package.find(query).then(async (pkgs) => {
 
         if (latestRevision.download_url && existsSync(latestRevision.download_url)) {
           const parseData = await clickParser.parseClickPackage(latestRevision.download_url, false);
-          pkg.updateFromClick(parseData);
+          await pkg.updateFromClick(parseData);
         }
 
         console.log(`Saving ${String(pkg.id)} (updated ${updatedCount} revisions)`);

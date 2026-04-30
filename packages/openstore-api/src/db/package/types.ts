@@ -325,7 +325,7 @@ export interface IPackageMethods {
     frameworks?: string[],
     version?: string
   ) => { revisionData?: HydratedRevision | null; revisionIndex: number };
-  updateFromClick: (data: ClickParserData) => void;
+  updateFromClick: (data: ClickParserData) => Promise<void>;
   updateFromBody: (body: BodyUpdate) => Promise<void>;
   updateVideoUrl: (videoUrl: string) => void;
   createNextRevision: (

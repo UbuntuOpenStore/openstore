@@ -1,5 +1,7 @@
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'fs/promises';
+import os from 'os';
 
 import { Package } from '.';
 import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
@@ -7,6 +9,9 @@ import { serializeRatings } from './methods';
 import { Ratings } from '../review/constants';
 import { UserError } from '../../exceptions';
 import { type TestPackage } from '../../tests/factory';
+import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory } from '../../utils/appstream-helpers';
+import { config } from '../../utils/config';
+import type { AppstreamExportData } from 'click-parser';
 
 describe('Package', () => {
   describe('parseRequestFilters', () => {
@@ -807,6 +812,304 @@ describe('Package', () => {
 
       await pkg.updateFromBody({ video_url: 'https://notavideosite.com/xyz' });
       assert.equal(pkg.video_url, '');
+    });
+  });
+
+  describe('appstream-helpers', () => {
+    describe('getAppstreamLocalizedString', () => {
+      test('returns english string', () => {
+        assert.equal(
+          getAppstreamLocalizedString([{ text: 'English', lang: 'en' }, { text: 'Deutsch', lang: 'de' }]),
+          'English',
+        );
+      });
+
+      test('falls back to first item when no english', () => {
+        assert.equal(
+          getAppstreamLocalizedString([{ text: 'Deutsch', lang: 'de' }]),
+          'Deutsch',
+        );
+      });
+
+      test('returns undefined for empty array', () => {
+        assert.equal(getAppstreamLocalizedString([]), undefined);
+        assert.equal(getAppstreamLocalizedString(undefined), undefined);
+      });
+    });
+
+    describe('mapSpdxLicense', () => {
+      test('maps licences', () => {
+        assert.equal(mapSpdxLicense('GPL-3.0'), 'GNU GPL v3');
+        assert.equal(mapSpdxLicense('GPL-3.0-only'), 'GNU GPL v3');
+        assert.equal(mapSpdxLicense('GPL-3.0-or-later'), 'GNU GPL v3');
+        assert.equal(mapSpdxLicense('MIT'), 'MIT/X/Expat License');
+        assert.equal(mapSpdxLicense('BSD-2-Clause'), 'BSD License (Simplified)');
+        assert.equal(mapSpdxLicense('BSD-3-Clause'), 'BSD License (Simplified)');
+        assert.equal(mapSpdxLicense('LicenseRef-proprietary'), 'Proprietary');
+      });
+
+      test('handles compound SPDX expressions (OR)', () => {
+        assert.equal(mapSpdxLicense('GPL-2.0-or-later OR MIT'), 'GNU GPL v2');
+      });
+
+      test('handles compound SPDX expressions (AND)', () => {
+        assert.equal(mapSpdxLicense('MIT AND Apache-2.0'), 'MIT/X/Expat License');
+      });
+
+      test('returns Other Open Source for unknown identifiers', () => {
+        assert.equal(mapSpdxLicense('LicenseRef-custom'), 'Other Open Source');
+        assert.equal(mapSpdxLicense(''), 'Other Open Source');
+      });
+    });
+
+    describe('mapAppstreamCategory', () => {
+      test('maps correctly', () => {
+        assert.equal(mapAppstreamCategory(['Development']), 'Developer Tools');
+        assert.equal(mapAppstreamCategory(['AudioVideo']), 'Music & Audio');
+      });
+
+      test('returns first match when multiple categories', () => {
+        assert.equal(mapAppstreamCategory(['UnknownCategory', 'Education']), 'Education & Reference');
+      });
+
+      test('returns undefined for unrecognised categories', () => {
+        assert.equal(mapAppstreamCategory(['UnknownCategory']), undefined);
+        assert.equal(mapAppstreamCategory([]), undefined);
+      });
+    });
+  });
+
+  describe('updateFromClick with AppStream data', () => {
+    let pkg: TestPackage;
+
+    const makeAppstream = (overrides: Partial<AppstreamExportData> = {}): AppstreamExportData => ({
+      name: [{ text: 'AppStream Name', lang: 'en' }],
+      summary: [{ text: 'AppStream Summary', lang: 'en' }],
+      description: [{ text: 'AppStream Description', lang: 'en' }],
+      keywords: [
+        { text: 'keyword1', lang: 'en' },
+        { text: 'keyword2', lang: 'en' },
+      ],
+      urls: [
+        { type: 'homepage', url: 'https://home.example.com' },
+        { type: 'donation', url: 'https://donate.example.com' },
+        { type: 'translate', url: 'https://translate.example.com' },
+      ],
+      project_license: 'MIT',
+      categories: ['Development'],
+      screenshots: [],
+      releases: [
+        { version: '1.0.0', description: [{ text: 'Initial release', lang: 'en' }] },
+      ],
+      ...overrides,
+    });
+
+    const makeClickData = (appstream?: AppstreamExportData) => ({
+      apps: [],
+      architecture: 'armhf',
+      description: 'Click description',
+      framework: 'ubuntu-sdk-20.04',
+      maintainer: 'test@example.com',
+      name: 'app.id',
+      title: 'Click Title',
+      version: '1.0.0',
+      permissions: [],
+      types: ['app'],
+      urls: [],
+      installedSize: 100,
+      webappInject: false,
+      webappProperties: {},
+      languages: ['en'],
+      files: [],
+      appstream,
+    });
+
+    beforeEach(() => {
+      pkg = new Package({
+        id: 'app.id',
+        name: 'Old Name',
+        description: 'Old description',
+        tagline: 'Old tagline',
+        keywords: ['old'],
+        license: 'Proprietary',
+        category: 'Utilities',
+        support_url: 'https://old.example.com',
+        donate_url: 'https://old.donate.com',
+        translation_url: 'https://old.translate.com',
+        screenshots: [],
+        version_changelogs: [],
+      });
+    });
+
+    test('overwrites mapped fields from AppStream data', async () => {
+      await pkg.updateFromClick(makeClickData(makeAppstream()));
+
+      assert.equal(pkg.name, 'AppStream Name');
+      assert.equal(pkg.tagline, 'AppStream Summary');
+      assert.equal(pkg.description, 'AppStream Description');
+      assert.deepEqual(pkg.keywords, ['keyword1', 'keyword2']);
+      assert.equal(pkg.support_url, 'https://home.example.com');
+      assert.equal(pkg.donate_url, 'https://donate.example.com');
+      assert.equal(pkg.translation_url, 'https://translate.example.com');
+      assert.equal(pkg.license, 'MIT/X/Expat License');
+      assert.equal(pkg.category, 'Developer Tools');
+      assert.deepEqual(pkg.version_changelogs, [{ version: '1.0.0', changelog: 'Initial release' }]);
+    });
+
+    test('leaves existing values unchanged when no AppStream data', async () => {
+      await pkg.updateFromClick(makeClickData(undefined));
+
+      assert.equal(pkg.name, 'Old Name');
+      assert.equal(pkg.description, 'Old description');
+      assert.equal(pkg.tagline, 'Old tagline');
+      assert.deepEqual(pkg.keywords, ['old']);
+      assert.equal(pkg.license, 'Proprietary');
+      assert.equal(pkg.category, 'Utilities');
+      assert.equal(pkg.support_url, 'https://old.example.com');
+    });
+
+    test('only takes english keywords', async () => {
+      const appstream = makeAppstream({
+        keywords: [
+          { text: 'english-keyword', lang: 'en' },
+          { text: 'deutsches-schlüsselwort', lang: 'de' },
+        ],
+      });
+
+      await pkg.updateFromClick(makeClickData(appstream));
+
+      assert.deepEqual(pkg.keywords, ['english-keyword']);
+    });
+
+    test('does not overwrite category when no matching AppStream category', async () => {
+      const appstream = makeAppstream({ categories: ['UnknownXDGCategory'] });
+      await pkg.updateFromClick(makeClickData(appstream));
+
+      assert.equal(pkg.category, 'Utilities');
+    });
+
+    test('does not overwrite URLs when they are invalid', async () => {
+      const appstream = makeAppstream({
+        urls: [
+          { type: 'homepage', url: 'not-a-valid-url' },
+        ],
+      });
+
+      await pkg.updateFromClick(makeClickData(appstream));
+
+      assert.equal(pkg.support_url, 'https://old.example.com');
+    });
+
+    test('screenshots from AppStream replace all existing screenshots', async (t) => {
+      const pngData = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        'base64',
+      );
+
+      t.mock.method(globalThis, 'fetch', async (url: string) => ({
+        ok: true,
+        headers: { get: () => 'image/png' },
+        arrayBuffer: async () => pngData.buffer,
+      }));
+
+      const tmpDir = await fs.mkdtemp(`${os.tmpdir()}/openstore-test-`);
+      const originalScreenshotDir = config.screenshot_dir;
+      config.screenshot_dir = tmpDir;
+
+      try {
+        // Pre-existing screenshot that should be replaced
+        const existingScreenshot = 'app.id-screenshot-existing.png';
+        await fs.writeFile(`${tmpDir}/${existingScreenshot}`, pngData);
+        pkg.screenshots = [existingScreenshot];
+
+        const appstream = makeAppstream({
+          screenshots: ['https://example.com/screenshot1.png', 'https://example.com/screenshot2.png'],
+        });
+
+        await pkg.updateFromClick(makeClickData(appstream));
+
+        // All existing screenshots replaced by the 2 AppStream ones
+        assert.equal(pkg.screenshots.length, 2);
+        assert.ok(!pkg.screenshots.includes(existingScreenshot), 'old screenshot replaced');
+        assert.ok(!pkg.screenshots[0].startsWith('https://'), 'screenshot should be a filename not a URL');
+        assert.ok(pkg.screenshots[0].includes('app.id-screenshot-'), 'filename follows naming convention');
+      }
+      finally {
+        config.screenshot_dir = originalScreenshotDir;
+        await fs.rm(tmpDir, { recursive: true, force: true });
+      }
+    });
+
+    test('re-uploading with AppStream replaces previous AppStream screenshots', async (t) => {
+      const pngData = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        'base64',
+      );
+
+      t.mock.method(globalThis, 'fetch', async (url: string) => ({
+        ok: true,
+        headers: { get: () => 'image/png' },
+        arrayBuffer: async () => pngData.buffer,
+      }));
+
+      const tmpDir = await fs.mkdtemp(`${os.tmpdir()}/openstore-test-`);
+      const originalScreenshotDir = config.screenshot_dir;
+      config.screenshot_dir = tmpDir;
+
+      try {
+        // First upload
+        const appstream1 = makeAppstream({ screenshots: ['https://example.com/v1.png'] });
+        await pkg.updateFromClick(makeClickData(appstream1));
+
+        assert.equal(pkg.screenshots.length, 1);
+        const firstFile = pkg.screenshots[0];
+
+        // Second upload replaces everything
+        const appstream2 = makeAppstream({ screenshots: ['https://example.com/v2.png'] });
+        await pkg.updateFromClick(makeClickData(appstream2));
+
+        assert.equal(pkg.screenshots.length, 1, 'one new screenshot');
+        assert.ok(!pkg.screenshots.includes(firstFile), 'previous screenshot replaced');
+      }
+      finally {
+        config.screenshot_dir = originalScreenshotDir;
+        await fs.rm(tmpDir, { recursive: true, force: true });
+      }
+    });
+
+    test('skips re-downloading screenshots when URLs are unchanged', async (t) => {
+      const pngData = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        'base64',
+      );
+
+      const fetchMock = t.mock.method(globalThis, 'fetch', async (url: string) => ({
+        ok: true,
+        headers: { get: () => 'image/png' },
+        arrayBuffer: async () => pngData.buffer,
+      }));
+
+      const tmpDir = await fs.mkdtemp(`${os.tmpdir()}/openstore-test-`);
+      const originalScreenshotDir = config.screenshot_dir;
+      config.screenshot_dir = tmpDir;
+
+      try {
+        const appstream = makeAppstream({ screenshots: ['https://example.com/shot.png'] });
+
+        // First upload downloads the screenshot
+        await pkg.updateFromClick(makeClickData(appstream));
+        assert.equal(fetchMock.mock.callCount(), 1, 'fetch called on first upload');
+        const firstFile = pkg.screenshots[0];
+
+        // Second upload with same URLs — should skip re-downloading
+        await pkg.updateFromClick(makeClickData(appstream));
+        assert.equal(fetchMock.mock.callCount(), 1, 'fetch not called again when URLs unchanged');
+        assert.equal(pkg.screenshots[0], firstFile, 'same filename kept');
+      }
+      finally {
+        config.screenshot_dir = originalScreenshotDir;
+        await fs.rm(tmpDir, { recursive: true, force: true });
+      }
     });
   });
 });
