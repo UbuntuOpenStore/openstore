@@ -12,6 +12,7 @@ import Review from "@/components/apps/Review.astro";
 import Screenshots from "@/components/apps/Screenshots";
 import AppTypeBadges from "@/components/apps/AppTypeBadges";
 import Ratings from "@/components/apps/Ratings";
+import ContentRating from "@/components/apps/ContentRating.astro";
 
 import SvgCommunity from "@/components/icons/Community";
 import SvgDate from "@/components/icons/Date";
@@ -327,7 +328,10 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
           </>
         )
       }
+
     </div>
+
+    <ContentRating contentRating={app.content_rating} />
   </section>
 
   <section class="section flex flex-col md:flex-row gap-4 items-stretch">

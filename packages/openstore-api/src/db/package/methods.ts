@@ -333,6 +333,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         if (url.type === 'translate' && isURL(url.url)) {
           this.translation_url = url.url;
         }
+        if (url.type === 'vcs-browser' && isURL(url.url)) {
+          this.source = url.url;
+        }
       }
 
       if (as.project_license) {
@@ -795,10 +798,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       source_store: this.source_store,
       snap_data: this.snap_data
         ? {
-            channels: this.snap_data.channels,
-            confinement: this.snap_data.confinement,
-            base: this.snap_data.base,
-          }
+          channels: this.snap_data.channels,
+          confinement: this.snap_data.confinement,
+          base: this.snap_data.base,
+        }
         : undefined,
 
       // Deprecated, remove in the next major version
@@ -814,32 +817,32 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       const jsonDownloads = Object.values(Channel)
         .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [
-          ...downloads,
-          ...this.architectures.map((arch) => {
-            if (!Object.values(Architecture).includes(arch)) {
-              return null; // Filter out unsupported arches like i386 (legacy apps)
-            }
-            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-            if (downloadRevisionData) {
-              const download = {
-                ...downloadRevisionData.toObject(),
-                _id: undefined,
-                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
-                installedSize: toBytes(downloadRevisionData.filesize),
-                downloadSize: downloadRevisionData.downloadSize ?? 0,
+          return [
+            ...downloads,
+            ...this.architectures.map((arch) => {
+              if (!Object.values(Architecture).includes(arch)) {
+                return null; // Filter out unsupported arches like i386 (legacy apps)
+              }
+              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+              if (downloadRevisionData) {
+                const download = {
+                  ...downloadRevisionData.toObject(),
+                  _id: undefined,
+                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                  download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
+                  installedSize: toBytes(downloadRevisionData.filesize),
+                  downloadSize: downloadRevisionData.downloadSize ?? 0,
 
-                // deprecated, remove in next version of the api
-                filesize: toBytes(downloadRevisionData.filesize),
-              };
-              delete download._id;
-              return download;
-            }
-            return null;
-          }),
-        ];
-      }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+                  // deprecated, remove in next version of the api
+                  filesize: toBytes(downloadRevisionData.filesize),
+                };
+                delete download._id;
+                return download;
+              }
+              return null;
+            }),
+          ];
+        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom

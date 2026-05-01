@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-04-22T02:48:45.202Z\n"
-"PO-Revision-Date: 2026-04-22T02:48:45.203Z\n"
+"POT-Creation-Date: 2026-05-01T03:19:50.552Z\n"
+"PO-Revision-Date: 2026-05-01T03:19:50.553Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -58,6 +58,277 @@ msgstr "Logout"
 
 msgid "Login"
 msgstr "Login"
+
+msgid "Cartoon Violence"
+msgstr "Cartoon Violence"
+
+msgid "Fantasy Violence"
+msgstr "Fantasy Violence"
+
+msgid "Realistic Violence"
+msgstr "Realistic Violence"
+
+msgid "Bloodshed"
+msgstr "Bloodshed"
+
+msgid "Sexual Violence"
+msgstr "Sexual Violence"
+
+msgid "Desecration"
+msgstr "Desecration"
+
+msgid "Human Slavery"
+msgstr "Human Slavery"
+
+msgid "Alcohol"
+msgstr "Alcohol"
+
+msgid "Narcotics"
+msgstr "Narcotics"
+
+msgid "Tobacco"
+msgstr "Tobacco"
+
+msgid "Nudity"
+msgstr "Nudity"
+
+msgid "Sexual Themes"
+msgstr "Sexual Themes"
+
+msgid "Profanity"
+msgstr "Profanity"
+
+msgid "Humor"
+msgstr "Humor"
+
+msgid "Discrimination"
+msgstr "Discrimination"
+
+msgid "Online Text Messaging"
+msgstr "Online Text Messaging"
+
+msgid "Information Sharing"
+msgstr "Information Sharing"
+
+msgid "Audio & Video Chat"
+msgstr "Audio & Video Chat"
+
+msgid "Location Sharing"
+msgstr "Location Sharing"
+
+msgid "Contact Sharing"
+msgstr "Contact Sharing"
+
+msgid "In-App Purchases"
+msgstr "In-App Purchases"
+
+msgid "Advertising"
+msgstr "Advertising"
+
+msgid "Gambling"
+msgstr "Gambling"
+
+msgid "Cartoon characters in unsafe situations"
+msgstr "Cartoon characters in unsafe situations"
+
+msgid "Cartoon characters in aggressive conflict"
+msgstr "Cartoon characters in aggressive conflict"
+
+msgid "Cartoon characters showing graphic violence"
+msgstr "Cartoon characters showing graphic violence"
+
+msgid "Fantasy characters in unsafe situations"
+msgstr "Fantasy characters in unsafe situations"
+
+msgid "Fantasy characters in aggressive conflict"
+msgstr "Fantasy characters in aggressive conflict"
+
+msgid "Fantasy characters with graphic violence"
+msgstr "Fantasy characters with graphic violence"
+
+msgid "Realistic characters in unsafe situations"
+msgstr "Realistic characters in unsafe situations"
+
+msgid "Realistic characters in depictions of aggressive conflict"
+msgstr "Realistic characters in depictions of aggressive conflict"
+
+msgid "Realistic characters with graphic violence"
+msgstr "Realistic characters with graphic violence"
+
+msgid "Unrealistic bloodshed"
+msgstr "Unrealistic bloodshed"
+
+msgid "Realistic bloodshed"
+msgstr "Realistic bloodshed"
+
+msgid "Depictions of bloodshed and the mutilation of body parts"
+msgstr "Depictions of bloodshed and the mutilation of body parts"
+
+msgid "Rape or other violent sexual behavior"
+msgstr "Rape or other violent sexual behavior"
+
+msgid "Visible dead human remains"
+msgstr "Visible dead human remains"
+
+msgid "Dead human remains that are exposed to the elements"
+msgstr "Dead human remains that are exposed to the elements"
+
+msgid ""
+"Graphic depictions of desecration of human bodies, for example being eaten "
+"by wild animals"
+msgstr ""
+"Graphic depictions of desecration of human bodies, for example being eaten "
+"by wild animals"
+
+msgid "Depictions or references to historical slavery"
+msgstr "Depictions or references to historical slavery"
+
+msgid "Depictions of modern-day slavery"
+msgstr "Depictions of modern-day slavery"
+
+msgid "Graphic depictions of modern-day slavery"
+msgstr "Graphic depictions of modern-day slavery"
+
+msgid "References to alcoholic beverages"
+msgstr "References to alcoholic beverages"
+
+msgid "Use of alcoholic beverages"
+msgstr "Use of alcoholic beverages"
+
+msgid "References to illicit drugs"
+msgstr "References to illicit drugs"
+
+msgid "Use of illicit drugs"
+msgstr "Use of illicit drugs"
+
+msgid "References to tobacco products"
+msgstr "References to tobacco products"
+
+msgid "Use of tobacco products"
+msgstr "Use of tobacco products"
+
+msgid "Brief artistic nudity"
+msgstr "Brief artistic nudity"
+
+msgid "Prolonged nudity"
+msgstr "Prolonged nudity"
+
+msgid "Explicit nudity showing nipples or sexual organs"
+msgstr "Explicit nudity showing nipples or sexual organs"
+
+msgid "Provocative references or depictions"
+msgstr "Provocative references or depictions"
+
+msgid "Sexual references or depictions"
+msgstr "Sexual references or depictions"
+
+msgid "Graphic sexual behavior"
+msgstr "Graphic sexual behavior"
+
+msgid "Mild or infrequent use of profanity"
+msgstr "Mild or infrequent use of profanity"
+
+msgid "Moderate use of profanity"
+msgstr "Moderate use of profanity"
+
+msgid "Strong or frequent use of profanity"
+msgstr "Strong or frequent use of profanity"
+
+msgid "Slapstick humor"
+msgstr "Slapstick humor"
+
+msgid "Vulgar or bathroom humor"
+msgstr "Vulgar or bathroom humor"
+
+msgid "Mature or sexual humor"
+msgstr "Mature or sexual humor"
+
+msgid "Negativity towards a specific group of people, e.g. ethnic jokes"
+msgstr "Negativity towards a specific group of people, e.g. ethnic jokes"
+
+msgid "Discrimination designed to cause emotional harm, e.g. racism or homophobia"
+msgstr "Discrimination designed to cause emotional harm, e.g. racism or homophobia"
+
+msgid "Explicit discrimination based on gender, sexuality, race or religion"
+msgstr "Explicit discrimination based on gender, sexuality, race or religion"
+
+msgid "User-to-user interactions without chat functionality"
+msgstr "User-to-user interactions without chat functionality"
+
+msgid "Moderated messaging between users"
+msgstr "Moderated messaging between users"
+
+msgid "Uncontrolled chat functionality between users"
+msgstr "Uncontrolled chat functionality between users"
+
+msgid "Using any online API, e.g. a user-counter"
+msgstr "Using any online API, e.g. a user-counter"
+
+msgid "Sharing diagnostic data not identifiable to the user"
+msgstr "Sharing diagnostic data not identifiable to the user"
+
+msgid "Sharing information identifiable to the user, e.g. crash dumps"
+msgstr "Sharing information identifiable to the user, e.g. crash dumps"
+
+msgid "Moderated audio or video chat between users"
+msgstr "Moderated audio or video chat between users"
+
+msgid "Uncontrolled audio or video chat between users"
+msgstr "Uncontrolled audio or video chat between users"
+
+msgid "Sharing physical location to other users"
+msgstr "Sharing physical location to other users"
+
+msgid "Sharing contact details with other users"
+msgstr "Sharing contact details with other users"
+
+msgid "Users are encouraged to donate real money, e.g. using Patreon"
+msgstr "Users are encouraged to donate real money, e.g. using Patreon"
+
+msgid "Ability to spend real money in-app, e.g. buying new content or new levels"
+msgstr "Ability to spend real money in-app, e.g. buying new content or new levels"
+
+msgid "Product placement, e.g. billboards in a football game"
+msgstr "Product placement, e.g. billboards in a football game"
+
+msgid "Explicit references to specific brands or trademarked products"
+msgstr "Explicit references to specific brands or trademarked products"
+
+msgid "Users are encouraged to purchase specific real-world items"
+msgstr "Users are encouraged to purchase specific real-world items"
+
+msgid "Gambling on random events using tokens or credits"
+msgstr "Gambling on random events using tokens or credits"
+
+msgid "Gambling using fictional money"
+msgstr "Gambling using fictional money"
+
+msgid "Gambling using real money"
+msgstr "Gambling using real money"
+
+msgid "Mild"
+msgstr "Mild"
+
+msgid "Moderate"
+msgstr "Moderate"
+
+msgid "Intense"
+msgstr "Intense"
+
+msgid "Content Rating"
+msgstr "Content Rating"
+
+msgid "This app has not been rated"
+msgstr "This app has not been rated"
+
+msgid "All Ages"
+msgstr "All Ages"
+
+msgid "No concerning content"
+msgstr "No concerning content"
+
+msgid "Self reported rating using Open Age Rating Service"
+msgstr "Self reported rating using Open Age Rating Service"
 
 msgid "Reviewed %{date} for version %{version}"
 msgstr "Reviewed %{date} for version %{version}"
@@ -823,9 +1094,6 @@ msgstr "Harassment, Bullying, or Hate Speech"
 
 msgid "App containing or promoting any of the above are strictly prohibited."
 msgstr "App containing or promoting any of the above are strictly prohibited."
-
-msgid "Gambling"
-msgstr "Gambling"
 
 msgid ""
 "Apps containing gambling involving real world money transactions are not "

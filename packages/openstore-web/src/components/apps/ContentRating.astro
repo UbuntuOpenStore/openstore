@@ -1,0 +1,235 @@
+---
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
+import CircleIcon from "@/components/CircleIcon.astro";
+import SvgInfo from "@/components/icons/Info";
+import SvgLock from "@/components/icons/Lock";
+import SvgSecurityAlert from "@/components/icons/SecurityAlert";
+
+await initializeI18N(Astro.currentLocale);
+
+type ContentAttribute = {
+  value: string;
+  id: string;
+};
+
+export type Props = {
+  contentRating?: {
+    type?: string;
+    content_attributes?: ContentAttribute[];
+  };
+};
+
+const { contentRating } = Astro.props;
+
+// Labels and descriptions from OARS: https://github.com/hughsie/oars/blob/master/docs/generate.html
+const ATTRIBUTE_LABELS: Record<string, string> = {
+  "violence-cartoon": t("Cartoon Violence"),
+  "violence-fantasy": t("Fantasy Violence"),
+  "violence-realistic": t("Realistic Violence"),
+  "violence-bloodshed": t("Bloodshed"),
+  "violence-sexual": t("Sexual Violence"),
+  "violence-desecration": t("Desecration"),
+  "violence-slavery": t("Human Slavery"),
+  "drugs-alcohol": t("Alcohol"),
+  "drugs-narcotics": t("Narcotics"),
+  "drugs-tobacco": t("Tobacco"),
+  "sex-nudity": t("Nudity"),
+  "sex-themes": t("Sexual Themes"),
+  "language-profanity": t("Profanity"),
+  "language-humor": t("Humor"),
+  "language-discrimination": t("Discrimination"),
+  "social-chat": t("Online Text Messaging"),
+  "social-info": t("Information Sharing"),
+  "social-audio": t("Audio & Video Chat"),
+  "social-location": t("Location Sharing"),
+  "social-contacts": t("Contact Sharing"),
+  "money-purchasing": t("In-App Purchases"),
+  "money-advertising": t("Advertising"),
+  "money-gambling": t("Gambling"),
+};
+
+const ATTRIBUTE_DESCRIPTIONS: Record<string, Partial<Record<string, string>>> = {
+  "violence-cartoon": {
+    mild: t("Cartoon characters in unsafe situations"),
+    moderate: t("Cartoon characters in aggressive conflict"),
+    intense: t("Cartoon characters showing graphic violence"),
+  },
+  "violence-fantasy": {
+    mild: t("Fantasy characters in unsafe situations"),
+    moderate: t("Fantasy characters in aggressive conflict"),
+    intense: t("Fantasy characters with graphic violence"),
+  },
+  "violence-realistic": {
+    mild: t("Realistic characters in unsafe situations"),
+    moderate: t("Realistic characters in depictions of aggressive conflict"),
+    intense: t("Realistic characters with graphic violence"),
+  },
+  "violence-bloodshed": {
+    mild: t("Unrealistic bloodshed"),
+    moderate: t("Realistic bloodshed"),
+    intense: t("Depictions of bloodshed and the mutilation of body parts"),
+  },
+  "violence-sexual": {
+    intense: t("Rape or other violent sexual behavior"),
+  },
+  "violence-desecration": {
+    mild: t("Visible dead human remains"),
+    moderate: t("Dead human remains that are exposed to the elements"),
+    intense: t("Graphic depictions of desecration of human bodies, for example being eaten by wild animals"),
+  },
+  "violence-slavery": {
+    mild: t("Depictions or references to historical slavery"),
+    moderate: t("Depictions of modern-day slavery"),
+    intense: t("Graphic depictions of modern-day slavery"),
+  },
+  "drugs-alcohol": {
+    mild: t("References to alcoholic beverages"),
+    moderate: t("Use of alcoholic beverages"),
+  },
+  "drugs-narcotics": {
+    mild: t("References to illicit drugs"),
+    moderate: t("Use of illicit drugs"),
+  },
+  "drugs-tobacco": {
+    mild: t("References to tobacco products"),
+    moderate: t("Use of tobacco products"),
+  },
+  "sex-nudity": {
+    mild: t("Brief artistic nudity"),
+    moderate: t("Prolonged nudity"),
+    intense: t("Explicit nudity showing nipples or sexual organs"),
+  },
+  "sex-themes": {
+    mild: t("Provocative references or depictions"),
+    moderate: t("Sexual references or depictions"),
+    intense: t("Graphic sexual behavior"),
+  },
+  "language-profanity": {
+    mild: t("Mild or infrequent use of profanity"),
+    moderate: t("Moderate use of profanity"),
+    intense: t("Strong or frequent use of profanity"),
+  },
+  "language-humor": {
+    mild: t("Slapstick humor"),
+    moderate: t("Vulgar or bathroom humor"),
+    intense: t("Mature or sexual humor"),
+  },
+  "language-discrimination": {
+    mild: t("Negativity towards a specific group of people, e.g. ethnic jokes"),
+    moderate: t("Discrimination designed to cause emotional harm, e.g. racism or homophobia"),
+    intense: t("Explicit discrimination based on gender, sexuality, race or religion"),
+  },
+  "social-chat": {
+    mild: t("User-to-user interactions without chat functionality"),
+    moderate: t("Moderated messaging between users"),
+    intense: t("Uncontrolled chat functionality between users"),
+  },
+  "social-info": {
+    mild: t("Using any online API, e.g. a user-counter"),
+    moderate: t("Sharing diagnostic data not identifiable to the user"),
+    intense: t("Sharing information identifiable to the user, e.g. crash dumps"),
+  },
+  "social-audio": {
+    moderate: t("Moderated audio or video chat between users"),
+    intense: t("Uncontrolled audio or video chat between users"),
+  },
+  "social-location": {
+    intense: t("Sharing physical location to other users"),
+  },
+  "social-contacts": {
+    intense: t("Sharing contact details with other users"),
+  },
+  "money-purchasing": {
+    mild: t("Users are encouraged to donate real money, e.g. using Patreon"),
+    intense: t("Ability to spend real money in-app, e.g. buying new content or new levels"),
+  },
+  "money-advertising": {
+    mild: t("Product placement, e.g. billboards in a football game"),
+    moderate: t("Explicit references to specific brands or trademarked products"),
+    intense: t("Users are encouraged to purchase specific real-world items"),
+  },
+  "money-gambling": {
+    mild: t("Gambling on random events using tokens or credits"),
+    moderate: t("Gambling using fictional money"),
+    intense: t("Gambling using real money"),
+  },
+};
+
+const SEVERITY_ORDER = ["none", "mild", "moderate", "intense"];
+
+const SEVERITY_LABELS: Record<string, string> = {
+  mild: t("Mild"),
+  moderate: t("Moderate"),
+  intense: t("Intense"),
+};
+
+const SEVERITY_CLASSES: Record<string, string> = {
+  mild: "text-yellow-600",
+  moderate: "text-orange-600",
+  intense: "text-red-700",
+};
+
+const nonNoneAttributes = contentRating ? (contentRating.content_attributes ?? []).filter((a) => a.value !== "none") : [];
+
+const isNotRated = !contentRating || !contentRating.type;
+const isAllAges = !isNotRated && nonNoneAttributes.length === 0;
+
+const maxSeverityIndex = nonNoneAttributes.reduce((max, attr) => {
+  const idx = SEVERITY_ORDER.indexOf(attr.value);
+  return idx > max ? idx : max;
+}, 0);
+
+const sortedAttributes = [...nonNoneAttributes].sort((a, b) => SEVERITY_ORDER.indexOf(b.value) - SEVERITY_ORDER.indexOf(a.value));
+---
+
+<div class="card">
+  <h2 class="text-xl text-center mb-4">{t("Content Rating")}</h2>
+
+  {
+    isNotRated ? (
+      <>
+        <CircleIcon outerClass="bg-gray-400/70 mb-4" innerClass="bg-gray-200">
+          <SvgInfo />
+        </CircleIcon>
+        <p class="text-center">{t("This app has not been rated")}</p>
+      </>
+    ) : isAllAges ? (
+      <>
+        <CircleIcon outerClass="bg-green-500/70 mb-4" innerClass="bg-green-200">
+          <SvgLock />
+        </CircleIcon>
+        <p class="text-center font-semibold">{t("All Ages")}</p>
+        <p class="text-center text-sm text-gray-600">{t("No concerning content")}</p>
+      </>
+    ) : (
+      <>
+        <CircleIcon
+          outerClass={`${maxSeverityIndex >= 3 ? "bg-red-500/70" : maxSeverityIndex >= 2 ? "bg-orange-500/70" : "bg-yellow-500/70"} mb-4`}
+          innerClass={maxSeverityIndex >= 3 ? "bg-red-200" : maxSeverityIndex >= 2 ? "bg-orange-200" : "bg-yellow-200"}
+        >
+          <SvgSecurityAlert />
+        </CircleIcon>
+        <ul>
+          {sortedAttributes.map((attr) => (
+            <li class="pb-2">
+              <div class="flex justify-between">
+                <span>{ATTRIBUTE_LABELS[attr.id] ?? attr.id}</span>
+                <span class={`ml-4 font-semibold ${SEVERITY_CLASSES[attr.value] ?? ""}`}>{SEVERITY_LABELS[attr.value] ?? attr.value}</span>
+              </div>
+              {ATTRIBUTE_DESCRIPTIONS[attr.id]?.[attr.value] && (
+                <p class={`text-sm ${SEVERITY_CLASSES[attr.value] ?? "text-gray-500"}`}>{ATTRIBUTE_DESCRIPTIONS[attr.id]![attr.value]}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  <p class="text-xs text-gray-500 mt-4 text-center">
+    <a href="https://hughsie.github.io/oars/" class="underline" rel="noopener noreferrer">
+      {t("Self reported rating using Open Age Rating Service")}</a
+    >
+  </p>
+</div>

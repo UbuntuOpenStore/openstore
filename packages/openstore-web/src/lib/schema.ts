@@ -89,6 +89,13 @@ export const AppSchema = z.object({
   permissions: z.array(z.string()),
   read_paths: z.array(z.string()),
   write_paths: z.array(z.string()),
+  content_rating: z.object({
+    type: z.string().optional(),
+    content_attributes: z.array(z.object({
+      value: z.string(),
+      id: z.string(),
+    })).optional(),
+  }).optional(),
 });
 
 export type AppData = z.infer<typeof AppSchema>;
