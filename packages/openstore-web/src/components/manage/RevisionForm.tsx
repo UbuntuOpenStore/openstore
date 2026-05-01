@@ -7,6 +7,7 @@ import SvgClose from "../icons/Close";
 import { cn, getClientApiKey } from "@/lib/utils";
 import SvgSave from "../icons/Save";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import SvgInfo from "../icons/Info";
 
 type RevisionFormProps = {
   app: AppManageData;
@@ -163,13 +164,28 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
   return (
     <form class="space-y-4 h-full" onSubmit={save}>
       <section class="section space-y-4">
-        <Alert>
-          <AlertTitle>AppStream Metainfo</AlertTitle>
-          <AlertDescription>
-            If your click package includes an AppStream metainfo file (<code>usr/share/metainfo/*.metainfo.xml</code>), the metadata it
-            contains (name, description, keywords, screenshots, changelogs, URLs, license, category) will <strong>overwrite</strong> the
-            values currently saved for this app. Manage those fields in your metainfo file rather than through the OpenStore.
-          </AlertDescription>
+        <Alert class="flex gap-4" variant="info">
+          <div>
+            <SvgInfo class="text-blue-600" />
+          </div>
+
+          <div>
+            <AlertTitle>AppStream Metainfo</AlertTitle>
+            <AlertDescription>
+              If your click package includes an{" "}
+              <a
+                href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="underline"
+              >
+                AppStream metainfo file
+              </a>{" "}
+              (<code>usr/share/metainfo/*.metainfo.xml</code>), the metadata it contains (name, description, keywords, screenshots,
+              changelogs, URLs, license, category) will overwrite the values currently saved for this app. Manage those fields in your
+              metainfo file rather than through the OpenStore.
+            </AlertDescription>
+          </div>
         </Alert>
       </section>
 
