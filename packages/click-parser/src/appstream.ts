@@ -196,12 +196,12 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
   const crNode = findChild(cc, 'content_rating');
   const contentRating = crNode
     ? {
-      type: crNode.attrs['@_type'],
-      content_attributes: findChildren(crNode.children, 'content_attribute').map((ca) => ({
-        value: getNodeText(ca.children),
-        id: ca.attrs['@_id'] ?? '',
-      })),
-    }
+        type: crNode.attrs['@_type'],
+        content_attributes: findChildren(crNode.children, 'content_attribute').map((ca) => ({
+          value: getNodeText(ca.children),
+          id: ca.attrs['@_id'] ?? '',
+        })),
+      }
     : undefined;
 
   const customNode = findChild(cc, 'custom');
