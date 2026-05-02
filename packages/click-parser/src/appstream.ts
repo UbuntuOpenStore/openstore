@@ -173,9 +173,13 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
   const screenshotsNode = findChild(cc, 'screenshots');
   if (screenshotsNode) {
     for (const ssNode of findChildren(screenshotsNode.children, 'screenshot')) {
-      for (const imgNode of findChildren(ssNode.children, 'image')) {
-        const url = getNodeText(imgNode.children);
-        if (url) screenshots.push(url);
+      const env = ssNode.attrs['@_environment'];
+      // Include screenshots with no environment (universal) or lomiri/lomiri:dark/lomiri:light
+      if (!env || env === 'lomiri' || env.startsWith('lomiri:')) {
+        for (const imgNode of findChildren(ssNode.children, 'image')) {
+          const url = getNodeText(imgNode.children);
+          if (url) screenshots.push(url);
+        }
       }
     }
   }

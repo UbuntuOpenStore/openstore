@@ -274,4 +274,60 @@ describe('click-parser', () => {
 
     assert.deepEqual(data.content_rating, { type: 'oars-1.1', content_attributes: [] });
   });
+
+  test('parseAppstream screenshot environment filtering', () => {
+    const xml = `<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>test.app</id>
+  <name>Test App</name>
+  <summary>Test</summary>
+  <screenshots>
+    <screenshot type="default" environment="lomiri">
+      <image>https://example.com/lomiri.png</image>
+    </screenshot>
+    <screenshot environment="lomiri:dark">
+      <image>https://example.com/lomiri-dark.png</image>
+    </screenshot>
+    <screenshot environment="lomiri:light">
+      <image>https://example.com/lomiri-light.png</image>
+    </screenshot>
+    <screenshot environment="gnome">
+      <image>https://example.com/gnome.png</image>
+    </screenshot>
+    <screenshot environment="plasma">
+      <image>https://example.com/plasma.png</image>
+    </screenshot>
+  </screenshots>
+</component>`;
+    const data = parseAppstream(Buffer.from(xml));
+    assert.ok(data, 'appstream data should be parsed');
+    assert.deepEqual(data.screenshots, [
+      'https://example.com/lomiri.png',
+      'https://example.com/lomiri-dark.png',
+      'https://example.com/lomiri-light.png',
+    ], 'only lomiri environment screenshots should be included');
+  });
+
+  test('parseAppstream screenshots with no environment attribute', () => {
+    const xml = `<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>test.app</id>
+  <name>Test App</name>
+  <summary>Test</summary>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://example.com/screenshot1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://example.com/screenshot2.png</image>
+    </screenshot>
+  </screenshots>
+</component>`;
+    const data = parseAppstream(Buffer.from(xml));
+    assert.ok(data, 'appstream data should be parsed');
+    assert.deepEqual(data.screenshots, [
+      'https://example.com/screenshot1.png',
+      'https://example.com/screenshot2.png',
+    ], 'all screenshots should be included when no environment is specified');
+  });
 });
