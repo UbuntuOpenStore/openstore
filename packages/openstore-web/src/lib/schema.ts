@@ -210,6 +210,7 @@ export const UserSchema = z.object({
   donation_url: z.string().optional(),
   avatar: z.string().optional(),
   description: z.string().optional(),
+  login_providers: z.array(z.string()).optional(),
 });
 
 export type UserData = z.infer<typeof UserSchema>;

@@ -48,6 +48,12 @@ userSchema.method('serialize', function (includeRole: boolean, includeApiKey: bo
 
   if (includeEmail) {
     userData.email = this.email;
+
+    const providers: string[] = [];
+    if (this.ubuntu_id) { providers.push('ubuntu'); }
+    if (this.github_id) { providers.push('github'); }
+    if (this.gitlab_id) { providers.push('gitlab'); }
+    userData.login_providers = providers;
   }
 
   return userData;

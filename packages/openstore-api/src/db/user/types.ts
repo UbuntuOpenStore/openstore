@@ -32,6 +32,7 @@ export type ProfileUpdateData = Pick<IUser,
 
 export interface UserSerializeOutput extends Omit<IUser, 'apikey'> {
   apikey?: string;
+  login_providers?: string[];
 }
 
 export interface IUserMethods {

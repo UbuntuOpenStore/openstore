@@ -383,7 +383,7 @@ export function transformSnapToPackage(
 
   const stableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
   const stableOrFirst = stableRevision || v2Data['channel-map'][0];
-  const snapCategory = v2Data.snap.categories?.[0]?.name || 'utilities';
+  const snapCategory = v2Data.snap.categories?.[0]?.name?.toLowerCase() || 'utilities';
   const openStoreCategory = CATEGORY_MAPPING[snapCategory] || 'Utilities';
   const contactUrls = v2Data.snap.links?.contact || [];
   const websiteUrls = v2Data.snap.links?.website || [];

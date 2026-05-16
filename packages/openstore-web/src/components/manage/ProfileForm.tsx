@@ -2,6 +2,9 @@ import { useState, useCallback, useRef } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
+import SvgGithub from "../icons/Github";
+import SvgGitlab from "../icons/Gitlab";
+import SvgUbuntuone from "../icons/Ubuntuone";
 import type { UserData } from "@/lib/schema";
 import { getClientApiKey } from "@/lib/utils";
 import type { JSX } from "preact/jsx-runtime";
@@ -111,7 +114,28 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
           </label>
           <input id="email" type="email" readOnly value={user.email || ""} class="form-input bg-gray-100" />
         </div>
-        <p class="mt-1 text-xs text-gray-500 text-right">{messages.emailManagedByProvider}</p>
+        <div class="mt-1 flex items-center justify-end gap-2">
+          <p class="text-xs text-gray-500">{messages.emailManagedByProvider}</p>
+          {user.login_providers && user.login_providers.length > 0 && (
+            <>
+              {user.login_providers.includes("github") && (
+                <span title="GitHub">
+                  <SvgGithub class="w-4 h-4" />
+                </span>
+              )}
+              {user.login_providers.includes("gitlab") && (
+                <span title="GitLab">
+                  <SvgGitlab class="w-4 h-4" />
+                </span>
+              )}
+              {user.login_providers.includes("ubuntu") && (
+                <span title="Ubuntu SSO">
+                  <SvgUbuntuone class="w-4 h-4" />
+                </span>
+              )}
+            </>
+          )}
+        </div>
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
