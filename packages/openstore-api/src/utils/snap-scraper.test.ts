@@ -151,6 +151,8 @@ describe('Snap Scraper Utils', () => {
             revision: 3777,
             type: 'app',
             version: '3.0.20-1-g2617de71b6',
+            confinement: 'strict',
+            base: 'core18',
           },
         ],
       };
@@ -247,7 +249,7 @@ describe('Snap Scraper Utils', () => {
   });
 
   describe('transformSnapToPackage', () => {
-    test('should transform v2 and v1 data to package format', () => {
+    test('should transform v2 data to package format', () => {
       const v2Data: SnapV2Response = {
         name: 'vlc',
         'snap-id': 'RT9mcUhVsRYrDLG8qnvGiy26NKvv6Qkd',
@@ -265,6 +267,17 @@ describe('Snap Scraper Utils', () => {
           'store-url': 'https://snapcraft.io/vlc',
           summary: 'The ultimate media player',
           title: 'VLC',
+          categories: [{ featured: false, name: 'music-and-audio' }],
+          description: 'VLC is the VideoLAN projects media player. Very detailed description here.',
+          media: [
+            { type: 'icon', url: 'https://example.com/icon.png', width: 256, height: 256 },
+            { type: 'screenshot', url: 'https://example.com/screenshot1.png', width: 1280, height: 720 },
+            { type: 'screenshot', url: 'https://example.com/screenshot2.png', width: 1280, height: 720 },
+          ],
+          links: {
+            contact: ['https://www.videolan.org/support/'],
+            website: ['https://www.videolan.org/vlc/'],
+          },
         },
         'channel-map': [
           {
@@ -284,6 +297,8 @@ describe('Snap Scraper Utils', () => {
             revision: 3777,
             type: 'app',
             version: '3.0.20-1-g2617de71b6',
+            confinement: 'strict',
+            base: 'core18',
           },
           {
             channel: {
@@ -302,49 +317,13 @@ describe('Snap Scraper Utils', () => {
             revision: 3778,
             type: 'app',
             version: '3.0.20-1-g2617de71b6',
+            confinement: 'strict',
+            base: 'core18',
           },
         ],
       };
 
-      const v1Data: SnapV1Response = {
-        name: 'vlc.videolan',
-        package_name: 'vlc',
-        title: 'VLC',
-        summary: 'The ultimate media player',
-        description: 'VLC is the VideoLAN projects media player. Very detailed description here.',
-        icon_url: 'https://example.com/icon.png',
-        last_updated: '2024-01-15T10:00:00Z',
-        screenshot_urls: ['https://example.com/screenshot1.png', 'https://example.com/screenshot2.png'],
-        base: 'core18',
-        confinement: 'strict',
-        license: 'GPL-2.0+',
-        publisher: 'VideoLAN',
-        developer_name: 'VideoLAN',
-        developer_id: 'dev-id',
-        developer_validation: 'verified',
-        version: '3.0.20',
-        revision: 3777,
-        architecture: ['amd64'],
-        apps: ['vlc'],
-        channel: 'stable',
-        release: ['16'],
-        binary_filesize: 336699392,
-        download_url: 'https://example.com/vlc.snap',
-        anon_download_url: 'https://example.com/vlc.snap',
-        download_sha3_384: 'abc123',
-        download_sha512: 'def456',
-        snap_id: 'RT9mcUhVsRYrDLG8qnvGiy26NKvv6Qkd',
-        common_ids: ['org.videolan.vlc'],
-        contact: 'https://www.videolan.org/support/',
-        support_url: 'https://www.videolan.org/support/',
-        links: {
-          contact: ['https://www.videolan.org/support/'],
-          website: ['https://www.videolan.org/vlc/'],
-        },
-        origin: 'videolan',
-      };
-
-      const result = transformSnapToPackage(v2Data, v1Data, 'music-and-audio');
+      const result = transformSnapToPackage(v2Data);
 
       assert.equal(result.id, 'snap.vlc');
       assert.equal(result.name, 'VLC');
@@ -387,7 +366,7 @@ describe('Snap Scraper Utils', () => {
       assert.equal(result.source, 'https://www.videolan.org/vlc/');
     });
 
-    test('should handle v2-only data (no v1)', () => {
+    test('should fall back to summary when description is missing', () => {
       const v2Data: SnapV2Response = {
         name: 'test-snap',
         'snap-id': 'test-id',
@@ -424,19 +403,21 @@ describe('Snap Scraper Utils', () => {
             revision: 1,
             type: 'app',
             version: '1.0.0',
+            confinement: 'strict',
+            base: 'core22',
           },
         ],
       };
 
-      const result = transformSnapToPackage(v2Data, null, 'utilities');
+      const result = transformSnapToPackage(v2Data);
 
       assert.equal(result.id, 'snap.test-snap');
       assert.equal(result.name, 'Test Snap');
       assert.equal(result.description, 'A test snap'); // Falls back to summary
       assert.equal(result.screenshots?.length, 0);
       assert.equal(result.icon, '');
-      assert.equal(result.snap_data?.confinement, 'strict'); // Default
-      assert.equal(result.snap_data?.base, ''); // No v1 data
+      assert.equal(result.snap_data?.confinement, 'strict');
+      assert.equal(result.snap_data?.base, 'core22');
     });
 
     test('should map unknown category to Utilities', () => {
@@ -457,6 +438,7 @@ describe('Snap Scraper Utils', () => {
           'store-url': 'https://snapcraft.io/test',
           summary: 'Test',
           title: 'Test',
+          categories: [{ featured: false, name: 'unknown-category' }],
         },
         'channel-map': [
           {
@@ -476,11 +458,13 @@ describe('Snap Scraper Utils', () => {
             revision: 1,
             type: 'app',
             version: '1.0.0',
+            confinement: 'strict',
+            base: 'core22',
           },
         ],
       };
 
-      const result = transformSnapToPackage(v2Data, null, 'unknown-category');
+      const result = transformSnapToPackage(v2Data);
 
       assert.equal(result.category, 'Utilities');
     });
@@ -518,6 +502,8 @@ describe('Snap Scraper Utils', () => {
             revision: 1,
             type: 'app',
             version: '1.0.0',
+            confinement: 'strict',
+            base: 'core22',
           },
           {
             channel: {
@@ -532,6 +518,8 @@ describe('Snap Scraper Utils', () => {
             revision: 2,
             type: 'app',
             version: '1.1.0-beta',
+            confinement: 'strict',
+            base: 'core22',
           },
           {
             channel: {
@@ -546,11 +534,13 @@ describe('Snap Scraper Utils', () => {
             revision: 3,
             type: 'app',
             version: '1.2.0-dev',
+            confinement: 'strict',
+            base: 'core22',
           },
         ],
       };
 
-      const result = transformSnapToPackage(v2Data, null, 'games');
+      const result = transformSnapToPackage(v2Data);
 
       assert.equal(result.snap_data?.channels.length, 3);
       assert.ok(result.snap_data?.channels.includes(SnapChannel.STABLE));
@@ -591,26 +581,28 @@ describe('Snap Scraper Utils', () => {
           revision: 1,
           type: 'app',
           version: '1.0.0',
+          confinement: 'strict',
+          base: 'core22',
         }],
       });
 
-      assert.equal(transformSnapToPackage(createV2Data('GPL-3.0'), null, 'utilities').license, 'GNU GPL v3');
-      assert.equal(transformSnapToPackage(createV2Data('GPL-3.0+'), null, 'utilities').license, 'GNU GPL v3');
-      assert.equal(transformSnapToPackage(createV2Data('GPL-3.0-or-later'), null, 'utilities').license, 'GNU GPL v3');
-      assert.equal(transformSnapToPackage(createV2Data('GPL-2.0'), null, 'utilities').license, 'GNU GPL v2');
-      assert.equal(transformSnapToPackage(createV2Data('GPL-2.0+'), null, 'utilities').license, 'GNU GPL v2');
-      assert.equal(transformSnapToPackage(createV2Data('LGPL-3.0'), null, 'utilities').license, 'GNU LGPL v3');
-      assert.equal(transformSnapToPackage(createV2Data('LGPL-2.1'), null, 'utilities').license, 'GNU LGPL v2.1');
-      assert.equal(transformSnapToPackage(createV2Data('AGPL-3.0'), null, 'utilities').license, 'GNU Affero GPL v3');
-      assert.equal(transformSnapToPackage(createV2Data('AGPL-3.0-only'), null, 'utilities').license, 'GNU Affero GPL v3');
-      assert.equal(transformSnapToPackage(createV2Data('Apache-2.0'), null, 'utilities').license, 'Apache License');
-      assert.equal(transformSnapToPackage(createV2Data('MIT'), null, 'utilities').license, 'MIT/X/Expat License');
-      assert.equal(transformSnapToPackage(createV2Data('BSD-3-Clause'), null, 'utilities').license, 'BSD License (Simplified)');
-      assert.equal(transformSnapToPackage(createV2Data('MPL-2.0'), null, 'utilities').license, 'Mozilla Public License');
-      assert.equal(transformSnapToPackage(createV2Data('EPL-2.0'), null, 'utilities').license, 'Eclipse Public License');
-      assert.equal(transformSnapToPackage(createV2Data('Proprietary'), null, 'utilities').license, 'Proprietary');
-      assert.equal(transformSnapToPackage(createV2Data('unset'), null, 'utilities').license, 'Other Open Source');
-      assert.equal(transformSnapToPackage(createV2Data(''), null, 'utilities').license, 'Other Open Source');
+      assert.equal(transformSnapToPackage(createV2Data('GPL-3.0')).license, 'GNU GPL v3');
+      assert.equal(transformSnapToPackage(createV2Data('GPL-3.0+')).license, 'GNU GPL v3');
+      assert.equal(transformSnapToPackage(createV2Data('GPL-3.0-or-later')).license, 'GNU GPL v3');
+      assert.equal(transformSnapToPackage(createV2Data('GPL-2.0')).license, 'GNU GPL v2');
+      assert.equal(transformSnapToPackage(createV2Data('GPL-2.0+')).license, 'GNU GPL v2');
+      assert.equal(transformSnapToPackage(createV2Data('LGPL-3.0')).license, 'GNU LGPL v3');
+      assert.equal(transformSnapToPackage(createV2Data('LGPL-2.1')).license, 'GNU LGPL v2.1');
+      assert.equal(transformSnapToPackage(createV2Data('AGPL-3.0')).license, 'GNU Affero GPL v3');
+      assert.equal(transformSnapToPackage(createV2Data('AGPL-3.0-only')).license, 'GNU Affero GPL v3');
+      assert.equal(transformSnapToPackage(createV2Data('Apache-2.0')).license, 'Apache License');
+      assert.equal(transformSnapToPackage(createV2Data('MIT')).license, 'MIT/X/Expat License');
+      assert.equal(transformSnapToPackage(createV2Data('BSD-3-Clause')).license, 'BSD License (Simplified)');
+      assert.equal(transformSnapToPackage(createV2Data('MPL-2.0')).license, 'Mozilla Public License');
+      assert.equal(transformSnapToPackage(createV2Data('EPL-2.0')).license, 'Eclipse Public License');
+      assert.equal(transformSnapToPackage(createV2Data('Proprietary')).license, 'Proprietary');
+      assert.equal(transformSnapToPackage(createV2Data('unset')).license, 'Other Open Source');
+      assert.equal(transformSnapToPackage(createV2Data('')).license, 'Other Open Source');
     });
   });
 

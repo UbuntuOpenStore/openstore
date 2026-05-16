@@ -4,11 +4,9 @@ import { PackageSearch as MeilisearchPackageSearch } from '../db/package/search-
 import {
   fetchSnaps,
   fetchSnapDetailsV2,
-  fetchSnapDetailsV1,
   transformSnapToPackage,
   discoverSnaps,
   sleep,
-  type SnapV1Response,
 } from '../utils/snap-scraper';
 
 const DELAY_BETWEEN_REQUESTS = 150;
@@ -37,17 +35,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
         const v2Data = await fetchSnapDetailsV2(snap.name);
         await sleep(DELAY_BETWEEN_REQUESTS);
 
-        let v1Data: SnapV1Response | null = null;
-        try {
-          v1Data = await fetchSnapDetailsV1(snap.name);
-          await sleep(DELAY_BETWEEN_REQUESTS);
-        }
-        catch (error) {
-          console.warn(`  Warning: v1 API not available for ${snap.name}, using v2 data only`);
-        }
-
-        const category = v1Data?.links?.website ? 'utilities' : 'utilities';
-        const packageData = transformSnapToPackage(v2Data, v1Data, category);
+        const packageData = transformSnapToPackage(v2Data);
 
         let savedPackage: HydratedPackage;
         if (existingPackage) {

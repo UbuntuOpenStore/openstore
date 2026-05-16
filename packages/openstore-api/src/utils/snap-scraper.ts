@@ -123,7 +123,9 @@ export interface SnapV2Download {
 }
 
 export interface SnapV2ChannelMap {
+  base: string;
   channel: SnapV2Channel;
+  confinement: string;
   'created-at': string;
   download: SnapV2Download;
   revision: number;
@@ -138,8 +140,27 @@ export interface SnapV2Publisher {
   validation: string;
 }
 
+export interface SnapV2Category {
+  featured: boolean;
+  name: string;
+}
+
+export interface SnapV2Media {
+  height: number;
+  type: string;
+  url: string;
+  width: number;
+}
+
 export interface SnapV2Snap {
+  categories?: SnapV2Category[];
+  description?: string;
   license: string;
+  links?: {
+    contact?: string[];
+    website?: string[];
+  };
+  media?: SnapV2Media[];
   name: string;
   publisher: SnapV2Publisher;
   'snap-id': string;
@@ -271,8 +292,11 @@ export async function discoverSnaps(limit?: number, fetchFn = fetch): Promise<Sn
   return allSnaps;
 }
 
+// eslint-disable-next-line max-len
+const SNAP_V2_FIELDS = 'channel-map,base,categories,confinement,description,download,links,media,revision,version,created-at,license,name,publisher,snap-id,store-url,summary,title';
+
 export async function fetchSnapDetailsV2(snapName: string, fetchFn = fetch): Promise<SnapV2Response> {
-  const response = await fetchFn(`https://api.snapcraft.io/v2/snaps/info/${snapName}`, {
+  const response = await fetchFn(`https://api.snapcraft.io/v2/snaps/info/${snapName}?fields=${SNAP_V2_FIELDS}`, {
     headers: {
       'User-Agent': USER_AGENT,
       'Snap-Device-Series': SNAP_DEVICE_SERIES,
@@ -312,8 +336,6 @@ export async function fetchSnapDetailsV1(snapName: string, arch = 'amd64', fetch
 
 export function transformSnapToPackage(
   v2Data: SnapV2Response,
-  v1Data: SnapV1Response | null,
-  category: string,
 ): Partial<IPackage> {
   const snapId = `snap.${v2Data.name}`;
 
@@ -360,19 +382,23 @@ export function transformSnapToPackage(
   });
 
   const stableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
-  const openStoreCategory = CATEGORY_MAPPING[category] || 'Utilities';
-  const contactUrls = v1Data?.links?.contact || [];
-  const websiteUrls = v1Data?.links?.website || [];
-  const supportUrl = v1Data?.support_url || contactUrls[0] || '';
+  const stableOrFirst = stableRevision || v2Data['channel-map'][0];
+  const snapCategory = v2Data.snap.categories?.[0]?.name || 'utilities';
+  const openStoreCategory = CATEGORY_MAPPING[snapCategory] || 'Utilities';
+  const contactUrls = v2Data.snap.links?.contact || [];
+  const websiteUrls = v2Data.snap.links?.website || [];
+  const supportUrl = contactUrls[0] || '';
   const source = websiteUrls[0] || '';
+  const icon = v2Data.snap.media?.find((m) => m.type === 'icon')?.url || '';
+  const screenshots = v2Data.snap.media?.filter((m) => m.type === 'screenshot').map((m) => m.url) || [];
 
   return {
     id: snapId,
     name: v2Data.snap.title || v2Data.name,
     tagline: v2Data.snap.summary,
-    description: v1Data?.description || v2Data.snap.summary || '',
+    description: v2Data.snap.description || v2Data.snap.summary || '',
     changelog: '',
-    screenshots: v1Data?.screenshot_urls || [],
+    screenshots,
     category: openStoreCategory,
     keywords: [],
     nsfw: false,
@@ -392,17 +418,17 @@ export function transformSnapToPackage(
     device_compatibilities: Array.from(deviceCompatibilitiesSet),
     locked: false,
     published: true,
-    published_date: stableRevision?.['created-at'] || v2Data['channel-map'][0]?.['created-at'] || new Date().toISOString(),
-    updated_date: stableRevision?.channel['released-at'] || v2Data['channel-map'][0]?.channel['released-at'] || new Date().toISOString(),
+    published_date: stableOrFirst?.['created-at'] || new Date().toISOString(),
+    updated_date: stableOrFirst?.channel['released-at'] || new Date().toISOString(),
     revisions: revisions as unknown as IPackage['revisions'],
-    icon: v1Data?.icon_url || '',
+    icon,
     package_type: PackageType.SNAP,
     source_store: SourceStore.SNAPCRAFT,
     external_id: v2Data.name,
     snap_data: {
       channels: Array.from(channelsSet),
-      confinement: (v1Data?.confinement as SnapConfinement) || ('strict' as SnapConfinement),
-      base: v1Data?.base || '',
+      confinement: (stableOrFirst?.confinement as SnapConfinement) || ('strict' as SnapConfinement),
+      base: stableOrFirst?.base || '',
     },
   };
 }
