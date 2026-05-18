@@ -340,26 +340,6 @@ export async function fetchSnapDetailsV2(snapName: string, fetchFn = fetch): Pro
   return (await response.json()) as SnapV2Response;
 }
 
-export async function fetchSnapDetailsV1(snapName: string, arch = 'amd64', fetchFn = fetch): Promise<SnapV1Response> {
-  const response = await fetchFn(`https://api.snapcraft.io/api/v1/snaps/details/${snapName}`, {
-    headers: {
-      'User-Agent': USER_AGENT,
-      'X-Ubuntu-Series': SNAP_DEVICE_SERIES,
-      'X-Ubuntu-Architecture': arch,
-    },
-  });
-
-  if (!response.ok) {
-    if (response.status === 429) {
-      await sleep(5000);
-      return await fetchSnapDetailsV1(snapName, arch, fetchFn);
-    }
-    throw new Error(`Failed to fetch v1 details for ${snapName}: ${response.statusText}`);
-  }
-
-  return (await response.json()) as SnapV1Response;
-}
-
 export function transformSnapToPackage(
   v2Data: SnapV2Response,
 ): Partial<IPackage> {
@@ -396,7 +376,7 @@ export function transformSnapToPackage(
       download_sha512: '',
       architecture: arch,
       framework: 'ubuntu-touch-24.04-1.x', // Setting as a constant so it'll show for nobel devices
-      filesize: Math.round(channelMap.download.size / 1024),
+      filesize: 0, // We don't have the install size, so don't show it in the app
       downloadSize: channelMap.download.size,
       created_date: channelMap['created-at'],
       permissions: channelMap['snap-yaml'] ? parseSnapYamlPlugs(channelMap['snap-yaml']) : ['unknown'],
