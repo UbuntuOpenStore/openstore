@@ -179,45 +179,6 @@ export interface SnapV2Response {
   'snap-id': string;
 }
 
-export interface SnapV1Response {
-  anon_download_url: string;
-  apps: string[];
-  architecture: string[];
-  base: string;
-  binary_filesize: number;
-  channel: string;
-  'common_ids': string[];
-  confinement: string;
-  contact: string;
-  description: string;
-  'developer_id': string;
-  'developer_name': string;
-  'developer_validation': string;
-  'download_sha3_384': string;
-  'download_sha512': string;
-  'download_url': string;
-  'icon_url': string;
-  'last_updated': string;
-  license: string;
-  name: string;
-  origin: string;
-  'package_name': string;
-  publisher: string;
-  release: string[];
-  revision: number;
-  'screenshot_urls': string[];
-  snap_id: string;
-  summary: string;
-  support_url?: string;
-  title: string;
-  version: string;
-  website?: string;
-  links?: {
-    contact?: string[];
-    website?: string[];
-  };
-}
-
 export function parseSnapYamlPlugs(snapYaml: string): string[] {
   try {
     const parsed = parseYaml(snapYaml) as {

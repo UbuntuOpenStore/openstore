@@ -9,7 +9,6 @@ import {
   CATEGORY_MAPPING,
   ARCH_MAPPING,
   type SnapV2Response,
-  type SnapV1Response,
 } from './snap-scraper';
 import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/package/types';
 
