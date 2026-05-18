@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {
   fetchSnaps,
   fetchSnapDetailsV2,
-  fetchSnapDetailsV1,
   transformSnapToPackage,
   parseSnapYamlPlugs,
   discoverSnaps,
@@ -180,71 +179,6 @@ describe('Snap Scraper Utils', () => {
       await assert.rejects(
         async () => await fetchSnapDetailsV2('nonexistent', mockFetch),
         { message: /Failed to fetch v2 details/ },
-      );
-    });
-  });
-
-  describe('fetchSnapDetailsV1', () => {
-    test('should fetch v1 snap details', async () => {
-      const mockV1Data: SnapV1Response = {
-        name: 'vlc.videolan',
-        package_name: 'vlc',
-        title: 'VLC',
-        summary: 'The ultimate media player',
-        description: 'VLC is the VideoLAN projects media player.',
-        icon_url: 'https://example.com/icon.png',
-        last_updated: '2024-01-15T10:00:00Z',
-        screenshot_urls: ['https://example.com/screenshot1.png'],
-        base: 'core18',
-        confinement: 'strict',
-        license: 'GPL-2.0+',
-        publisher: 'VideoLAN',
-        developer_name: 'VideoLAN',
-        developer_id: 'dev-id',
-        developer_validation: 'verified',
-        version: '3.0.20',
-        revision: 3777,
-        architecture: ['amd64'],
-        apps: ['vlc'],
-        channel: 'stable',
-        release: ['16'],
-        binary_filesize: 336699392,
-        download_url: 'https://example.com/vlc.snap',
-        anon_download_url: 'https://example.com/vlc.snap',
-        download_sha3_384: 'abc123',
-        download_sha512: 'def456',
-        snap_id: 'RT9mcUhVsRYrDLG8qnvGiy26NKvv6Qkd',
-        common_ids: ['org.videolan.vlc'],
-        contact: 'https://www.videolan.org/support/',
-        links: {
-          contact: ['https://www.videolan.org/support/'],
-          website: ['https://www.videolan.org/vlc/'],
-        },
-        origin: 'videolan',
-      };
-
-      const mockFetch = mock.fn(async () => ({
-        ok: true,
-        json: async () => mockV1Data,
-      })) as any;
-
-      const result = await fetchSnapDetailsV1('vlc', 'amd64', mockFetch);
-
-      assert.equal(result.name, 'vlc.videolan');
-      assert.equal(result.description.length > 0, true);
-      assert.equal(result.screenshot_urls.length, 1);
-    });
-
-    test('should throw on error', async () => {
-      const mockFetch = mock.fn(async () => ({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found',
-      })) as any;
-
-      await assert.rejects(
-        async () => await fetchSnapDetailsV1('nonexistent', 'amd64', mockFetch),
-        { message: /Failed to fetch v1 details/ },
       );
     });
   });
