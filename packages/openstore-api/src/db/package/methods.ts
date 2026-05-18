@@ -842,7 +842,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
               return null;
             }),
           ];
-        }, []).filter((revision) => (revision?.download_url)) as SerializedDownload[];
+        }, []).filter((revision) => {
+          return revision && (this.package_type === PackageType.SNAP || revision.download_url);
+        }) as SerializedDownload[];
 
       jsonDownloads.sort((a, b) => {
         // Sort xenial to the bottom
