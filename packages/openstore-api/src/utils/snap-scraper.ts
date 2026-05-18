@@ -1,3 +1,4 @@
+import { parse as parseYaml } from 'yaml';
 import {
   Architecture,
   Channel,
@@ -129,6 +130,7 @@ export interface SnapV2ChannelMap {
   'created-at': string;
   download: SnapV2Download;
   revision: number;
+  'snap-yaml'?: string;
   type: string;
   version: string;
 }
@@ -216,6 +218,30 @@ export interface SnapV1Response {
   };
 }
 
+export function parseSnapYamlPlugs(snapYaml: string): string[] {
+  try {
+    const parsed = parseYaml(snapYaml) as {
+      confinement?: string;
+      apps?: Record<string, { plugs?: string[] }>;
+    };
+
+    if (parsed.confinement === 'classic') {
+      return ['unconfined'];
+    }
+
+    const plugsSet = new Set<string>();
+    for (const app of Object.values(parsed.apps || {})) {
+      for (const plug of app.plugs || []) {
+        plugsSet.add(plug);
+      }
+    }
+    return plugsSet.size > 0 ? Array.from(plugsSet).sort() : ['unknown'];
+  }
+  catch {
+    return ['unknown'];
+  }
+}
+
 export async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -293,7 +319,7 @@ export async function discoverSnaps(limit?: number, fetchFn = fetch): Promise<Sn
 }
 
 // eslint-disable-next-line max-len
-const SNAP_V2_FIELDS = 'channel-map,base,categories,confinement,description,download,links,media,revision,version,created-at,license,name,publisher,snap-id,store-url,summary,title';
+const SNAP_V2_FIELDS = 'channel-map,base,categories,confinement,description,download,links,media,revision,snap-yaml,version,created-at,license,name,publisher,snap-id,store-url,summary,title';
 
 export async function fetchSnapDetailsV2(snapName: string, fetchFn = fetch): Promise<SnapV2Response> {
   const response = await fetchFn(`https://api.snapcraft.io/v2/snaps/info/${snapName}?fields=${SNAP_V2_FIELDS}`, {
@@ -373,7 +399,7 @@ export function transformSnapToPackage(
       filesize: Math.round(channelMap.download.size / 1024),
       downloadSize: channelMap.download.size,
       created_date: channelMap['created-at'],
-      permissions: ['unknown'],
+      permissions: channelMap['snap-yaml'] ? parseSnapYamlPlugs(channelMap['snap-yaml']) : ['unknown'],
       snap_data: {
         grade: SnapGrade.STABLE,
         risk: channelMap.channel.risk,

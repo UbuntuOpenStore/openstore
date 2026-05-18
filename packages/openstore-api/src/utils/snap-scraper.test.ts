@@ -5,6 +5,7 @@ import {
   fetchSnapDetailsV2,
   fetchSnapDetailsV1,
   transformSnapToPackage,
+  parseSnapYamlPlugs,
   discoverSnaps,
   CATEGORY_MAPPING,
   ARCH_MAPPING,
@@ -299,6 +300,7 @@ describe('Snap Scraper Utils', () => {
             version: '3.0.20-1-g2617de71b6',
             confinement: 'strict',
             base: 'core18',
+            'snap-yaml': 'name: vlc\napps:\n  vlc:\n    command: bin/vlc\n    plugs:\n    - network\n    - x11\n    - audio-playback\n',
           },
           {
             channel: {
@@ -350,6 +352,8 @@ describe('Snap Scraper Utils', () => {
       assert.ok(result.device_compatibilities?.includes('focal:arm64:ubuntu-touch-24.04-1.x'));
 
       assert.equal(result.revisions?.length, 2);
+      const firstRevision = (result.revisions as any)?.[0];
+      assert.deepEqual(firstRevision?.permissions, ['audio-playback', 'network', 'x11']);
 
       assert.equal(result.snap_data?.confinement, 'strict');
       assert.equal(result.snap_data?.base, 'core18');
@@ -688,6 +692,67 @@ describe('Snap Scraper Utils', () => {
       assert.equal(ARCH_MAPPING.arm64, Architecture.ARM64);
       assert.equal(ARCH_MAPPING.armhf, Architecture.ARMHF);
       assert.equal(ARCH_MAPPING.all, Architecture.ALL);
+    });
+  });
+
+  describe('parseSnapYamlPlugs', () => {
+    test('should extract plugs from app definitions', () => {
+      const snapYaml = [
+        'name: myapp',
+        'apps:',
+        '  myapp:',
+        '    command: bin/myapp',
+        '    plugs:',
+        '    - network',
+        '    - x11',
+        '    - audio-playback',
+      ].join('\n');
+
+      const plugs = parseSnapYamlPlugs(snapYaml);
+      assert.deepEqual(plugs, ['audio-playback', 'network', 'x11']);
+    });
+
+    test('should deduplicate plugs across multiple apps', () => {
+      const snapYaml = [
+        'name: myapp',
+        'apps:',
+        '  app1:',
+        '    command: bin/app1',
+        '    plugs:',
+        '    - network',
+        '    - x11',
+        '  app2:',
+        '    command: bin/app2',
+        '    plugs:',
+        '    - network',
+        '    - wayland',
+      ].join('\n');
+
+      const plugs = parseSnapYamlPlugs(snapYaml);
+      assert.deepEqual(plugs, ['network', 'wayland', 'x11']);
+    });
+
+    test('should return ["unknown"] when no apps or plugs defined', () => {
+      assert.deepEqual(parseSnapYamlPlugs('name: myapp\nversion: 1.0'), ['unknown']);
+      assert.deepEqual(parseSnapYamlPlugs('name: myapp\napps:\n  myapp:\n    command: bin/myapp'), ['unknown']);
+    });
+
+    test('should return ["unconfined"] for classic confinement', () => {
+      const snapYaml = [
+        'name: myapp',
+        'confinement: classic',
+        'apps:',
+        '  myapp:',
+        '    command: bin/myapp',
+        '    plugs:',
+        '    - network',
+      ].join('\n');
+
+      assert.deepEqual(parseSnapYamlPlugs(snapYaml), ['unconfined']);
+    });
+
+    test('should return ["unknown"] on invalid YAML', () => {
+      assert.deepEqual(parseSnapYamlPlugs('invalid: yaml: {{{'), ['unknown']);
     });
   });
 });
