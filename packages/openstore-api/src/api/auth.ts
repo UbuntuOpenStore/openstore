@@ -42,7 +42,7 @@ const router = express.Router();
 function safeParseUrl(url: string) {
   try {
     return new URL(url, config.server.host);
-  } catch (e) {}
+  } catch { }
 }
 
 function saveReturnTo(req: Request, res: Response, next: NextFunction) {

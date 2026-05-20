@@ -139,7 +139,7 @@ describe('Apps API', () => {
       config.allowed_package_types = originalAllowedTypes;
     });
 
-    test('returns 404 when package_type param does not match app package type', async function (t) {
+    test('returns 404 when package_type param does not match app package type', async function () {
       const originalAllowedTypes = config.allowed_package_types;
       config.allowed_package_types = [PackageType.CLICK];
 

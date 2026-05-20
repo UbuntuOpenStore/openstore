@@ -37,7 +37,7 @@ describe('Discover API', () => {
     try {
       const files = await fs.readdir(cacheDir);
       await Promise.all(files.map((file) => fs.unlink(path.join(cacheDir, file))));
-    } catch (error) {
+    } catch {
       // Don't worry about errors
     }
 

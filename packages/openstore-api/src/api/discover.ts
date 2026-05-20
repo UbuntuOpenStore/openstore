@@ -32,7 +32,7 @@ async function getCachedData(cacheKey: string): Promise<CachedData | null> {
     const cacheFile = path.join(CACHE_DIR, `${cacheKey}.json`);
     const content = await fs.readFile(cacheFile, 'utf-8');
     return JSON.parse(content);
-  } catch (error) {
+  } catch {
     // Cache miss or read error
     return null;
   }
