@@ -1,8 +1,9 @@
-services:
-  - mongo:latest
+image: bhdouglass/openstore-ci
 
 stages:
   - check
+  - test
+  - build
   - deploy
 
 # Ref: https://docs.gitlab.com/ee/ci/caching/#cache-nodejs-dependencies
@@ -16,74 +17,61 @@ cache:
 before_script:
   - npm ci --cache .npm --prefer-offline
 
-api-lint:
+api-check:
   stage: check
-  image: bhdouglass/openstore-ci
   script:
     - npm run lint -w openstore-api
     - npm run lint:json -w openstore-api
+    - npm run format:check -w openstore-api
 
 api-test:
-  stage: check
-  image: bhdouglass/openstore-ci
+  stage: test
+  services:
+    - mongo:latest
   script:
     - npm run build -w click-parser
     - npm run test:ci -w openstore-api
 
 api-build:
-  stage: check
-  image: bhdouglass/openstore-ci
+  stage: build
   script:
     - npm run build -w click-parser
-    - npm run type-check -w openstore-api
     - npm run build -w openstore-api
 
 web-check:
   stage: check
-  image: bhdouglass/openstore-ci
   script:
     - npm run convert-po -w openstore-web
     - npm run check -w openstore-web
 
 web-build:
-  stage: check
-  image: bhdouglass/openstore-ci
+  stage: build
   script:
     - npm run convert-po -w openstore-web
-    - npm run check -w openstore-web
+    - npm run build -w openstore-web
 
 dpkg-build:
-  stage: check
-  image: bhdouglass/openstore-ci
+  stage: build
   script:
     - npm run build -w openstore-dpkg
 
-api-format:
-  stage: check
-  image: bhdouglass/openstore-ci
-  script:
-    - npm run format:check -w openstore-api
-
-click-parser-format:
-  stage: check
-  image: bhdouglass/openstore-ci
-  script:
-    - npm run format:check -w click-parser
-
 click-parser-check:
   stage: check
-  image: bhdouglass/openstore-ci
   script:
     - npm run lint -w click-parser
     - npm run type-check -w click-parser
+    - npm run format:check -w click-parser
+
+click-parser-test:
+  stage: test
+  script:
     - npm run build -w click-parser
     - npm run test -w click-parser
 
 deploy:
   stage: deploy
-  only:
-    - master
-  image: bhdouglass/openstore-ci
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   script:
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
