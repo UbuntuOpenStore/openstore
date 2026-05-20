@@ -1,9 +1,9 @@
 import 'db'; // Make sure the database connection gets setup
-
 import { Types } from 'mongoose';
+
 import { Package } from '../db/package';
-import { User } from '../db/user';
 import { ReservedNamespace } from '../db/reserved_namespace';
+import { User } from '../db/user';
 
 /**
  * Command to assign wildcard namespaces to users based on their existing packages
@@ -85,8 +85,7 @@ async function assignUserNamespaces(args: string[]): Promise<void> {
 
       console.log('Namespace assignment completed');
     }
-  }
-  catch (err) {
+  } catch (err) {
     console.error('Error assigning namespaces:', err);
     throw err;
   }
@@ -129,10 +128,12 @@ function extractNamespaces(packageIds: string[]): string[] {
   return Array.from(namespaces);
 }
 
-assignUserNamespaces(process.argv).then(() => {
-  console.log('done');
-  process.exit(0);
-}).catch((err: Error) => {
-  console.log(err);
-  process.exit(1);
-});
+assignUserNamespaces(process.argv)
+  .then(() => {
+    console.log('done');
+    process.exit(0);
+  })
+  .catch((err: Error) => {
+    console.log(err);
+    process.exit(1);
+  });

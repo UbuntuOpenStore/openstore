@@ -1,13 +1,7 @@
 import 'db'; // Make sure the database connection gets setup
 import { type HydratedPackage, Package } from '../db/package';
 import { PackageSearch as MeilisearchPackageSearch } from '../db/package/search-meilisearch';
-import {
-  fetchSnaps,
-  fetchSnapDetailsV2,
-  transformSnapToPackage,
-  discoverSnaps,
-  sleep,
-} from '../utils/snap-scraper';
+import { fetchSnaps, fetchSnapDetailsV2, transformSnapToPackage, discoverSnaps, sleep } from '../utils/snap-scraper';
 
 const DELAY_BETWEEN_REQUESTS = 150;
 
@@ -20,9 +14,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
   let totalErrors = 0;
 
   try {
-    const snaps = options.search
-      ? await fetchSnaps(options.search, options.limit)
-      : await discoverSnaps(options.limit);
+    const snaps = options.search ? await fetchSnaps(options.search, options.limit) : await discoverSnaps(options.limit);
     console.log(`Found ${snaps.length} snaps to process`);
 
     for (const snap of snaps) {
@@ -56,8 +48,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
           Object.assign(existingPackage, packageData);
           savedPackage = await existingPackage.save();
           console.log(`  Updated: ${snap.name}`);
-        }
-        else {
+        } else {
           savedPackage = await Package.create(packageData);
           console.log(`  Created: ${snap.name}`);
         }
@@ -66,8 +57,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
         console.log(`  Indexed in Meilisearch: ${snap.name}`);
 
         totalSynced++;
-      }
-      catch (error) {
+      } catch (error) {
         console.error(`Error processing snap ${snap.name}:`, error);
         totalErrors++;
       }
@@ -78,8 +68,7 @@ async function syncSnapPackages(options: { limit?: number; search?: string; forc
     console.log(`Total skipped: ${totalSkipped}`);
     console.log(`Total errors: ${totalErrors}`);
     process.exit(0);
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Fatal error during sync:', error);
     process.exit(1);
   }
@@ -92,12 +81,10 @@ for (let i = 0; i < args.length; i++) {
   if (args[i] === '--limit' && args[i + 1]) {
     options.limit = parseInt(args[i + 1], 10);
     i++;
-  }
-  else if (args[i] === '--search' && args[i + 1]) {
+  } else if (args[i] === '--search' && args[i + 1]) {
     options.search = args[i + 1];
     i++;
-  }
-  else if (args[i] === '--force') {
+  } else if (args[i] === '--force') {
     options.force = true;
   }
 }

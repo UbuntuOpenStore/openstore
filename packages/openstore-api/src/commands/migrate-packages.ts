@@ -12,10 +12,7 @@ async function migratePackages() {
 
   try {
     const packagesNeedingMigration = await Package.countDocuments({
-      $or: [
-        { source_store: { $exists: false } },
-        { package_type: { $exists: false } },
-      ],
+      $or: [{ source_store: { $exists: false } }, { package_type: { $exists: false } }],
     });
 
     console.log(`Found ${packagesNeedingMigration} packages needing migration`);
@@ -27,10 +24,7 @@ async function migratePackages() {
 
     const result = await Package.updateMany(
       {
-        $or: [
-          { source_store: { $exists: false } },
-          { package_type: { $exists: false } },
-        ],
+        $or: [{ source_store: { $exists: false } }, { package_type: { $exists: false } }],
       },
       {
         $set: {
@@ -45,10 +39,7 @@ async function migratePackages() {
     console.log(`  - Modified: ${result.modifiedCount} packages`);
 
     const remainingPackages = await Package.countDocuments({
-      $or: [
-        { source_store: { $exists: false } },
-        { package_type: { $exists: false } },
-      ],
+      $or: [{ source_store: { $exists: false } }, { package_type: { $exists: false } }],
     });
 
     if (remainingPackages > 0) {
@@ -67,8 +58,7 @@ async function migratePackages() {
 
     console.log('\nMigration successful!');
     process.exit(0);
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Migration failed:', error);
     process.exit(1);
   }

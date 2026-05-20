@@ -1,5 +1,7 @@
-import { test, describe, mock } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, mock } from 'node:test';
+
+import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/package/types';
 import {
   fetchSnaps,
   fetchSnapDetailsV2,
@@ -10,7 +12,6 @@ import {
   ARCH_MAPPING,
   type SnapV2Response,
 } from './snap-scraper';
-import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/package/types';
 
 describe('Snap Scraper Utils', () => {
   describe('fetchSnaps', () => {
@@ -105,10 +106,7 @@ describe('Snap Scraper Utils', () => {
         statusText: 'Internal Server Error',
       })) as any;
 
-      await assert.rejects(
-        async () => await fetchSnaps('games', undefined, mockFetch),
-        { message: /Failed to fetch snaps/ },
-      );
+      await assert.rejects(async () => await fetchSnaps('games', undefined, mockFetch), { message: /Failed to fetch snaps/ });
     });
   });
 
@@ -175,10 +173,7 @@ describe('Snap Scraper Utils', () => {
         statusText: 'Not Found',
       })) as any;
 
-      await assert.rejects(
-        async () => await fetchSnapDetailsV2('nonexistent', mockFetch),
-        { message: /Failed to fetch v2 details/ },
-      );
+      await assert.rejects(async () => await fetchSnapDetailsV2('nonexistent', mockFetch), { message: /Failed to fetch v2 details/ });
     });
   });
 
@@ -505,22 +500,24 @@ describe('Snap Scraper Utils', () => {
           summary: 'Test',
           title: 'Test',
         },
-        'channel-map': [{
-          channel: {
-            architecture: 'amd64',
-            name: 'stable',
-            'released-at': '2024-01-01T00:00:00.000000+00:00',
-            risk: 'stable',
-            track: 'latest',
+        'channel-map': [
+          {
+            channel: {
+              architecture: 'amd64',
+              name: 'stable',
+              'released-at': '2024-01-01T00:00:00.000000+00:00',
+              risk: 'stable',
+              track: 'latest',
+            },
+            'created-at': '2024-01-01T00:00:00.000000+00:00',
+            download: { 'sha3-384': 'abc', size: 10000000, url: 'https://example.com/test.snap' },
+            revision: 1,
+            type: 'app',
+            version: '1.0.0',
+            confinement: 'strict',
+            base: 'core22',
           },
-          'created-at': '2024-01-01T00:00:00.000000+00:00',
-          download: { 'sha3-384': 'abc', size: 10000000, url: 'https://example.com/test.snap' },
-          revision: 1,
-          type: 'app',
-          version: '1.0.0',
-          confinement: 'strict',
-          base: 'core22',
-        }],
+        ],
       });
 
       assert.equal(transformSnapToPackage(createV2Data('GPL-3.0')).license, 'GNU GPL v3');
@@ -552,9 +549,7 @@ describe('Snap Scraper Utils', () => {
         assert.ok(url.includes('category='));
 
         // Return different results for different categories
-        const results = callCount === 1
-          ? [{ name: 'snap1', 'snap-id': 'id1' }]
-          : [{ name: 'snap2', 'snap-id': 'id2' }];
+        const results = callCount === 1 ? [{ name: 'snap1', 'snap-id': 'id1' }] : [{ name: 'snap2', 'snap-id': 'id2' }];
 
         return {
           ok: true,
@@ -572,9 +567,7 @@ describe('Snap Scraper Utils', () => {
       const mockFetch = mock.fn(async () => ({
         ok: true,
         json: async () => ({
-          results: [
-            { name: 'vlc', 'snap-id': 'same-id' },
-          ],
+          results: [{ name: 'vlc', 'snap-id': 'same-id' }],
         }),
       })) as any;
 

@@ -1,16 +1,17 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import { test, describe, beforeEach, before, after } from 'node:test';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestPackage } from '../tests/factory';
-import * as api from '.';
 import { type App } from 'supertest/types';
 
-import path from 'node:path';
-import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
+import * as api from '.';
 import { Package } from '../db/package/model';
-import * as messages from '../utils/error-messages';
+import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
+import factory, { type TestPackage } from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { config } from '../utils/config';
+import * as messages from '../utils/error-messages';
 
 describe('Apps API', () => {
   const route = '/api/v3/apps/';
@@ -81,7 +82,9 @@ describe('Apps API', () => {
     });
 
     test('fails gracefully', async function (t) {
-      const mockFindOneByFilters = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+      const mockFindOneByFilters = t.mock.method(Package, 'findOneByFilters', () => {
+        throw new Error();
+      });
 
       const res = await request(app).get(`${route}${package1.id}`).expect(500);
 
@@ -196,7 +199,9 @@ describe('Apps API', () => {
     });
 
     test('fails gracefully', async function (t) {
-      const mockFindByFilters = t.mock.method(Package, 'findByFilters', () => { throw new Error(); });
+      const mockFindByFilters = t.mock.method(Package, 'findByFilters', () => {
+        throw new Error();
+      });
 
       const res = await request(app).get(route).expect(500);
 
@@ -208,11 +213,7 @@ describe('Apps API', () => {
       package1.channel_architectures = [ChannelArchitecture.FOCAL_ARMHF];
       package2.channel_architectures = [ChannelArchitecture.FOCAL_ALL];
       unpublishedPackage.channel_architectures = [ChannelArchitecture.FOCAL_ARM64];
-      await Promise.all([
-        package1.save(),
-        package2.save(),
-        unpublishedPackage.save(),
-      ]);
+      await Promise.all([package1.save(), package2.save(), unpublishedPackage.save()]);
 
       const res = await request(app).get(`${route}?architecture=armhf&channel=${Channel.FOCAL}`).expect(200);
       assert.ok(res.body.success);
@@ -226,11 +227,7 @@ describe('Apps API', () => {
       package1.channel_architectures = [ChannelArchitecture.FOCAL_ARMHF];
       package2.channel_architectures = [ChannelArchitecture.XENIAL_ALL];
       unpublishedPackage.channel_architectures = [ChannelArchitecture.XENIAL_ARM64];
-      await Promise.all([
-        package1.save(),
-        package2.save(),
-        unpublishedPackage.save(),
-      ]);
+      await Promise.all([package1.save(), package2.save(), unpublishedPackage.save()]);
 
       const res = await request(app).get(`${route}?architecture=armhf&channel=${Channel.FOCAL}`).expect(200);
       assert.ok(res.body.success);
@@ -243,15 +240,11 @@ describe('Apps API', () => {
       package1.device_compatibilities = [`${ChannelArchitecture.FOCAL_ARMHF}:ubuntu-sdk-20.04`];
       package2.device_compatibilities = [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-16.04`];
       unpublishedPackage.device_compatibilities = [`${ChannelArchitecture.FOCAL_ARMHF}:ubuntu-sdk-16.04`];
-      await Promise.all([
-        package1.save(),
-        package2.save(),
-        unpublishedPackage.save(),
-      ]);
+      await Promise.all([package1.save(), package2.save(), unpublishedPackage.save()]);
 
-      const res = await request(app).get(
-        `${route}?architecture=armhf&channel=${Channel.FOCAL}&frameworks=ubuntu-sdk-20.04,ubuntu-sdk-16.04`,
-      ).expect(200);
+      const res = await request(app)
+        .get(`${route}?architecture=armhf&channel=${Channel.FOCAL}&frameworks=ubuntu-sdk-20.04,ubuntu-sdk-16.04`)
+        .expect(200);
       assert.ok(res.body.success);
       assert.equal(res.body.data.packages.length, 2);
       assert.equal(res.body.data.count, 2);
@@ -263,15 +256,9 @@ describe('Apps API', () => {
       package1.device_compatibilities = [`${ChannelArchitecture.FOCAL_ARMHF}:ubuntu-sdk-20.04`];
       package2.device_compatibilities = [`${ChannelArchitecture.FOCAL_ARMHF}:ubuntu-sdk-16.04`];
       unpublishedPackage.device_compatibilities = [`${ChannelArchitecture.FOCAL_ARMHF}:ubuntu-sdk-20.04`];
-      await Promise.all([
-        package1.save(),
-        package2.save(),
-        unpublishedPackage.save(),
-      ]);
+      await Promise.all([package1.save(), package2.save(), unpublishedPackage.save()]);
 
-      const res = await request(app).get(
-        `${route}?architecture=armhf&channel=${Channel.FOCAL}&frameworks=ubuntu-sdk-20.04`,
-      ).expect(200);
+      const res = await request(app).get(`${route}?architecture=armhf&channel=${Channel.FOCAL}&frameworks=ubuntu-sdk-20.04`).expect(200);
       assert.ok(res.body.success);
       assert.equal(res.body.data.packages.length, 1);
       assert.equal(res.body.data.count, 1);
@@ -426,7 +413,9 @@ describe('Apps API', () => {
     });
 
     test('fails gracefully', async (t) => {
-      const mockFindOneByFilters = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+      const mockFindOneByFilters = t.mock.method(Package, 'findOneByFilters', () => {
+        throw new Error();
+      });
 
       const res = await request(app).get(`${route}${package3.id}/download/${DEFAULT_CHANNEL}/armhf`).expect(500);
 

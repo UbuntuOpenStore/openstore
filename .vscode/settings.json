@@ -10,5 +10,14 @@
         "ubports",
         "Virtuals",
         "xenial"
-    ]
+    ],
+    "oxc.fmt.configPath": ".oxfmtrc.json",
+    "[javascript]": {
+        "editor.defaultFormatter": "oxc.oxc-vscode",
+        "editor.formatOnSave": true
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "oxc.oxc-vscode",
+        "editor.formatOnSave": true
+    }
 }

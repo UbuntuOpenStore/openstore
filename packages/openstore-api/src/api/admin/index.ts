@@ -1,6 +1,7 @@
 import express from 'express';
-import namespaces from './namespaces';
+
 import discover from './discover';
+import namespaces from './namespaces';
 
 const router = express.Router();
 

@@ -1,10 +1,10 @@
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
-import path from 'path';
 import { test, describe } from 'node:test';
+import path from 'path';
 
-import parse from '../src/index';
 import { parseAppstream } from '../src/appstream';
+import parse from '../src/index';
 
 describe('click-parser', () => {
   test('parse qml click package', async () => {
@@ -234,7 +234,8 @@ describe('click-parser', () => {
       domain: '',
       homepage: '',
       /* eslint-disable-next-line max-len */
-      'user-agent-override': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36',
+      'user-agent-override':
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/39.0.2171.65 Chrome/39.0.2171.65 Safari/537.36',
     });
   });
 
@@ -301,11 +302,11 @@ describe('click-parser', () => {
 </component>`;
     const data = parseAppstream(Buffer.from(xml));
     assert.ok(data, 'appstream data should be parsed');
-    assert.deepEqual(data.screenshots, [
-      'https://example.com/lomiri.png',
-      'https://example.com/lomiri-dark.png',
-      'https://example.com/lomiri-light.png',
-    ], 'only lomiri environment screenshots should be included');
+    assert.deepEqual(
+      data.screenshots,
+      ['https://example.com/lomiri.png', 'https://example.com/lomiri-dark.png', 'https://example.com/lomiri-light.png'],
+      'only lomiri environment screenshots should be included',
+    );
   });
 
   test('parseAppstream screenshots with no environment attribute', () => {
@@ -325,9 +326,10 @@ describe('click-parser', () => {
 </component>`;
     const data = parseAppstream(Buffer.from(xml));
     assert.ok(data, 'appstream data should be parsed');
-    assert.deepEqual(data.screenshots, [
-      'https://example.com/screenshot1.png',
-      'https://example.com/screenshot2.png',
-    ], 'all screenshots should be included when no environment is specified');
+    assert.deepEqual(
+      data.screenshots,
+      ['https://example.com/screenshot1.png', 'https://example.com/screenshot2.png'],
+      'all screenshots should be included when no environment is specified',
+    );
   });
 });

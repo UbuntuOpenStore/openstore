@@ -58,6 +58,18 @@ dpkg-build:
   script:
     - npm run build -w openstore-dpkg
 
+api-format:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run format:check -w openstore-api
+
+click-parser-format:
+  stage: check
+  image: bhdouglass/openstore-ci
+  script:
+    - npm run format:check -w click-parser
+
 click-parser-check:
   stage: check
   image: bhdouglass/openstore-ci

@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+
 import { RATINGS } from './constants';
 import { setupStatics } from './statics';
 import { type IReview, type IReviewMethods, type ReviewModel } from './types';

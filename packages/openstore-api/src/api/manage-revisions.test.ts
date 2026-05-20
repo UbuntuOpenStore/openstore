@@ -1,19 +1,20 @@
-import { test, describe, beforeEach, before, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after, afterEach } from 'node:test';
+import path from 'path';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestPackage, type TestUser } from '../tests/factory';
-import * as api from '.';
 import { type App } from 'supertest/types';
 
-import path from 'path';
-import { Package } from '../db/package';
-import { Architecture, Channel } from '../db/package/types';
+import * as api from '.';
 import { Lock } from '../db/lock';
-import * as reviewPackage from '../utils/review-package';
-import * as clickParser from '../utils/click-parser-async';
+import { Package } from '../db/package';
 import { packageSearchInstance } from '../db/package/search-factory';
+import { Architecture, Channel } from '../db/package/types';
+import factory, { type TestPackage, type TestUser } from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
+import * as clickParser from '../utils/click-parser-async';
 import * as messages from '../utils/error-messages';
+import * as reviewPackage from '../utils/review-package';
 
 const GOOD_REVIEW = { manualReviewMessages: [], errorMessages: [], warningMessages: [] };
 const MANUAL_REVIEW = {
@@ -89,10 +90,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route2)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route2).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(parseMock.mock.callCount(), 1);
@@ -112,10 +110,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -138,10 +133,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(reviewSpy.mock.callCount(), 0);
@@ -168,10 +160,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -191,8 +180,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const res = await request(app).post(route1)
-        .expect(400);
+      const res = await request(app).post(route1).expect(400);
 
       assert.equal(res.body.message, messages.NO_FILE);
       assert.equal(lockAcquireSpy.mock.callCount(), 0);
@@ -203,10 +191,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', 'vivid')
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', 'vivid').expect(400);
 
       assert.equal(res.body.message, messages.INVALID_CHANNEL);
       assert.equal(lockAcquireSpy.mock.callCount(), 0);
@@ -217,10 +202,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', 'xenial')
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', 'xenial').expect(400);
 
       assert.equal(res.body.message, messages.INVALID_CHANNEL);
       assert.equal(lockAcquireSpy.mock.callCount(), 0);
@@ -231,7 +213,8 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const res = await request(app).post(`/api/v3/manage/foo/revision?apikey=${user.apikey}`)
+      const res = await request(app)
+        .post(`/api/v3/manage/foo/revision?apikey=${user.apikey}`)
         .attach('file', emptyClick)
         .field('channel', Channel.FOCAL)
         .expect(404);
@@ -245,10 +228,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      await request(app).post(route2)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(403);
+      await request(app).post(route2).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(403);
 
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
@@ -260,10 +240,7 @@ describe('Manage Revision POST', () => {
 
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => MANUAL_REVIEW);
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.NEEDS_MANUAL_REVIEW);
@@ -280,10 +257,7 @@ describe('Manage Revision POST', () => {
 
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => ERROR_REVIEW);
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.CLICK_REVIEW_ERROR);
@@ -298,10 +272,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const res = await request(app).post(route1)
-        .attach('file', notAClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', notAClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.BAD_FILE);
@@ -320,10 +291,7 @@ describe('Manage Revision POST', () => {
         architecture: 'armhf',
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.WRONG_PACKAGE);
@@ -340,10 +308,7 @@ describe('Manage Revision POST', () => {
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
       const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({}));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.MALFORMED_MANIFEST);
@@ -366,10 +331,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.INVALID_VERSION);
@@ -402,10 +364,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.NON_ASCENDING_VERSION);
@@ -431,10 +390,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.equal(res.body.success, true);
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -459,10 +415,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.EXISTING_VERSION);
@@ -489,10 +442,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       const data = res.body.data;
       assert.ok(res.body.success);
@@ -527,13 +477,11 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
-      assert.equal(res.body.message,
+      assert.equal(
+        res.body.message,
         'You cannot upload a click with the architecture "all" for the same version as an architecture specific click',
       );
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -558,13 +506,11 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
-      assert.equal(res.body.message,
+      assert.equal(
+        res.body.message,
         'You cannot upload and architecture specific click for the same version as a click with the architecture "all"',
       );
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -589,10 +535,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.MISMATCHED_FRAMEWORK);
@@ -606,17 +549,10 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      package1.createNextRevision(
-        '1.0.0',
-        Channel.FOCAL,
-        Architecture.ARM64,
-        'ubuntu-sdk-20.04',
-        'url',
-        'shasum',
-        10,
-        8,
-        ['permission1', 'permission2'],
-      );
+      package1.createNextRevision('1.0.0', Channel.FOCAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8, [
+        'permission1',
+        'permission2',
+      ]);
       await package1.save();
 
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
@@ -629,10 +565,7 @@ describe('Manage Revision POST', () => {
         permissions: ['permission1', 'permission3'],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(400);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.MISMATCHED_PERMISSIONS);
@@ -646,17 +579,10 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      package1.createNextRevision(
-        '1.0.0',
-        Channel.XENIAL,
-        Architecture.ARM64,
-        'ubuntu-sdk-20.04',
-        'url',
-        'shasum',
-        10,
-        8,
-        ['permission1', 'permission2'],
-      );
+      package1.createNextRevision('1.0.0', Channel.XENIAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8, [
+        'permission1',
+        'permission2',
+      ]);
       await package1.save();
 
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
@@ -669,10 +595,7 @@ describe('Manage Revision POST', () => {
         permissions: ['permission1', 'permission2'],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -685,17 +608,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      package1.createNextRevision(
-        '1.0.0',
-        Channel.XENIAL,
-        Architecture.ARM64,
-        'ubuntu-sdk-20.04',
-        'url',
-        'shasum',
-        10,
-        8,
-        [],
-      );
+      package1.createNextRevision('1.0.0', Channel.XENIAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8, []);
       await package1.save();
 
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
@@ -708,10 +621,7 @@ describe('Manage Revision POST', () => {
         permissions: ['permission1', 'permission2'],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -727,10 +637,7 @@ describe('Manage Revision POST', () => {
       package1.locked = true;
       await package1.save();
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(403);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(403);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.APP_LOCKED);
@@ -752,7 +659,8 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
+      const res = await request(app)
+        .post(route1)
         .attach('file', emptyClick)
         .field('channel', Channel.FOCAL)
         .field('changelog', '<script></script> changelog update')
@@ -767,7 +675,7 @@ describe('Manage Revision POST', () => {
       const pkg = await Package.findOneByFilters(package1.id);
       assert.ok(pkg);
       assert.ok(pkg.version_changelogs);
-      assert.equal(pkg.version_changelogs.find(vc => vc.version === '1.0.0')?.changelog, 'changelog update');
+      assert.equal(pkg.version_changelogs.find((vc) => vc.version === '1.0.0')?.changelog, 'changelog update');
     });
 
     test('successfully reviews/updates/saves a package and icon and updates elasticsearch', async (t) => {
@@ -781,13 +689,10 @@ describe('Manage Revision POST', () => {
       const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
 
       // TODO setup elastic search for testing in CI
-      const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => { } : undefined) as any;
+      const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => {} : undefined) as any;
       const usertSpy = t.mock.method(packageSearchInstance, 'upsert', mockSearchMethod);
 
-      const res = await request(app).post(route1)
-        .attach('file', goodClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', goodClick).field('channel', Channel.FOCAL).expect(200);
 
       const data = res.body.data;
 
@@ -817,12 +722,11 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const findSpy = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+      const findSpy = t.mock.method(Package, 'findOneByFilters', () => {
+        throw new Error();
+      });
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(500);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(500);
 
       assert.equal(res.body.success, false);
       assert.equal(findSpy.mock.callCount(), 1);
@@ -847,10 +751,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       const data = res.body.data;
       assert.ok(res.body.success);
@@ -882,10 +783,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       const data = res.body.data;
       assert.ok(res.body.success);
@@ -915,10 +813,7 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
-        .attach('file', emptyClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(reviewMock.mock.callCount(), 1);
@@ -936,7 +831,7 @@ describe('Manage Revision POST', () => {
       const now = Date.now();
       const lock = new Lock({
         name: `revision-${package1.id}`,
-        expire: now + (1 * 1000), // 1 second in the future
+        expire: now + 1 * 1000, // 1 second in the future
         inserted: now,
       });
       await lock.save();
@@ -950,7 +845,8 @@ describe('Manage Revision POST', () => {
         apps: [],
       }));
 
-      const res = await request(app).post(route1)
+      const res = await request(app)
+        .post(route1)
         .attach('file', emptyClick)
         .field('channel', Channel.FOCAL)
         .field('changelog', '<script></script> changelog update')
@@ -970,15 +866,9 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const armhfRevision = request(app).post(route1)
-        .attach('file', goodClick)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const armhfRevision = request(app).post(route1).attach('file', goodClick).field('channel', Channel.FOCAL).expect(200);
 
-      const arm64Revision = request(app).post(route1)
-        .attach('file', good64Click)
-        .field('channel', Channel.FOCAL)
-        .expect(200);
+      const arm64Revision = request(app).post(route1).attach('file', good64Click).field('channel', Channel.FOCAL).expect(200);
 
       const [arm64Res] = await Promise.all([arm64Revision, armhfRevision]);
 

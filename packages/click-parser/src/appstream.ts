@@ -34,14 +34,14 @@ function getNodeText(children: XmlNode[]): string {
 }
 
 function getNodeLang(node: XmlNode): string {
-  return (node[':@'])?.['@_xml:lang'] ?? 'en';
+  return node[':@']?.['@_xml:lang'] ?? 'en';
 }
 
 function findChild(nodes: XmlNode[], tagName: string): { attrs: Record<string, string>; children: XmlNode[] } | undefined {
   for (const node of nodes) {
     if (node[tagName] !== undefined) {
       return {
-        attrs: (node[':@']) ?? {},
+        attrs: node[':@'] ?? {},
         children: node[tagName] as XmlNode[],
       };
     }
@@ -53,7 +53,7 @@ function findChildren(nodes: XmlNode[], tagName: string): Array<{ attrs: Record<
   return nodes
     .filter((node) => node[tagName] !== undefined)
     .map((node) => ({
-      attrs: (node[':@']) ?? {},
+      attrs: node[':@'] ?? {},
       children: node[tagName] as XmlNode[],
     }));
 }
@@ -88,8 +88,7 @@ function processDescriptionChildren(descChildren: XmlNode[]): AppstreamExportloc
     if (tag === 'p') {
       const text = getNodeText(children);
       if (text) addChunk(lang, text);
-    }
-    else if (tag === 'ul' || tag === 'ol') {
+    } else if (tag === 'ul' || tag === 'ol') {
       const items: string[] = [];
       for (const liNode of children) {
         if (liNode['#text'] !== undefined) continue;
@@ -100,16 +99,13 @@ function processDescriptionChildren(descChildren: XmlNode[]): AppstreamExportloc
         }
       }
       if (items.length > 0) {
-        const listMd = items
-          .map((item, i) => (tag === 'ol' ? `${i + 1}. ${item}` : `- ${item}`))
-          .join('\n');
+        const listMd = items.map((item, i) => (tag === 'ol' ? `${i + 1}. ${item}` : `- ${item}`)).join('\n');
         addChunk(lang, listMd);
       }
     }
   }
 
-  return Array.from(byLang.entries(), ([lang, chunks]) => ({ text: chunks.join('\n\n'), lang }))
-    .filter((item) => item.text);
+  return Array.from(byLang.entries(), ([lang, chunks]) => ({ text: chunks.join('\n\n'), lang })).filter((item) => item.text);
 }
 
 interface AppstreamExportlocalized {
@@ -152,8 +148,7 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
   let nodes: XmlNode[];
   try {
     nodes = appstreamParser.parse(Buffer.from(rawData).toString()) as XmlNode[];
-  }
-  catch {
+  } catch {
     return undefined;
   }
 
@@ -211,9 +206,9 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
   const customNode = findChild(cc, 'custom');
   const custom = customNode
     ? findChildren(customNode.children, 'value').map((v) => ({
-      value: getNodeText(v.children),
-      key: v.attrs['@_key'] ?? '',
-    }))
+        value: getNodeText(v.children),
+        key: v.attrs['@_key'] ?? '',
+      }))
     : undefined;
 
   const licenseNode = findChild(cc, 'project_license');
@@ -230,7 +225,9 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
     })),
     project_license: licenseNode ? getNodeText(licenseNode.children) : '',
     categories: categoriesNode
-      ? findChildren(categoriesNode.children, 'category').map((c) => getNodeText(c.children)).filter(Boolean)
+      ? findChildren(categoriesNode.children, 'category')
+          .map((c) => getNodeText(c.children))
+          .filter(Boolean)
       : [],
     screenshots,
     releases,

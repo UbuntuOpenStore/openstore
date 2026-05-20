@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 
-import { type Schema } from 'mongoose';
 import path from 'path';
+
+import { type Schema } from 'mongoose';
 
 import { config } from '../../utils';
 import { DEFAULT_CHANNEL, PackageType, type HydratedPackage, type IPackage, type IPackageMethods, type PackageModel } from './types';

@@ -1,14 +1,15 @@
-import multer from 'multer';
-import express, { type Request, type Response } from 'express';
-
-import fs from 'fs/promises';
 import { existsSync } from 'fs';
+import fs from 'fs/promises';
+
+import express, { type Request, type Response } from 'express';
 import { Types } from 'mongoose';
+import multer from 'multer';
+
 import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from '../db/package';
-import { ReservedNamespace } from '../db/reserved_namespace';
 import { packageSearchInstance } from '../db/package/search-factory';
-import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
+import { ReservedNamespace } from '../db/reserved_namespace';
+import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
 import {
   authenticate,
   userRole,
@@ -19,6 +20,8 @@ import {
   canManageLocked,
   maintenanceMode,
 } from '../middleware';
+import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
+import { handleChannel } from '../utils/channels';
 import {
   APP_NOT_FOUND,
   PERMISSION_DENIED,
@@ -33,9 +36,7 @@ import {
   CLICK_REVIEW_ERROR,
   INVALID_CHANNEL,
 } from '../utils/error-messages';
-import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
 import { clickReview } from '../utils/review-package';
-import { handleChannel } from '../utils/channels';
 import { validateNamespace } from '../utils/validate-namespace';
 
 const mupload = multer({ dest: '/tmp' });
@@ -45,19 +46,24 @@ const router = express.Router();
  * Get a list of apps belonging to the logged in user.
  * If the user is an admin, return all apps.
  */
-router.get('/', authenticate, userRole, asyncErrorWrapper(async (req: Request, res: Response) => {
-  const filters = Package.parseRequestFilters(req);
-  if (!req.isAdminUser) {
-    filters.publisherId = req.user!._id.toString();
-  }
+router.get(
+  '/',
+  authenticate,
+  userRole,
+  asyncErrorWrapper(async (req: Request, res: Response) => {
+    const filters = Package.parseRequestFilters(req);
+    if (!req.isAdminUser) {
+      filters.publisherId = req.user!._id.toString();
+    }
 
-  const pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip, false);
-  const count = await Package.countByFilters(filters, false);
+    const pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip, false);
+    const count = await Package.countByFilters(filters, false);
 
-  const formatted = pkgs.map((pkg) => pkg.serialize(undefined, undefined, undefined, undefined, true));
-  const { next, previous } = apiLinks(req.originalUrl, formatted.length, filters.limit, filters.skip);
-  success(res, { count, next, previous, packages: formatted });
-}, 'Could not fetch app list at this time'));
+    const formatted = pkgs.map((pkg) => pkg.serialize(undefined, undefined, undefined, undefined, true));
+    const { next, previous } = apiLinks(req.originalUrl, formatted.length, filters.limit, filters.skip);
+    success(res, { count, next, previous, packages: formatted });
+  }, 'Could not fetch app list at this time'),
+);
 
 /**
  * Get one app belonging to the logged in user.
@@ -104,8 +110,7 @@ router.post(
     pkg = await pkg.save();
 
     success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
-  },
-  'There was an error creating your app, please try again later'),
+  }, 'There was an error creating your app, please try again later'),
 );
 
 const putUpload = mupload.fields([
@@ -142,7 +147,7 @@ router.put(
       delete req.body.desktop_names_override;
     }
 
-    const published = (req.body.published === 'true' || req.body.published === true);
+    const published = req.body.published === 'true' || req.body.published === true;
     if (published && req.pkg.revisions.length === 0) {
       error(res, NO_REVISIONS, 400);
       return;
@@ -164,14 +169,12 @@ router.put(
 
     if (pkg.published) {
       await packageSearchInstance.upsert(pkg);
-    }
-    else {
+    } else {
       await packageSearchInstance.remove(pkg);
     }
 
     success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
-  },
-  'There was an error updating your app, please try again later'),
+  }, 'There was an error updating your app, please try again later'),
 );
 
 /**
@@ -203,8 +206,7 @@ router.delete(
               logger.info(`Deleted click file: ${filePath}`);
             }
           }
-        }
-        catch (err) {
+        } catch (err) {
           logger.error('Error deleting revision file:', err);
           captureException(err, req.originalUrl);
         }
@@ -219,16 +221,14 @@ router.delete(
           logger.info(`Deleted icon file: ${iconPath}`);
         }
       }
-    }
-    catch (err) {
+    } catch (err) {
       logger.error('Error deleting icon file:', err);
       captureException(err, req.originalUrl);
     }
 
     try {
       await packageSearchInstance.remove(req.pkg);
-    }
-    catch (err) {
+    } catch (err) {
       logger.error('Error removing from search index:', err);
       captureException(err, req.originalUrl);
     }
@@ -245,21 +245,17 @@ router.delete(
 
         await reservedNamespace.save();
       }
-    }
-    catch (err) {
+    } catch (err) {
       logger.error('Error creating namespace reservation:', err);
       captureException(err, req.originalUrl);
     }
 
     await req.pkg.deleteOne();
     success(res, {});
-  },
-  'There was an error deleting your app, please try again later'),
+  }, 'There was an error deleting your app, please try again later'),
 );
 
-const postUpload = mupload.fields([
-  { name: 'file', maxCount: 1 },
-]);
+const postUpload = mupload.fields([{ name: 'file', maxCount: 1 }]);
 
 /**
  * Create a new revision for an app via the uploaded file. A revision is specific to a channel and an
@@ -284,8 +280,7 @@ router.post(
     let channel = DEFAULT_CHANNEL;
     try {
       channel = handleChannel(req.body.channel);
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof UserError) {
         error(res, INVALID_CHANNEL, 400);
         return;
@@ -325,8 +320,7 @@ router.post(
 
       if (req.isAdminUser && pkg.skip_review) {
         logger.info(`Skipping review for ${pkg.id as string}`);
-      }
-      else {
+      } else {
         const reviewSummary = await clickReview(filePath, pkg.review_exceptions ?? []);
         if (!req.isAdminUser && !req.isTrustedUser) {
           // Admin & trusted users can upload apps without manual review
@@ -338,10 +332,7 @@ router.post(
 
         // Everyone needs to upload apps without issues
         if (reviewSummary.errorMessages.length > 0 || reviewSummary.warningMessages.length > 0) {
-          throw new ClickReviewError(
-            CLICK_REVIEW_ERROR,
-            reviewSummary.errorMessages.concat(reviewSummary.warningMessages),
-          );
+          throw new ClickReviewError(CLICK_REVIEW_ERROR, reviewSummary.errorMessages.concat(reviewSummary.warningMessages));
         }
       }
 
@@ -356,8 +347,7 @@ router.post(
 
       await Lock.release(lock, req);
       success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
-    }
-    catch (err) {
+    } catch (err) {
       if (lock) {
         await Lock.release(lock, req);
       }
@@ -366,8 +356,7 @@ router.post(
       if (existsSync(file.path)) {
         try {
           await fs.unlink(file.path);
-        }
-        catch (fileError) {
+        } catch (fileError) {
           logger.error(`Error deleting file: ${file.path}`);
           captureException(fileError, req.originalUrl);
         }
@@ -377,8 +366,7 @@ router.post(
       if (existsSync(filePath)) {
         try {
           await fs.unlink(filePath);
-        }
-        catch (fileError) {
+        } catch (fileError) {
           logger.error(`Error deleting file: ${filePath}`);
           captureException(fileError, req.originalUrl);
         }

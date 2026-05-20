@@ -13,8 +13,7 @@ if (config.server.process_limit > 0) {
 
 if (processes === 1 || !cluster.isPrimary) {
   setup();
-}
-else {
+} else {
   logger.debug(`spawning ${processes} processes`);
 
   for (let i = 0; i < processes; i += 1) {

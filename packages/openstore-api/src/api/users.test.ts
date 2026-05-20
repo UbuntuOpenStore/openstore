@@ -1,13 +1,15 @@
+import assert from 'node:assert/strict';
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { test, describe, beforeEach, before, after } from 'node:test';
-import assert from 'node:assert/strict';
-import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestUser } from '../tests/factory';
-import * as api from '.';
-import { type App } from 'supertest/types';
-import { User } from '../db/user';
+
 import { Types } from 'mongoose';
+import request from 'supertest';
+import { type App } from 'supertest/types';
+
+import * as api from '.';
+import { User } from '../db/user';
+import factory, { type TestUser } from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { USER_NOT_FOUND } from '../utils/error-messages';
 
 describe('Users API', () => {
@@ -48,9 +50,7 @@ describe('Users API', () => {
 
   describe('GET /', () => {
     test('allows authenticated users to list all users', async () => {
-      const res = await request(app)
-        .get(`${route}?apikey=${regularUser.apikey}`)
-        .expect(200);
+      const res = await request(app).get(`${route}?apikey=${regularUser.apikey}`).expect(200);
 
       assert.ok(res.body.success);
       assert.ok(Array.isArray(res.body.data));
@@ -71,17 +71,13 @@ describe('Users API', () => {
     });
 
     test('returns 401 when not authenticated', async () => {
-      await request(app)
-        .get(route)
-        .expect(401);
+      await request(app).get(route).expect(401);
     });
   });
 
   describe('GET /me', () => {
     test('returns user info with role and apikey when authenticated', async () => {
-      const res = await request(app)
-        .get(`${route}me?apikey=${regularUser.apikey}`)
-        .expect(200);
+      const res = await request(app).get(`${route}me?apikey=${regularUser.apikey}`).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.username, 'regular-user');
@@ -91,17 +87,13 @@ describe('Users API', () => {
     });
 
     test('returns 401 when not authenticated', async () => {
-      await request(app)
-        .get(`${route}me`)
-        .expect(401);
+      await request(app).get(`${route}me`).expect(401);
     });
   });
 
   describe('GET /:id', () => {
     test('allows unauthenticated users to get other users by id', async () => {
-      const res = await request(app)
-        .get(`${route}${adminUser._id}`)
-        .expect(200);
+      const res = await request(app).get(`${route}${adminUser._id}`).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.username, 'admin-user');
@@ -111,15 +103,11 @@ describe('Users API', () => {
     });
 
     test('returns 404 for non-existent user', async () => {
-      await request(app)
-        .get(`${route}${new Types.ObjectId().toString()}?apikey=${adminUser.apikey}`)
-        .expect(404);
+      await request(app).get(`${route}${new Types.ObjectId().toString()}?apikey=${adminUser.apikey}`).expect(404);
     });
 
     test('returns 404 for invalid ObjectId', async () => {
-      const res = await request(app)
-        .get(`${route}invalid-objectid`)
-        .expect(404);
+      const res = await request(app).get(`${route}invalid-objectid`).expect(404);
 
       assert.ok(!res.body.success);
       assert.equal(res.body.message, USER_NOT_FOUND);
@@ -137,10 +125,7 @@ describe('Users API', () => {
         description: 'This is my test profile description',
       };
 
-      const res = await request(app)
-        .put(`${route}me?apikey=${regularUser.apikey}`)
-        .send(profileData)
-        .expect(200);
+      const res = await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send(profileData).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.website_url, profileData.website_url);
@@ -168,10 +153,7 @@ describe('Users API', () => {
         role: 'admin', // This should be ignored for non-admin users
       };
 
-      const res = await request(app)
-        .put(`${route}me?apikey=${regularUser.apikey}`)
-        .send(profileData)
-        .expect(200);
+      const res = await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send(profileData).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.website_url, profileData.website_url);
@@ -185,10 +167,7 @@ describe('Users API', () => {
     test('rejects description that exceeds maximum length', async () => {
       const longDescription = 'a'.repeat(201);
 
-      await request(app)
-        .put(`${route}me?apikey=${regularUser.apikey}`)
-        .send({ description: longDescription })
-        .expect(400);
+      await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send({ description: longDescription }).expect(400);
 
       const user = await User.findById(regularUser._id);
       assert.ok(user);
@@ -200,10 +179,7 @@ describe('Users API', () => {
         website_url: 'http://example.com',
       };
 
-      await request(app)
-        .put(`${route}me?apikey=${regularUser.apikey}`)
-        .send(profileData)
-        .expect(400);
+      await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send(profileData).expect(400);
 
       const user = await User.findById(regularUser._id);
       assert.ok(user);
@@ -215,10 +191,7 @@ describe('Users API', () => {
         github_profile_url: 'invalid-url',
       };
 
-      await request(app)
-        .put(`${route}me?apikey=${regularUser.apikey}`)
-        .send(profileData)
-        .expect(400);
+      await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send(profileData).expect(400);
 
       const user = await User.findById(regularUser._id);
       assert.ok(user);
@@ -226,10 +199,7 @@ describe('Users API', () => {
     });
 
     test('returns 401 when not authenticated', async () => {
-      await request(app)
-        .put(`${route}me`)
-        .send({ website_url: 'https://example.com' })
-        .expect(401);
+      await request(app).put(`${route}me`).send({ website_url: 'https://example.com' }).expect(401);
     });
   });
 
@@ -240,10 +210,7 @@ describe('Users API', () => {
         role: 'trusted', // Admin should be able to update role
       };
 
-      const res = await request(app)
-        .put(`${route}${regularUser._id}?apikey=${adminUser.apikey}`)
-        .send(profileData)
-        .expect(200);
+      const res = await request(app).put(`${route}${regularUser._id}?apikey=${adminUser.apikey}`).send(profileData).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.website_url, profileData.website_url);
@@ -265,7 +232,7 @@ describe('Users API', () => {
       assert.notEqual(user.website_url, 'https://should-not-update.com');
     });
 
-    test('prevents user from updating another user\'s profile', async () => {
+    test("prevents user from updating another user's profile", async () => {
       await request(app)
         .put(`${route}${anotherUser._id}?apikey=${regularUser.apikey}`)
         .send({ website_url: 'https://should-not-update.com' })

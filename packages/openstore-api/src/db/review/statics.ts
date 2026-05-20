@@ -1,15 +1,15 @@
 /* eslint-disable no-param-reassign */
 
-import { type FilterQuery, type Schema } from 'mongoose';
 import { type Request } from 'express';
+import { type FilterQuery, type Schema } from 'mongoose';
 
 import { UserError } from '../../exceptions';
-import { REVIEW_REDACTED } from '../../utils/error-messages';
 import { getDataInt } from '../../utils';
-import { type HydratedUser } from '../user/types';
+import { REVIEW_REDACTED } from '../../utils/error-messages';
 import { type HydratedPackage } from '../package/types';
-import { type HydratedReview, type IReview, type IReviewMethods, type ReviewModel, type ReviewRequestFilters } from './types';
+import { type HydratedUser } from '../user/types';
 import { type Ratings } from './constants';
+import { type HydratedReview, type IReview, type IReviewMethods, type ReviewModel, type ReviewRequestFilters } from './types';
 
 export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewMethods>) {
   reviewSchema.statics.createOrUpdateExisting = async function (
@@ -44,12 +44,11 @@ export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewM
     let limit = getDataInt(req, 'limit', 10);
     if (limit < 0) {
       limit = 10;
-    }
-    else if (limit > 100) {
+    } else if (limit > 100) {
       limit = 100;
     }
 
-    const user = ('filter' in req.query && req.query.filter === 'apikey' && req.user) ? req.user._id : undefined;
+    const user = 'filter' in req.query && req.query.filter === 'apikey' && req.user ? req.user._id : undefined;
     return {
       limit,
       skip: getDataInt(req, 'skip', 0),
@@ -68,8 +67,7 @@ export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewM
 
     if (user) {
       query.user = user;
-    }
-    else {
+    } else {
       // Since this is for the reviews api, don't return reviews that are only a rating
       query.body = { $ne: '' };
     }
@@ -80,7 +78,8 @@ export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewM
   reviewSchema.statics.countByFilters = async function (filters: ReviewRequestFilters): Promise<number> {
     const query = this.parseFilters(filters);
 
-    if (query.date) { // The date filter is for paging, so we want the count to include all the reviews, not just the ones from this date
+    if (query.date) {
+      // The date filter is for paging, so we want the count to include all the reviews, not just the ones from this date
       delete query.date;
     }
 
@@ -95,10 +94,7 @@ export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewM
   ): Promise<HydratedReview[]> {
     const query = this.parseFilters(filters);
 
-    const findQuery = this.find(query)
-      .populate('user')
-      .populate('comment')
-      .sort({ date: -1 });
+    const findQuery = this.find(query).populate('user').populate('comment').sort({ date: -1 });
 
     if (limit) {
       void findQuery.limit(limit);

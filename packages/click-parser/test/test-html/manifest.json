@@ -1,15 +1,15 @@
 {
-    "name": "test-html.bhdouglass",
-    "description": "A short description of your app",
-    "architecture": "$ENV{ARCH}",
-    "title": "Test HTML",
-    "hooks": {
-        "test-html": {
-            "apparmor": "test-html.apparmor",
-            "desktop":  "test-html.desktop"
-        }
-    },
-    "version": "1.0.0",
-    "maintainer": "Brian Douglass <bhdouglass@gmail.com>",
-    "framework" : "$ENV{CLICK_FRAMEWORK}"
+  "name": "test-html.bhdouglass",
+  "description": "A short description of your app",
+  "architecture": "$ENV{ARCH}",
+  "title": "Test HTML",
+  "hooks": {
+    "test-html": {
+      "apparmor": "test-html.apparmor",
+      "desktop": "test-html.desktop"
+    }
+  },
+  "version": "1.0.0",
+  "maintainer": "Brian Douglass <bhdouglass@gmail.com>",
+  "framework": "$ENV{CLICK_FRAMEWORK}"
 }

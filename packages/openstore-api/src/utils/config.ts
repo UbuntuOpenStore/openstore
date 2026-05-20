@@ -1,4 +1,5 @@
 import path from 'path';
+
 import { PackageType } from '../db/package/types';
 
 let configuration = {

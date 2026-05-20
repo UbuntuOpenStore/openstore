@@ -1,15 +1,16 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after } from 'node:test';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestPackage, type TestUser } from '../tests/factory';
-import * as api from '.';
 import { type App } from 'supertest/types';
 
+import * as api from '.';
 import { Package } from '../db/package';
-import { Ratings, Review } from '../db/review';
-import { recalculatePackageRatings } from '../db/rating_count/utils';
 import { Architecture, Channel, PackageType, SourceStore } from '../db/package/types';
+import { recalculatePackageRatings } from '../db/rating_count/utils';
+import { Ratings, Review } from '../db/review';
+import factory, { type TestPackage, type TestUser } from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import * as messages from '../utils/error-messages';
 
 describe('Reviews', () => {
@@ -34,12 +35,7 @@ describe('Reviews', () => {
   beforeEach(async () => {
     await cleanMongoose();
 
-    [user1, user2, user3, user4] = await Promise.all([
-      factory.user(),
-      factory.user(),
-      factory.user(),
-      factory.user(),
-    ]);
+    [user1, user2, user3, user4] = await Promise.all([factory.user(), factory.user(), factory.user(), factory.user()]);
     route = `/api/v4/apps/pkg-id/reviews?apikey=${user1.apikey}`;
 
     package1 = await factory.package({
@@ -105,9 +101,7 @@ describe('Reviews', () => {
 
   describe('PUT/POST', () => {
     test('creates own review', async () => {
-      const res = await request(app).post(route)
-        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(200);
+      const res = await request(app).post(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(200);
 
       assert.ok(res.body.success);
 
@@ -138,9 +132,7 @@ describe('Reviews', () => {
       }
       assert.deepEqual(checkRatings, { THUMBS_UP: 0, THUMBS_DOWN: 1, HAPPY: 1, NEUTRAL: 1, BUGGY: 0 });
 
-      const res = await request(app).put(route)
-        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(200);
+      const res = await request(app).put(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(200);
 
       assert.ok(res.body.success);
 
@@ -171,7 +163,8 @@ describe('Reviews', () => {
     });
 
     test('throws a 404 when the package cannot be found', async () => {
-      const res = await request(app).post(`/api/v4/apps/bad-id/reviews?apikey=${user1.apikey}`)
+      const res = await request(app)
+        .post(`/api/v4/apps/bad-id/reviews?apikey=${user1.apikey}`)
         .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
         .expect(404);
 
@@ -183,25 +176,22 @@ describe('Reviews', () => {
       package1.maintainer = user1._id;
       await package1.save();
 
-      const res = await request(app).post(route)
-        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(400);
+      const res = await request(app).post(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.CANNOT_REVIEW_OWN_APP);
     });
 
     test('throws a 404 when the revision cannot be found', async () => {
-      const res = await request(app).post(route)
-        .send({ body: 'great app', version: 'nope', rating: 'THUMBS_UP' })
-        .expect(404);
+      const res = await request(app).post(route).send({ body: 'great app', version: 'nope', rating: 'THUMBS_UP' }).expect(404);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.VERSION_NOT_FOUND);
     });
 
     test('throws a 400 when the review is long winded', async () => {
-      const res = await request(app).post(route)
+      const res = await request(app)
+        .post(route)
         .send({ body: 'a'.repeat(600), version: '1.0.0', rating: 'THUMBS_UP' })
         .expect(400);
 
@@ -210,27 +200,21 @@ describe('Reviews', () => {
     });
 
     test('throws a 400 when the rating is invalid', async () => {
-      const res = await request(app).post(route)
-        .send({ body: 'great app', version: '1.0.0', rating: 'INVALID' })
-        .expect(400);
+      const res = await request(app).post(route).send({ body: 'great app', version: '1.0.0', rating: 'INVALID' }).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.INVALID_RATING);
     });
 
     test('throws a 400 when missing parameters', async () => {
-      const res = await request(app).post(route)
-        .send({ body: 'great app', version: '', rating: 'THUMBS_UP' })
-        .expect(400);
+      const res = await request(app).post(route).send({ body: 'great app', version: '', rating: 'THUMBS_UP' }).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.PARAMETER_MISSING);
     });
 
     test('creates a new review when trying to update a nonexistent review', async () => {
-      const res = await request(app).put(route)
-        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(200);
+      const res = await request(app).put(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(200);
 
       assert.ok(res.body.success);
 
@@ -246,9 +230,7 @@ describe('Reviews', () => {
 
     test('throws a 400 when updating a redacted review', async () => {
       await factory.review({ pkg: package1._id, user: user1._id, redacted: true });
-      const res = await request(app).put(route)
-        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(400);
+      const res = await request(app).put(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.REVIEW_REDACTED);
@@ -256,9 +238,7 @@ describe('Reviews', () => {
 
     test('updates existing review when to create another review', async () => {
       await factory.review({ pkg: package1._id, user: user1._id });
-      const res = await request(app).post(route)
-        .send({ body: 'really great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(200);
+      const res = await request(app).post(route).send({ body: 'really great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(200);
 
       assert.ok(res.body.success);
 
@@ -295,9 +275,7 @@ describe('Reviews', () => {
       });
 
       const snapRoute = `/api/v4/apps/snap.package/reviews?apikey=${user1.apikey}`;
-      const res = await request(app).post(snapRoute)
-        .send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' })
-        .expect(200);
+      const res = await request(app).post(snapRoute).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(200);
 
       assert.ok(res.body.success);
 

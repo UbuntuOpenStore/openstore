@@ -1,6 +1,7 @@
-import Gettext from 'node-gettext';
 import fs from 'fs';
 import path from 'path';
+
+import Gettext from 'node-gettext';
 
 const gettextParse = import('gettext-parser');
 const gt = new Gettext();
@@ -28,12 +29,10 @@ export function setLang(lang: string) {
 
     if (langs.includes(checkLang)) {
       gt.setLocale(checkLang);
-    }
-    else {
+    } else {
       gt.setLocale('en_US');
     }
-  }
-  else {
+  } else {
     gt.setLocale('en_US');
   }
 }

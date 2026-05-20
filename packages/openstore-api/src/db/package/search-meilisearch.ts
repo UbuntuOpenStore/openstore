@@ -1,7 +1,8 @@
 import { MeiliSearch, type SearchParams } from 'meilisearch';
+
 import { config, logger } from '../../utils';
-import { type HydratedPackage, type IPackage, type PackageRequestFilters } from './types';
 import type { PackageSearchInterface } from './search-interface';
+import { type HydratedPackage, type IPackage, type PackageRequestFilters } from './types';
 
 // Properties to index for search
 const PROPERTIES: (keyof IPackage)[] = [
@@ -61,8 +62,7 @@ export class PackageSearch implements PackageSearchInterface {
     for (const prop of PROPERTIES) {
       if (prop === 'id') {
         doc[prop] = sanitizedId;
-      }
-      else {
+      } else {
         (doc as any)[prop] = item[prop] ? item[prop] : null;
       }
     }
@@ -73,8 +73,7 @@ export class PackageSearch implements PackageSearchInterface {
 
     if (doc.keywords) {
       doc.keywords = doc.keywords.map((keyword: string) => keyword.toLowerCase().trim()).filter(Boolean);
-    }
-    else {
+    } else {
       doc.keywords = [];
     }
 
@@ -101,8 +100,7 @@ export class PackageSearch implements PackageSearchInterface {
     try {
       const sanitizedId = sanitizeId(item.id);
       await this.client.index(this.indexName).deleteDocument(sanitizedId);
-    }
-    catch (err) {
+    } catch (err) {
       // Handle cases where document doesn't exist
       if (err instanceof Error && err.message !== 'document_not_found') {
         throw err;
@@ -113,12 +111,12 @@ export class PackageSearch implements PackageSearchInterface {
 
   async bulk(upserts: HydratedPackage[], removals?: HydratedPackage[]): Promise<any> {
     if (upserts.length > 0) {
-      const documents = upserts.map(item => this.convert(item));
+      const documents = upserts.map((item) => this.convert(item));
       await this.client.index(this.indexName).addDocuments(documents, { primaryKey: 'id' });
     }
 
     if (removals && removals.length > 0) {
-      const ids = removals.map(item => sanitizeId(item.id));
+      const ids = removals.map((item) => sanitizeId(item.id));
       await this.client.index(this.indexName).deleteDocuments(ids);
     }
 
@@ -137,7 +135,7 @@ export class PackageSearch implements PackageSearchInterface {
     }
 
     if (ids && ids.length > 0) {
-      const sanitizedIds = ids.map(id => sanitizeId(id));
+      const sanitizedIds = ids.map((id) => sanitizeId(id));
       filters.push(`id IN ["${sanitizedIds.join('","')}"]`);
     }
 
@@ -149,12 +147,10 @@ export class PackageSearch implements PackageSearchInterface {
       );
 
       filters.push(`device_compatibilities IN ["${deviceCompats.join('","')}"]`);
-    }
-    else if (architectures && architectures.length > 0 && channel) {
-      const channelArchs = architectures.map(arch => `${channel}:${arch}`);
+    } else if (architectures && architectures.length > 0 && channel) {
+      const channelArchs = architectures.map((arch) => `${channel}:${arch}`);
       filters.push(`channel_architectures IN ["${channelArchs.join('","')}"]`);
-    }
-    else if (channel) {
+    } else if (channel) {
       filters.push(`channels IN ["${channel}"]`);
     }
 
@@ -211,7 +207,7 @@ export class PackageSearch implements PackageSearchInterface {
 
     // Map back the sanitized IDs to the original IDs
     if (results.hits.length > 0) {
-      results.hits = results.hits.map(hit => {
+      results.hits = results.hits.map((hit) => {
         if (hit.originalId) {
           hit.id = hit.originalId;
         }
@@ -229,8 +225,7 @@ export class PackageSearch implements PackageSearchInterface {
     try {
       const result = await this.client.deleteIndex(this.indexName);
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       // If index doesn't exist, that's fine
       if (error instanceof Error && !error.message.includes('not_found')) {
         throw error;
@@ -260,21 +255,8 @@ export class PackageSearch implements PackageSearchInterface {
         'device_compatibilities',
         'package_type',
       ],
-      sortableAttributes: [
-        'name',
-        'updated_date',
-        'published_date',
-        'calculated_rating',
-        'rating_bucket',
-      ],
-      rankingRules: [
-        'words',
-        'typo',
-        'proximity',
-        'sort',
-        'attribute',
-        'exactness',
-      ],
+      sortableAttributes: ['name', 'updated_date', 'published_date', 'calculated_rating', 'rating_bucket'],
+      rankingRules: ['words', 'typo', 'proximity', 'sort', 'attribute', 'exactness'],
     });
 
     return { created: true };

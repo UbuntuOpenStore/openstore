@@ -32,8 +32,7 @@ async function reindex() {
 
     console.log('Reindexing complete!');
     process.exit(0);
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Failed to reindex:', error);
     process.exit(1);
   }

@@ -13,7 +13,7 @@ export function compareVersions(v1: string, v2: string): number {
   }
 
   return openstoreCompareVersions(v1.trim(), v2.trim());
-};
+}
 
 export function isValidVersion(version: string): boolean {
   return openstoreIsValidVersion(version.trim());

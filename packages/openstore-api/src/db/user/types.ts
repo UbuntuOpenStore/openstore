@@ -19,15 +19,16 @@ export interface IUser {
   description?: string;
 }
 
-export type ProfileUpdateData = Pick<IUser,
-'website_url' |
-'github_profile_url' |
-'gitlab_profile_url' |
-'ubports_forum_username' |
-'donation_url' |
-'description' |
-'avatar' |
-'role'
+export type ProfileUpdateData = Pick<
+  IUser,
+  | 'website_url'
+  | 'github_profile_url'
+  | 'gitlab_profile_url'
+  | 'ubports_forum_username'
+  | 'donation_url'
+  | 'description'
+  | 'avatar'
+  | 'role'
 >;
 
 export interface UserSerializeOutput extends Omit<IUser, 'apikey'> {
@@ -42,4 +43,4 @@ export interface IUserMethods {
 
 export type HydratedUser = HydratedDocument<IUser, IUserMethods>;
 
-export interface UserModel extends Model<IUser, unknown, IUserMethods> { }
+export interface UserModel extends Model<IUser, unknown, IUserMethods> {}

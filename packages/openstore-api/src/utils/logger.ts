@@ -1,10 +1,10 @@
-import winston from 'winston';
 import * as Sentry from '@sentry/node';
+import winston from 'winston';
 
 export const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
-      level: (process.env.NODE_ENV === 'production') ? 'info' : 'debug',
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
       format: winston.format.simple(),
       silent: (process.env.NODE_ENV === 'testing' || process.env.NODE_ENV === 'ci') && !(process.env.DEBUG_LOGS === 'true'),
     }),

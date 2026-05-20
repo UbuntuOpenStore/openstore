@@ -2,6 +2,30 @@
   "name": "click-parser",
   "version": "5.1.0",
   "description": "Extract data from Ubuntu's click packages",
+  "keywords": [
+    "click",
+    "clickable",
+    "deb",
+    "debian",
+    "package",
+    "scope",
+    "ubports",
+    "ubuntu",
+    "ubuntu-touch"
+  ],
+  "homepage": "https://gitlab.com/theopenstore/openstore",
+  "bugs": {
+    "url": "https://gitlab.com/theopenstore/openstore/-/issues"
+  },
+  "license": "GPL-3.0",
+  "author": "Brian Douglass",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/theopenstore/openstore.git"
+  },
+  "bin": {
+    "click-parser": "bin/click-parser"
+  },
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
@@ -14,32 +38,10 @@
     "build": "tsc",
     "type-check": "tsc --noemit",
     "test": "node -r ts-node/register --test test/*.ts",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "lint": "eslint src/*.ts test/*.ts bin/click-parser"
   },
-  "bin": {
-    "click-parser": "bin/click-parser"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://gitlab.com/theopenstore/openstore.git"
-  },
-  "keywords": [
-    "click",
-    "ubuntu",
-    "debian",
-    "package",
-    "deb",
-    "scope",
-    "clickable",
-    "ubports",
-    "ubuntu-touch"
-  ],
-  "author": "Brian Douglass",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://gitlab.com/theopenstore/openstore/-/issues"
-  },
-  "homepage": "https://gitlab.com/theopenstore/openstore",
   "dependencies": {
     "fast-xml-parser": "^4.5.0",
     "modern-tar": "^0.7.6",

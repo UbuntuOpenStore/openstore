@@ -1,12 +1,15 @@
 /* eslint-disable no-param-reassign */
 
-import { type FilterQuery, type Schema, type Types } from 'mongoose';
-import uniq from 'lodash/uniq';
 import { type Request } from 'express';
+import uniq from 'lodash/uniq';
+import { type FilterQuery, type Schema, type Types } from 'mongoose';
 
-import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from '../../utils';
 import { UserError } from '../../exceptions';
+import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from '../../utils';
+import { handleChannel } from '../../utils/channels';
 import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH } from '../../utils/error-messages';
+import { RatingCount } from '../rating_count/model';
+import { packageSearchInstance } from './search-factory';
 import {
   Architecture,
   type PackageRequestFilters,
@@ -21,9 +24,6 @@ import {
   type AppType,
   PackageType,
 } from './types';
-import { packageSearchInstance } from './search-factory';
-import { RatingCount } from '../rating_count/model';
-import { handleChannel } from '../../utils/channels';
 
 export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPackageMethods>) {
   packageSchema.statics.incrementDownload = async function (id: Types.ObjectId, revisionIndex: number) {
@@ -39,36 +39,42 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       this.aggregate([
         {
           $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
-        }, {
+        },
+        {
           $group: {
             _id: '$types',
             count: { $sum: 1 },
           },
-        }, {
+        },
+        {
           $sort: { _id: 1 },
         },
       ]),
       this.aggregate([
         {
           $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
-        }, {
+        },
+        {
           $group: {
             _id: '$framework',
             count: { $sum: 1 },
           },
-        }, {
+        },
+        {
           $sort: { _id: 1 },
         },
       ]),
       this.aggregate([
         {
           $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
-        }, {
+        },
+        {
           $group: {
             _id: '$architectures',
             count: { $sum: 1 },
           },
-        }, {
+        },
+        {
           $sort: { _id: 1 },
         },
       ]),
@@ -84,8 +90,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       type._id.forEach((t: string) => {
         if (types[t]) {
           types[t] += type.count as number;
-        }
-        else {
+        } else {
           types[t] = type.count;
         }
       });
@@ -122,12 +127,14 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     const results = await this.aggregate([
       {
         $match: match,
-      }, {
+      },
+      {
         $group: {
           _id: '$category',
           count: { $sum: 1 },
         },
-      }, {
+      },
+      {
         $sort: { _id: 1 },
       },
     ]);
@@ -148,9 +155,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       // Handle non-pluralized form
       ...getDataArray(req, 'package_type'),
     ];
-    const packageTypes = packageTypeParams.length > 0
-      ? uniq(packageTypeParams) as PackageType[]
-      : [PackageType.CLICK];
+    const packageTypes = packageTypeParams.length > 0 ? (uniq(packageTypeParams) as PackageType[]) : [PackageType.CLICK];
 
     const architecture = getData(req, 'architecture').toLowerCase() as Architecture;
     let architectures: Architecture[] = [];
@@ -164,8 +169,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     let limit = getDataInt(req, 'limit', 30);
     if (limit > 100) {
       limit = 100;
-    }
-    else if (limit <= 0) {
+    } else if (limit <= 0) {
       limit = 30;
     }
 
@@ -173,8 +177,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     let nsfw: (null | boolean)[] = [];
     if (queryNsfw === true) {
       nsfw = [true];
-    }
-    else if (queryNsfw === false) {
+    } else if (queryNsfw === false) {
       nsfw = [null, false];
     }
 
@@ -204,21 +207,24 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     };
   };
 
-  packageSchema.statics.parseFilters = function ({
-    types,
-    ids,
-    packageTypes,
-    frameworks,
-    architecture, // TODO can this be removed?
-    architectures,
-    category,
-    author,
-    channel,
-    search,
-    nsfw,
-    publisherId,
-    published,
-  }: PackageRequestFilters, textSearch = true): FilterQuery<IPackage> {
+  packageSchema.statics.parseFilters = function (
+    {
+      types,
+      ids,
+      packageTypes,
+      frameworks,
+      architecture, // TODO can this be removed?
+      architectures,
+      category,
+      author,
+      channel,
+      search,
+      nsfw,
+      publisherId,
+      published,
+    }: PackageRequestFilters,
+    textSearch = true,
+  ): FilterQuery<IPackage> {
     const query: FilterQuery<IPackage> = {};
 
     if (types && types.length > 0) {
@@ -258,15 +264,13 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       });
 
       query.device_compatibilities = { $in: deviceCompatibilities };
-    }
-    else if (arches.length > 0 && channel && parsedFrameworks.length === 0) {
+    } else if (arches.length > 0 && channel && parsedFrameworks.length === 0) {
       const channelArchitectures = arches.map((arch) => {
         return `${channel}:${arch}`;
       }) as ChannelArchitecture[];
 
       query.channel_architectures = { $in: channelArchitectures };
-    }
-    else if (channel) {
+    } else if (channel) {
       query.channels = channel;
     }
 
@@ -281,8 +285,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     if (search) {
       if (textSearch) {
         query.$text = { $search: search };
-      }
-      else {
+      } else {
         query.name = { $regex: search, $options: 'i' };
       }
     }
@@ -324,16 +327,13 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       if (query.$text) {
         void findQuery.select({ score: { $meta: 'textScore' } });
         void findQuery.sort({ score: { $meta: 'textScore' } });
-      }
-      else {
+      } else {
         void findQuery.sort('name');
       }
-    }
-    else {
+    } else {
       if (sort === '-name' || sort === 'name') {
         void findQuery.sort(sort);
-      }
-      else {
+      } else {
         void findQuery.sort(sort).sort('name');
       }
     }
@@ -374,8 +374,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
 
       // Maintain ordering from the elastic search results
       pkgs.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
-    }
-    else {
+    } else {
       // Get the ratings
       const ratingCounts = await RatingCount.getCountsByIds(ids);
 

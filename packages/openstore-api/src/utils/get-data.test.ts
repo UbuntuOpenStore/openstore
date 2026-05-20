@@ -1,5 +1,5 @@
-import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe } from 'node:test';
 
 import { getData, getDataArray, getDataBoolean, getDataBooleanOrUndefined } from './get-data';
 

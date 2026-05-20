@@ -30,4 +30,4 @@ export class ClickReviewError extends UserError {
   }
 }
 
-export class ValidationError extends UserError { }
+export class ValidationError extends UserError {}

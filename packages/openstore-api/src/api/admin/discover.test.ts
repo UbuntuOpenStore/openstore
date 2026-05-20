@@ -1,12 +1,13 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after } from 'node:test';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
-import factory from '../../tests/factory';
-import * as api from '..';
 import { type App } from 'supertest/types';
 
+import * as api from '..';
 import { Discover } from '../../db/discover';
+import factory from '../../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
 
 describe('Admin API - Discover Management', () => {
   const route = '/api/v4/admin/discover';
@@ -50,9 +51,7 @@ describe('Admin API - Discover Management', () => {
 
   describe('GET /api/v4/admin/discover', () => {
     test('returns discover data for admin users', async () => {
-      const res = await request(app)
-        .get(`${route}?apikey=${adminApiKey}`)
-        .expect(200);
+      const res = await request(app).get(`${route}?apikey=${adminApiKey}`).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.highlights.length, 2);
@@ -60,28 +59,20 @@ describe('Admin API - Discover Management', () => {
     });
 
     test('returns 403 for non-admin users', async () => {
-      const res = await request(app)
-        .get(`${route}?apikey=${regularApiKey}`)
-        .expect(403);
+      const res = await request(app).get(`${route}?apikey=${regularApiKey}`).expect(403);
 
       assert.equal(res.body.success, false);
     });
 
     test('returns 401 for unauthenticated requests', async () => {
-      await request(app)
-        .get(route)
-        .expect(401);
+      await request(app).get(route).expect(401);
     });
   });
 
   describe('PUT /api/v4/admin/discover', () => {
     test('updates discover data for admin users', async () => {
-      const newHighlights = [
-        { id: 'new.app', description: 'New app' },
-      ];
-      const newCategories = [
-        { name: 'New Category', tagline: 'New tagline', referral: '', ids: ['new1', 'new2'] },
-      ];
+      const newHighlights = [{ id: 'new.app', description: 'New app' }];
+      const newCategories = [{ name: 'New Category', tagline: 'New tagline', referral: '', ids: ['new1', 'new2'] }];
 
       const res = await request(app)
         .put(`${route}?apikey=${adminApiKey}`)
@@ -96,28 +87,19 @@ describe('Admin API - Discover Management', () => {
     });
 
     test('returns 403 for non-admin users', async () => {
-      const res = await request(app)
-        .put(`${route}?apikey=${regularApiKey}`)
-        .send({ highlights: [], categories: [] })
-        .expect(403);
+      const res = await request(app).put(`${route}?apikey=${regularApiKey}`).send({ highlights: [], categories: [] }).expect(403);
 
       assert.equal(res.body.success, false);
     });
 
     test('returns 400 for invalid highlights', async () => {
-      const res = await request(app)
-        .put(`${route}?apikey=${adminApiKey}`)
-        .send({ highlights: 'invalid', categories: [] })
-        .expect(400);
+      const res = await request(app).put(`${route}?apikey=${adminApiKey}`).send({ highlights: 'invalid', categories: [] }).expect(400);
 
       assert.equal(res.body.success, false);
     });
 
     test('returns 400 for invalid categories', async () => {
-      const res = await request(app)
-        .put(`${route}?apikey=${adminApiKey}`)
-        .send({ highlights: [], categories: 'invalid' })
-        .expect(400);
+      const res = await request(app).put(`${route}?apikey=${adminApiKey}`).send({ highlights: [], categories: 'invalid' }).expect(400);
 
       assert.equal(res.body.success, false);
     });
@@ -161,20 +143,14 @@ describe('Admin API - Discover Management', () => {
     });
 
     test('returns 400 for empty highlights array', async () => {
-      const res = await request(app)
-        .put(`${route}?apikey=${adminApiKey}`)
-        .send({ highlights: [], categories: testCategories })
-        .expect(400);
+      const res = await request(app).put(`${route}?apikey=${adminApiKey}`).send({ highlights: [], categories: testCategories }).expect(400);
 
       assert.equal(res.body.success, false);
       assert.ok(res.body.message.includes('Must have at least one highlight'));
     });
 
     test('returns 400 for empty categories array', async () => {
-      const res = await request(app)
-        .put(`${route}?apikey=${adminApiKey}`)
-        .send({ highlights: testHighlights, categories: [] })
-        .expect(400);
+      const res = await request(app).put(`${route}?apikey=${adminApiKey}`).send({ highlights: testHighlights, categories: [] }).expect(400);
 
       assert.equal(res.body.success, false);
       assert.ok(res.body.message.includes('Must have at least one category'));

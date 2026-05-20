@@ -1,10 +1,13 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+
 import { createGzipDecoder, unpackTar } from 'modern-tar';
 
 import { App } from './app';
 import type { QmlImport } from './app';
+import { parseAppstream } from './appstream';
+import type { AppstreamExportData } from './appstream';
 import {
   apparmorSchema,
   contentHubSchema,
@@ -17,8 +20,6 @@ import {
 } from './schemas';
 import type { Manifest } from './schemas';
 import { bufferToWebReadableStream, parseArArchive, parseIniAs, parseJsonAs, parseXmlAs, XMLParser } from './utils';
-import { parseAppstream } from './appstream';
-import type { AppstreamExportData } from './appstream';
 
 const accountXmlParser = new XMLParser({
   ignoreAttributes: false,
@@ -77,8 +78,7 @@ async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedDa
       await fs.writeFile(write, iconEntry.data);
       data.icon = write;
     }
-  }
-  catch (err) {
+  } catch (err) {
     console.error(err);
   }
 
@@ -86,12 +86,15 @@ async function extractIcon(fileData: Buffer, data: ParsedData): Promise<ParsedDa
 }
 
 function parseQmlImports(str: string): QmlImport[] {
-  return str.split('\n').filter((line) => line.trim().startsWith('import ')).map((line) => {
-    const tokens = line.split(' ');
-    const module = tokens[1].replace(/"/g, '');
-    const isJs = module.endsWith('.js');
-    return { module, version: isJs ? undefined : tokens[2] };
-  });
+  return str
+    .split('\n')
+    .filter((line) => line.trim().startsWith('import '))
+    .map((line) => {
+      const tokens = line.split(' ');
+      const module = tokens[1].replace(/"/g, '');
+      const isJs = module.endsWith('.js');
+      return { module, version: isJs ? undefined : tokens[2] };
+    });
 }
 
 async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Promise<ParsedData> {
@@ -188,8 +191,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
             data.webappInject = true;
           }
         }
-      }
-      else if (entry.header.name.endsWith('.qml')) {
+      } else if (entry.header.name.endsWith('.qml')) {
         // Collect QML imports from all .qml files across all apps.
         const str = entry.data ? Buffer.from(entry.data).toString() : '';
         const imports = parseQmlImports(str);
@@ -197,8 +199,7 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
         for (const app of data.apps) {
           app.qmlImports = app.qmlImports.concat(imports);
         }
-      }
-      else if (entry.header.name.includes('LC_MESSAGES') && entry.header.name.includes('.mo')) {
+      } else if (entry.header.name.includes('LC_MESSAGES') && entry.header.name.includes('.mo')) {
         const langs = entry.header.name.split('/');
         const pos = langs.indexOf('LC_MESSAGES');
         if (pos >= 1) {
@@ -207,12 +208,9 @@ async function parseData(fileData: Buffer, data: ParsedData, icon: boolean): Pro
             languagesSet.add(lang);
           }
         }
-      }
-      else if (
-        (entry.header.name.startsWith('./usr/share/metainfo/') ||
-          entry.header.name.startsWith('./usr/share/appdata/')) &&
-        (entry.header.name.endsWith('.metainfo.xml') ||
-          entry.header.name.endsWith('.appdata.xml')) &&
+      } else if (
+        (entry.header.name.startsWith('./usr/share/metainfo/') || entry.header.name.startsWith('./usr/share/appdata/')) &&
+        (entry.header.name.endsWith('.metainfo.xml') || entry.header.name.endsWith('.appdata.xml')) &&
         !data.appstream
       ) {
         const appstream = parseAppstream(entry.data);
@@ -264,8 +262,7 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
       let rawManifest: unknown;
       try {
         rawManifest = JSON.parse(manifestStr);
-      }
-      catch {
+      } catch {
         throw new Error('Manifest file is not in a json format');
       }
 
@@ -299,8 +296,7 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
       if (!decoded.includes('\uFFFD')) {
         maintainer = decoded;
       }
-    }
-    catch {
+    } catch {
       // ignore encoding errors, keep original maintainer string
     }
   }
@@ -324,10 +320,7 @@ async function parseControl(control: Buffer, fileData: Buffer, icon: boolean): P
   return await parseData(fileData, data, icon);
 }
 
-export default async function parseClickPackage(
-  filepath: string,
-  extractIcon: boolean = false,
-): Promise<ParsedData> {
+export default async function parseClickPackage(filepath: string, extractIcon: boolean = false): Promise<ParsedData> {
   const fileBuffer = await fs.readFile(filepath);
   const arFiles = parseArArchive(fileBuffer);
 
@@ -337,8 +330,7 @@ export default async function parseClickPackage(
   for (const file of arFiles) {
     if (file.name === 'data.tar.gz') {
       dataFile = file.fileData;
-    }
-    else if (file.name === 'control.tar.gz') {
+    } else if (file.name === 'control.tar.gz') {
       controlFile = file.fileData;
     }
   }

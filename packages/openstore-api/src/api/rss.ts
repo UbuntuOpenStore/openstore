@@ -1,5 +1,5 @@
-import RSS from 'rss';
 import express, { type Request, type Response } from 'express';
+import RSS from 'rss';
 
 import { Package } from '../db/package';
 import { PackageType } from '../db/package/types';
@@ -49,8 +49,7 @@ async function generateFeed(req: Request, res: Response, updates: boolean) {
         custom_elements: [{ tagline: pkg.tagline ? pkg.tagline : '' }],
       });
     });
-  }
-  catch (err) {
+  } catch (err) {
     logger.error('RSS feed error', err);
     captureException(err, req.originalUrl);
     error(res, 'There was an error generating the RSS feed');

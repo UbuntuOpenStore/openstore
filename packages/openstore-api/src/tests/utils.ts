@@ -12,12 +12,14 @@ export function closeMongoose() {
 
 export async function cleanMongoose() {
   const collections = await mongoose.connection.db.listCollections().toArray();
-  await Promise.all(collections.map(({ name }) => {
-    if (name === 'system.profile') {
-      return null;
-    }
+  await Promise.all(
+    collections.map(({ name }) => {
+      if (name === 'system.profile') {
+        return null;
+      }
 
-    const collection = mongoose.connection.db.collection(name);
-    return collection.deleteMany({});
-  }));
+      const collection = mongoose.connection.db.collection(name);
+      return collection.deleteMany({});
+    }),
+  );
 }

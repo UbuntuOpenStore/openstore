@@ -1,16 +1,25 @@
 /* eslint-disable no-param-reassign */
 
-import { type Schema } from 'mongoose';
-import path from 'path';
-import fs from 'fs/promises';
-import { existsSync } from 'fs';
-
 import { createHash } from 'crypto';
-import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
-import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory, extractAppstreamChangelogs }
-  from '../../utils/appstream-helpers';
-import { type HydratedRatingCount } from '../rating_count/types';
+import { existsSync } from 'fs';
+import fs from 'fs/promises';
+import path from 'path';
+
+import { isURL } from 'class-validator';
+import { difference, omit } from 'lodash';
+import { type Schema } from 'mongoose';
 import { v4 } from 'uuid';
+
+import { UserError } from '../../exceptions';
+import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
+import {
+  getAppstreamLocalizedString,
+  mapSpdxLicense,
+  mapAppstreamCategory,
+  extractAppstreamChangelogs,
+} from '../../utils/appstream-helpers';
+import * as clickParser from '../../utils/click-parser-async';
+import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 import {
   EXISTING_VERSION,
   INVALID_VERSION,
@@ -22,10 +31,8 @@ import {
   NON_ASCENDING_VERSION,
   WRONG_PACKAGE,
 } from '../../utils/error-messages';
-import { UserError } from '../../exceptions';
-import * as clickParser from '../../utils/click-parser-async';
-import { isURL } from 'class-validator';
-import { difference, omit } from 'lodash';
+import { type HydratedRatingCount } from '../rating_count/types';
+import { User } from '../user';
 import {
   type PackageModel,
   Architecture,
@@ -46,8 +53,6 @@ import {
   type ContentRating,
   PackageType,
 } from './types';
-import { User } from '../user';
-import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 
 /*
   The filesize is stored in kilobytes (from the click package
@@ -64,15 +69,11 @@ export function extractPathsFromClickData(data: ClickParserData): { readPaths: s
   for (const app of data.apps) {
     if (Object.keys(app.apparmor).length > 0) {
       if (app.apparmor.write_path && Array.isArray(app.apparmor.write_path)) {
-        writePaths = writePaths.concat(
-          app.apparmor.write_path.map((p: string) => p.replace('/home/phablet', '~').replace('@{HOME}', '~')),
-        );
+        writePaths = writePaths.concat(app.apparmor.write_path.map((p: string) => p.replace('/home/phablet', '~').replace('@{HOME}', '~')));
       }
 
       if (app.apparmor.read_path && Array.isArray(app.apparmor.read_path)) {
-        readPaths = readPaths.concat(
-          app.apparmor.read_path.map((p: string) => p.replace('/home/phablet', '~').replace('@{HOME}', '~')),
-        );
+        readPaths = readPaths.concat(app.apparmor.read_path.map((p: string) => p.replace('/home/phablet', '~').replace('@{HOME}', '~')));
       }
     }
   }
@@ -100,47 +101,42 @@ export function serializeRatings(ratingCounts: HydratedRatingCount[]) {
 }
 
 export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPackageMethods>) {
-  packageSchema.method<HydratedPackage>('getLatestRevision', function (
-    channel: Channel,
-    arch: Architecture,
-    detectAll = true,
-    frameworks?: string[],
-    version?: string,
-  ) {
-    let architecture = arch;
-    if (this.architectures.includes(Architecture.ALL) && detectAll) {
-      architecture = Architecture.ALL;
-    }
-
-    let revisionData: HydratedRevision | null = null;
-    let revisionIndex = -1;
-    this.revisions.forEach((data, index) => {
-      let archCheck = data.architecture === architecture;
-      if (data.architecture && data.architecture.includes(',')) {
-        // Handle multi arch clicks
-        archCheck = data.architecture.includes(architecture);
+  packageSchema.method<HydratedPackage>(
+    'getLatestRevision',
+    function (channel: Channel, arch: Architecture, detectAll = true, frameworks?: string[], version?: string) {
+      let architecture = arch;
+      if (this.architectures.includes(Architecture.ALL) && detectAll) {
+        architecture = Architecture.ALL;
       }
 
-      if (
-        (!revisionData || revisionData.revision < data.revision) &&
-        (
-          !revisionData ||
-          !isValidVersion(data.version) ||
-          !isValidVersion(revisionData.version) ||
-          compareVersions(revisionData.version, data.version) < 0
-        ) &&
-        data.channel === channel &&
-        (!arch || archCheck) &&
-        (!frameworks || frameworks.length === 0 || frameworks.includes(data.framework)) &&
-        (!version || version === data.version)
-      ) {
-        revisionData = data;
-        revisionIndex = index;
-      }
-    });
+      let revisionData: HydratedRevision | null = null;
+      let revisionIndex = -1;
+      this.revisions.forEach((data, index) => {
+        let archCheck = data.architecture === architecture;
+        if (data.architecture && data.architecture.includes(',')) {
+          // Handle multi arch clicks
+          archCheck = data.architecture.includes(architecture);
+        }
 
-    return { revisionData, revisionIndex };
-  });
+        if (
+          (!revisionData || revisionData.revision < data.revision) &&
+          (!revisionData ||
+            !isValidVersion(data.version) ||
+            !isValidVersion(revisionData.version) ||
+            compareVersions(revisionData.version, data.version) < 0) &&
+          data.channel === channel &&
+          (!arch || archCheck) &&
+          (!frameworks || frameworks.length === 0 || frameworks.includes(data.framework)) &&
+          (!version || version === data.version)
+        ) {
+          revisionData = data;
+          revisionIndex = index;
+        }
+      });
+
+      return { revisionData, revisionIndex };
+    },
+  );
 
   packageSchema.method<HydratedPackage>('updateFromClick', async function (data: ClickParserData) {
     const manifest = {
@@ -252,52 +248,48 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         for (const filename of this.screenshots) {
           if (incomingUrls.some((url) => filename.includes(`-screenshot-${urlHashFor(url)}`))) {
             keptScreenshots.push(filename);
-          }
-          else {
+          } else {
             toDelete.push(filename);
           }
         }
 
-        await Promise.all(toDelete.map((filename) =>
-          fs.unlink(`${config.screenshot_dir}/${filename}`).catch(() => { }),
-        ));
+        await Promise.all(toDelete.map((filename) => fs.unlink(`${config.screenshot_dir}/${filename}`).catch(() => {})));
 
         // Download only URLs not already present by hash
-        const urlsToDownload = incomingUrls.filter(
-          (url) => !keptScreenshots.some((f) => f.includes(`-screenshot-${urlHashFor(url)}`)),
+        const urlsToDownload = incomingUrls.filter((url) => !keptScreenshots.some((f) => f.includes(`-screenshot-${urlHashFor(url)}`)));
+
+        const downloadResults = await Promise.all(
+          urlsToDownload.map(async (url: string) => {
+            const urlHash = urlHashFor(url);
+            try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                return null;
+              }
+
+              const contentType = response.headers.get('content-type') ?? '';
+              const extMap: Record<string, string> = {
+                'image/png': '.png',
+                'image/jpeg': '.jpg',
+                'image/webp': '.webp',
+              };
+              const ext = Object.entries(extMap).find(([mime]) => contentType.includes(mime))?.[1];
+              if (!ext) {
+                return null;
+              }
+
+              const tmpPath = path.join('/tmp', `${v4()}${ext}`);
+              await fs.writeFile(tmpPath, Buffer.from(await response.arrayBuffer()));
+
+              const filename = `${this.id as string}-screenshot-${urlHash}${ext}`;
+              await moveFile(tmpPath, `${config.screenshot_dir}/${filename}`);
+              return filename;
+            } catch (err) {
+              console.warn(`Failed to download AppStream screenshot ${url}:`, err);
+              return null;
+            }
+          }),
         );
-
-        const downloadResults = await Promise.all(urlsToDownload.map(async (url: string) => {
-          const urlHash = urlHashFor(url);
-          try {
-            const response = await fetch(url);
-            if (!response.ok) {
-              return null;
-            }
-
-            const contentType = response.headers.get('content-type') ?? '';
-            const extMap: Record<string, string> = {
-              'image/png': '.png',
-              'image/jpeg': '.jpg',
-              'image/webp': '.webp',
-            };
-            const ext = Object.entries(extMap).find(([mime]) => contentType.includes(mime))?.[1];
-            if (!ext) {
-              return null;
-            }
-
-            const tmpPath = path.join('/tmp', `${v4()}${ext}`);
-            await fs.writeFile(tmpPath, Buffer.from(await response.arrayBuffer()));
-
-            const filename = `${this.id as string}-screenshot-${urlHash}${ext}`;
-            await moveFile(tmpPath, `${config.screenshot_dir}/${filename}`);
-            return filename;
-          }
-          catch (err) {
-            console.warn(`Failed to download AppStream screenshot ${url}:`, err);
-            return null;
-          }
-        }));
 
         // Assemble screenshots in original URL order
         const newScreenshots: string[] = [];
@@ -306,8 +298,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
           const kept = keptScreenshots.find((f) => f.includes(`-screenshot-${urlHash}`));
           if (kept) {
             newScreenshots.push(kept);
-          }
-          else {
+          } else {
             const downloaded = downloadResults[urlsToDownload.indexOf(url)];
             if (downloaded) {
               newScreenshots.push(downloaded);
@@ -359,31 +350,26 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         if (ytMatch) {
           embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
         }
-      }
-      else if (url.includes('vimeo.com')) {
+      } else if (url.includes('vimeo.com')) {
         const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
         if (vimeoMatch) {
           embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
         }
-      }
-      else if (url.match(/^https?:\/\/[^/]+\/w\/[\w-]+/)) {
+      } else if (url.match(/^https?:\/\/[^/]+\/w\/[\w-]+/)) {
         // Peertube "watch" URLs, e.g. https://peer.tube/w/abcdefghijk
         const peertubeMatch = url.match(/^(https?:\/\/[^/]+)\/w\/([\w-]+)/);
         if (peertubeMatch) {
           embedUrl = `${peertubeMatch[1]}/videos/embed/${peertubeMatch[2]}`;
         }
-      }
-      else if (url.includes('/videos/embed/')) {
+      } else if (url.includes('/videos/embed/')) {
         // Peertube already-embedded URL
         embedUrl = url;
-      }
-      else if (url.includes('rumble.com/embed/')) {
+      } else if (url.includes('rumble.com/embed/')) {
         const rumbleEmbedMatch = url.match(/rumble\.com\/embed\/(v[\w]+)/);
         if (rumbleEmbedMatch) {
           embedUrl = `https://rumble.com/embed/${rumbleEmbedMatch[1]}/`;
         }
-      }
-      else if (url.includes('rumble.com')) {
+      } else if (url.includes('rumble.com')) {
         const rumbleMatch = url.match(/rumble\.com\/(?:[\w-]+-)?(v[\w]+)-?/);
         if (rumbleMatch) {
           embedUrl = `https://rumble.com/embed/${rumbleMatch[1]}/`;
@@ -396,16 +382,16 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
   packageSchema.method<HydratedPackage>('updateFromBody', async function (body: BodyUpdate) {
     if (body.locked !== undefined) {
-      this.locked = (body.locked === 'true' || body.locked === 'on' || body.locked === true);
+      this.locked = body.locked === 'true' || body.locked === 'on' || body.locked === true;
     }
 
     if (body.published !== undefined) {
-      this.published = (body.published === 'true' || body.published === 'on' || body.published === true);
+      this.published = body.published === 'true' || body.published === 'on' || body.published === true;
     }
 
     if (!this.published_date && this.published) {
-      this.published_date = (new Date()).toISOString();
-      this.updated_date = (new Date()).toISOString();
+      this.published_date = new Date().toISOString();
+      this.updated_date = new Date().toISOString();
     }
 
     this.name = body.name ? body.name : this.name;
@@ -415,15 +401,15 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
     if (body.version_changelogs) {
       try {
-        const parsedChangelogs = typeof body.version_changelogs === 'string'
-          ? JSON.parse(body.version_changelogs) as Array<{ version: string; changelog: string }>
-          : body.version_changelogs;
+        const parsedChangelogs =
+          typeof body.version_changelogs === 'string'
+            ? (JSON.parse(body.version_changelogs) as Array<{ version: string; changelog: string }>)
+            : body.version_changelogs;
 
         this.version_changelogs = parsedChangelogs
           .filter(({ version }) => isValidVersion(version))
           .map(({ version, changelog }) => ({ version, changelog: sanitize(changelog) }));
-      }
-      catch (err) {
+      } catch (err) {
         console.error('Failed to parse version_changelogs', err);
       }
     }
@@ -431,24 +417,21 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.description = sanitize(body.description ?? this.description ?? '');
     this.tagline = sanitize(body.tagline ?? this.tagline ?? '');
 
-    this.source = (isURL(body.source ?? '') || body.source === '') ? body.source : (this.source ?? '');
-    this.support_url = (isURL(body.support_url ?? '') || body.support_url === '') ? body.support_url : (this.support_url ?? '');
-    this.donate_url = (isURL(body.donate_url ?? '') || body.donate_url === '') ? body.donate_url : (this.donate_url ?? '');
-    this.translation_url = (isURL(body.translation_url ?? '') || body.translation_url === '')
-      ? body.translation_url
-      : (this.translation_url ?? '');
+    this.source = isURL(body.source ?? '') || body.source === '' ? body.source : (this.source ?? '');
+    this.support_url = isURL(body.support_url ?? '') || body.support_url === '' ? body.support_url : (this.support_url ?? '');
+    this.donate_url = isURL(body.donate_url ?? '') || body.donate_url === '' ? body.donate_url : (this.donate_url ?? '');
+    this.translation_url =
+      isURL(body.translation_url ?? '') || body.translation_url === '' ? body.translation_url : (this.translation_url ?? '');
     this.updateVideoUrl(body.video_url ?? '');
 
     let updatedScreenshots: string[] = [];
     if (body.screenshots) {
       if (Array.isArray(body.screenshots)) {
         updatedScreenshots = body.screenshots;
-      }
-      else if (isURL(body.screenshots)) {
+      } else if (isURL(body.screenshots)) {
         // When there is just one screenshot in form data, it comes across like a single string
         updatedScreenshots = [body.screenshots];
-      }
-      else {
+      } else {
         updatedScreenshots = JSON.parse(body.screenshots);
       }
     }
@@ -465,8 +448,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       if (!updatedScreenshots.includes(filename)) {
         try {
           await fs.unlink(`${config.screenshot_dir}/${filename}`);
-        }
-        catch (error) {
+        } catch (error) {
           // Ignore errors if file doesn't exist or can't be removed
           console.warn(`Failed to remove screenshot ${filename}:`, error);
         }
@@ -482,7 +464,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.keywords = keywords.map((keyword) => keyword.trim());
 
     if (body.nsfw !== undefined) {
-      this.nsfw = (body.nsfw === 'true' || body.nsfw === 'on' || body.nsfw === true);
+      this.nsfw = body.nsfw === 'true' || body.nsfw === 'on' || body.nsfw === true;
     }
 
     if (body.type_override !== undefined) {
@@ -496,14 +478,15 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (body.desktop_names_override !== undefined) {
       if (Array.isArray(body.desktop_names_override)) {
         this.desktop_names_override = body.desktop_names_override;
-      }
-      else if (typeof body.desktop_names_override === 'string') {
+      } else if (typeof body.desktop_names_override === 'string') {
         // Handle comma-separated string or JSON string
         try {
           this.desktop_names_override = JSON.parse(body.desktop_names_override);
-        }
-        catch {
-          this.desktop_names_override = body.desktop_names_override.split(',').map(name => name.trim()).filter(Boolean);
+        } catch {
+          this.desktop_names_override = body.desktop_names_override
+            .split(',')
+            .map((name) => name.trim())
+            .filter(Boolean);
         }
       }
     }
@@ -521,72 +504,78 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     }
   });
 
-  packageSchema.method<HydratedPackage>('createNextRevision', function (
-    version: string,
-    channel: Channel,
-    architecture: Architecture,
-    framework: string,
-    url: string,
-    downloadSha512: string,
-    installedSize: number,
-    downloadSize: number,
-    permissions: string[] = [],
-    readPaths: string[] = [],
-    writePaths: string[] = [],
-    desktopNames: string[] = [],
-    contentRating?: ContentRating,
-  ) {
-    this.revisions.push({
-      revision: this.next_revision,
-      version,
-      downloads: 0,
-      channel,
-      download_url: url,
-      download_sha512: downloadSha512,
-      architecture,
-      framework,
-      filesize: installedSize,
-      downloadSize,
-      created_date: (new Date()).toISOString(),
-      permissions,
-      read_paths: readPaths,
-      write_paths: writePaths,
-      desktop_names: desktopNames,
-      content_rating: contentRating,
-    });
+  packageSchema.method<HydratedPackage>(
+    'createNextRevision',
+    function (
+      version: string,
+      channel: Channel,
+      architecture: Architecture,
+      framework: string,
+      url: string,
+      downloadSha512: string,
+      installedSize: number,
+      downloadSize: number,
+      permissions: string[] = [],
+      readPaths: string[] = [],
+      writePaths: string[] = [],
+      desktopNames: string[] = [],
+      contentRating?: ContentRating,
+    ) {
+      this.revisions.push({
+        revision: this.next_revision,
+        version,
+        downloads: 0,
+        channel,
+        download_url: url,
+        download_sha512: downloadSha512,
+        architecture,
+        framework,
+        filesize: installedSize,
+        downloadSize,
+        created_date: new Date().toISOString(),
+        permissions,
+        read_paths: readPaths,
+        write_paths: writePaths,
+        desktop_names: desktopNames,
+        content_rating: contentRating,
+      });
 
-    this.updated_date = (new Date()).toISOString();
-  });
+      this.updated_date = new Date().toISOString();
+    },
+  );
 
-  packageSchema.method<HydratedPackage>('updateRevision', function (
-    revisionNumber: number,
-    framework: string,
-    url: string,
-    downloadSha512: string,
-    installedSize: number,
-    downloadSize: number,
-    permissions: string[] = [],
-    readPaths: string[] = [],
-    writePaths: string[] = [],
-    desktopNames: string[] = [],
-  ) {
-    const revisionIndex = this.revisions.findIndex((rev) => rev.revision === revisionNumber);
+  packageSchema.method<HydratedPackage>(
+    'updateRevision',
+    function (
+      revisionNumber: number,
+      framework: string,
+      url: string,
+      downloadSha512: string,
+      installedSize: number,
+      downloadSize: number,
+      permissions: string[] = [],
+      readPaths: string[] = [],
+      writePaths: string[] = [],
+      desktopNames: string[] = [],
+    ) {
+      const revisionIndex = this.revisions.findIndex((rev) => rev.revision === revisionNumber);
 
-    if (revisionIndex === -1) {
-      throw new UserError(`Revision ${revisionNumber} not found`);
-    }
+      if (revisionIndex === -1) {
+        throw new UserError(`Revision ${revisionNumber} not found`);
+      }
 
-    const revision = this.revisions[revisionIndex];
-    revision.framework = framework;
-    revision.download_url = url;
-    revision.download_sha512 = downloadSha512;
-    revision.filesize = installedSize;
-    revision.downloadSize = downloadSize;
-    revision.permissions = permissions;
-    revision.read_paths = readPaths;
-    revision.write_paths = writePaths;
-    revision.desktop_names = desktopNames;
-  });
+      const revision = this.revisions[revisionIndex];
+      revision.framework = framework;
+      revision.download_url = url;
+      revision.download_sha512 = downloadSha512;
+      revision.filesize = installedSize;
+      revision.downloadSize = downloadSize;
+      revision.permissions = permissions;
+      revision.read_paths = readPaths;
+      revision.write_paths = writePaths;
+      revision.desktop_names = desktopNames;
+    },
+  );
 
   packageSchema.method<HydratedPackage>('getClickFilePath', function (channel: Channel, arch: Architecture, version: string) {
     return path.join(config.data_dir, `${this.id as string}-${channel}-${arch}-${version}.click`);
@@ -665,231 +654,238 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     - https://gitlab.com/theopenstore/openstore-web/-/blob/master/src/views/ManagePackage.vue
     - https://gitlab.com/theopenstore/openstore-web/-/blob/master/src/views/Package.vue
   */
-  packageSchema.method<HydratedPackage>('serialize', function (
-    architecture: Architecture = Architecture.ARMHF,
-    channel: Channel = DEFAULT_CHANNEL,
-    frameworks: string[] = [],
-    apiVersion = 4,
-    fullChangelog = false,
-  ): SerializedPackage {
-    // Clean up languages that got screwed up by click-parser
-    let languages = this.languages ? this.languages.sort() : [];
-    languages = languages.map((language) => {
-      let cleanLanguage = language;
-      if (language.includes('/')) {
-        const split = language.split('/');
-        cleanLanguage = split[split.length - 1];
+  packageSchema.method<HydratedPackage>(
+    'serialize',
+    function (
+      architecture: Architecture = Architecture.ARMHF,
+      channel: Channel = DEFAULT_CHANNEL,
+      frameworks: string[] = [],
+      apiVersion = 4,
+      fullChangelog = false,
+    ): SerializedPackage {
+      // Clean up languages that got screwed up by click-parser
+      let languages = this.languages ? this.languages.sort() : [];
+      languages = languages.map((language) => {
+        let cleanLanguage = language;
+        if (language.includes('/')) {
+          const split = language.split('/');
+          cleanLanguage = split[split.length - 1];
+        }
+
+        return cleanLanguage;
+      });
+
+      let defaultChannel = channel;
+      if (!this.channels.includes(defaultChannel) && this.channels.length > 0) {
+        defaultChannel = this.channels[0];
       }
 
-      return cleanLanguage;
-    });
+      const { revisionData } = this.getLatestRevision(defaultChannel, this.architectures.includes(architecture) ? architecture : undefined);
+      const installedSize = revisionData ? toBytes(revisionData.filesize) : 0;
 
-    let defaultChannel = channel;
-    if (!this.channels.includes(defaultChannel) && this.channels.length > 0) {
-      defaultChannel = this.channels[0];
-    }
+      const revisions = (this.revisions || [])
+        .map((rData) => {
+          if (!Object.values(Architecture).includes(rData.architecture)) {
+            return null; // Filter out unsupported arches like i386 (legacy apps)
+          }
 
-    const { revisionData } = this.getLatestRevision(defaultChannel, this.architectures.includes(architecture) ? architecture : undefined);
-    const installedSize = revisionData ? toBytes(revisionData.filesize) : 0;
+          const revision = {
+            ...rData.toObject(),
+            _id: undefined,
+            download_url: rData.download_url ? this.getDownloadUrl(rData.channel, rData.architecture, rData.version) : null,
+            installedSize: toBytes(rData.filesize),
+            downloadSize: rData.downloadSize ?? 0,
+            architecture: rData.architecture ?? 'armhf',
 
-    const revisions = (this.revisions || []).map((rData) => {
-      if (!Object.values(Architecture).includes(rData.architecture)) {
-        return null; // Filter out unsupported arches like i386 (legacy apps)
+            // deprecated, remove in next version of the api
+            filesize: toBytes(rData.filesize),
+          };
+
+          delete revision._id;
+          return revision;
+        })
+        .filter((revision) => !!revision);
+
+      const originalManifest = this.manifest || {};
+      const manifest = { ...omit(originalManifest, 'hooks'), hooks: {} };
+      for (const [key, value] of Object.entries(originalManifest.hooks ?? {})) {
+        // @ts-ignore
+        manifest.hooks[key.replace(/__/g, '.')] = value;
       }
 
-      const revision = {
-        ...rData.toObject(),
-        _id: undefined,
-        download_url: rData.download_url ? this.getDownloadUrl(rData.channel, rData.architecture, rData.version) : null,
-        installedSize: toBytes(rData.filesize),
-        downloadSize: rData.downloadSize ?? 0,
-        architecture: rData.architecture ?? 'armhf',
+      let changelog = this.changelog || '';
+      if (!fullChangelog && this.version_changelogs && this.version_changelogs.length > 0) {
+        if (revisionData) {
+          const found = this.version_changelogs.find((vc) => vc.version === revisionData.version);
+          if (found) {
+            changelog = found.changelog;
+          } else {
+            changelog = '';
+          }
+        }
+      }
 
-        // deprecated, remove in next version of the api
-        filesize: toBytes(rData.filesize),
+      let desktopNames = revisionData ? (revisionData.desktop_names ?? []) : [];
+      if (this.desktop_names_override && this.desktop_names_override.length > 0) {
+        desktopNames = this.desktop_names_override;
+      }
+
+      const json = {
+        architectures: this.architectures.filter((arch) => Object.values(Architecture).includes(arch)) || [],
+        category: this.category || '',
+        changelog,
+        version_changelogs: fullChangelog
+          ? (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version))
+          : (this.version_changelogs || [])
+              .slice()
+              .sort((a, b) => -1 * compareVersions(a.version, b.version))
+              .slice(0, 5),
+        channels: this.channels || [DEFAULT_CHANNEL],
+        channel_architectures: this.channel_architectures || [],
+        device_compatibilities: this.device_compatibilities || [],
+        description: this.description || '',
+        downloads: [] as SerializedDownload[],
+        icon: this.icon_url,
+        banner: this.banner_url,
+        id: this.id || '',
+        keywords: this.keywords || [],
+        license: this.license || 'Proprietary',
+        maintainer_name: this.maintainer_name || null,
+        maintainer: this.maintainer || null,
+        manifest,
+        name: this.name || '',
+        nsfw: !!this.nsfw,
+        published_date: this.published_date || '',
+        published: !!this.published,
+        locked: !!this.locked,
+        screenshots: this.screenshots.map((file) => {
+          // For snap packages, screenshots are already external URLs
+          if (this.package_type === PackageType.SNAP) {
+            return file;
+          }
+          return `${config.server.host}/screenshots/${file}`;
+        }),
+        source: this.source || '',
+        support_url: this.support_url || '',
+        donate_url: this.donate_url || '',
+        video_url: this.video_url || '',
+        translation_url: this.translation_url || '',
+        tagline: this.tagline || '',
+        types: this.types || [],
+        updated_date: this.updated_date || '',
+        languages,
+        revisions,
+        totalDownloads: 0,
+        latestDownloads: 0,
+        version: revisionData ? revisionData.version : '',
+        ratings: this.serializeRatings(),
+        type_override: this.type_override || '',
+        calculated_rating: this.calculated_rating || 0,
+        publisher: this.author || '',
+        publisher_id: this.maintainer || '',
+        review_exceptions: this.review_exceptions ?? [],
+        permissions: revisionData ? (revisionData.permissions ?? []) : [],
+        read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
+        write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
+        content_rating: revisionData ? revisionData.content_rating : undefined,
+        desktop_names: desktopNames,
+        package_type: this.package_type,
+        source_store: this.source_store,
+        snap_data: this.snap_data
+          ? {
+              channels: this.snap_data.channels,
+              confinement: this.snap_data.confinement,
+              base: this.snap_data.base,
+            }
+          : undefined,
+
+        // Deprecated, remove in the next major version
+        author: this.author || '',
+        architecture: '',
+        framework: '',
+        revision: -1,
+        download: null,
+        download_sha512: '',
+        filesize: installedSize,
       };
 
-      delete revision._id;
-      return revision;
-    }).filter((revision) => !!revision);
+      if (this.revisions) {
+        const jsonDownloads = Object.values(Channel)
+          .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
+            return [
+              ...downloads,
+              ...this.architectures.map((arch) => {
+                if (!Object.values(Architecture).includes(arch)) {
+                  return null; // Filter out unsupported arches like i386 (legacy apps)
+                }
+                const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+                if (downloadRevisionData) {
+                  const download = {
+                    ...downloadRevisionData.toObject(),
+                    _id: undefined,
+                    architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                    download_url: downloadRevisionData.download_url
+                      ? this.getDownloadUrl(channel, arch, downloadRevisionData.version)
+                      : null,
+                    installedSize: toBytes(downloadRevisionData.filesize),
+                    downloadSize: downloadRevisionData.downloadSize ?? 0,
 
-    const originalManifest = this.manifest || {};
-    const manifest = { ...omit(originalManifest, 'hooks'), hooks: {} };
-    for (const [key, value] of Object.entries(originalManifest.hooks ?? {})) {
-      // @ts-ignore
-      manifest.hooks[key.replace(/__/g, '.')] = value;
-    }
+                    // deprecated, remove in next version of the api
+                    filesize: toBytes(downloadRevisionData.filesize),
+                  };
+                  delete download._id;
+                  return download;
+                }
+                return null;
+              }),
+            ];
+          }, [])
+          .filter((revision) => {
+            return revision && (this.package_type === PackageType.SNAP || revision.download_url);
+          }) as SerializedDownload[];
 
-    let changelog = this.changelog || '';
-    if (!fullChangelog && this.version_changelogs && this.version_changelogs.length > 0) {
-      if (revisionData) {
-        const found = this.version_changelogs.find(vc => vc.version === revisionData.version);
-        if (found) {
-          changelog = found.changelog;
-        }
-        else {
-          changelog = '';
-        }
-      }
-    }
+        jsonDownloads.sort((a, b) => {
+          // Sort xenial to the bottom
+          if (a.channel !== b.channel) {
+            if (b.channel === Channel.XENIAL) {
+              return -1;
+            }
 
-    let desktopNames = revisionData ? (revisionData.desktop_names ?? []) : [];
-    if (this.desktop_names_override && this.desktop_names_override.length > 0) {
-      desktopNames = this.desktop_names_override;
-    }
-
-    const json = {
-      architectures: this.architectures.filter((arch) => Object.values(Architecture).includes(arch)) || [],
-      category: this.category || '',
-      changelog,
-      version_changelogs: fullChangelog
-        ? (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version))
-        : (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version)).slice(0, 5),
-      channels: this.channels || [DEFAULT_CHANNEL],
-      channel_architectures: this.channel_architectures || [],
-      device_compatibilities: this.device_compatibilities || [],
-      description: this.description || '',
-      downloads: [] as SerializedDownload[],
-      icon: this.icon_url,
-      banner: this.banner_url,
-      id: this.id || '',
-      keywords: this.keywords || [],
-      license: this.license || 'Proprietary',
-      maintainer_name: this.maintainer_name || null,
-      maintainer: this.maintainer || null,
-      manifest,
-      name: this.name || '',
-      nsfw: !!this.nsfw,
-      published_date: this.published_date || '',
-      published: !!this.published,
-      locked: !!this.locked,
-      screenshots: this.screenshots.map((file) => {
-        // For snap packages, screenshots are already external URLs
-        if (this.package_type === PackageType.SNAP) {
-          return file;
-        }
-        return `${config.server.host}/screenshots/${file}`;
-      }),
-      source: this.source || '',
-      support_url: this.support_url || '',
-      donate_url: this.donate_url || '',
-      video_url: this.video_url || '',
-      translation_url: this.translation_url || '',
-      tagline: this.tagline || '',
-      types: this.types || [],
-      updated_date: this.updated_date || '',
-      languages,
-      revisions,
-      totalDownloads: 0,
-      latestDownloads: 0,
-      version: revisionData ? revisionData.version : '',
-      ratings: this.serializeRatings(),
-      type_override: this.type_override || '',
-      calculated_rating: this.calculated_rating || 0,
-      publisher: this.author || '',
-      publisher_id: this.maintainer || '',
-      review_exceptions: this.review_exceptions ?? [],
-      permissions: revisionData ? (revisionData.permissions ?? []) : [],
-      read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
-      write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
-      content_rating: revisionData ? revisionData.content_rating : undefined,
-      desktop_names: desktopNames,
-      package_type: this.package_type,
-      source_store: this.source_store,
-      snap_data: this.snap_data
-        ? {
-            channels: this.snap_data.channels,
-            confinement: this.snap_data.confinement,
-            base: this.snap_data.base,
+            return 1;
           }
-        : undefined,
 
-      // Deprecated, remove in the next major version
-      author: this.author || '',
-      architecture: '',
-      framework: '',
-      revision: -1,
-      download: null,
-      download_sha512: '',
-      filesize: installedSize,
-    };
-
-    if (this.revisions) {
-      const jsonDownloads = Object.values(Channel)
-        .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-        return [
-          ...downloads,
-          ...this.architectures.map((arch) => {
-            if (!Object.values(Architecture).includes(arch)) {
-              return null; // Filter out unsupported arches like i386 (legacy apps)
-            }
-            const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-            if (downloadRevisionData) {
-              const download = {
-                ...downloadRevisionData.toObject(),
-                _id: undefined,
-                architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
-                installedSize: toBytes(downloadRevisionData.filesize),
-                downloadSize: downloadRevisionData.downloadSize ?? 0,
-
-                // deprecated, remove in next version of the api
-                filesize: toBytes(downloadRevisionData.filesize),
-              };
-              delete download._id;
-              return download;
-            }
-            return null;
-          }),
-        ];
-      }, []).filter((revision) => {
-        return revision && (this.package_type === PackageType.SNAP || revision.download_url);
-      }) as SerializedDownload[];
-
-      jsonDownloads.sort((a, b) => {
-        // Sort xenial to the bottom
-        if (a.channel !== b.channel) {
-          if (b.channel === Channel.XENIAL) {
+          // Make sure the current architecture is last to not break old versions of the app
+          if (a.architecture === architecture) {
+            return 1;
+          }
+          if (b.architecture === architecture) {
             return -1;
           }
 
-          return 1;
+          return 0;
+        });
+
+        if (apiVersion === 3) {
+          json.downloads = jsonDownloads.filter(
+            (download) => download.architecture === architecture || download.architecture === Architecture.ALL,
+          );
+        } else {
+          json.downloads = jsonDownloads;
         }
 
-        // Make sure the current architecture is last to not break old versions of the app
-        if (a.architecture === architecture) {
-          return 1;
-        }
-        if (b.architecture === architecture) {
-          return -1;
+        const latestDownloads = jsonDownloads.filter((download) => download.channel === channel);
+        for (const download of latestDownloads) {
+          json.latestDownloads += download.downloads;
         }
 
-        return 0;
-      });
-
-      if (apiVersion === 3) {
-        json.downloads = jsonDownloads.filter((download) => (
-          download.architecture === architecture || download.architecture === Architecture.ALL
-        ));
-      }
-      else {
-        json.downloads = jsonDownloads;
+        this.revisions.forEach((revision) => {
+          json.totalDownloads += revision.downloads;
+        });
       }
 
-      const latestDownloads = jsonDownloads.filter((download) => (
-        download.channel === channel
-      ));
-      for (const download of latestDownloads) {
-        json.latestDownloads += download.downloads;
-      }
-
-      this.revisions.forEach((revision) => {
-        json.totalDownloads += revision.downloads;
-      });
-    }
-
-    return json;
-  });
+      return json;
+    },
+  );
 
   packageSchema.method<HydratedPackage>('updateScreenshotFiles', async function (screenshotFiles: File[]) {
     // Clear out the uploaded files that are over the limit
@@ -902,8 +898,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       for (let i = screenshotLimit; i < screenshotFiles.length; i++) {
         try {
           await fs.unlink(screenshotFiles[i].path);
-        }
-        catch (error) {
+        } catch (error) {
           // Ignore errors if file doesn't exist or can't be removed
           console.warn(`Failed to remove screenshot ${screenshotFiles[i].path}:`, error);
         }
@@ -918,20 +913,15 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         // Reject anything not an image we support
         try {
           await fs.unlink(file.path);
-        }
-        catch (error) {
+        } catch (error) {
           // Ignore errors if file doesn't exist or can't be removed
           console.warn(`Failed to remove screenshot ${file.path}:`, error);
         }
-      }
-      else {
+      } else {
         const id = v4();
         const filename = `${this.id as string}-screenshot-${id}${ext}`;
 
-        await moveFile(
-          screenshotFiles[i].path,
-          `${config.screenshot_dir}/${filename}`,
-        );
+        await moveFile(screenshotFiles[i].path, `${config.screenshot_dir}/${filename}`);
 
         this.screenshots.push(filename);
       }
@@ -949,8 +939,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.banner) {
       try {
         await fs.unlink(`${config.banner_dir}/${this.banner}`);
-      }
-      catch (err) {
+      } catch (err) {
         // Ignore errors if file doesn't exist
       }
     }
@@ -958,10 +947,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     const uuid = v4();
     const filename = `${this.id as string}-banner-${uuid}${ext}`;
 
-    await moveFile(
-      bannerFile.path,
-      `${config.banner_dir}/${filename}`,
-    );
+    await moveFile(bannerFile.path, `${config.banner_dir}/${filename}`);
 
     this.banner = filename;
     return true;
@@ -986,21 +972,15 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.revisions) {
       // Check for existing revisions (for this channel) with the same version string
       const matches = this.revisions.find((revision) => {
-        return (
-          revision.version === version &&
-          revision.channel === channel &&
-          revision.architecture === architecture
-        );
+        return revision.version === version && revision.channel === channel && revision.architecture === architecture;
       });
       if (matches) {
         throw new UserError(EXISTING_VERSION);
       }
 
       // Check for strictly increasing version for same channel, framework, and architecture
-      const sameGroup = this.revisions.filter((rev) =>
-        rev.channel === channel &&
-        rev.architecture === architecture &&
-        rev.framework === parseData.framework,
+      const sameGroup = this.revisions.filter(
+        (rev) => rev.channel === channel && rev.architecture === architecture && rev.framework === parseData.framework,
       );
       if (sameGroup.length > 0) {
         const latest = sameGroup[sameGroup.length - 1];
@@ -1067,9 +1047,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       parseData.permissions,
       readPaths,
       writePaths,
-      parseData.apps
-        .filter((app) => app.type === 'app')
-        .map((app) => app.name),
+      parseData.apps.filter((app) => app.type === 'app').map((app) => app.name),
       contentRating,
     );
 
@@ -1082,8 +1060,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
           if (oldExt !== ext && existsSync(this.icon)) {
             try {
               await fs.unlink(this.icon);
-            }
-            catch (err) {
+            } catch (err) {
               // Ignore errors if file doesn't exist or can't be removed
               console.warn(`Failed to remove old icon ${this.icon}:`, err);
             }
@@ -1107,11 +1084,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         this.version_changelogs = [];
       }
 
-      const found = this.version_changelogs.find(vc => vc.version === version);
+      const found = this.version_changelogs.find((vc) => vc.version === version);
       if (found) {
         found.changelog = sanitize(changelog.trim());
-      }
-      else {
+      } else {
         this.version_changelogs.push({ version, changelog: sanitize(changelog.trim()) });
       }
     }
@@ -1122,23 +1098,23 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
     if (this.architectures.includes(Architecture.ALL) && architecture !== Architecture.ALL) {
       this.architectures = [architecture];
-    }
-    else if (!this.architectures.includes(Architecture.ALL) && architecture === Architecture.ALL) {
+    } else if (!this.architectures.includes(Architecture.ALL) && architecture === Architecture.ALL) {
       this.architectures = [Architecture.ALL];
-    }
-    else if (!this.architectures.includes(architecture)) {
+    } else if (!this.architectures.includes(architecture)) {
       this.architectures.push(architecture);
     }
   });
 
   packageSchema.method<HydratedPackage>('updateCalculatedProperties', async function () {
-    this.channel_architectures = this.channels.flatMap((channel) => {
-      return this.architectures.map((arch) => {
-        const { revisionData } = this.getLatestRevision(channel, arch, false);
+    this.channel_architectures = this.channels
+      .flatMap((channel) => {
+        return this.architectures.map((arch) => {
+          const { revisionData } = this.getLatestRevision(channel, arch, false);
 
-        return revisionData ? `${channel}:${arch}` : undefined;
-      });
-    }).filter(Boolean) as ChannelArchitecture[];
+          return revisionData ? `${channel}:${arch}` : undefined;
+        });
+      })
+      .filter(Boolean) as ChannelArchitecture[];
 
     const deviceCompatibilities = new Set<string>();
     this.revisions.forEach((revision) => {

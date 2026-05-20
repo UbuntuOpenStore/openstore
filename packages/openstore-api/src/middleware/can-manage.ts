@@ -1,7 +1,8 @@
 import { type Request, type Response, type NextFunction } from 'express';
+
+import { PackageType } from '../db/package/types';
 import { error } from '../utils';
 import { APP_LOCKED, PERMISSION_DENIED, SNAP_MANAGEMENT_NOT_SUPPORTED } from '../utils/error-messages';
-import { PackageType } from '../db/package/types';
 
 export function canManage(req: Request, res: Response, next: NextFunction) {
   if (req.pkg.package_type === PackageType.SNAP) {

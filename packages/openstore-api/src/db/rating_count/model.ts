@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+
 import { RATINGS } from '../review/constants';
 import { type HydratedRatingCount, type IRatingCount, type RatingCountModel } from './types';
 

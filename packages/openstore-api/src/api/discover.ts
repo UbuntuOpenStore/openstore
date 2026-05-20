@@ -1,19 +1,20 @@
-/* eslint-disable no-param-reassign */
-import shuffle from 'shuffle-array';
-import express, { type Request, type Response } from 'express';
+import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
-import crypto from 'crypto';
 
+import express, { type Request, type Response } from 'express';
+/* eslint-disable no-param-reassign */
+import shuffle from 'shuffle-array';
+
+import { Discover } from '../db/discover';
 import { Package } from '../db/package';
+import { serializeRatings } from '../db/package/methods';
 import { Architecture, type Channel, AppType, PackageType } from '../db/package/types';
 import { RatingCount } from '../db/rating_count';
-import { Discover } from '../db/discover';
 import { success, getData, getDataArray, setLang, gettext, asyncErrorWrapper } from '../utils';
-import { serializeRatings } from '../db/package/methods';
-import { type DiscoverHighlight, type DiscoverData } from './types';
 import { handleChannel } from '../utils/channels';
 import { config } from '../utils/config';
+import { type DiscoverHighlight, type DiscoverData } from './types';
 
 const router = express.Router();
 
@@ -31,8 +32,7 @@ async function getCachedData(cacheKey: string): Promise<CachedData | null> {
     const cacheFile = path.join(CACHE_DIR, `${cacheKey}.json`);
     const content = await fs.readFile(cacheFile, 'utf-8');
     return JSON.parse(content);
-  }
-  catch (error) {
+  } catch (error) {
     // Cache miss or read error
     return null;
   }
@@ -48,8 +48,7 @@ async function setCachedData(cacheKey: string, data: DiscoverData, frameworks: s
     };
     await fs.mkdir(CACHE_DIR, { recursive: true });
     await fs.writeFile(cacheFile, JSON.stringify(cachedData), 'utf-8');
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Failed to write cache file:', error);
   }
 }
@@ -76,21 +75,25 @@ async function getHighlights(
     packageTypes: [PackageType.CLICK],
   });
 
-  discover.highlights = shuffle(discover.highlights.map((highlight) => {
-    const highlightedApp = highlights.find((app) => app.id === highlight.id);
+  discover.highlights = shuffle(
+    discover.highlights
+      .map((highlight) => {
+        const highlightedApp = highlights.find((app) => app.id === highlight.id);
 
-    if (!highlightedApp) {
-      return null;
-    }
+        if (!highlightedApp) {
+          return null;
+        }
 
-    const serializedApp = highlightedApp.serialize(architecture, channel, frameworks, apiVersion);
+        const serializedApp = highlightedApp.serialize(architecture, channel, frameworks, apiVersion);
 
-    return {
-      ...highlight,
-      image: serializedApp.banner,
-      app: serializedApp,
-    };
-  }).filter((highlight): highlight is DiscoverHighlight => !!highlight && !!highlight.image));
+        return {
+          ...highlight,
+          image: serializedApp.banner,
+          app: serializedApp,
+        };
+      })
+      .filter((highlight): highlight is DiscoverHighlight => !!highlight && !!highlight.image),
+  );
 
   // Deprecated, for backwards compatibility
   discover.highlight = discover.highlights[0];
@@ -107,28 +110,36 @@ async function getNewAndUpdatedApps(
   apiVersion?: number,
 ) {
   const [newApps, updatedApps] = await Promise.all([
-    Package.findByFilters({
-      published: true,
-      channel,
-      architectures: [architecture, Architecture.ALL],
-      frameworks,
-      nsfw: [null, false],
-      types: [AppType.APP],
-      packageTypes: [PackageType.CLICK],
-    }, '-published_date', 8),
+    Package.findByFilters(
+      {
+        published: true,
+        channel,
+        architectures: [architecture, Architecture.ALL],
+        frameworks,
+        nsfw: [null, false],
+        types: [AppType.APP],
+        packageTypes: [PackageType.CLICK],
+      },
+      '-published_date',
+      8,
+    ),
 
-    Package.findByFilters({
-      published: true,
-      channel,
-      architectures: [architecture, Architecture.ALL],
-      frameworks,
-      nsfw: [null, false],
-      types: [AppType.APP],
-      packageTypes: [PackageType.CLICK],
-    }, '-updated_date', 8),
+    Package.findByFilters(
+      {
+        published: true,
+        channel,
+        architectures: [architecture, Architecture.ALL],
+        frameworks,
+        nsfw: [null, false],
+        types: [AppType.APP],
+        packageTypes: [PackageType.CLICK],
+      },
+      '-updated_date',
+      8,
+    ),
   ]);
 
-  const newAndUpdatedCategory = discover.categories.find((category) => (category.name === NEW_AND_UPDATED));
+  const newAndUpdatedCategory = discover.categories.find((category) => category.name === NEW_AND_UPDATED);
 
   // Get the 10 latest updated or published apps
   let newAndUpdatedApps = newApps.concat(updatedApps);
@@ -148,8 +159,7 @@ async function getNewAndUpdatedApps(
     return 0;
   });
 
-  newAndUpdatedCategory!.apps = newAndUpdatedApps.slice(0, 10)
-    .map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
+  newAndUpdatedCategory!.apps = newAndUpdatedApps.slice(0, 10).map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
 }
 
 /**
@@ -180,20 +190,22 @@ async function getCategoryApps(
     },
   ];
 
-  const discoverCategoriesApps = await Promise.all(categories.map((category) => {
-    if (category.ids.length === 0) {
-      return [];
-    }
+  const discoverCategoriesApps = await Promise.all(
+    categories.map((category) => {
+      if (category.ids.length === 0) {
+        return [];
+      }
 
-    return Package.findByFilters({
-      ids: category.ids,
-      channel,
-      architectures: [architecture, Architecture.ALL],
-      frameworks,
-      published: true,
-      packageTypes: [PackageType.CLICK],
-    });
-  }));
+      return Package.findByFilters({
+        ids: category.ids,
+        channel,
+        architectures: [architecture, Architecture.ALL],
+        frameworks,
+        published: true,
+        packageTypes: [PackageType.CLICK],
+      });
+    }),
+  );
 
   discover.categories = categories.map((category, index) => {
     const apps = discoverCategoriesApps[index].map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
@@ -216,17 +228,21 @@ async function getPopularApps(
   frameworks: string[],
   apiVersion?: number,
 ) {
-  const popularApps = await Package.findByFilters({
-    published: true,
-    channel,
-    architectures: [architecture, Architecture.ALL],
-    frameworks,
-    nsfw: [null, false],
-    types: [AppType.APP],
-    packageTypes: [PackageType.CLICK],
-  }, '-calculated_rating', 8);
+  const popularApps = await Package.findByFilters(
+    {
+      published: true,
+      channel,
+      architectures: [architecture, Architecture.ALL],
+      frameworks,
+      nsfw: [null, false],
+      types: [AppType.APP],
+      packageTypes: [PackageType.CLICK],
+    },
+    '-calculated_rating',
+    8,
+  );
 
-  const popularCategory = discover.categories.find((category) => (category.name === POPULAR));
+  const popularCategory = discover.categories.find((category) => category.name === POPULAR);
   popularCategory!.apps = popularApps.map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
 }
 
@@ -234,9 +250,11 @@ async function getPopularApps(
  * Refresh the ratings in the cached discover data
  */
 async function refreshRatings(discover: DiscoverData) {
-  const ids = discover.categories.reduce<string[]>((accumulator, category) => {
-    return [...accumulator, ...category.ids];
-  }, []).concat(discover.highlights.map((highlight) => highlight.id));
+  const ids = discover.categories
+    .reduce<string[]>((accumulator, category) => {
+      return [...accumulator, ...category.ids];
+    }, [])
+    .concat(discover.highlights.map((highlight) => highlight.id));
 
   const ratingCounts = await RatingCount.getCountsByIds(ids);
 
@@ -283,64 +301,63 @@ function translateDiscover(lang: string, discover: DiscoverData) {
  * There are two static categories: one for new and updated apps
  * and one for popular apps.
  */
-router.get('/', asyncErrorWrapper(async (req: Request, res: Response) => {
-  const frameworks = getDataArray(req, 'frameworks', []);
-  const lang = getData(req, 'lang');
+router.get(
+  '/',
+  asyncErrorWrapper(async (req: Request, res: Response) => {
+    const frameworks = getDataArray(req, 'frameworks', []);
+    const lang = getData(req, 'lang');
 
-  const channel = handleChannel(getData(req, 'channel'));
-  let architecture = getData(req, 'architecture', Architecture.ARMHF).toLowerCase() as Architecture;
-  if (!Object.values(Architecture).includes(architecture)) {
-    architecture = Architecture.ARMHF;
-  }
-
-  // Use hash for frameworks to avoid filename length issues with long framework lists
-  const frameworksHash = frameworks.length > 0
-    ? crypto.createHash('md5').update(JSON.stringify(frameworks)).digest('hex')
-    : 'none';
-  const cacheKey = `${channel}-${architecture}-${frameworksHash}`;
-
-  const now = Date.now();
-  const cachedData = await getCachedData(cacheKey);
-
-  if (
-    !cachedData ||
-    (now - cachedData.timestamp) > CACHE_DURATION_MS
-  ) { // Cache miss (10 minutes)
-    const discoverData = await Discover.getDiscoverData();
-    if (!discoverData) {
-      throw new Error('No discover data found in database');
+    const channel = handleChannel(getData(req, 'channel'));
+    let architecture = getData(req, 'architecture', Architecture.ARMHF).toLowerCase() as Architecture;
+    if (!Object.values(Architecture).includes(architecture)) {
+      architecture = Architecture.ARMHF;
     }
 
-    const discover: DiscoverData = {
-      highlights: JSON.parse(JSON.stringify(discoverData.highlights)),
-      categories: JSON.parse(JSON.stringify(discoverData.categories)),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      highlight: {} as DiscoverHighlight, // Will be set by getHighlights
-    };
+    // Use hash for frameworks to avoid filename length issues with long framework lists
+    const frameworksHash = frameworks.length > 0 ? crypto.createHash('md5').update(JSON.stringify(frameworks)).digest('hex') : 'none';
+    const cacheKey = `${channel}-${architecture}-${frameworksHash}`;
 
-    await getHighlights(discover, channel, architecture, frameworks, req.apiVersion);
-    await getCategoryApps(discover, channel, architecture, frameworks, req.apiVersion);
-    await getNewAndUpdatedApps(discover, channel, architecture, frameworks, req.apiVersion);
-    await getPopularApps(discover, channel, architecture, frameworks, req.apiVersion);
+    const now = Date.now();
+    const cachedData = await getCachedData(cacheKey);
 
-    discover.categories = discover.categories.filter((category) => (category.apps.length > 0));
-    discover.categories = discover.categories.map((category) => {
-      return {
-        ...category,
-        ids: category.apps.map((app) => app.id),
+    if (!cachedData || now - cachedData.timestamp > CACHE_DURATION_MS) {
+      // Cache miss (10 minutes)
+      const discoverData = await Discover.getDiscoverData();
+      if (!discoverData) {
+        throw new Error('No discover data found in database');
+      }
+
+      const discover: DiscoverData = {
+        highlights: JSON.parse(JSON.stringify(discoverData.highlights)),
+        categories: JSON.parse(JSON.stringify(discoverData.categories)),
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        highlight: {} as DiscoverHighlight, // Will be set by getHighlights
       };
-    });
 
-    await setCachedData(cacheKey, discover, frameworks);
+      await getHighlights(discover, channel, architecture, frameworks, req.apiVersion);
+      await getCategoryApps(discover, channel, architecture, frameworks, req.apiVersion);
+      await getNewAndUpdatedApps(discover, channel, architecture, frameworks, req.apiVersion);
+      await getPopularApps(discover, channel, architecture, frameworks, req.apiVersion);
 
-    success(res, translateDiscover(lang, discover));
-  }
-  else { // Cache hit
-    const discover: DiscoverData = JSON.parse(JSON.stringify(cachedData.data));
-    await refreshRatings(discover);
+      discover.categories = discover.categories.filter((category) => category.apps.length > 0);
+      discover.categories = discover.categories.map((category) => {
+        return {
+          ...category,
+          ids: category.apps.map((app) => app.id),
+        };
+      });
 
-    success(res, translateDiscover(lang, discover));
-  }
-}, 'Unable to fetch discovery data at this time'));
+      await setCachedData(cacheKey, discover, frameworks);
+
+      success(res, translateDiscover(lang, discover));
+    } else {
+      // Cache hit
+      const discover: DiscoverData = JSON.parse(JSON.stringify(cachedData.data));
+      await refreshRatings(discover);
+
+      success(res, translateDiscover(lang, discover));
+    }
+  }, 'Unable to fetch discovery data at this time'),
+);
 
 export default router;

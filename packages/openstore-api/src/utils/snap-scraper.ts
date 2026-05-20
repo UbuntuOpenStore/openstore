@@ -1,4 +1,5 @@
 import { parse as parseYaml } from 'yaml';
+
 import {
   Architecture,
   Channel,
@@ -197,8 +198,7 @@ export function parseSnapYamlPlugs(snapYaml: string): string[] {
       }
     }
     return plugsSet.size > 0 ? Array.from(plugsSet).sort() : ['unknown'];
-  }
-  catch {
+  } catch {
     return ['unknown'];
   }
 }
@@ -280,7 +280,8 @@ export async function discoverSnaps(limit?: number, fetchFn = fetch): Promise<Sn
 }
 
 // eslint-disable-next-line max-len
-const SNAP_V2_FIELDS = 'channel-map,base,categories,confinement,description,download,links,media,revision,snap-yaml,version,created-at,license,name,publisher,snap-id,store-url,summary,title';
+const SNAP_V2_FIELDS =
+  'channel-map,base,categories,confinement,description,download,links,media,revision,snap-yaml,version,created-at,license,name,publisher,snap-id,store-url,summary,title';
 
 export async function fetchSnapDetailsV2(snapName: string, fetchFn = fetch): Promise<SnapV2Response> {
   const response = await fetchFn(`https://api.snapcraft.io/v2/snaps/info/${snapName}?fields=${SNAP_V2_FIELDS}`, {
@@ -301,9 +302,7 @@ export async function fetchSnapDetailsV2(snapName: string, fetchFn = fetch): Pro
   return (await response.json()) as SnapV2Response;
 }
 
-export function transformSnapToPackage(
-  v2Data: SnapV2Response,
-): Partial<IPackage> {
+export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage> {
   const snapId = `snap.${v2Data.name}`;
 
   const channelsSet = new Set<SnapChannel>();

@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+
 import { type IReservedNamespace, type IReservedNamespaceMethods, type ReservedNamespaceModel } from './types';
 
 const reservedNamespaceSchema = new Schema<IReservedNamespace, ReservedNamespaceModel, IReservedNamespaceMethods>({
@@ -66,7 +67,4 @@ reservedNamespaceSchema.static('isPackageIdReserved', async function (packageId:
   return false;
 });
 
-export const ReservedNamespace = model<IReservedNamespace, ReservedNamespaceModel>(
-  'ReservedNamespace',
-  reservedNamespaceSchema,
-);
+export const ReservedNamespace = model<IReservedNamespace, ReservedNamespaceModel>('ReservedNamespace', reservedNamespaceSchema);

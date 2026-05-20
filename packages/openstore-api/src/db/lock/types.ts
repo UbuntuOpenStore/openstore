@@ -1,5 +1,5 @@
-import { type HydratedDocument, type Model } from 'mongoose';
 import { type Request } from 'express';
+import { type HydratedDocument, type Model } from 'mongoose';
 
 export interface ILock {
   name: string;

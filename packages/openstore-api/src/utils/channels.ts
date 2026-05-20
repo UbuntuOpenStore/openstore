@@ -1,5 +1,5 @@
-import { UserError } from '../exceptions';
 import { Channel } from '../db/package/types';
+import { UserError } from '../exceptions';
 import { INVALID_CHANNEL } from './error-messages';
 
 export function handleChannel(channel?: string): Channel {

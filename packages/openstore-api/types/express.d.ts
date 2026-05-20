@@ -35,9 +35,8 @@ declare global {
       };
     }
 
-    interface Response {
-    }
+    interface Response {}
 
-    interface User extends HydratedUser { }
+    interface User extends HydratedUser {}
   }
 }

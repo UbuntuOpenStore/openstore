@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose';
-import { type IUser, type IUserMethods, type UserModel, type ProfileUpdateData } from './types';
+
 import { ValidationError } from '../../exceptions';
 import { config } from '../../utils/config';
 import { sanitize } from '../../utils/sanitize';
+import { type IUser, type IUserMethods, type UserModel, type ProfileUpdateData } from './types';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   apikey: String,
@@ -50,9 +51,15 @@ userSchema.method('serialize', function (includeRole: boolean, includeApiKey: bo
     userData.email = this.email;
 
     const providers: string[] = [];
-    if (this.ubuntu_id) { providers.push('ubuntu'); }
-    if (this.github_id) { providers.push('github'); }
-    if (this.gitlab_id) { providers.push('gitlab'); }
+    if (this.ubuntu_id) {
+      providers.push('ubuntu');
+    }
+    if (this.github_id) {
+      providers.push('github');
+    }
+    if (this.gitlab_id) {
+      providers.push('gitlab');
+    }
     userData.login_providers = providers;
   }
 
@@ -90,8 +97,7 @@ userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAd
         if (url.protocol !== 'https:') {
           throw new ValidationError(`${field} must use HTTPS protocol`);
         }
-      }
-      catch (error) {
+      } catch (error) {
         throw new ValidationError(`Invalid URL provided for ${field}`);
       }
     }

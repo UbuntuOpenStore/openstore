@@ -2,12 +2,20 @@
   "name": "openstore-api",
   "version": "1.0.0",
   "description": "",
+  "license": "GPL-3.0",
+  "author": "Brian Douglass",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/theopenstore/openstore.git"
+  },
   "main": "index.js",
   "scripts": {
     "start": "NODE_PATH=./dist node --heapsnapshot-signal=SIGUSR2 -r dotenv/config dist/index.js",
     "dev": "nodemon ./src/index.ts",
     "build": "tsc",
     "type-check": "tsc --noemit",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "lint": "eslint ./src/**/*.ts ./src/*/*/*.ts --fix",
     "lint:nofix": "eslint ./src/**/*.ts ./src/*/*/*.ts",
     "lint:json": "jsonlint -q ./src/api/json/category_icons.json",
@@ -17,25 +25,6 @@
     "update-pot-file": "npm run ts-command update-pot-file",
     "command": "bash -c 'NODE_PATH=./dist node -r dotenv/config ./dist/commands/\"$0\".js -- \"${@:1}\"'",
     "ts-command": "bash -c 'NODE_PATH=./src ts-node ./src/commands/\"$0\".ts -- \"${@:1}\"'"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://gitlab.com/theopenstore/openstore.git"
-  },
-  "author": "Brian Douglass",
-  "license": "GPL-3.0",
-  "nodemonConfig": {
-    "ignore": [
-      "**/*.test.ts",
-      "**/*.spec.ts",
-      ".git",
-      "node_modules"
-    ],
-    "watch": [
-      "src"
-    ],
-    "exec": "node -r tsconfig-paths/register -r ts-node/register -r dotenv/config ./src/index.ts",
-    "ext": "ts, js, json"
   },
   "dependencies": {
     "@sentry/node": "^8.32.0",
@@ -96,5 +85,18 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
+  },
+  "nodemonConfig": {
+    "exec": "node -r tsconfig-paths/register -r ts-node/register -r dotenv/config ./src/index.ts",
+    "ext": "ts, js, json",
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ]
   }
 }

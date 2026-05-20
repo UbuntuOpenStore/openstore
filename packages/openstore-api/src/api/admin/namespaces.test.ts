@@ -1,13 +1,15 @@
-import { beforeEach, before, after, describe, it } from 'node:test';
 import { strictEqual } from 'node:assert/strict';
-import { User } from '../../db/user';
-import { ReservedNamespace } from '../../db/reserved_namespace';
+import { beforeEach, before, after, describe, it } from 'node:test';
+
 import mongoose from 'mongoose';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
-import * as api from '..';
-import { type TestUser } from '../../tests/factory';
-import { type App } from 'supertest/types';
 import request from 'supertest';
+import { type App } from 'supertest/types';
+
+import * as api from '..';
+import { ReservedNamespace } from '../../db/reserved_namespace';
+import { User } from '../../db/user';
+import { type TestUser } from '../../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
 
 describe('Reserved Namespace API', () => {
   let app: App;
@@ -133,7 +135,8 @@ describe('Reserved Namespace API', () => {
 
   describe('POST /api/v4/admin/namespaces', () => {
     it('should create a new namespace reservation', async () => {
-      const response = await request(app).post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
+      const response = await request(app)
+        .post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
         .send({
           namespace: 'namespace',
           type: 'exact',
@@ -152,15 +155,15 @@ describe('Reserved Namespace API', () => {
     });
 
     it('should not allow duplicate namespace reservations', async () => {
-      await request(app).post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
-        .send({
-          namespace: 'namespace',
-          type: 'exact',
-          ownerId: namespaceOwnerId,
-        });
+      await request(app).post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`).send({
+        namespace: 'namespace',
+        type: 'exact',
+        ownerId: namespaceOwnerId,
+      });
 
       // Try to create duplicate
-      const response = await request(app).post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
+      const response = await request(app)
+        .post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
         .send({
           namespace: 'namespace',
           type: 'exact',
@@ -174,12 +177,14 @@ describe('Reserved Namespace API', () => {
 
   describe('DELETE /api/v4/admin/namespaces/:id', () => {
     it('should delete a namespace reservation', async () => {
-      const createResponse = await request(app).post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
+      const createResponse = await request(app)
+        .post(`/api/v4/admin/namespaces?apikey=${adminUser.apikey}`)
         .send({
           namespace: 'namespace',
           type: 'exact',
           ownerId: namespaceOwnerId,
-        }).expect(200);
+        })
+        .expect(200);
 
       const namespaceId = createResponse.body.data.id as string;
 

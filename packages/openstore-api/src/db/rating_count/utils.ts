@@ -2,12 +2,12 @@
 import { type FilterQuery, type Types } from 'mongoose';
 
 import { logger } from '../../utils';
-import { Review } from '../review/model';
+import { Package } from '../package/model';
 import { RATINGS, RATING_MAP } from '../review/constants';
 import type { Ratings } from '../review/constants';
+import { Review } from '../review/model';
 import { type IReview } from '../review/types';
 import { RatingCount } from './model';
-import { Package } from '../package/model';
 
 export async function recalculatePackageRatings(pkgId: Types.ObjectId) {
   let pkg = await Package.findOne({ _id: pkgId }).populate('rating_counts');

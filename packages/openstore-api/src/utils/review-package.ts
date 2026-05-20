@@ -1,6 +1,6 @@
 import childProcess from 'child_process';
-import { UserError } from '../exceptions';
 
+import { UserError } from '../exceptions';
 import { config } from './config';
 import { captureException } from './logger';
 
@@ -36,68 +36,69 @@ export type ReviewSummary = {
 export function clickReview(file: string, exceptions: string[]): Promise<ReviewSummary> {
   return new Promise((resolve, reject) => {
     const command = `${config.clickreview.command} --json ${file}`;
-    const proc = childProcess.exec(command, {
-      env: {
-        PYTHONPATH: config.clickreview.pythonpath,
+    const proc = childProcess.exec(
+      command,
+      {
+        env: {
+          PYTHONPATH: config.clickreview.pythonpath,
+        },
       },
-    }, (err, stdout, stderr) => {
-      // Exit codes 2 and 3 are acceptable (warnings/errors found but output is valid)
-      if (err && err.code !== 2 && err.code !== 3) {
-        console.error(stdout, stderr, err);
-        captureException(err, '');
-        reject(new UserError('Unable to process the click for review'));
-        return;
-      }
+      (err, stdout, stderr) => {
+        // Exit codes 2 and 3 are acceptable (warnings/errors found but output is valid)
+        if (err && err.code !== 2 && err.code !== 3) {
+          console.error(stdout, stderr, err);
+          captureException(err, '');
+          reject(new UserError('Unable to process the click for review'));
+          return;
+        }
 
-      let reviewData: ReviewData;
-      try {
-        reviewData = JSON.parse(stdout);
-      }
-      catch (e) {
-        console.error(stdout, stderr, err);
-        captureException(e, '');
-        reject(new UserError('Unable to process the click for review'));
-        return;
-      }
+        let reviewData: ReviewData;
+        try {
+          reviewData = JSON.parse(stdout);
+        } catch (e) {
+          console.error(stdout, stderr, err);
+          captureException(e, '');
+          reject(new UserError('Unable to process the click for review'));
+          return;
+        }
 
-      const manualReviewMessages: string[] = [];
-      const errorMessages: string[] = [];
-      const warningMessages: string[] = [];
+        const manualReviewMessages: string[] = [];
+        const errorMessages: string[] = [];
+        const warningMessages: string[] = [];
 
-      Object.values(reviewData).forEach((groupData) => {
-        Object.entries(groupData.error).forEach(([name, error]) => {
-          if (exceptions.includes(name)) {
-            return;
-          }
+        Object.values(reviewData).forEach((groupData) => {
+          Object.entries(groupData.error).forEach(([name, error]) => {
+            if (exceptions.includes(name)) {
+              return;
+            }
 
-          if (error.manual_review) {
-            manualReviewMessages.push(error.text.replace('(NEEDS REVIEW)', '').trim());
-          }
-          else {
-            errorMessages.push(error.text.trim());
-          }
+            if (error.manual_review) {
+              manualReviewMessages.push(error.text.replace('(NEEDS REVIEW)', '').trim());
+            } else {
+              errorMessages.push(error.text.trim());
+            }
+          });
+
+          Object.entries(groupData.warn).forEach(([name, warn]) => {
+            if (exceptions.includes(name)) {
+              return;
+            }
+
+            if (warn.manual_review) {
+              manualReviewMessages.push(warn.text.replace('(NEEDS REVIEW)', '').trim());
+            } else {
+              warningMessages.push(warn.text.trim());
+            }
+          });
         });
 
-        Object.entries(groupData.warn).forEach(([name, warn]) => {
-          if (exceptions.includes(name)) {
-            return;
-          }
-
-          if (warn.manual_review) {
-            manualReviewMessages.push(warn.text.replace('(NEEDS REVIEW)', '').trim());
-          }
-          else {
-            warningMessages.push(warn.text.trim());
-          }
+        resolve({
+          manualReviewMessages,
+          errorMessages,
+          warningMessages,
         });
-      });
-
-      resolve({
-        manualReviewMessages,
-        errorMessages,
-        warningMessages,
-      });
-    });
+      },
+    );
 
     // Ensure cleanup on uncaught errors
     proc.on('error', (err) => {

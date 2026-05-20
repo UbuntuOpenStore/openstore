@@ -1,8 +1,9 @@
 import express, { type Request, type Response } from 'express';
 import { z } from 'zod/v4';
+
 import { Discover } from '../../db/discover';
-import { success, error, asyncErrorWrapper } from '../../utils';
 import { authenticate, adminOnly } from '../../middleware/auth';
+import { success, error, asyncErrorWrapper } from '../../utils';
 
 const highlightSchema = z.object({
   id: z.string().min(1, 'Highlight id cannot be empty'),
@@ -23,42 +24,54 @@ const discoverDataSchema = z.object({
 
 const router = express.Router();
 
-router.get('/', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, res: Response) => {
-  const discoverData = await Discover.getDiscoverData();
+router.get(
+  '/',
+  authenticate,
+  adminOnly,
+  asyncErrorWrapper(async (req: Request, res: Response) => {
+    const discoverData = await Discover.getDiscoverData();
 
-  if (!discoverData) {
-    error(res, 'No discover data found', 404);
-    return;
-  }
+    if (!discoverData) {
+      error(res, 'No discover data found', 404);
+      return;
+    }
 
-  success(res, {
-    highlights: discoverData.highlights,
-    categories: discoverData.categories,
-  });
-}, 'Unable to fetch discover data at this time'));
+    success(res, {
+      highlights: discoverData.highlights,
+      categories: discoverData.categories,
+    });
+  }, 'Unable to fetch discover data at this time'),
+);
 
-router.put('/', authenticate, adminOnly, asyncErrorWrapper(async (req: Request, res: Response) => {
-  const validation = discoverDataSchema.safeParse(req.body);
+router.put(
+  '/',
+  authenticate,
+  adminOnly,
+  asyncErrorWrapper(async (req: Request, res: Response) => {
+    const validation = discoverDataSchema.safeParse(req.body);
 
-  if (!validation.success) {
-    const errorMessages = validation.error.issues.map((issue) => {
-      const path = issue.path.join('.');
-      return path ? `${path}: ${issue.message}` : issue.message;
-    }).join(', ');
+    if (!validation.success) {
+      const errorMessages = validation.error.issues
+        .map((issue) => {
+          const path = issue.path.join('.');
+          return path ? `${path}: ${issue.message}` : issue.message;
+        })
+        .join(', ');
 
-    error(res, errorMessages, 400);
-    return;
-  }
+      error(res, errorMessages, 400);
+      return;
+    }
 
-  const { highlights, categories } = validation.data;
+    const { highlights, categories } = validation.data;
 
-  const updatedData = await Discover.updateDiscoverData(highlights, categories);
+    const updatedData = await Discover.updateDiscoverData(highlights, categories);
 
-  success(res, {
-    message: 'Discover data updated successfully',
-    highlights: updatedData.highlights,
-    categories: updatedData.categories,
-  });
-}, 'Unable to update discover data at this time'));
+    success(res, {
+      message: 'Discover data updated successfully',
+      highlights: updatedData.highlights,
+      categories: updatedData.categories,
+    });
+  }, 'Unable to update discover data at this time'),
+);
 
 export default router;

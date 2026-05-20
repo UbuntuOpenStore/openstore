@@ -1,23 +1,24 @@
-import passport from 'passport';
+import cluster from 'cluster';
+
+import * as Sentry from '@sentry/node';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import methodOverride from 'method-override';
 import session from 'cookie-session';
 import express, { type Request, type Response, type NextFunction } from 'express';
-import cluster from 'cluster';
-import * as Sentry from '@sentry/node';
+import methodOverride from 'method-override';
+import passport from 'passport';
 
 import { logger, config, success, error } from '../utils';
+import admin from './admin';
 import apps from './apps';
-import stats from './stats';
-import manage from './manage';
+import auth from './auth';
 import categories from './categories';
 import discover from './discover';
+import manage from './manage';
 import revisions from './revisions';
-import auth from './auth';
-import users from './users';
 import rss from './rss';
-import admin from './admin';
+import stats from './stats';
+import users from './users';
 import '../db'; // Make sure the database connection gets setup
 
 export function setup() {
@@ -47,12 +48,10 @@ export function setup() {
       const host = config.server.host.replace('https://', '').replace('http://', '');
       if (req.headers.host !== host) {
         res.redirect(301, config.server.host + req.originalUrl);
-      }
-      else {
+      } else {
         next();
       }
-    }
-    else {
+    } else {
       next();
     }
   });
@@ -61,8 +60,7 @@ export function setup() {
     req.apiVersion = 2;
     if (req.originalUrl.startsWith('/api/v3')) {
       req.apiVersion = 3;
-    }
-    else if (req.originalUrl.startsWith('/api/v4')) {
+    } else if (req.originalUrl.startsWith('/api/v4')) {
       req.apiVersion = 4;
     }
 
@@ -73,11 +71,13 @@ export function setup() {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   app.use(methodOverride());
-  app.use(session({
-    secret: config.server.session_secret,
-    name: 'opensession',
-    maxAge: 604800000, // 7 days in miliseconds
-  }));
+  app.use(
+    session({
+      secret: config.server.session_secret,
+      name: 'opensession',
+      maxAge: 604800000, // 7 days in miliseconds
+    }),
+  );
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -128,7 +128,7 @@ export function setup() {
   app.get('/logged-in', (req: Request, res: Response) => {
     if (req.isAuthenticated()) {
       if (!req.query.apiKey && req.headers['user-agent'] && req.headers['user-agent'].startsWith('OpenStore App')) {
-        res.redirect(`/logged-in?apiKey=${req.user!.apikey}`);
+        res.redirect(`/logged-in?apiKey=${req.user.apikey}`);
         return;
       }
 

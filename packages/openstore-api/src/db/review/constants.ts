@@ -6,13 +6,7 @@ export enum Ratings {
   BUGGY = 'BUGGY',
 }
 
-export const RATINGS = [
-  'THUMBS_UP',
-  'THUMBS_DOWN',
-  'HAPPY',
-  'NEUTRAL',
-  'BUGGY',
-];
+export const RATINGS = ['THUMBS_UP', 'THUMBS_DOWN', 'HAPPY', 'NEUTRAL', 'BUGGY'];
 
 export const REVIEW_MAX_LEN = 512;
 

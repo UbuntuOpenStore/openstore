@@ -18,7 +18,7 @@ export interface IDiscover extends Document {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IDiscoverMethods { }
+export interface IDiscoverMethods {}
 
 export interface DiscoverModel extends Model<IDiscover, object, IDiscoverMethods> {
   getDiscoverData: () => Promise<IDiscover | null>;

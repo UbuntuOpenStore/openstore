@@ -1,9 +1,12 @@
+import fs from 'fs';
+import fsPromise from 'fs/promises';
+
 import express, { type Request, type Response } from 'express';
 
-import fsPromise from 'fs/promises';
-import fs from 'fs';
-import { Architecture, type HydratedPackage, PackageType } from '../db/package/types';
 import { Package } from '../db/package';
+import { Architecture, type HydratedPackage, PackageType } from '../db/package/types';
+import { NotFoundError, UserError } from '../exceptions';
+import { fetchPublishedPackage } from '../middleware';
 import {
   success,
   getData,
@@ -16,11 +19,9 @@ import {
   config,
   error,
 } from '../utils';
-import { fetchPublishedPackage } from '../middleware';
-import { NotFoundError, UserError } from '../exceptions';
-import reviews from './reviews';
-import { DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH, SNAP_DOWNLOAD_NOT_SUPPORTED } from '../utils/error-messages';
 import { handleChannel } from '../utils/channels';
+import { DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH, SNAP_DOWNLOAD_NOT_SUPPORTED } from '../utils/error-messages';
+import reviews from './reviews';
 
 const router = express.Router();
 
@@ -42,8 +43,7 @@ async function apps(req: Request, res: Response) {
     const results = await Package.searchByFilters(filters, getDataBoolean(req, 'full', false));
     pkgs = results.pkgs;
     count = results.count;
-  }
-  else {
+  } else {
     pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip);
     count = await Package.countByFilters(filters);
   }
@@ -74,10 +74,7 @@ router.get('/:id', fetchPublishedPackage(true), async (req: Request, res: Respon
   // Allow access if either:
   // 1. Package type is in the allowed list, OR
   // 2. Request explicitly specifies package_type that matches the app's package_type
-  const requestedPackageTypes = [
-    ...getDataArray(req, 'package_types'),
-    ...getDataArray(req, 'package_type'),
-  ];
+  const requestedPackageTypes = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
   if (!config.allowed_package_types.includes(req.pkg.package_type) && !requestedPackageTypes.includes(req.pkg.package_type)) {
     error(res, 'Package type not available', 404);
     return;

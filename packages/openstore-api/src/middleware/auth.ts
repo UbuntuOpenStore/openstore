@@ -1,17 +1,16 @@
-import passport from 'passport';
 import { type Request, type Response, type NextFunction } from 'express';
+import passport from 'passport';
 
-import { error } from '../utils';
 import { type HydratedUser } from '../db/user';
+import { error } from '../utils';
 
 export function userRole(req: Request, res: Response, next: NextFunction) {
-  req.isAdminUser = (req.isAuthenticated() && req.user && req.user.role === 'admin');
-  req.isTrustedUser = (req.isAuthenticated() && req.user && req.user.role === 'trusted');
+  req.isAdminUser = req.isAuthenticated() && req.user && req.user.role === 'admin';
+  req.isTrustedUser = req.isAuthenticated() && req.user && req.user.role === 'trusted';
 
   if (req.isAuthenticated() && req.user && req.user.role !== 'disabled') {
     next();
-  }
-  else {
+  } else {
     error(res, 'Your account has been disabled at this time', 403);
   }
 }
@@ -19,8 +18,7 @@ export function userRole(req: Request, res: Response, next: NextFunction) {
 export function adminOnly(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated() && req.user && req.user.role === 'admin') {
     next();
-  }
-  else {
+  } else {
     error(res, 'Forbidden', 403);
   }
 }

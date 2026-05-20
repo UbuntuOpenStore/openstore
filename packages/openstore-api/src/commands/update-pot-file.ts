@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+
 import { po } from 'gettext-parser';
+
 import categoryIcons from '../api/json/category_icons.json';
 import '../db'; // Make sure the database connection gets setup
 import { Discover } from '../db/discover';
@@ -15,14 +17,16 @@ async function updatePotFile() {
   // Get discover data from database
   const discoverData = await Discover.getDiscoverData();
   if (discoverData) {
-    strings = strings.concat(discoverData.categories.flatMap((category) => {
-      const categoryStrings = [category.name];
-      if (category.tagline) {
-        categoryStrings.push(category.tagline);
-      }
+    strings = strings.concat(
+      discoverData.categories.flatMap((category) => {
+        const categoryStrings = [category.name];
+        if (category.tagline) {
+          categoryStrings.push(category.tagline);
+        }
 
-      return categoryStrings;
-    }));
+        return categoryStrings;
+      }),
+    );
   }
 
   const potFileName = path.join(__dirname, '../../po/openstore-web.pot');

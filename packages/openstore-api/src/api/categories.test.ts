@@ -1,13 +1,14 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after } from 'node:test';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory from '../tests/factory';
-import * as api from '.';
 import { type App } from 'supertest/types';
 
+import * as api from '.';
 import { Package } from '../db/package';
 import { DEFAULT_CHANNEL } from '../db/package/types';
+import factory from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import categoryIcons from './json/category_icons.json';
 
 describe('Categories API', () => {
@@ -53,7 +54,9 @@ describe('Categories API', () => {
   });
 
   test('throws a nice error', async (t) => {
-    const categoryStatsMock = t.mock.method(Package, 'categoryStats', () => { throw new Error(); });
+    const categoryStatsMock = t.mock.method(Package, 'categoryStats', () => {
+      throw new Error();
+    });
 
     const res = await request(app).get(route).expect(500);
     assert.equal(res.body.success, false);

@@ -1,7 +1,8 @@
-import path from 'path';
-import { type Request, type Response, type NextFunction } from 'express';
 import fs from 'fs';
+import path from 'path';
+
 import axios from 'axios';
+import { type Request, type Response, type NextFunction } from 'express';
 
 import { error, config, captureException, logger } from '../utils';
 
@@ -45,11 +46,13 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
         writer.on('finish', () => {
           cleanup();
           req.files = {
-            file: [{
-              originalname: filename,
-              path: tmpfile,
-              size: fs.statSync(tmpfile).size,
-            } as any],
+            file: [
+              {
+                originalname: filename,
+                path: tmpfile,
+                size: fs.statSync(tmpfile).size,
+              } as any,
+            ],
           };
           next();
         });
@@ -75,19 +78,16 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
         });
 
         response.data.pipe(writer);
-      }
-      else {
+      } else {
         error(res, 'Failed to download remote file', 400);
       }
-    }
-    catch (err) {
+    } catch (err) {
       captureException(err, req.originalUrl);
       if (!res.headersSent) {
         error(res, 'Failed to download remote file', 400);
       }
     }
-  }
-  else {
+  } else {
     next();
   }
 }

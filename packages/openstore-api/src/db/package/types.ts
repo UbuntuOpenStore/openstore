@@ -1,5 +1,5 @@
-import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
 import { type Request } from 'express';
+import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
 
 import { type ClickParserData } from '../../utils';
 import { type HydratedRatingCount } from '../rating_count/types';
@@ -114,9 +114,9 @@ export interface IRevision {
 
 export type HydratedRevision = HydratedDocument<IRevision>;
 
-export interface RevisionModel extends Model<IRevision> { }
+export interface RevisionModel extends Model<IRevision> {}
 
-export interface SerializedDownload extends IRevision { }
+export interface SerializedDownload extends IRevision {}
 
 export type SerializedRatings = {
   THUMBS_UP: number;
@@ -333,7 +333,7 @@ export interface IPackageMethods {
     arch?: Architecture,
     detectAll?: boolean,
     frameworks?: string[],
-    version?: string
+    version?: string,
   ) => { revisionData?: HydratedRevision | null; revisionIndex: number };
   updateFromClick: (data: ClickParserData) => Promise<void>;
   updateFromBody: (body: BodyUpdate) => Promise<void>;
@@ -375,7 +375,7 @@ export interface IPackageMethods {
     channel?: Channel,
     frameworks?: string[],
     apiVersion?: number,
-    fullChangelog?: boolean
+    fullChangelog?: boolean,
   ) => SerializedPackage;
   updateScreenshotFiles: (screenshotFiles: File[]) => Promise<void>;
   updateBannerFile: (bannerFile: File) => Promise<boolean>;
@@ -403,7 +403,7 @@ export interface PackageModel extends Model<IPackage, unknown, IPackageMethods> 
     sort?: string,
     limit?: number,
     skip?: number,
-    textSearch?: boolean
+    textSearch?: boolean,
   ) => Promise<HydratedPackage[]>;
   findOneByFilters: (id: string, filters?: PackageRequestFilters) => Promise<HydratedPackage | null>;
   searchByFilters: (filters: PackageRequestFilters, full: boolean) => Promise<{ pkgs: HydratedPackage[]; count: number }>;

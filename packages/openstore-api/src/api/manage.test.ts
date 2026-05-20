@@ -1,15 +1,16 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after } from 'node:test';
+import path from 'path';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestUser, type TestPackage, type TestReservedNamespace } from '../tests/factory';
-import * as api from '.';
 import { type App } from 'supertest/types';
 
-import path from 'path';
+import * as api from '.';
 import { Package } from '../db/package';
-import { PackageType, SourceStore } from '../db/package/types';
 import { packageSearchInstance } from '../db/package/search-factory';
+import { PackageType, SourceStore } from '../db/package/types';
+import factory, { type TestUser, type TestPackage, type TestReservedNamespace } from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import * as messages from '../utils/error-messages';
 
 describe('Manage', () => {
@@ -17,7 +18,7 @@ describe('Manage', () => {
   let user: TestUser;
 
   // TODO setup elastic search for testing in CI
-  const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => { } : undefined) as any;
+  const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => {} : undefined) as any;
 
   before(async () => {
     await waitForMongoose();
@@ -42,10 +43,7 @@ describe('Manage', () => {
     beforeEach(async () => {
       route = `/api/v3/manage/?apikey=${user.apikey}`;
 
-      [package1] = await Promise.all([
-        factory.package({ maintainer: user._id, name: 'User app' }),
-        factory.package(),
-      ]);
+      [package1] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
     });
 
     test('blocks access when not logged in', async () => {
@@ -125,7 +123,9 @@ describe('Manage', () => {
       });
 
       test('fails gracefully', async (t) => {
-        const findMock = t.mock.method(Package, 'findByFilters', () => { throw new Error(); });
+        const findMock = t.mock.method(Package, 'findByFilters', () => {
+          throw new Error();
+        });
 
         const res = await request(app).get(route).expect(500);
 
@@ -141,10 +141,7 @@ describe('Manage', () => {
     let package2: TestPackage;
 
     beforeEach(async () => {
-      [package1, package2] = await Promise.all([
-        factory.package({ maintainer: user._id, name: 'User app' }),
-        factory.package(),
-      ]);
+      [package1, package2] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
       route = `/api/v3/manage/${package1.id}?apikey=${user.apikey}`;
     });
 
@@ -200,7 +197,9 @@ describe('Manage', () => {
       });
 
       test('fails gracefully', async (t) => {
-        const findMock = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+        const findMock = t.mock.method(Package, 'findOneByFilters', () => {
+          throw new Error();
+        });
 
         const res = await request(app).get(route).expect(500);
 
@@ -247,49 +246,37 @@ describe('Manage', () => {
       });
 
       test('succeeds with a com.ubuntu id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.ubuntu.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'com.ubuntu.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a com.canonical id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.canonical.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'com.canonical.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a ubports id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'ubports.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'ubports.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a openstore id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'OpenStore.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'OpenStore.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a lomiri id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'lomiri.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with an exact reserved namespace id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, exactReservedNamespace.namespace);
@@ -297,9 +284,7 @@ describe('Manage', () => {
 
       test('succeeds with a wildcard reserved namespace id', async () => {
         const packageId = `app.${wildcardReservedNamespace.namespace.substring(2)}`;
-        const res = await request(app).post(route)
-          .send({ id: packageId, name: 'Reserved Wildcard App' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: packageId, name: 'Reserved Wildcard App' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, packageId);
@@ -313,41 +298,31 @@ describe('Manage', () => {
       });
 
       test('succeeds with a com.ubuntu id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.ubuntu.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'com.ubuntu.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a com.canonical id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.canonical.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'com.canonical.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a ubports id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'ubports.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'ubports.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a openstore id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'OpenStore.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'OpenStore.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a lomiri id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'lomiri.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
@@ -367,89 +342,69 @@ describe('Manage', () => {
       });
 
       test('fails with no name', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'app.dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'app.dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.NO_APP_TITLE);
       });
 
       test('fails with spaces in the id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'app dev', name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'app dev', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.NO_SPACES_NAME);
       });
 
       test('fails with a duplicate id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: package1.id, name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: package1.id, name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.DUPLICATE_PACKAGE);
       });
 
       test('fails with a com.ubuntu id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.ubuntu.app', name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'com.ubuntu.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a com.canonical id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.canonical.app', name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'com.canonical.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a ubports id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'ubports.app', name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'ubports.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a openstore id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'OpenStore.app', name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'OpenStore.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a lomiri id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'lomiri.app', name: 'App Dev' })
-          .expect(400);
+        const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('succeeds with a com.ubuntu.developer id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'com.ubuntu.developer.app', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'com.ubuntu.developer.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('fails with an exact reserved namespace id', async () => {
-        const res = await request(app).post(route)
-          .send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' })
-          .expect(403);
+        const res = await request(app).post(route).send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' }).expect(403);
 
         assert.equal(res.body.success, false);
         assert.ok(res.body.message.includes('reserved by another user'));
@@ -457,9 +412,7 @@ describe('Manage', () => {
 
       test('fails with a wildcard reserved namespace id', async () => {
         const packageId = `app.${wildcardReservedNamespace.namespace.substring(2)}`;
-        const res = await request(app).post(route)
-          .send({ id: packageId, name: 'Reserved Wildcard App' })
-          .expect(403);
+        const res = await request(app).post(route).send({ id: packageId, name: 'Reserved Wildcard App' }).expect(403);
 
         assert.equal(res.body.success, false);
         assert.ok(res.body.message.includes('reserved by another user'));
@@ -473,9 +426,7 @@ describe('Manage', () => {
           owner_id: user._id,
         });
 
-        const res = await request(app).post(route)
-          .send({ id: userOwnedNamespace.namespace, name: 'User Owned App' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: userOwnedNamespace.namespace, name: 'User Owned App' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, userOwnedNamespace.namespace);
@@ -490,18 +441,14 @@ describe('Manage', () => {
         });
 
         const packageId = 'app.user.wildcard';
-        const res = await request(app).post(route)
-          .send({ id: packageId, name: 'User Wildcard App' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: packageId, name: 'User Wildcard App' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, packageId);
       });
 
       test('creates a new package', async () => {
-        const res = await request(app).post(route)
-          .send({ id: 'app.dev', name: 'App Dev' })
-          .expect(200);
+        const res = await request(app).post(route).send({ id: 'app.dev', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, 'app.dev');
@@ -517,11 +464,11 @@ describe('Manage', () => {
       });
 
       test('fails gracefully', async (t) => {
-        const findMock = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+        const findMock = t.mock.method(Package, 'findOneByFilters', () => {
+          throw new Error();
+        });
 
-        const res = await request(app).post(route)
-          .send({ id: 'app.dev', name: 'App Dev' })
-          .expect(500);
+        const res = await request(app).post(route).send({ id: 'app.dev', name: 'App Dev' }).expect(500);
 
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
@@ -540,10 +487,7 @@ describe('Manage', () => {
     const notAScreenshot = path.join(__dirname, '../tests/fixtures/empty.click');
 
     beforeEach(async () => {
-      [package1, package2] = await Promise.all([
-        factory.package({ maintainer: user._id, name: 'User app' }),
-        factory.package(),
-      ]);
+      [package1, package2] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
 
       route = `/api/v3/manage/${package1.id}?apikey=${user.apikey}`;
       route2 = `/api/v3/manage/${package2.id}?apikey=${user.apikey}`;
@@ -564,9 +508,7 @@ describe('Manage', () => {
 
         const user2 = await factory.user();
 
-        const res = await request(app).put(route)
-          .send({ maintainer: user2._id, type_override: 'webapp', locked: true })
-          .expect(200);
+        const res = await request(app).put(route).send({ maintainer: user2._id, type_override: 'webapp', locked: true }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.maintainer, user2._id.toString());
@@ -582,9 +524,7 @@ describe('Manage', () => {
       test('can update any package', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route2)
-          .send({ name: 'Foo Bar' })
-          .expect(200);
+        const res = await request(app).put(route2).send({ name: 'Foo Bar' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
@@ -601,9 +541,7 @@ describe('Manage', () => {
         package2.locked = true;
         await package2.save();
 
-        const res = await request(app).put(route2)
-          .send({ name: 'Foo Bar' })
-          .expect(200);
+        const res = await request(app).put(route2).send({ name: 'Foo Bar' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
@@ -630,9 +568,7 @@ describe('Manage', () => {
       });
 
       test('does not allow publishing without revisions', async () => {
-        const res = await request(app).put(route)
-          .send({ published: true })
-          .expect(400);
+        const res = await request(app).put(route).send({ published: true }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.NO_REVISIONS);
@@ -641,9 +577,7 @@ describe('Manage', () => {
       test('does not allow changing admin only fields', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
-          .send({ maintainer: 'foo', type_override: 'webapp', locked: true })
-          .expect(200);
+        const res = await request(app).put(route).send({ maintainer: 'foo', type_override: 'webapp', locked: true }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.maintainer, user._id.toString());
@@ -656,9 +590,7 @@ describe('Manage', () => {
       test('updates successfully', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
-          .send({ name: 'Foo Bar' })
-          .expect(200);
+        const res = await request(app).put(route).send({ name: 'Foo Bar' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
@@ -675,9 +607,7 @@ describe('Manage', () => {
         package1.revisions.push({});
         await package1.save();
 
-        const res = await request(app).put(route)
-          .send({ published: true })
-          .expect(200);
+        const res = await request(app).put(route).send({ published: true }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(upsertSpy.mock.callCount(), 1);
@@ -695,9 +625,7 @@ describe('Manage', () => {
         package1.revisions.push({});
         await package1.save();
 
-        const res = await request(app).put(route)
-          .send({ published: false })
-          .expect(200);
+        const res = await request(app).put(route).send({ published: false }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(removeSpy.mock.callCount(), 1);
@@ -707,7 +635,9 @@ describe('Manage', () => {
       });
 
       test('fails gracefully', async (t) => {
-        const findMock = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+        const findMock = t.mock.method(Package, 'findOneByFilters', () => {
+          throw new Error();
+        });
 
         const res = await request(app).put(route).expect(500);
 
@@ -720,9 +650,7 @@ describe('Manage', () => {
         package1.locked = true;
         await package1.save();
 
-        const res = await request(app).put(route)
-          .send({ published: true, locked: false })
-          .expect(403);
+        const res = await request(app).put(route).send({ published: true, locked: false }).expect(403);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.APP_LOCKED);
@@ -735,7 +663,8 @@ describe('Manage', () => {
       test('adds screenshots up to the limit', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
+        const res = await request(app)
+          .put(route)
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', screenshot2)
           .attach('screenshot_files', screenshot1)
@@ -756,7 +685,8 @@ describe('Manage', () => {
       test('rejects non-images uploaded as screenshots', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
+        const res = await request(app)
+          .put(route)
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', notAScreenshot)
           .expect(200);
@@ -773,7 +703,8 @@ describe('Manage', () => {
       test('removes screenshots', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
+        const res = await request(app)
+          .put(route)
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', screenshot2)
           .expect(200);
@@ -781,9 +712,7 @@ describe('Manage', () => {
         assert.ok(res.body.success);
         assert.equal(res.body.data.screenshots.length, 2);
 
-        const res2 = await request(app).put(route)
-          .send({ screenshots: [] })
-          .expect(200);
+        const res2 = await request(app).put(route).send({ screenshots: [] }).expect(200);
 
         assert.ok(res2.body.success);
         assert.equal(res2.body.data.screenshots.length, 0);
@@ -797,7 +726,8 @@ describe('Manage', () => {
       test('reorders screenshots', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
+        const res = await request(app)
+          .put(route)
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', screenshot2)
           .expect(200);
@@ -805,7 +735,8 @@ describe('Manage', () => {
         assert.ok(res.body.success);
         assert.equal(res.body.data.screenshots.length, 2);
 
-        const res2 = await request(app).put(route)
+        const res2 = await request(app)
+          .put(route)
           .send({
             screenshots: [
               res.body.data.screenshots[1].replace('http://local.open-store.io/screenshots/', ''),
@@ -830,7 +761,8 @@ describe('Manage', () => {
       test('clears out urls', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route)
+        const res = await request(app)
+          .put(route)
           .send({
             source: 'https://example.com/',
             support_url: 'https://example.com/',
@@ -847,7 +779,8 @@ describe('Manage', () => {
         assert.ok(res.body.data.translation_url.length > 0);
         assert.ok(res.body.data.video_url.length > 0);
 
-        const res2 = await request(app).put(route)
+        const res2 = await request(app)
+          .put(route)
           .send({
             source: '',
             support_url: '',
@@ -876,10 +809,7 @@ describe('Manage', () => {
     let package2: TestPackage;
 
     beforeEach(async () => {
-      [package1, package2] = await Promise.all([
-        factory.package({ maintainer: user._id, name: 'User app' }),
-        factory.package(),
-      ]);
+      [package1, package2] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
       route = `/api/v3/manage/${package1.id}?apikey=${user.apikey}`;
       route2 = `/api/v3/manage/${package2.id}?apikey=${user.apikey}`;
     });
@@ -927,7 +857,9 @@ describe('Manage', () => {
       });
 
       test('fails gracefully', async (t) => {
-        const findMock = t.mock.method(Package, 'findOneByFilters', () => { throw new Error(); });
+        const findMock = t.mock.method(Package, 'findOneByFilters', () => {
+          throw new Error();
+        });
 
         const res = await request(app).delete(route).expect(500);
 
@@ -956,9 +888,7 @@ describe('Manage', () => {
     test('can update version-specific changelogs', async (t) => {
       t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-      pkg.version_changelogs = [
-        { version: '1.0.0', changelog: 'Initial release notes' },
-      ];
+      pkg.version_changelogs = [{ version: '1.0.0', changelog: 'Initial release notes' }];
       await pkg.save();
 
       const versionChangelogs = [
@@ -966,10 +896,7 @@ describe('Manage', () => {
         { version: '1.1.0', changelog: 'New version changelog' },
       ];
 
-      const res = await request(app)
-        .put(route)
-        .field('version_changelogs', JSON.stringify(versionChangelogs))
-        .expect(200);
+      const res = await request(app).put(route).field('version_changelogs', JSON.stringify(versionChangelogs)).expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.version_changelogs.length, 2);
@@ -978,18 +905,13 @@ describe('Manage', () => {
       assert.ok(updatedPkg);
       assert.ok(updatedPkg.version_changelogs);
       assert.equal(updatedPkg.version_changelogs.length, 2);
-      assert.equal(updatedPkg.version_changelogs.find(vc => vc.version === '1.0.0')?.changelog, 'Updated initial release notes');
-      assert.equal(updatedPkg.version_changelogs.find(vc => vc.version === '1.1.0')?.changelog, 'New version changelog');
+      assert.equal(updatedPkg.version_changelogs.find((vc) => vc.version === '1.0.0')?.changelog, 'Updated initial release notes');
+      assert.equal(updatedPkg.version_changelogs.find((vc) => vc.version === '1.1.0')?.changelog, 'New version changelog');
 
       // Test replace behavior: sending only a subset removes unlisted versions
-      const reducedChangelogs = [
-        { version: '1.0.0', changelog: 'Kept initial release notes' },
-      ];
+      const reducedChangelogs = [{ version: '1.0.0', changelog: 'Kept initial release notes' }];
 
-      const res2 = await request(app)
-        .put(route)
-        .field('version_changelogs', JSON.stringify(reducedChangelogs))
-        .expect(200);
+      const res2 = await request(app).put(route).field('version_changelogs', JSON.stringify(reducedChangelogs)).expect(200);
 
       assert.ok(res2.body.success);
       assert.equal(res2.body.data.version_changelogs.length, 1);

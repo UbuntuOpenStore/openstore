@@ -14,7 +14,7 @@ export function apiLinks(originalUrl: string, count: number, limit: number = 0, 
   }
 
   if (skip > 0) {
-    const previousSkip = (skip - limit > 0) ? (skip - limit) : 0;
+    const previousSkip = skip - limit > 0 ? skip - limit : 0;
     url.searchParams.set('skip', `${previousSkip}`);
     previous = url.toString();
   }

@@ -2,10 +2,10 @@ import express, { type Request, type Response } from 'express';
 
 import { Package } from '../db/package';
 import { Architecture, type Channel } from '../db/package/types';
-import { getDataArray, getData, success, asyncErrorWrapper } from '../utils';
-import { INVALID_ARCH } from '../utils/error-messages';
 import { UserError } from '../exceptions';
+import { getDataArray, getData, success, asyncErrorWrapper } from '../utils';
 import { handleChannel } from '../utils/channels';
+import { INVALID_ARCH } from '../utils/error-messages';
 
 const router = express.Router();
 
@@ -27,18 +27,19 @@ async function revisionsByVersion(req: Request, res: Response) {
   }
 
   const pkgs = (await Package.findByFilters({ published: true, ids }))
-    .filter((pkg) => (pkg.architectures.includes(architecture) || pkg.architectures.includes(Architecture.ALL)))
+    .filter((pkg) => pkg.architectures.includes(architecture) || pkg.architectures.includes(Architecture.ALL))
     .map((pkg) => {
-      let version = versions.filter((v: string) => (v.split('@')[0] === pkg.id))[0];
+      let version = versions.filter((v: string) => v.split('@')[0] === pkg.id)[0];
       const parts = version.split('@');
-      const channel = (parts.length > 2) ? parts[2] as Channel : defaultChannel;
+      const channel = parts.length > 2 ? (parts[2] as Channel) : defaultChannel;
       version = parts[1];
 
-      const revisionData = pkg.revisions.filter((rev) => (
-        rev.version === version &&
-        rev.channel === channel &&
-        (rev.architecture === architecture || rev.architecture === Architecture.ALL)
-      ))[0];
+      const revisionData = pkg.revisions.filter(
+        (rev) =>
+          rev.version === version &&
+          rev.channel === channel &&
+          (rev.architecture === architecture || rev.architecture === Architecture.ALL),
+      )[0];
       const revision = revisionData ? revisionData.revision : 0;
 
       const { revisionData: latestRevisionData } = pkg.getLatestRevision(channel, architecture, undefined, frameworks);

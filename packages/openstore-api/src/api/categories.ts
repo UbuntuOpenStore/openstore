@@ -1,10 +1,10 @@
 import express, { type Request, type Response } from 'express';
 
 import { Package } from '../db/package';
-import { setLang, gettext, config, success, getData, getDataArray, asyncErrorWrapper } from '../utils';
 import { PackageType } from '../db/package/types';
-import categoryIcons from './json/category_icons.json';
+import { setLang, gettext, config, success, getData, getDataArray, asyncErrorWrapper } from '../utils';
 import { handleChannel } from '../utils/channels';
+import categoryIcons from './json/category_icons.json';
 
 const categoryNames = Object.keys(categoryIcons);
 const router = express.Router();
@@ -12,47 +12,46 @@ const router = express.Router();
 /**
  * Returns a list of available categories that apps can belong to.
  */
-router.get('/', asyncErrorWrapper(async (req: Request, res: Response) => {
-  setLang(getData(req, 'lang'));
+router.get(
+  '/',
+  asyncErrorWrapper(async (req: Request, res: Response) => {
+    setLang(getData(req, 'lang'));
 
-  const channel = handleChannel(getData(req, 'channel'));
-  const packageTypeParams = [
-    ...getDataArray(req, 'package_types'),
-    ...getDataArray(req, 'package_type'),
-  ];
-  const packageTypes = packageTypeParams.length > 0
-    ? packageTypeParams as PackageType[]
-    : [PackageType.CLICK];
-  let categories = categoryNames.map((category) => {
-    return {
-      name: category,
-      count: 0,
-    };
-  });
-
-  if (!req.query.all) {
-    // By default we only return categories that have apps. The `all` flag tells us to return everything.
-
-    categories = (await Package.categoryStats([channel], packageTypes)).map((stats) => {
+    const channel = handleChannel(getData(req, 'channel'));
+    const packageTypeParams = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
+    const packageTypes = packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [PackageType.CLICK];
+    let categories = categoryNames.map((category) => {
       return {
-        ...stats,
-        name: stats._id,
-      };
-    });
-  }
-
-  const categoriesResponse = categories.filter((category) => !!category.name)
-    .map((category) => {
-      return {
-        category: category.name,
-        translation: gettext(category.name),
-        count: category.count,
-        icon: config.server.host + (categoryIcons as { [key: string]: string })[category.name],
-        slug: category.name.toLowerCase().replace('& ', '').replace(/ /g, '-'),
+        name: category,
+        count: 0,
       };
     });
 
-  success(res, categoriesResponse);
-}, 'Could not fetch category list at this time'));
+    if (!req.query.all) {
+      // By default we only return categories that have apps. The `all` flag tells us to return everything.
+
+      categories = (await Package.categoryStats([channel], packageTypes)).map((stats) => {
+        return {
+          ...stats,
+          name: stats._id,
+        };
+      });
+    }
+
+    const categoriesResponse = categories
+      .filter((category) => !!category.name)
+      .map((category) => {
+        return {
+          category: category.name,
+          translation: gettext(category.name),
+          count: category.count,
+          icon: config.server.host + (categoryIcons as { [key: string]: string })[category.name],
+          slug: category.name.toLowerCase().replace('& ', '').replace(/ /g, '-'),
+        };
+      });
+
+    success(res, categoriesResponse);
+  }, 'Could not fetch category list at this time'),
+);
 
 export default router;

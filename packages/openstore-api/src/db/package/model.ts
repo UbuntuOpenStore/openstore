@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
+
 import { setupMethods } from './methods';
-import { setupVirtuals } from './virtuals';
 import { setupStatics } from './statics';
 import {
   type RevisionModel,
@@ -11,6 +11,7 @@ import {
   PackageType,
   SourceStore,
 } from './types';
+import { setupVirtuals } from './virtuals';
 
 const revisionSchema = new Schema<IRevision, RevisionModel>({
   revision: Number,

@@ -1,5 +1,5 @@
-import type { z } from 'zod/v4';
 import { XMLParser } from 'fast-xml-parser';
+import type { z } from 'zod/v4';
 
 export { XMLParser };
 
@@ -21,8 +21,17 @@ export function parseArArchive(buffer: Buffer): ArFile[] {
       break;
     }
 
-    const name = buffer.slice(offset, offset + 16).toString('ascii').trimEnd();
-    const size = parseInt(buffer.slice(offset + 48, offset + 58).toString('ascii').trim(), 10);
+    const name = buffer
+      .slice(offset, offset + 16)
+      .toString('ascii')
+      .trimEnd();
+    const size = parseInt(
+      buffer
+        .slice(offset + 48, offset + 58)
+        .toString('ascii')
+        .trim(),
+      10,
+    );
     offset += 60;
 
     const fileData = buffer.slice(offset, offset + size);
@@ -55,8 +64,7 @@ export function parseJsonFile(data: Uint8Array | undefined): unknown | undefined
   const str = Buffer.from(data).toString();
   try {
     return JSON.parse(str);
-  }
-  catch {
+  } catch {
     return undefined;
   }
 }
@@ -69,8 +77,7 @@ export function parseXmlFile(data: Uint8Array | undefined, parser: XMLParser): R
   const str = Buffer.from(data).toString();
   try {
     return parser.parse(str) as Record<string, unknown>;
-  }
-  catch {
+  } catch {
     return undefined;
   }
 }
@@ -88,9 +95,11 @@ export function parseIniFile(data: Uint8Array | undefined): Record<string, unkno
     if (!(lline[0] === '[' && lline[lline.length - 1] === ']') && lline.length > 0) {
       const pos = lline.indexOf('=');
       if (pos > -1) {
-        result[lline.substring(0, pos).trim()] = line.trim().substring(pos + 1).trim();
-      }
-      else {
+        result[lline.substring(0, pos).trim()] = line
+          .trim()
+          .substring(pos + 1)
+          .trim();
+      } else {
         other.push(line);
       }
     }

@@ -14,8 +14,7 @@ const gracefulShutdown = async (signal: string) => {
   try {
     await mongoose.connection.close();
     process.exit(0);
-  }
-  catch (err) {
+  } catch (err) {
     logger.error('Error closing MongoDB connection:', err);
     process.exit(1);
   }

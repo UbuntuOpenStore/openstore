@@ -1,8 +1,8 @@
-import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
 import { type Request } from 'express';
+import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
 
-import { type HydratedUser } from '../user/types';
 import { type HydratedPackage } from '../package/types';
+import { type HydratedUser } from '../user/types';
 import { type Ratings } from './constants';
 
 export interface IReview {
@@ -54,9 +54,5 @@ export interface ReviewModel extends Model<IReview, unknown, IReviewMethods> {
   parseRequestFilters: (req: Request) => ReviewRequestFilters;
   parseFilters: (filters: ReviewRequestFilters) => FilterQuery<IReview>;
   countByFilters: (filters: ReviewRequestFilters) => Promise<number>;
-  findByFilters: (
-    filters: ReviewRequestFilters,
-    limit?: number,
-    skip?: number,
-  ) => Promise<HydratedReview[]>;
+  findByFilters: (filters: ReviewRequestFilters, limit?: number, skip?: number) => Promise<HydratedReview[]>;
 }

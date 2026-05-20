@@ -11,8 +11,7 @@ async function init() {
     await meilisearchSearch.createIndex();
     console.log('Successfully created Meilisearch index');
     process.exit(0);
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Failed to create index:', error);
     process.exit(1);
   }

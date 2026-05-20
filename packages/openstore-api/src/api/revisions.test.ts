@@ -1,13 +1,14 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after } from 'node:test';
+
 import request from 'supertest';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory, { type TestPackage } from '../tests/factory';
-import * as api from '.';
 import { type App } from 'supertest/types';
 
+import * as api from '.';
 import { Package } from '../db/package';
 import { Architecture, Channel, type HydratedRevision } from '../db/package/types';
+import factory, { type TestPackage } from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 
 describe('Revisions GET', () => {
   const route = '/api/v3/revisions';
@@ -79,7 +80,9 @@ describe('Revisions GET', () => {
   });
 
   test('returns latest update for an app that is "all" when requesting a different arch', async () => {
-    const { body } = await request(app).get(makeUrl({ architecture: Architecture.ARMHF })).expect(200);
+    const { body } = await request(app)
+      .get(makeUrl({ architecture: Architecture.ARMHF }))
+      .expect(200);
 
     assert.ok(body.success);
     assert.equal(body.data.length, 1);
@@ -94,7 +97,9 @@ describe('Revisions GET', () => {
   });
 
   test('returns latest update for a "sideloaded" app', async () => {
-    const { body } = await request(app).get(makeUrl({ version: '2.0.1' })).expect(200);
+    const { body } = await request(app)
+      .get(makeUrl({ version: '2.0.1' }))
+      .expect(200);
 
     assert.ok(body.success);
     assert.equal(body.data.length, 1);
@@ -109,7 +114,9 @@ describe('Revisions GET', () => {
   });
 
   test('returns nothing for an app that is not in the OpenStore', async () => {
-    const { body } = await request(app).get(makeUrl({ id: 'foo.bar' })).expect(200);
+    const { body } = await request(app)
+      .get(makeUrl({ id: 'foo.bar' }))
+      .expect(200);
 
     assert.ok(body.success);
     assert.equal(body.data.length, 0);
@@ -140,7 +147,9 @@ describe('Revisions GET', () => {
     package1.architectures = [Architecture.ARM64];
     await package1.save();
 
-    const { body } = await request(app).get(makeUrl({ architecture: Architecture.ARMHF })).expect(200);
+    const { body } = await request(app)
+      .get(makeUrl({ architecture: Architecture.ARMHF }))
+      .expect(200);
 
     assert.ok(body.success);
     assert.equal(body.data.length, 0);
@@ -164,7 +173,9 @@ describe('Revisions GET', () => {
     package1.architectures = [Architecture.ARM64, Architecture.ARMHF];
     await package1.save();
 
-    const { body } = await request(app).get(makeUrl({ version: '2.0.0', architecture: Architecture.ARMHF })).expect(200);
+    const { body } = await request(app)
+      .get(makeUrl({ version: '2.0.0', architecture: Architecture.ARMHF }))
+      .expect(200);
 
     assert.ok(body.success);
     assert.equal(body.data.length, 1);
@@ -179,11 +190,15 @@ describe('Revisions GET', () => {
   });
 
   test('fails if the channel is invalid', async () => {
-    await request(app).get(makeUrl({ channel: 'vivid', architecture: Architecture.ARMHF })).expect(400);
+    await request(app)
+      .get(makeUrl({ channel: 'vivid', architecture: Architecture.ARMHF }))
+      .expect(400);
   });
 
   test('fails gracefully', async (t) => {
-    const findMock = t.mock.method(Package, 'findByFilters', () => { throw new Error(); });
+    const findMock = t.mock.method(Package, 'findByFilters', () => {
+      throw new Error();
+    });
 
     const res = await request(app).get(makeUrl()).expect(500);
 
@@ -217,8 +232,12 @@ describe('Revisions GET', () => {
     package1.architectures = [Architecture.ARM64];
     await package1.save();
 
-    await request(app).get(makeUrl({ channel: Channel.FOCAL, architecture: 'foo' })).expect(400);
-    await request(app).get(makeUrl({ channel: Channel.FOCAL, architecture: '' })).expect(400);
+    await request(app)
+      .get(makeUrl({ channel: Channel.FOCAL, architecture: 'foo' }))
+      .expect(400);
+    await request(app)
+      .get(makeUrl({ channel: Channel.FOCAL, architecture: '' }))
+      .expect(400);
   });
 
   test('returns the most recent for the given frameworks', async () => {

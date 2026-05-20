@@ -1,11 +1,12 @@
-import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import request from 'supertest';
-import { closeMongoose, waitForMongoose } from './utils';
-import * as api from '../api';
-import { type App } from 'supertest/types';
+import { test, describe, before, after } from 'node:test';
 
 import axios from 'axios';
+import request from 'supertest';
+import { type App } from 'supertest/types';
+
+import * as api from '../api';
+import { closeMongoose, waitForMongoose } from './utils';
 
 describe('Snapshots', () => {
   let app: App;

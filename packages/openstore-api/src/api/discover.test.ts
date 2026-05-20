@@ -1,17 +1,18 @@
-import { test, describe, beforeEach, before, after } from 'node:test';
-import assert from 'node:assert/strict';
-import request from 'supertest';
 import fs from 'fs/promises';
+import assert from 'node:assert/strict';
+import { test, describe, beforeEach, before, after } from 'node:test';
 import path from 'path';
-import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import factory from '../tests/factory';
-import * as api from '.';
+
+import request from 'supertest';
 import { type App } from 'supertest/types';
 
-import { Package } from '../db/package';
-import { RatingCount } from '../db/rating_count';
+import * as api from '.';
 import { Discover } from '../db/discover';
+import { Package } from '../db/package';
 import { Architecture, Channel, ChannelArchitecture, AppType, PackageType, SourceStore } from '../db/package/types';
+import { RatingCount } from '../db/rating_count';
+import factory from '../tests/factory';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { config } from '../utils/config';
 
 describe('Discover API', () => {
@@ -36,8 +37,7 @@ describe('Discover API', () => {
     try {
       const files = await fs.readdir(cacheDir);
       await Promise.all(files.map((file) => fs.unlink(path.join(cacheDir, file))));
-    }
-    catch (error) {
+    } catch (error) {
       // Don't worry about errors
     }
 
@@ -75,7 +75,7 @@ describe('Discover API', () => {
         channels: [Channel.FOCAL],
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
-        published_date: (new Date()).toISOString(),
+        published_date: new Date().toISOString(),
         types: [AppType.APP],
         banner: 'test.svg',
       }),
@@ -110,7 +110,7 @@ describe('Discover API', () => {
         channels: [Channel.FOCAL],
         channel_architectures: [ChannelArchitecture.FOCAL_ALL],
         device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-16.04`],
-        published_date: (new Date()).toISOString(),
+        published_date: new Date().toISOString(),
         types: [AppType.APP],
         banner: 'test.svg',
       }),
@@ -118,7 +118,9 @@ describe('Discover API', () => {
   });
 
   test('returns a nice error', async (t) => {
-    const mockFn = t.mock.method(Package, 'findByFilters', () => { throw new Error(); });
+    const mockFn = t.mock.method(Package, 'findByFilters', () => {
+      throw new Error();
+    });
 
     const res = await request(app).get(route).expect(500);
     assert.equal(res.body.success, false);
@@ -175,8 +177,7 @@ describe('Discover API', () => {
   test('returns data for the multiple supported framework', async (t) => {
     const getCountsByIdsSpy = t.mock.method(RatingCount, 'getCountsByIds');
 
-    const frameworkRoute =
-      `${route}?channel=${Channel.FOCAL}&architecture=${Architecture.ARM64}&frameworks=ubuntu-sdk-16.04,ubuntu-sdk-20.04`;
+    const frameworkRoute = `${route}?channel=${Channel.FOCAL}&architecture=${Architecture.ARM64}&frameworks=ubuntu-sdk-16.04,ubuntu-sdk-20.04`;
     const res = await request(app).get(frameworkRoute).expect(200);
 
     assert.ok(res.body.success);
@@ -203,7 +204,7 @@ describe('Discover API', () => {
       channels: [Channel.FOCAL],
       channel_architectures: [ChannelArchitecture.FOCAL_ALL],
       device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
-      published_date: (new Date()).toISOString(),
+      published_date: new Date().toISOString(),
       types: [AppType.APP],
       package_type: PackageType.SNAP,
       source_store: SourceStore.SNAPCRAFT,

@@ -1,17 +1,18 @@
-import { test, describe, beforeEach } from 'node:test';
-import assert from 'node:assert/strict';
 import fs from 'fs/promises';
+import assert from 'node:assert/strict';
+import { test, describe, beforeEach } from 'node:test';
 import os from 'os';
 
+import type { AppstreamExportData } from 'click-parser';
+
 import { Package } from '.';
-import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
-import { serializeRatings } from './methods';
-import { Ratings } from '../review/constants';
 import { UserError } from '../../exceptions';
 import { type TestPackage } from '../../tests/factory';
 import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory } from '../../utils/appstream-helpers';
 import { config } from '../../utils/config';
-import type { AppstreamExportData } from 'click-parser';
+import { Ratings } from '../review/constants';
+import { serializeRatings } from './methods';
+import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
 
 describe('Package', () => {
   describe('parseRequestFilters', () => {
@@ -53,27 +54,40 @@ describe('Package', () => {
     });
 
     test('handles types and type', () => {
-      assert.deepEqual(Package.parseRequestFilters({
-        query: { type: AppType.APP, types: AppType.WEBAPP },
-      } as any).types, [AppType.WEBAPP, AppType.APP]);
+      assert.deepEqual(
+        Package.parseRequestFilters({
+          query: { type: AppType.APP, types: AppType.WEBAPP },
+        } as any).types,
+        [AppType.WEBAPP, AppType.APP],
+      );
     });
 
     test('adds arch all when the arch is not all', () => {
-      assert.deepEqual(Package.parseRequestFilters({
-        query: { architecture: Architecture.ARMHF, channel: Channel.FOCAL },
-      } as any).architectures, [Architecture.ARMHF, Architecture.ALL]);
+      assert.deepEqual(
+        Package.parseRequestFilters({
+          query: { architecture: Architecture.ARMHF, channel: Channel.FOCAL },
+        } as any).architectures,
+        [Architecture.ARMHF, Architecture.ALL],
+      );
     });
 
     test('does not throw an error when arch is not specified but channel is', () => {
-      assert.equal(Package.parseRequestFilters({
-        query: { channel: Channel.FOCAL },
-      } as any).channel, Channel.FOCAL);
+      assert.equal(
+        Package.parseRequestFilters({
+          query: { channel: Channel.FOCAL },
+        } as any).channel,
+        Channel.FOCAL,
+      );
     });
 
     test('throws an error when channel is not specified but arch is', () => {
-      assert.throws(() => Package.parseRequestFilters({
-        query: { architecture: Architecture.ARMHF },
-      } as any), UserError);
+      assert.throws(
+        () =>
+          Package.parseRequestFilters({
+            query: { architecture: Architecture.ARMHF },
+          } as any),
+        UserError,
+      );
     });
 
     test('defaults to click package type when not specified', () => {
@@ -125,10 +139,7 @@ describe('Package', () => {
         types: { $in: [AppType.APP, AppType.WEBAPP] },
         id: { $in: ['foo.bar'] },
         device_compatibilities: {
-          $in: [
-            `${Channel.FOCAL}:${Architecture.ARMHF}:ubuntu-16.04`,
-            `${Channel.FOCAL}:${Architecture.ALL}:ubuntu-16.04`,
-          ],
+          $in: [`${Channel.FOCAL}:${Architecture.ARMHF}:ubuntu-16.04`, `${Channel.FOCAL}:${Architecture.ALL}:ubuntu-16.04`],
         },
         category: 'Category',
         author: 'Author',
@@ -162,7 +173,7 @@ describe('Package', () => {
   });
 
   describe('serialization', () => {
-    const now = (new Date()).toISOString();
+    const now = new Date().toISOString();
     let package1: TestPackage;
 
     beforeEach(() => {
@@ -559,16 +570,16 @@ describe('Package', () => {
 
     describe('serializeRatings', () => {
       test('formats ratings', () => {
-        assert.deepEqual(serializeRatings([
-          { name: Ratings.THUMBS_UP, count: 10 } as any,
-          { name: Ratings.THUMBS_DOWN, count: 10 } as any,
-        ]), {
-          THUMBS_UP: 10,
-          THUMBS_DOWN: 10,
-          HAPPY: 0,
-          NEUTRAL: 0,
-          BUGGY: 0,
-        });
+        assert.deepEqual(
+          serializeRatings([{ name: Ratings.THUMBS_UP, count: 10 } as any, { name: Ratings.THUMBS_DOWN, count: 10 } as any]),
+          {
+            THUMBS_UP: 10,
+            THUMBS_DOWN: 10,
+            HAPPY: 0,
+            NEUTRAL: 0,
+            BUGGY: 0,
+          },
+        );
       });
     });
   });
@@ -626,23 +637,19 @@ describe('Package', () => {
       assert.equal(rev2?.channel, Channel.FOCAL);
       assert.equal(rev2?.framework, 'ubuntu-sdk-16.04');
 
-      const { revisionData: rev3 } = package1.getLatestRevision(
-        Channel.FOCAL,
-        Architecture.ARM64,
-        undefined,
-        ['ubuntu-sdk-16.04', 'ubuntu-sdk-20.04'],
-      );
+      const { revisionData: rev3 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+        'ubuntu-sdk-16.04',
+        'ubuntu-sdk-20.04',
+      ]);
       assert.equal(rev3?.version, '1.0.4');
       assert.equal(rev3?.architecture, Architecture.ARM64);
       assert.equal(rev3?.channel, Channel.FOCAL);
       assert.equal(rev3?.framework, 'ubuntu-sdk-20.04');
 
-      const { revisionData: rev4 } = package1.getLatestRevision(
-        Channel.FOCAL,
-        Architecture.ARM64,
-        undefined,
-        ['ubuntu-sdk-20.04', 'ubuntu-touch-24.04-1.x'],
-      );
+      const { revisionData: rev4 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+        'ubuntu-sdk-20.04',
+        'ubuntu-touch-24.04-1.x',
+      ]);
       assert.equal(rev4?.version, '2.0.0');
       assert.equal(rev4?.architecture, Architecture.ARM64);
       assert.equal(rev4?.channel, Channel.FOCAL);
@@ -654,23 +661,19 @@ describe('Package', () => {
       package1.createNextRevision('2.0.0', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       package1.createNextRevision('2.0.0', Channel.FOCAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
 
-      const { revisionData: rev1 } = package1.getLatestRevision(
-        Channel.FOCAL,
-        Architecture.ARM64,
-        undefined,
-        ['ubuntu-sdk-20.04', 'ubuntu-touch-24.04-1.x'],
-      );
+      const { revisionData: rev1 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+        'ubuntu-sdk-20.04',
+        'ubuntu-touch-24.04-1.x',
+      ]);
       assert.equal(rev1?.version, '2.0.0');
       assert.equal(rev1?.architecture, Architecture.ARM64);
       assert.equal(rev1?.channel, Channel.FOCAL);
       assert.equal(rev1?.framework, 'ubuntu-touch-24.04-1.x');
 
-      const { revisionData: rev2 } = package1.getLatestRevision(
-        Channel.FOCAL,
-        Architecture.ARM64,
-        undefined,
-        ['ubuntu-sdk-16.04', 'ubuntu-sdk-20.04'],
-      );
+      const { revisionData: rev2 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+        'ubuntu-sdk-16.04',
+        'ubuntu-sdk-20.04',
+      ]);
       assert.equal(rev2?.version, '2.0.0');
       assert.equal(rev2?.architecture, Architecture.ARM64);
       assert.equal(rev2?.channel, Channel.FOCAL);
@@ -681,23 +684,19 @@ describe('Package', () => {
       package1.createNextRevision('...invalid!!', Channel.FOCAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       package1.createNextRevision('...invalid!!', Channel.FOCAL, Architecture.ARM64, 'ubuntu-touch-24.04-1.x', 'url', 'shasum', 10, 8);
 
-      const { revisionData: rev1 } = package1.getLatestRevision(
-        Channel.FOCAL,
-        Architecture.ARM64,
-        undefined,
-        ['ubuntu-sdk-20.04', 'ubuntu-touch-24.04-1.x'],
-      );
+      const { revisionData: rev1 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+        'ubuntu-sdk-20.04',
+        'ubuntu-touch-24.04-1.x',
+      ]);
       assert.equal(rev1?.version, '...invalid!!');
       assert.equal(rev1?.architecture, Architecture.ARM64);
       assert.equal(rev1?.channel, Channel.FOCAL);
       assert.equal(rev1?.framework, 'ubuntu-touch-24.04-1.x');
 
-      const { revisionData: rev2 } = package1.getLatestRevision(
-        Channel.FOCAL,
-        Architecture.ARM64,
-        undefined,
-        ['ubuntu-sdk-16.04', 'ubuntu-sdk-20.04'],
-      );
+      const { revisionData: rev2 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+        'ubuntu-sdk-16.04',
+        'ubuntu-sdk-20.04',
+      ]);
       assert.equal(rev2?.version, '...invalid!!');
       assert.equal(rev2?.architecture, Architecture.ARM64);
       assert.equal(rev2?.channel, Channel.FOCAL);
@@ -729,17 +728,20 @@ describe('Package', () => {
         assert.equal(rev1?.channel, Channel.FOCAL);
         assert.equal(rev1?.framework, 'ubuntu-sdk-20.04');
 
-        const { revisionData: rev2 } = package1.getLatestRevision(
-          Channel.FOCAL, Architecture.ARM64, undefined, ['ubuntu-sdk-16.04', 'ubuntu-touch-24.04-1.x'],
-        );
+        const { revisionData: rev2 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+          'ubuntu-sdk-16.04',
+          'ubuntu-touch-24.04-1.x',
+        ]);
         assert.equal(rev2?.version, '1.0.0-24.04-1.x');
         assert.equal(rev2?.architecture, Architecture.ARM64);
         assert.equal(rev2?.channel, Channel.FOCAL);
         assert.equal(rev2?.framework, 'ubuntu-touch-24.04-1.x');
 
-        const { revisionData: rev3 } = package1.getLatestRevision(
-          Channel.FOCAL, Architecture.ARM64, undefined, ['ubuntu-sdk-16.04', 'ubuntu-touch-24.04-1.x', 'ubuntu-touch-24.04-2.x'],
-        );
+        const { revisionData: rev3 } = package1.getLatestRevision(Channel.FOCAL, Architecture.ARM64, undefined, [
+          'ubuntu-sdk-16.04',
+          'ubuntu-touch-24.04-1.x',
+          'ubuntu-touch-24.04-2.x',
+        ]);
         assert.equal(rev3?.version, '1.0.0-24.04-2.x');
         assert.equal(rev3?.architecture, Architecture.ARM64);
         assert.equal(rev3?.channel, Channel.FOCAL);
@@ -819,16 +821,16 @@ describe('Package', () => {
     describe('getAppstreamLocalizedString', () => {
       test('returns english string', () => {
         assert.equal(
-          getAppstreamLocalizedString([{ text: 'English', lang: 'en' }, { text: 'Deutsch', lang: 'de' }]),
+          getAppstreamLocalizedString([
+            { text: 'English', lang: 'en' },
+            { text: 'Deutsch', lang: 'de' },
+          ]),
           'English',
         );
       });
 
       test('falls back to first item when no english', () => {
-        assert.equal(
-          getAppstreamLocalizedString([{ text: 'Deutsch', lang: 'de' }]),
-          'Deutsch',
-        );
+        assert.equal(getAppstreamLocalizedString([{ text: 'Deutsch', lang: 'de' }]), 'Deutsch');
       });
 
       test('returns undefined for empty array', () => {
@@ -898,9 +900,7 @@ describe('Package', () => {
       project_license: 'MIT',
       categories: ['Development'],
       screenshots: [],
-      releases: [
-        { version: '1.0.0', description: [{ text: 'Initial release', lang: 'en' }] },
-      ],
+      releases: [{ version: '1.0.0', description: [{ text: 'Initial release', lang: 'en' }] }],
       ...overrides,
     });
 
@@ -990,9 +990,7 @@ describe('Package', () => {
 
     test('does not overwrite URLs when they are invalid', async () => {
       const appstream = makeAppstream({
-        urls: [
-          { type: 'homepage', url: 'not-a-valid-url' },
-        ],
+        urls: [{ type: 'homepage', url: 'not-a-valid-url' }],
       });
 
       await pkg.updateFromClick(makeClickData(appstream));
@@ -1033,8 +1031,7 @@ describe('Package', () => {
         assert.ok(!pkg.screenshots.includes(existingScreenshot), 'old screenshot replaced');
         assert.ok(!pkg.screenshots[0].startsWith('https://'), 'screenshot should be a filename not a URL');
         assert.ok(pkg.screenshots[0].includes('app.id-screenshot-'), 'filename follows naming convention');
-      }
-      finally {
+      } finally {
         config.screenshot_dir = originalScreenshotDir;
         await fs.rm(tmpDir, { recursive: true, force: true });
       }
@@ -1070,8 +1067,7 @@ describe('Package', () => {
 
         assert.equal(pkg.screenshots.length, 1, 'one new screenshot');
         assert.ok(!pkg.screenshots.includes(firstFile), 'previous screenshot replaced');
-      }
-      finally {
+      } finally {
         config.screenshot_dir = originalScreenshotDir;
         await fs.rm(tmpDir, { recursive: true, force: true });
       }
@@ -1105,8 +1101,7 @@ describe('Package', () => {
         await pkg.updateFromClick(makeClickData(appstream));
         assert.equal(fetchMock.mock.callCount(), 1, 'fetch not called again when URLs unchanged');
         assert.equal(pkg.screenshots[0], firstFile, 'same filename kept');
-      }
-      finally {
+      } finally {
         config.screenshot_dir = originalScreenshotDir;
         await fs.rm(tmpDir, { recursive: true, force: true });
       }
