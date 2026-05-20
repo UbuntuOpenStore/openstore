@@ -394,7 +394,7 @@ export type HydratedPackage = HydratedDocument<IPackage, IPackageMethods>;
 export interface PackageModel extends Model<IPackage, unknown, IPackageMethods> {
   incrementDownload: (id: Types.ObjectId, revisionIndex: number) => Promise<void>;
   stats: () => Promise<PackageStats>;
-  categoryStats: (channels: Channel[]) => Promise<CategoryStat[]>;
+  categoryStats: (channels: Channel[], packageTypes?: PackageType[]) => Promise<CategoryStat[]>;
   parseRequestFilters: (req: Request) => PackageRequestFilters;
   parseFilters: (filters: PackageRequestFilters, textSearch?: boolean) => FilterQuery<IPackage>;
   countByFilters: (filters: PackageRequestFilters, textSearch?: boolean) => Promise<number>;

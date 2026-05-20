@@ -110,8 +110,11 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     return { categories, types, frameworks, architectures };
   };
 
-  packageSchema.statics.categoryStats = async function (channels: Channel[]): Promise<CategoryStat[]> {
-    const match: FilterQuery<IPackage> = { published: true, package_type: PackageType.CLICK };
+  packageSchema.statics.categoryStats = async function (
+    channels: Channel[],
+    packageTypes: PackageType[] = [PackageType.CLICK],
+  ): Promise<CategoryStat[]> {
+    const match: FilterQuery<IPackage> = { published: true, package_type: { $in: packageTypes } };
     if (channels) {
       match.channels = { $in: channels };
     }
