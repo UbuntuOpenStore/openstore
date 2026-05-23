@@ -3,112 +3,18 @@ import { test, describe, mock } from 'node:test';
 
 import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/package/types';
 import {
-  fetchSnaps,
   fetchSnapDetailsV2,
   transformSnapToPackage,
   parseSnapYamlPlugs,
   discoverSnaps,
   CATEGORY_MAPPING,
   ARCH_MAPPING,
+  PREFIX_CHARS,
+  VOWELS,
   type SnapV2Response,
 } from './snap-scraper';
 
 describe('Snap Scraper Utils', () => {
-  describe('fetchSnaps', () => {
-    test('should fetch and return snaps by category', async () => {
-      const mockResponse = {
-        results: [
-          { name: 'vlc', 'snap-id': 'id1' },
-          { name: 'firefox', 'snap-id': 'id2' },
-        ],
-      };
-
-      const mockFetch = mock.fn(async (url: string) => {
-        assert.ok(url.includes('category=games'));
-        return {
-          ok: true,
-          json: async () => mockResponse,
-        };
-      }) as any;
-
-      const results = await fetchSnaps('games', undefined, mockFetch);
-
-      assert.equal(results.length, 2);
-      assert.equal(results[0].name, 'vlc');
-      assert.equal(results[1].name, 'firefox');
-      assert.equal(mockFetch.mock.calls.length, 1);
-    });
-
-    test('should respect limit parameter', async () => {
-      const mockResponse = {
-        results: [
-          { name: 'vlc', 'snap-id': 'id1' },
-          { name: 'firefox', 'snap-id': 'id2' },
-          { name: 'chrome', 'snap-id': 'id3' },
-        ],
-      };
-
-      const mockFetch = mock.fn(async () => ({
-        ok: true,
-        json: async () => mockResponse,
-      })) as any;
-
-      const results = await fetchSnaps('productivity', 2, mockFetch);
-
-      assert.equal(results.length, 2);
-    });
-
-    test('should deduplicate snaps with same snap-id', async () => {
-      const mockResponse = {
-        results: [
-          { name: 'vlc', 'snap-id': 'id1' },
-          { name: 'vlc-duplicate', 'snap-id': 'id1' },
-        ],
-      };
-
-      const mockFetch = mock.fn(async () => ({
-        ok: true,
-        json: async () => mockResponse,
-      })) as any;
-
-      const results = await fetchSnaps('entertainment', undefined, mockFetch);
-
-      assert.equal(results.length, 1);
-      assert.equal(results[0].name, 'vlc');
-    });
-
-    test('should return empty array on 404', async () => {
-      const mockFetch = mock.fn(async () => ({
-        ok: false,
-        status: 404,
-      })) as any;
-
-      const results = await fetchSnaps('nonexistent-category', undefined, mockFetch);
-
-      assert.equal(results.length, 0);
-    });
-
-    test('should return empty array on 400', async () => {
-      const mockFetch = mock.fn(async () => ({
-        ok: false,
-        status: 400,
-      })) as any;
-
-      const results = await fetchSnaps('invalid-category', undefined, mockFetch);
-
-      assert.equal(results.length, 0);
-    });
-
-    test('should throw on other errors', async () => {
-      const mockFetch = mock.fn(async () => ({
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-      })) as any;
-
-      await assert.rejects(async () => await fetchSnaps('games', undefined, mockFetch), { message: /Failed to fetch snaps/ });
-    });
-  });
 
   describe('fetchSnapDetailsV2', () => {
     test('should fetch v2 snap details', async () => {
@@ -541,65 +447,116 @@ describe('Snap Scraper Utils', () => {
   });
 
   describe('discoverSnaps', () => {
-    test('should discover snaps across multiple categories', async () => {
-      let callCount = 0;
-      const mockFetch = mock.fn(async (url: string) => {
-        callCount++;
-        // Verify URL contains category parameter
-        assert.ok(url.includes('category='));
-
-        // Return different results for different categories
-        const results = callCount === 1 ? [{ name: 'snap1', 'snap-id': 'id1' }] : [{ name: 'snap2', 'snap-id': 'id2' }];
-
-        return {
-          ok: true,
-          json: async () => ({ results }),
-        };
-      }) as any;
-
-      const results = await discoverSnaps(10, mockFetch);
-
-      assert.ok(results.length > 0);
-      assert.ok(mockFetch.mock.calls.length > 1); // Should make multiple calls for different categories
-    });
-
-    test('should deduplicate across categories', async () => {
-      const mockFetch = mock.fn(async () => ({
-        ok: true,
-        json: async () => ({
-          results: [{ name: 'vlc', 'snap-id': 'same-id' }],
-        }),
-      })) as any;
-
-      const results = await discoverSnaps(5, mockFetch);
-
-      // All results have the same snap-id, so should only get 1 unique snap
-      assert.equal(results.length, 1);
-    });
-
-    test('should iterate through all categories from CATEGORY_MAPPING', async () => {
-      const categoriesUsed = new Set<string>();
+    test('should search using q= prefix parameter', async () => {
+      const queriesUsed: string[] = [];
       const mockFetch = mock.fn(async (url: string) => {
         const urlObj = new URL(url);
-        const category = urlObj.searchParams.get('category');
-        if (category) {
-          categoriesUsed.add(category);
-        }
-
+        assert.ok(urlObj.searchParams.has('q'), 'Should use q= parameter');
+        queriesUsed.push(urlObj.searchParams.get('q')!);
         return {
           ok: true,
           json: async () => ({ results: [] }),
         };
       }) as any;
 
-      await discoverSnaps(undefined, mockFetch);
+      await discoverSnaps(mockFetch);
 
-      const expectedCategories = Object.keys(CATEGORY_MAPPING);
-      assert.equal(categoriesUsed.size, expectedCategories.length);
+      // Should search for each character in PREFIX_CHARS
+      for (const char of PREFIX_CHARS) {
+        assert.ok(queriesUsed.includes(char), `Should have searched for prefix "${char}"`);
+      }
+    });
 
-      expectedCategories.forEach((cat) => {
-        assert.ok(categoriesUsed.has(cat), `Category ${cat} should be used`);
-      });
+    test('should recurse using vowels after a consonant when 100 results are returned', async () => {
+      const queriesUsed: string[] = [];
+      const fullPage = Array.from({ length: 100 }, (_, i) => ({ name: `snap-${i}`, 'snap-id': `id-${i}` }));
+
+      const mockFetch = mock.fn(async (url: string) => {
+        const urlObj = new URL(url);
+        const q = urlObj.searchParams.get('q')!;
+        queriesUsed.push(q);
+        // Return full page for consonant 't', empty for everything else
+        const results = q === 't' ? fullPage : [];
+        return {
+          ok: true,
+          json: async () => ({ results }),
+        };
+      }) as any;
+
+      await discoverSnaps(mockFetch);
+
+      // 't' is a consonant so second chars should only be vowels
+      for (const c of Array.from(VOWELS)) {
+        assert.ok(queriesUsed.includes(`t${c}`), `Should recurse into "t${c}" (vowel after consonant)`);
+      }
+      // Should NOT use a consonant as the second char after a consonant
+      assert.ok(!queriesUsed.includes('tb'), 'Should not recurse into "tb" (consonant after consonant)');
+      assert.ok(!queriesUsed.includes('tt'), 'Should not recurse into "tt" (consonant after consonant)');
+    });
+
+    test('should recurse using consonants after a vowel when 100 results are returned', async () => {
+      const queriesUsed: string[] = [];
+      const fullPage = Array.from({ length: 100 }, (_, i) => ({ name: `snap-${i}`, 'snap-id': `id-${i}` }));
+
+      const mockFetch = mock.fn(async (url: string) => {
+        const urlObj = new URL(url);
+        const q = urlObj.searchParams.get('q')!;
+        queriesUsed.push(q);
+        // Return full page for vowel 'a', empty for everything else
+        const results = q === 'a' ? fullPage : [];
+        return {
+          ok: true,
+          json: async () => ({ results }),
+        };
+      }) as any;
+
+      await discoverSnaps(mockFetch);
+
+      // 'a' is a vowel so second chars should only be non-vowels
+      assert.ok(queriesUsed.includes('ab'), 'Should recurse into "ab" (consonant after vowel)');
+      assert.ok(queriesUsed.includes('at'), 'Should recurse into "at" (consonant after vowel)');
+      // Should NOT use a vowel as the second char after a vowel
+      assert.ok(!queriesUsed.includes('aa'), 'Should not recurse into "aa" (vowel after vowel)');
+      assert.ok(!queriesUsed.includes('ae'), 'Should not recurse into "ae" (vowel after vowel)');
+    });
+
+    test('should not recurse deeper than 2 characters', async () => {
+      const queriesUsed: string[] = [];
+      const fullPage = Array.from({ length: 100 }, (_, i) => ({ name: `snap-${i}`, 'snap-id': `id-${i}` }));
+
+      const mockFetch = mock.fn(async (url: string) => {
+        const urlObj = new URL(url);
+        const q = urlObj.searchParams.get('q')!;
+        queriesUsed.push(q);
+        // Always return a full page to see if recursion goes beyond 2 chars
+        return {
+          ok: true,
+          json: async () => ({ results: fullPage }),
+        };
+      }) as any;
+
+      await discoverSnaps(mockFetch);
+
+      const maxPrefixLength = Math.max(...queriesUsed.map((q) => q.length));
+      assert.equal(maxPrefixLength, 2, 'Should not recurse beyond 2-character prefixes');
+    });
+
+    test('should not recurse when fewer than 100 results are returned', async () => {
+      const queriesUsed: string[] = [];
+
+      const mockFetch = mock.fn(async (url: string) => {
+        const urlObj = new URL(url);
+        queriesUsed.push(urlObj.searchParams.get('q')!);
+        return {
+          ok: true,
+          json: async () => ({ results: [{ name: 'snap1', 'snap-id': 'id1' }] }),
+        };
+      }) as any;
+
+      await discoverSnaps(mockFetch);
+
+      // Only the initial PREFIX_CHARS queries should have been made — no recursion
+      assert.equal(queriesUsed.length, PREFIX_CHARS.length);
     });
   });
 

@@ -207,15 +207,21 @@ export async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function fetchSnaps(category = '', limit?: number, fetchFn = fetch): Promise<SnapSearchResult[]> {
-  const allSnaps: SnapSearchResult[] = [];
-  const seenIds = new Set<string>();
+export const PREFIX_CHARS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+export const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
+export const CONSONANTS = PREFIX_CHARS.filter((c) => !VOWELS.has(c));
+const MAX_RESULTS_PER_PAGE = 100;
 
+function secondCharsFor(firstChar: string): string[] {
+  return VOWELS.has(firstChar) ? CONSONANTS : Array.from(VOWELS);
+}
+
+export async function searchSnaps(prefix: string, fetchFn = fetch): Promise<string[]> {
+  let snaps: string[] = [];
   const url = new URL('https://api.snapcraft.io/v2/snaps/find');
-  if (category) {
-    url.searchParams.set('category', category);
-  }
+  url.searchParams.set('q', prefix);
 
+  console.log(`Searching for snaps with prefix "${prefix}"...`);
   const response = await fetchFn(url.toString(), {
     headers: {
       'User-Agent': USER_AGENT,
@@ -224,59 +230,43 @@ export async function fetchSnaps(category = '', limit?: number, fetchFn = fetch)
   });
 
   if (!response.ok) {
-    if (response.status === 429) {
+    if (response.status === 429 || response.status === 503 || response.status === 504) {
       await sleep(5000);
-      return await fetchSnaps(category, limit, fetchFn);
+      return searchSnaps(prefix, fetchFn);
     }
     if (response.status === 400 || response.status === 404) {
-      return [];
+      return snaps;
     }
-    throw new Error(`Failed to fetch snaps: ${response.statusText}`);
+    throw new Error(`Failed to discover snaps for prefix "${prefix}": ${response.statusText}`);
   }
 
   const data = (await response.json()) as { results: SnapSearchResult[] };
+  const results = data.results || [];
 
-  if (!data.results || data.results.length === 0) {
-    return [];
-  }
+  snaps = results.map((snap) => snap.name);
 
-  for (const snap of data.results) {
-    if (!seenIds.has(snap['snap-id'])) {
-      seenIds.add(snap['snap-id']);
-      allSnaps.push(snap);
-
-      if (limit && allSnaps.length >= limit) {
-        break;
-      }
+  // If we received the maximum results the API returns and we're still on a
+  // single-character prefix, expand to two-character prefixes using the
+  // complementary character class (vowels after consonants, consonants after vowels).
+  if (results.length >= MAX_RESULTS_PER_PAGE && prefix.length === 1) {
+    for (const char of secondCharsFor(prefix)) {
+      await sleep(DELAY_BETWEEN_REQUESTS);
+      snaps = snaps.concat(await searchSnaps(prefix + char, fetchFn));
     }
   }
 
-  return allSnaps;
+  return snaps;
 }
 
-export async function discoverSnaps(limit?: number, fetchFn = fetch): Promise<SnapSearchResult[]> {
-  const allSnaps: SnapSearchResult[] = [];
-  const seenIds = new Set<string>();
+export async function discoverSnaps(fetchFn = fetch): Promise<string[]> {
+  let allSnaps: string[] = [];
 
-  const categories = Object.keys(CATEGORY_MAPPING);
-
-  for (const category of categories) {
-    if (limit && allSnaps.length >= limit) {
-      break;
-    }
-
-    const snaps = await fetchSnaps(category, limit ? limit - allSnaps.length : undefined, fetchFn);
+  for (const char of PREFIX_CHARS) {
+    allSnaps = allSnaps.concat(await searchSnaps(char, fetchFn));
     await sleep(DELAY_BETWEEN_REQUESTS);
-
-    for (const snap of snaps) {
-      if (!seenIds.has(snap['snap-id'])) {
-        seenIds.add(snap['snap-id']);
-        allSnaps.push(snap);
-      }
-    }
   }
 
-  return allSnaps;
+  return [...new Set(allSnaps)];
 }
 
 // eslint-disable-next-line max-len
@@ -292,7 +282,7 @@ export async function fetchSnapDetailsV2(snapName: string, fetchFn = fetch): Pro
   });
 
   if (!response.ok) {
-    if (response.status === 429) {
+    if (response.status === 429 || response.status === 503 || response.status === 504) {
       await sleep(5000);
       return await fetchSnapDetailsV2(snapName, fetchFn);
     }
