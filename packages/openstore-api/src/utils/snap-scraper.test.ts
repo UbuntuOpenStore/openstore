@@ -15,7 +15,6 @@ import {
 } from './snap-scraper';
 
 describe('Snap Scraper Utils', () => {
-
   describe('fetchSnapDetailsV2', () => {
     test('should fetch v2 snap details', async () => {
       const mockV2Data: SnapV2Response = {

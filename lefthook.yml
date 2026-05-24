@@ -1,9 +1,13 @@
 pre-commit:
   jobs:
     - name: format
-      glob: "packages/openstore-api/**/*.{ts,js,json}|packages/click-parser/**/*.{ts,js,json}"
+      glob:
+        - "packages/openstore-api/**/*.{ts,js,json}"
+        - "packages/click-parser/**/*.{ts,js,json}"
       run: npx oxfmt --write {staged_files}
       stage_fixed: true
     - name: lint
-      glob: "packages/openstore-api/**/*.{ts,js}|packages/click-parser/**/*.{ts,js}"
+      glob:
+        - "packages/openstore-api/**/*.{ts,js}"
+        - "packages/click-parser/**/*.{ts,js}"
       run: npx oxlint {staged_files}

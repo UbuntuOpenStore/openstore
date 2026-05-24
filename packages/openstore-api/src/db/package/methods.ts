@@ -257,7 +257,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
           }
         }
 
-        await Promise.all(toDelete.map((filename) => fs.unlink(`${config.screenshot_dir}/${filename}`).catch(() => { })));
+        await Promise.all(toDelete.map((filename) => fs.unlink(`${config.screenshot_dir}/${filename}`).catch(() => {})));
 
         // Download only URLs not already present by hash
         const urlsToDownload = incomingUrls.filter((url) => !keptScreenshots.some((f) => f.includes(`-screenshot-${urlHashFor(url)}`)));
@@ -741,9 +741,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         version_changelogs: fullChangelog
           ? (this.version_changelogs || []).slice().sort((a, b) => -1 * compareVersions(a.version, b.version))
           : (this.version_changelogs || [])
-            .slice()
-            .sort((a, b) => -1 * compareVersions(a.version, b.version))
-            .slice(0, 5),
+              .slice()
+              .sort((a, b) => -1 * compareVersions(a.version, b.version))
+              .slice(0, 5),
         channels: this.channels || [DEFAULT_CHANNEL],
         channel_architectures: this.channel_architectures || [],
         device_compatibilities: this.device_compatibilities || [],
@@ -797,10 +797,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         source_store: this.source_store,
         snap_data: this.snap_data
           ? {
-            channels: this.snap_data.channels,
-            confinement: this.snap_data.confinement,
-            base: this.snap_data.base,
-          }
+              channels: this.snap_data.channels,
+              confinement: this.snap_data.confinement,
+              base: this.snap_data.base,
+            }
           : undefined,
 
         // Deprecated, remove in the next major version
@@ -943,7 +943,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     if (this.banner) {
       try {
         await fs.unlink(`${config.banner_dir}/${this.banner}`);
-      } catch (err) {
+      } catch {
         // Ignore errors if file doesn't exist
       }
     }

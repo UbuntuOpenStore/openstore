@@ -14,9 +14,7 @@ async function syncSnapPackages(options: { search?: string; force?: boolean } = 
   let totalErrors = 0;
 
   try {
-    const snaps = options.search
-      ? await searchSnaps(options.search)
-      : await discoverSnaps();
+    const snaps = options.search ? await searchSnaps(options.search) : await discoverSnaps();
     console.log(`Found ${snaps.length} snaps to process`);
 
     for (const snapName of snaps) {
