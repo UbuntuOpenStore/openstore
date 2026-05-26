@@ -243,7 +243,7 @@ function secondCharsFor(firstChar: string): string[] {
   return VOWELS.has(firstChar) ? CONSONANTS : Array.from(VOWELS);
 }
 
-export async function searchSnaps(prefix: string, fetchFn = fetch): Promise<string[]> {
+export async function searchSnaps(prefix: string, fetchFn = fetch, sleepFn = sleep): Promise<string[]> {
   let snaps: string[] = [];
   const url = new URL('https://api.snapcraft.io/v2/snaps/find');
   url.searchParams.set('q', prefix);
@@ -258,8 +258,8 @@ export async function searchSnaps(prefix: string, fetchFn = fetch): Promise<stri
 
   if (!response.ok) {
     if (response.status === 429 || response.status === 503 || response.status === 504) {
-      await sleep(5000);
-      return searchSnaps(prefix, fetchFn);
+      await sleepFn(5000);
+      return searchSnaps(prefix, fetchFn, sleepFn);
     }
     if (response.status === 400 || response.status === 404) {
       return snaps;
@@ -277,20 +277,20 @@ export async function searchSnaps(prefix: string, fetchFn = fetch): Promise<stri
   // complementary character class (vowels after consonants, consonants after vowels).
   if (results.length >= MAX_RESULTS_PER_PAGE && prefix.length === 1) {
     for (const char of secondCharsFor(prefix)) {
-      await sleep(DELAY_BETWEEN_REQUESTS);
-      snaps = snaps.concat(await searchSnaps(prefix + char, fetchFn));
+      await sleepFn(DELAY_BETWEEN_REQUESTS);
+      snaps = snaps.concat(await searchSnaps(prefix + char, fetchFn, sleepFn));
     }
   }
 
   return snaps;
 }
 
-export async function discoverSnaps(fetchFn = fetch): Promise<string[]> {
+export async function discoverSnaps(fetchFn = fetch, sleepFn = sleep): Promise<string[]> {
   let allSnaps: string[] = [];
 
   for (const char of PREFIX_CHARS) {
-    allSnaps = allSnaps.concat(await searchSnaps(char, fetchFn));
-    await sleep(DELAY_BETWEEN_REQUESTS);
+    allSnaps = allSnaps.concat(await searchSnaps(char, fetchFn, sleepFn));
+    await sleepFn(DELAY_BETWEEN_REQUESTS);
   }
 
   return [...new Set(allSnaps)];

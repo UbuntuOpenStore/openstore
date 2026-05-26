@@ -458,7 +458,7 @@ describe('Snap Scraper Utils', () => {
         };
       }) as any;
 
-      await discoverSnaps(mockFetch);
+      await discoverSnaps(mockFetch, async () => {});
 
       // Should search for each character in PREFIX_CHARS
       for (const char of PREFIX_CHARS) {
@@ -482,7 +482,7 @@ describe('Snap Scraper Utils', () => {
         };
       }) as any;
 
-      await discoverSnaps(mockFetch);
+      await discoverSnaps(mockFetch, async () => {});
 
       // 't' is a consonant so second chars should only be vowels
       for (const c of Array.from(VOWELS)) {
@@ -509,7 +509,7 @@ describe('Snap Scraper Utils', () => {
         };
       }) as any;
 
-      await discoverSnaps(mockFetch);
+      await discoverSnaps(mockFetch, async () => {});
 
       // 'a' is a vowel so second chars should only be non-vowels
       assert.ok(queriesUsed.includes('ab'), 'Should recurse into "ab" (consonant after vowel)');
@@ -534,7 +534,7 @@ describe('Snap Scraper Utils', () => {
         };
       }) as any;
 
-      await discoverSnaps(mockFetch);
+      await discoverSnaps(mockFetch, async () => {});
 
       const maxPrefixLength = Math.max(...queriesUsed.map((q) => q.length));
       assert.equal(maxPrefixLength, 2, 'Should not recurse beyond 2-character prefixes');
@@ -552,7 +552,7 @@ describe('Snap Scraper Utils', () => {
         };
       }) as any;
 
-      await discoverSnaps(mockFetch);
+      await discoverSnaps(mockFetch, async () => {});
 
       // Only the initial PREFIX_CHARS queries should have been made — no recursion
       assert.equal(queriesUsed.length, PREFIX_CHARS.length);
