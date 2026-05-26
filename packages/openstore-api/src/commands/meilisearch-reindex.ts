@@ -1,20 +1,18 @@
 import 'db'; // Make sure the database connection gets setup
 import { Package } from '../db/package';
 import { PackageSearch as MeilisearchPackageSearch } from '../db/package/search-meilisearch';
+import type { HydratedPackage } from '../db/package/types';
 import { recalculatePackageRatings } from '../db/rating_count/utils';
 
 const meilisearchSearch = new MeilisearchPackageSearch();
 
 async function reindex() {
   try {
-    console.log('Fetching packages from MongoDB...');
-    const packages = await Package.find({ published: true }).exec();
-    console.log(`Found ${packages.length} packages to index`);
+    const filter = { published: true };
+    const BATCH_SIZE = 100;
 
-    console.log('Recalculating package ratings...');
-    for (const pkg of packages) {
-      await recalculatePackageRatings(pkg._id);
-    }
+    const totalPackages = await Package.countDocuments(filter);
+    console.log(`Found ${totalPackages} packages to index`);
 
     console.log('Reinitializing Meilisearch index...');
     await meilisearchSearch.removeIndex().catch(() => {
@@ -22,12 +20,33 @@ async function reindex() {
     });
     await meilisearchSearch.createIndex();
 
-    console.log('Indexing packages in batches...');
-    const BATCH_SIZE = 100;
-    for (let i = 0; i < packages.length; i += BATCH_SIZE) {
-      const batch = packages.slice(i, i + BATCH_SIZE);
+    console.log('Recalculating ratings and indexing packages in batches...');
+    const cursor = Package.find(filter).cursor({ batchSize: BATCH_SIZE });
+    const batch: HydratedPackage[] = [];
+    let indexedCount = 0;
+    let batchNumber = 0;
+    const totalBatches = Math.ceil(totalPackages / BATCH_SIZE);
+
+    for await (const pkg of cursor) {
+      await recalculatePackageRatings(pkg._id);
+      batch.push(pkg);
+
+      if (batch.length < BATCH_SIZE) {
+        continue;
+      }
+
       await meilisearchSearch.bulk(batch);
-      console.log(`Indexed batch ${i / BATCH_SIZE + 1} of ${Math.ceil(packages.length / BATCH_SIZE)}`);
+      indexedCount += batch.length;
+      batchNumber += 1;
+      console.log(`Indexed batch ${batchNumber} of ${totalBatches} (${indexedCount}/${totalPackages})`);
+      batch.length = 0;
+    }
+
+    if (batch.length > 0) {
+      await meilisearchSearch.bulk(batch);
+      indexedCount += batch.length;
+      batchNumber += 1;
+      console.log(`Indexed batch ${batchNumber} of ${totalBatches} (${indexedCount}/${totalPackages})`);
     }
 
     console.log('Reindexing complete!');
