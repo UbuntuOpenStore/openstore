@@ -147,6 +147,7 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
 
             <div>
               <p>{file.name}</p>
+              {file.progress > 0 && !file.success && !file.error && <p>{file.progress}%</p>}
               {file.error && <p>{file.error}</p>}
             </div>
           </div>
