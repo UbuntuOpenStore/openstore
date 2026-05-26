@@ -7,7 +7,16 @@ import { type App } from 'supertest/types';
 
 import * as api from '.';
 import { Package } from '../db/package/model';
-import { Architecture, Channel, ChannelArchitecture, DEFAULT_CHANNEL, PackageType, SourceStore } from '../db/package/types';
+import {
+  Architecture,
+  Channel,
+  ChannelArchitecture,
+  DEFAULT_CHANNEL,
+  PackageType,
+  SnapChannel,
+  SnapConfinement,
+  SourceStore,
+} from '../db/package/types';
 import factory, { type TestPackage } from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { config } from '../utils/config';
@@ -302,6 +311,7 @@ describe('Apps API', () => {
         category: 'Utilities',
         package_type: PackageType.SNAP,
         source_store: SourceStore.SNAPCRAFT,
+        snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
       });
 
       await factory.package({
@@ -312,6 +322,11 @@ describe('Apps API', () => {
         category: 'Entertainment',
         package_type: PackageType.SNAP,
         source_store: SourceStore.SNAPCRAFT,
+        snap_data: {
+          channels: [SnapChannel.STABLE, SnapChannel.BETA],
+          confinement: SnapConfinement.STRICT,
+          base: 'core22',
+        },
       });
 
       const res = await request(app).get(`${route}?package_type=snap`).expect(200);
@@ -324,6 +339,36 @@ describe('Apps API', () => {
       }
     });
 
+    test('excludes snaps without a stable channel from listing', async () => {
+      await factory.package({
+        id: 'snap.stable-only',
+        name: 'Stable Snap',
+        author: 'Stable Publisher',
+        published: true,
+        category: 'Utilities',
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
+      });
+
+      await factory.package({
+        id: 'snap.beta-only',
+        name: 'Beta Snap',
+        author: 'Beta Publisher',
+        published: true,
+        category: 'Utilities',
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        snap_data: { channels: [SnapChannel.BETA], confinement: SnapConfinement.STRICT, base: 'core22' },
+      });
+
+      const res = await request(app).get(`${route}?package_type=snap`).expect(200);
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.packages.length, 1);
+      assert.equal(res.body.data.count, 1);
+      assert.equal(res.body.data.packages[0].id, 'snap.stable-only');
+    });
+
     test('filters by multiple package_types', async () => {
       await factory.package({
         id: 'snap.firefox',
@@ -333,6 +378,7 @@ describe('Apps API', () => {
         category: 'Utilities',
         package_type: PackageType.SNAP,
         source_store: SourceStore.SNAPCRAFT,
+        snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
       });
 
       const res = await request(app).get(`${route}?package_type=click,snap`).expect(200);

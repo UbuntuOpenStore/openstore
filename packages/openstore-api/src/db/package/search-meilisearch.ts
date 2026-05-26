@@ -2,7 +2,7 @@ import { MeiliSearch, type SearchParams } from 'meilisearch';
 
 import { config, logger } from '../../utils';
 import type { PackageSearchInterface } from './search-interface';
-import { type HydratedPackage, type IPackage, type PackageRequestFilters } from './types';
+import { PackageType, type HydratedPackage, type IPackage, type PackageRequestFilters } from './types';
 
 // Properties to index for search
 const PROPERTIES: (keyof IPackage)[] = [
@@ -134,6 +134,9 @@ export class PackageSearch implements PackageSearchInterface {
 
     if (packageTypes && packageTypes.length > 0) {
       filters.push(`package_type IN ["${packageTypes.join('","')}"]`);
+      if (packageTypes.includes(PackageType.SNAP)) {
+        filters.push(`package_type != snap OR snap_data_channels = "stable"`);
+      }
     }
 
     if (ids && ids.length > 0) {

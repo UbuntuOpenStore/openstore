@@ -238,6 +238,10 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       query.package_type = {
         $in: packageTypes,
       };
+
+      if (packageTypes.includes(PackageType.SNAP)) {
+        query.$or = [{ package_type: { $ne: PackageType.SNAP } }, { 'snap_data.channels': SnapChannel.STABLE }];
+      }
     }
 
     if (ids && ids.length > 0) {
@@ -302,9 +306,6 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     if (published !== undefined) {
       query.published = published;
     }
-
-    // Only include snaps that have a stable channel
-    query.$or = [{ package_type: { $ne: PackageType.SNAP } }, { 'snap_data.channels': SnapChannel.STABLE }];
 
     return query;
   };
