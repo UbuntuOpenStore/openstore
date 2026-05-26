@@ -52,7 +52,8 @@ export class PackageSearch implements PackageSearchInterface {
   }
 
   convert(item: HydratedPackage): Record<string, any> {
-    const doc: Partial<IPackage> & { search_name?: string; originalId?: string; rating_bucket?: number } = {};
+    const doc: Partial<IPackage> & { search_name?: string; originalId?: string; rating_bucket?: number; snap_data_channels?: string[] } =
+      {};
 
     // Store the original ID for reference
     doc.originalId = item.id;
@@ -68,6 +69,7 @@ export class PackageSearch implements PackageSearchInterface {
     }
 
     doc.search_name = item.name;
+    doc.snap_data_channels = item.snap_data?.channels ?? [];
     doc.category = doc.category ? doc.category.replace(/&/g, '_').replace(/ /g, '_').toLowerCase() : '';
     doc.nsfw = !!doc.nsfw; // Force a boolean
 
@@ -166,6 +168,9 @@ export class PackageSearch implements PackageSearchInterface {
       filters.push(`nsfw = ${String(nsfw.includes(true))}`);
     }
 
+    // Only include snaps that have a stable channel
+    filters.push(`package_type != snap OR snap_data_channels = "stable"`);
+
     return filters;
   }
 
@@ -254,6 +259,7 @@ export class PackageSearch implements PackageSearchInterface {
         'channel_architectures',
         'device_compatibilities',
         'package_type',
+        'snap_data_channels',
       ],
       sortableAttributes: ['name', 'updated_date', 'published_date', 'calculated_rating', 'rating_bucket'],
       rankingRules: ['words', 'typo', 'proximity', 'sort', 'attribute', 'exactness'],

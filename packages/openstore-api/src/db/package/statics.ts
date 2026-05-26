@@ -23,6 +23,7 @@ import {
   type HydratedPackage,
   type AppType,
   PackageType,
+  SnapChannel,
 } from './types';
 
 export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPackageMethods>) {
@@ -301,6 +302,9 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     if (published !== undefined) {
       query.published = published;
     }
+
+    // Only include snaps that have a stable channel
+    query.$or = [{ package_type: { $ne: PackageType.SNAP } }, { 'snap_data.channels': SnapChannel.STABLE }];
 
     return query;
   };
