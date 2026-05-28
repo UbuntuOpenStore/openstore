@@ -7,28 +7,39 @@ import { Package } from '../db/package';
 import { type IPackage } from '../db/package/types';
 
 const query: FilterQuery<IPackage> = {};
-if (process.argv[2]) {
-  query.id = process.argv[2];
+if (process.argv[3]) {
+  query.id = process.argv[3];
 }
 
-Package.find(query)
-  .then(async (pkgs) => {
-    const pLimit = await import('p-limit');
-    const limit = pLimit.default(10);
+const CONCURRENCY = 10;
 
-    return await Promise.all(
-      pkgs.map((pkg) => {
-        return limit(async () => {
-          console.log(`processing ${pkg.id as string}`);
+async function refreshData() {
+  const cursor = Package.find(query).cursor({ batchSize: 100 });
+  const activeTasks = new Set<Promise<void>>();
 
-          await pkg.updateFromBody({ screenshots: pkg.screenshots });
-          pkg.updateCalculatedProperties();
+  for await (const pkg of cursor) {
+    const task = (async () => {
+      console.log(`processing ${pkg.id as string}`);
 
-          return await pkg.save();
-        });
-      }),
-    );
-  })
+      await pkg.updateFromBody({ screenshots: pkg.screenshots });
+      pkg.updateCalculatedProperties();
+
+      await pkg.save();
+    })();
+
+    activeTasks.add(task);
+
+    if (activeTasks.size >= CONCURRENCY) {
+      console.log(`Processing batch of ${activeTasks.size} packages...`);
+      await Promise.all(activeTasks);
+      activeTasks.clear();
+    }
+  }
+
+  await Promise.all(activeTasks);
+}
+
+refreshData()
   .then(() => {
     console.log('done');
     process.exit(0);
