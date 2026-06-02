@@ -79,6 +79,26 @@ describe('Users API', () => {
     test('returns 401 when not authenticated', async () => {
       await request(app).get(route).expect(401);
     });
+
+    test('excludes disabled users from the list for non-admins', async () => {
+      const disabledUser = await factory.user({ username: 'disabled-user', role: 'disabled' });
+
+      const res = await request(app).get(`${route}?apikey=${regularUser.apikey}`).expect(200);
+
+      assert.ok(res.body.success);
+      const found = res.body.data.find((u: any) => u.username === disabledUser.username);
+      assert.equal(found, undefined);
+    });
+
+    test('includes disabled users in the list for admins', async () => {
+      const disabledUser = await factory.user({ username: 'disabled-user', role: 'disabled' });
+
+      const res = await request(app).get(`${route}?apikey=${adminUser.apikey}`).expect(200);
+
+      assert.ok(res.body.success);
+      const found = res.body.data.find((u: any) => u.username === disabledUser.username);
+      assert.ok(found);
+    });
   });
 
   describe('GET /me', () => {
@@ -116,6 +136,15 @@ describe('Users API', () => {
       const res = await request(app).get(`${route}invalid-objectid`).expect(404);
 
       assert.ok(!res.body.success);
+      assert.equal(res.body.message, USER_NOT_FOUND);
+    });
+
+    test('returns 404 for disabled users', async () => {
+      const disabledUser = await factory.user({ username: 'disabled-user', role: 'disabled' });
+
+      const res = await request(app).get(`${route}${disabledUser._id}`).expect(404);
+
+      assert.equal(res.body.success, false);
       assert.equal(res.body.message, USER_NOT_FOUND);
     });
   });

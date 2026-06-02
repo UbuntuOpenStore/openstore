@@ -44,10 +44,12 @@ router.get(
   '/',
   authenticate,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    const users = await User.find({});
+    const isAdmin = req.user?.role === 'admin';
+    const filter = isAdmin ? {} : { role: { $ne: 'disabled' } };
+    const users = await User.find(filter);
     success(
       res,
-      users.map((user) => user.serialize(req.user?.role === 'admin', false, req.user?.role === 'admin')),
+      users.map((user) => user.serialize(isAdmin, false, isAdmin)),
     );
   }, 'Could not fetch user list at this time'),
 );
@@ -101,7 +103,7 @@ router.get(
     }
 
     const user = await User.findById(req.params.id);
-    if (!user) {
+    if (!user || user.role === 'disabled') {
       throw new NotFoundError(USER_NOT_FOUND);
     }
 
