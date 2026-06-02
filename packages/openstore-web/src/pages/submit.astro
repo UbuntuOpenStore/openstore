@@ -22,13 +22,18 @@ await initializeI18N(Astro.currentLocale);
     <ul class="list-disc ml-6">
       <li>{t('Apps not requiring manual review can be submitted by logging in with the "Log In" link above.')}</li>
       <li>{t("You are only allowed to publish apps that you have permission to distribute.")}</li>
-      <li>{"(You are not allowed to impersonate someone else or another app.)"}</li>
+      <li>{t("You are not allowed to impersonate someone else or another app.")}</li>
       <li>
         {
           t(
-            "Your app can be pulled without warning at the discretion of our admins. Where possible, we will contact you regarding any such actions."
+            "Your app can be pulled without warning at the discretion of our admins. Where possible, we will contact you regarding any such actions.",
           )
         }
+      </li>
+      <li>
+        <a href="https://ubports.com/code-of-conduct"
+          >{t("Users using the OpenStore are expected to follow the UBports Code of Conduct.")}</a
+        >
       </li>
       <li>
         <a href="/telegram">{t("Apps requiring manual review must be submitted by contacting an admin in our telegram group.")}</a>
@@ -47,21 +52,21 @@ await initializeI18N(Astro.currentLocale);
       <li>
         {
           t(
-            'Give a short explanation why you can\'t publish the app without extra privileges. No need to go into details, a one liner like "needs to run a daemon in the background" will do. List all the special features you have, if there are more.'
+            'Give a short explanation why you can\'t publish the app without extra privileges. No need to go into details, a one liner like "needs to run a daemon in the background" will do. List all the special features you have, if there are more.',
           )
         }
       </li>
       <li>
         {
           t(
-            "If an application could be published without manual review if it wouldn't be for that one cool feature, publish a stripped down version! Not everyone will want to install apps with less confinement."
+            "If an application could be published without manual review if it wouldn't be for that one cool feature, publish a stripped down version! Not everyone will want to install apps with less confinement.",
           )
         }
       </li>
       <li>
         {
           t(
-            "Only open source applications allowed for manual review: As the applications might have arbitrary access to the device, every manually reviewed app will get a source code review."
+            "Only open source applications allowed for manual review: As the applications might have arbitrary access to the device, every manually reviewed app will get a source code review.",
           )
         }
       </li>
@@ -72,7 +77,7 @@ await initializeI18N(Astro.currentLocale);
     <p class="pl-6">
       {
         t(
-          "One of the main goals of the OpenStore is to provide a safe app store for people of all ages. To accomplish this goal we do not allow certain types of app to be published. Failure to follow the guidelines will result in your app being removed. Any account with serious infractions may be subject to termination. The OpenStore team thanks you for helping us promote a better environment for everyone."
+          "One of the main goals of the OpenStore is to provide a safe app store for people of all ages. To accomplish this goal we do not allow certain types of app to be published. Failure to follow the guidelines will result in your app being removed. Any account with serious infractions may be subject to termination. The OpenStore team thanks you for helping us promote a better environment for everyone.",
         )
       }
     </p>
@@ -85,7 +90,7 @@ await initializeI18N(Astro.currentLocale);
         <span>
           {
             t(
-              "Apps containing or promoting sexually explicit content are not allowed. This includes, but is not limited to, pornography and services promoting sexually explicit content."
+              "Apps containing or promoting sexually explicit content are not allowed. This includes, but is not limited to, pornography and services promoting sexually explicit content.",
             )
           }
         </span>
@@ -99,7 +104,7 @@ await initializeI18N(Astro.currentLocale);
         <span>
           {
             t(
-              "Apps containing or promoting gratuitous violence are not allowed. This includes, but is not limited to, violence, terrorism, bomb/weapon making, self harm, and grotesque imagery."
+              "Apps containing or promoting gratuitous violence are not allowed. This includes, but is not limited to, violence, terrorism, bomb/weapon making, self harm, and grotesque imagery.",
             )
           }
         </span>
@@ -113,7 +118,7 @@ await initializeI18N(Astro.currentLocale);
         <span>
           {
             t(
-              "Apps containing gambling involving real world money transactions are not allowed. This includes, but is not limited to, online casinos, betting, and lotteries."
+              "Apps containing gambling involving real world money transactions are not allowed. This includes, but is not limited to, online casinos, betting, and lotteries.",
             )
           }
         </span>
@@ -127,7 +132,7 @@ await initializeI18N(Astro.currentLocale);
         <span>
           {
             t(
-              "Apps that are found to be stealing the users data, trying to escalate their privileges without user consent, or executing malicious process are strictly prohibited."
+              "Apps that are found to be stealing the users data, trying to escalate their privileges without user consent, or executing malicious process are strictly prohibited.",
             )
           }
         </span>

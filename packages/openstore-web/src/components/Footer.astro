@@ -29,6 +29,7 @@ await initializeI18N(Astro.currentLocale);
       <div class="text-sm flex flex-col my-4 md:my-0">
         <a href="https://gitlab.com/theopenstore/openstore/-/issues" class="text-ubuntu-orange">{t("Report an Issue")}</a>
         <a href="/telegram" class="text-ubuntu-orange">{t("Chat with us on Telegram")}</a>
+        <a href="https://ubports.com/code-of-conduct" class="text-ubuntu-orange">{t("Code of Conduct")}</a>
         <a href="https://stats.uptimerobot.com/R6Z8mtJ8P" class="text-ubuntu-orange">{t("Site Status")}</a>
         <a href={getRelativeLocaleUrl(Astro.currentLocale, "/stats/")} class="text-ubuntu-orange">{t("Stats")}</a>
       </div>

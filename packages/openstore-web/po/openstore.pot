@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-06-01T20:00:38.550Z\n"
-"PO-Revision-Date: 2026-06-01T20:00:38.550Z\n"
+"POT-Creation-Date: 2026-06-02T19:58:50.728Z\n"
+"PO-Revision-Date: 2026-06-02T19:58:50.728Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -25,6 +25,9 @@ msgstr "Report an Issue"
 
 msgid "Chat with us on Telegram"
 msgstr "Chat with us on Telegram"
+
+msgid "Code of Conduct"
+msgstr "Code of Conduct"
 
 msgid "Site Status"
 msgstr "Site Status"
@@ -508,6 +511,9 @@ msgstr ""
 msgid "Submit your app"
 msgstr "Submit your app"
 
+msgid "UBports Code of Conduct"
+msgstr "UBports Code of Conduct"
+
 msgid "App Submission Tutorial"
 msgstr "App Submission Tutorial"
 
@@ -978,12 +984,22 @@ msgstr ""
 msgid "You are only allowed to publish apps that you have permission to distribute."
 msgstr "You are only allowed to publish apps that you have permission to distribute."
 
+msgid "You are not allowed to impersonate someone else or another app."
+msgstr "You are not allowed to impersonate someone else or another app."
+
 msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
+
+msgid ""
+"Users using the OpenStore are expected to follow the UBports Code of "
+"Conduct."
+msgstr ""
+"Users using the OpenStore are expected to follow the UBports Code of "
+"Conduct."
 
 msgid ""
 "Apps requiring manual review must be submitted by contacting an admin in "
