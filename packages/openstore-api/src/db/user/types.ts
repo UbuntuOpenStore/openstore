@@ -6,6 +6,7 @@ export interface IUser {
   language?: string;
   name?: string;
   role?: string;
+  disabled_reason?: string;
   ubuntu_id?: string;
   github_id?: string;
   gitlab_id?: string;
@@ -29,6 +30,7 @@ export type ProfileUpdateData = Pick<
   | 'description'
   | 'avatar'
   | 'role'
+  | 'disabled_reason'
 >;
 
 export interface UserSerializeOutput extends Omit<IUser, 'apikey'> {

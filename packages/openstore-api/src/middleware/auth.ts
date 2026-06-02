@@ -3,6 +3,7 @@ import passport from 'passport';
 
 import { type HydratedUser } from '../db/user';
 import { error } from '../utils';
+import { ACCOUNT_DISABLED } from '../utils/error-messages';
 
 export function userRole(req: Request, res: Response, next: NextFunction) {
   req.isAdminUser = req.isAuthenticated() && req.user && req.user.role === 'admin';
@@ -11,7 +12,8 @@ export function userRole(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated() && req.user && req.user.role !== 'disabled') {
     next();
   } else {
-    error(res, 'Your account has been disabled at this time', 403);
+    const reason = req.isAuthenticated() && req.user?.disabled_reason;
+    error(res, reason ? `${ACCOUNT_DISABLED}: ${reason}` : ACCOUNT_DISABLED, 403);
   }
 }
 

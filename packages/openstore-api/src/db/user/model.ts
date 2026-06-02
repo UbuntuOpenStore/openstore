@@ -3,6 +3,9 @@ import { Schema, model } from 'mongoose';
 import { ValidationError } from '../../exceptions';
 import { config } from '../../utils/config';
 import { sanitize } from '../../utils/sanitize';
+import { Package } from '../package';
+import { packageSearchInstance } from '../package/search-factory';
+import { Review } from '../review';
 import { type IUser, type IUserMethods, type UserModel, type ProfileUpdateData } from './types';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
@@ -11,6 +14,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   language: String,
   name: String,
   role: String,
+  disabled_reason: String,
   ubuntu_id: { type: String, index: true },
   github_id: String,
   gitlab_id: String,
@@ -67,9 +71,12 @@ userSchema.method('serialize', function (includeRole: boolean, includeApiKey: bo
 });
 
 userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAdmin: boolean) {
-  // Only admins can update the role
+  // Only admins can update the role and disabled_reason
   if (isAdmin && data.role !== undefined) {
     this.role = data.role;
+  }
+  if (isAdmin && data.disabled_reason !== undefined) {
+    this.disabled_reason = data.disabled_reason;
   }
 
   const allowedFields: Array<keyof ProfileUpdateData> = [
@@ -97,7 +104,7 @@ userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAd
         if (url.protocol !== 'https:') {
           throw new ValidationError(`${field} must use HTTPS protocol`);
         }
-      } catch (error) {
+      } catch {
         throw new ValidationError(`Invalid URL provided for ${field}`);
       }
     }
@@ -110,6 +117,16 @@ userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAd
   }
 
   await this.save();
+
+  if (isAdmin && data.role === 'disabled') {
+    const userPackages = await Package.find({ maintainer: this._id.toString(), published: true });
+
+    await Promise.all([
+      Package.updateMany({ maintainer: this._id.toString() }, { published: false }),
+      Review.updateMany({ user: this._id }, { redacted: true }),
+      ...userPackages.map((pkg) => packageSearchInstance.remove(pkg)),
+    ]);
+  }
 });
 
 export const User = model<IUser, UserModel>('User', userSchema);

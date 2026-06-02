@@ -285,4 +285,25 @@ describe('Reviews', () => {
       assert.equal(review?.rating, 'THUMBS_UP');
     });
   });
+
+  describe('disabled user', () => {
+    beforeEach(async () => {
+      user1.role = 'disabled';
+      await user1.save();
+    });
+
+    test('blocks creating a review for a disabled user', async () => {
+      const res = await request(app).post(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(403);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
+    });
+
+    test('blocks updating a review for a disabled user', async () => {
+      const res = await request(app).put(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(403);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
+    });
+  });
 });

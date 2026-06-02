@@ -7,8 +7,11 @@ import request from 'supertest';
 import { type App } from 'supertest/types';
 
 import * as api from '.';
+import { Package } from '../db/package';
+import { packageSearchInstance } from '../db/package/search-factory';
+import { Review } from '../db/review';
 import { User } from '../db/user';
-import factory, { type TestUser } from '../tests/factory';
+import factory, { type TestPackage, type TestUser } from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { USER_NOT_FOUND } from '../utils/error-messages';
 
@@ -18,6 +21,9 @@ describe('Users API', () => {
   let adminUser: TestUser;
   let regularUser: TestUser;
   let anotherUser: TestUser;
+
+  // TODO setup search for testing in CI
+  const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => {} : undefined) as any;
 
   before(async () => {
     await waitForMongoose();
@@ -258,6 +264,45 @@ describe('Users API', () => {
 
       assert.ok(!res.body.success);
       assert.equal(res.body.message, 'User not found');
+    });
+
+    test('unpublishes all apps and redacts all reviews when disabling a user', async (t) => {
+      const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+      let pkg: TestPackage;
+      [pkg] = await Promise.all([
+        factory.package({ maintainer: regularUser._id.toString(), published: true }),
+        factory.review({ user: regularUser._id, redacted: false }),
+      ]);
+
+      await request(app).put(`${route}${regularUser._id}?apikey=${adminUser.apikey}`).send({ role: 'disabled' }).expect(200);
+
+      const updatedPkg = await Package.findById(pkg._id);
+      assert.equal(updatedPkg?.published, false);
+
+      const reviews = await Review.find({ user: regularUser._id });
+      assert.ok(reviews.every((r) => r.redacted === true));
+
+      assert.equal(removeSpy.mock.callCount(), 1);
+    });
+
+    test('does not unpublish apps or redact reviews when updating a non-disabled role', async (t) => {
+      const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+      const [pkg] = await Promise.all([
+        factory.package({ maintainer: regularUser._id.toString(), published: true }),
+        factory.review({ user: regularUser._id, redacted: false }),
+      ]);
+
+      await request(app).put(`${route}${regularUser._id}?apikey=${adminUser.apikey}`).send({ role: 'trusted' }).expect(200);
+
+      const updatedPkg = await Package.findById(pkg._id);
+      assert.equal(updatedPkg?.published, true);
+
+      const reviews = await Review.find({ user: regularUser._id });
+      assert.ok(reviews.every((r) => r.redacted === false));
+
+      assert.equal(removeSpy.mock.callCount(), 0);
     });
   });
 });

@@ -133,6 +133,20 @@ describe('Manage', () => {
         assert.equal(findMock.mock.callCount(), 1);
       });
     });
+
+    describe('disabled user', () => {
+      beforeEach(async () => {
+        user.role = 'disabled';
+        await user.save();
+      });
+
+      test('blocks access for a disabled user', async () => {
+        const res = await request(app).get(route).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
+      });
+    });
   });
 
   describe('Manage GET id', () => {
@@ -205,6 +219,20 @@ describe('Manage', () => {
 
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
+      });
+    });
+
+    describe('disabled user', () => {
+      beforeEach(async () => {
+        user.role = 'disabled';
+        await user.save();
+      });
+
+      test('blocks access for a disabled user', async () => {
+        const res = await request(app).get(route).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
       });
     });
   });
@@ -472,6 +500,20 @@ describe('Manage', () => {
 
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
+      });
+    });
+
+    describe('disabled user', () => {
+      beforeEach(async () => {
+        user.role = 'disabled';
+        await user.save();
+      });
+
+      test('blocks access for a disabled user', async () => {
+        const res = await request(app).post(route).send({ id: 'app.dev', name: 'App Dev' }).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
       });
     });
   });
@@ -800,6 +842,20 @@ describe('Manage', () => {
         assert.equal(removeSpy.mock.callCount(), 2);
       });
     });
+
+    describe('disabled user', () => {
+      beforeEach(async () => {
+        user.role = 'disabled';
+        await user.save();
+      });
+
+      test('blocks access for a disabled user', async () => {
+        const res = await request(app).put(route).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
+      });
+    });
   });
 
   describe('Manage DELETE', () => {
@@ -865,6 +921,20 @@ describe('Manage', () => {
 
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
+      });
+    });
+
+    describe('disabled user', () => {
+      beforeEach(async () => {
+        user.role = 'disabled';
+        await user.save();
+      });
+
+      test('blocks access for a disabled user', async () => {
+        const res = await request(app).delete(route).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
       });
     });
   });
