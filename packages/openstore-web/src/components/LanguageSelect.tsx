@@ -8,9 +8,6 @@ const LanguageSelect = ({ currentLocale, currentPath }: { currentLocale: string 
   const code = localeSlugToCode(currentLocale);
   const currentLanguage = localesJson.find((locale) => locale.code === code);
   let path = removeLocaleFromPath(currentPath);
-  if (path.startsWith("/manage/")) {
-    path = "/";
-  }
 
   return (
     <DropdownMenu>

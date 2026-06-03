@@ -2,32 +2,33 @@ import type { AppManageData } from "@/lib/schema";
 import SvgHome from "../icons/Home";
 import Ratings from "../apps/Ratings";
 import ManageMenu from "./ManageMenu";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
-const ManageHeaders = ({ app, breadcrumb }: { app: AppManageData; breadcrumb: string }) => {
+const ManageHeaders = ({ app, breadcrumb, currentLocale }: { app: AppManageData; breadcrumb: string; currentLocale: string | undefined }) => {
   return (
     <>
       <section class="section flex justify-between items-center">
         <div class="flex">
-          <a href="/">
+          <a href={getRelativeLocaleUrl(currentLocale, "/")}>
             <SvgHome />
           </a>
 
           <div class="ml-1">
             /{" "}
-            <a href="/manage/" class="underline">
+            <a href={getRelativeLocaleUrl(currentLocale, "/manage/")} class="underline">
               Manage
             </a>
           </div>
           <div class="ml-1 text-ellipsis inline-block max-w-32 md:max-w-64 whitespace-nowrap overflow-hidden">
             /{" "}
-            <a href={`/manage/${app.id}/`} class="underline">
+            <a href={getRelativeLocaleUrl(currentLocale, `/manage/${app.id}/`)} class="underline">
               {app.name}
             </a>
           </div>
           <div class="ml-1">/ {breadcrumb}</div>
         </div>
 
-        <ManageMenu id={app.id} />
+        <ManageMenu id={app.id} currentLocale={currentLocale} />
       </section>
 
       <section class="section space-y-4">

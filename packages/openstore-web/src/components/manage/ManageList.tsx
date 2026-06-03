@@ -18,6 +18,7 @@ import TopRating from "../apps/TopRating";
 import Ratings from "../apps/Ratings";
 import SvgGrid from "../icons/Grid";
 import SvgList from "../icons/List";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
 const PAGE_SIZE = 32;
 const DEFAULT_SORT = "name";
@@ -26,6 +27,7 @@ type ManageListProps = {
   apikey: string;
   isAdmin: boolean;
   userId: string;
+  currentLocale: string | undefined;
 };
 
 type ViewMode = "grid" | "list";
@@ -41,7 +43,7 @@ const SORT_OPTIONS = [
   { value: "updated_date", label: "Oldest Update" },
 ];
 
-const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
+const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps) => {
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
   const urlPage = parseInt(hashParams.get("page") ?? "0");
 
@@ -200,7 +202,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
           </Button>
         </div>
 
-        <a href="/submit/" class="btn bg-ubuntu-orange text-white inline-block">
+        <a href={getRelativeLocaleUrl(currentLocale, "/submit/")} class="btn bg-ubuntu-orange text-white inline-block">
           Submit
         </a>
       </div>
@@ -220,7 +222,11 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
                   {viewMode === "grid" ? (
                     <div class="grid grid-cols-2 md:grid-cols-4">
                       {apps.map((app) => (
-                        <a href={`/manage/${app.id}/`} class="flex flex-row gap-4 max-w-xl mb-4 py-2 px-1 md:p-4" key={app.id}>
+                        <a
+                          href={getRelativeLocaleUrl(currentLocale, `/manage/${app.id}/`)}
+                          class="flex flex-row gap-4 max-w-xl mb-4 py-2 px-1 md:p-4"
+                          key={app.id}
+                        >
                           <img
                             class="rounded-2xl max-w-[64px] max-h-[64px]"
                             src={app.icon}
@@ -246,7 +252,7 @@ const ManageList = ({ apikey, isAdmin, userId }: ManageListProps) => {
                     <div class="space-y-2">
                       {apps.map((app) => (
                         <a
-                          href={`/manage/${app.id}/`}
+                          href={getRelativeLocaleUrl(currentLocale, `/manage/${app.id}/`)}
                           class="flex flex-col md:flex-row gap-4 md:items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                           key={app.id}
                         >

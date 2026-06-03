@@ -7,18 +7,19 @@ import { getUser, invalidateUserCache } from "@/lib/user";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import SvgExternalLink from "@/components/icons/ExternalLink";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
 export const prerender = false;
 
 const apikey = Astro.cookies.get("apikey")?.value;
 if (!apikey) {
-  return Astro.redirect("/login/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
 
 const user = await getUser(apikey, false);
 if (!user) {
   Astro.cookies.delete("apikey");
-  return Astro.redirect("/login/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
 
 // Invalidate the user cache in case the user will update their profile, the actual update occurs on the client instead of the server
@@ -37,8 +38,8 @@ await initializeI18N(Astro.currentLocale);
   <section class="section">
     <h1 class="text-4xl">{t("Profile")}</h1>
     <p class="py-4">
-      <a href={`/users/${user._id}/`} target="_blank" class="underline">{t("View public profile")}</a>
-      <a href={`/users/${user._id}/`} target="_blank">
+      <a href={getRelativeLocaleUrl(Astro.currentLocale, `/users/${user._id}/`)} target="_blank" class="underline">{t("View public profile")}</a>
+      <a href={getRelativeLocaleUrl(Astro.currentLocale, `/users/${user._id}/`)} target="_blank">
         <SvgExternalLink class="inline w-4 h-4" />
       </a>
     </p>

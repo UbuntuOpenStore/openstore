@@ -1,9 +1,10 @@
 import type { UserData } from "@/lib/schema";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
 type Props = {
   user: UserData;
-  currentLocale?: string;
+  currentLocale: string | undefined;
   messages: {
     profile: string;
     manageApps: string;
@@ -11,7 +12,7 @@ type Props = {
   };
 };
 
-export default function UserMenu({ user, messages }: Props) {
+export default function UserMenu({ user, currentLocale, messages }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,12 +34,12 @@ export default function UserMenu({ user, messages }: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="md:w-auto w-52">
         <DropdownMenuItem asChild>
-          <a href="/manage/profile/" className="w-full cursor-pointer">
+          <a href={getRelativeLocaleUrl(currentLocale, "/manage/profile/")} className="w-full cursor-pointer">
             {messages.profile}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href="/manage/" className="w-full cursor-pointer">
+          <a href={getRelativeLocaleUrl(currentLocale, "/manage/")} className="w-full cursor-pointer">
             {messages.manageApps}
           </a>
         </DropdownMenuItem>

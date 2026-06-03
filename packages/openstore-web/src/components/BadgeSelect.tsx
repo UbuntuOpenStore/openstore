@@ -23,7 +23,7 @@ const LANGUAGES = [
   { code: "sv", label: "Swedish" },
 ];
 
-const BadgeSelect = ({ appId, currentLocale }: { appId?: string; currentLocale?: string }) => {
+const BadgeSelect = ({ appId, currentLocale }: { appId?: string; currentLocale: string | undefined }) => {
   const code = localeSlugToCode(currentLocale);
   const defaultLanguage = LANGUAGES.find((lang) => lang.code === code);
   const [language, setLanguage] = useState(defaultLanguage?.code ?? "en_US");

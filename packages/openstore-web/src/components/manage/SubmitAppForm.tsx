@@ -34,7 +34,7 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
       if (response.ok) {
         setSuccess(true);
 
-        location.pathname = `/manage/${formData.get("id")}/`;
+       location.pathname = getRelativeLocaleUrl(currentLocale, `/manage/${formData.get("id")}/`);
       } else {
         const errorBody = await response.json();
         let message = "An unknown error has occurred";

@@ -4,7 +4,7 @@ import Loading from "../Loading";
 import { useManageApp } from "@/lib/use-manage-app";
 import RevisionForm from "./RevisionForm";
 
-const RevisionPage = ({ id }: { id: string }) => {
+const RevisionPage = ({ id, currentLocale }: { id: string; currentLocale: string | undefined }) => {
   const [app, loading, status] = useManageApp(id);
 
   if (loading) {
@@ -17,7 +17,7 @@ const RevisionPage = ({ id }: { id: string }) => {
 
   return (
     <>
-      <ManageHeader app={app} breadcrumb="Revision" />
+      <ManageHeader app={app} breadcrumb="Revision" currentLocale={currentLocale} />
 
       <div class="grow">
         <RevisionForm app={app} />

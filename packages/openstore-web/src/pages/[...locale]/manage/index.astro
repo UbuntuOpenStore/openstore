@@ -2,6 +2,7 @@
 import ManageList from "@/components/manage/ManageList";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getUser } from "@/lib/user";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
 export const prerender = false;
 
@@ -10,18 +11,18 @@ if (Astro.url.searchParams.has("key")) {
   expires.setDate(expires.getDate() + 14);
 
   Astro.cookies.set("apikey", Astro.url.searchParams.get("key")!, { expires, path: "/" });
-  return Astro.redirect("/manage/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/manage/"));
 }
 
 const apikey = Astro.cookies.get("apikey")?.value;
 if (!apikey) {
-  return Astro.redirect("/login/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
 
 const user = await getUser(apikey);
 if (!user) {
   Astro.cookies.delete("apikey");
-  return Astro.redirect("/login/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
 ---
 
@@ -29,6 +30,6 @@ if (!user) {
   <section class="section space-y-4 grow">
     <h1 class="text-4xl">Welcome {user.name || user.username}</h1>
 
-    <ManageList apikey={apikey} isAdmin={user.role === "admin"} userId={user._id} client:only="preact" />
+    <ManageList apikey={apikey} isAdmin={user.role === "admin"} userId={user._id} currentLocale={Astro.currentLocale} client:only="preact" />
   </section>
 </BaseLayout>

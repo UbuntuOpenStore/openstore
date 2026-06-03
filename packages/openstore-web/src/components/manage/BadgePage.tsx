@@ -4,7 +4,7 @@ import ManageError from "./ManageError";
 import Loading from "../Loading";
 import { useManageApp } from "@/lib/use-manage-app";
 
-const BadgePage = ({ id }: { id: string }) => {
+const BadgePage = ({ id, currentLocale }: { id: string; currentLocale: string | undefined }) => {
   const [app, loading, status] = useManageApp(id);
 
   if (loading) {
@@ -17,13 +17,13 @@ const BadgePage = ({ id }: { id: string }) => {
 
   return (
     <>
-      <ManageHeader app={app} breadcrumb="Badge" />
+      <ManageHeader app={app} breadcrumb="Badge" currentLocale={currentLocale} />
 
       <section class="section mb-8 grow">
         <h2 class="text-2xl">Badge</h2>
 
         <div class="w-full mt-4">
-          <BadgeSelect appId={app.id} />
+         <BadgeSelect appId={app.id} currentLocale={currentLocale} />
         </div>
       </section>
     </>

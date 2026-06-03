@@ -6,7 +6,7 @@ import ManageAppForm from "./ManageAppForm";
 import type { UserData } from "@/lib/schema";
 import { useManageMaintainers } from "@/lib/use-manage-maintainers";
 
-const ManagePage = ({ id, user }: { id: string; user: UserData }) => {
+const ManagePage = ({ id, user, currentLocale }: { id: string; user: UserData; currentLocale: string | undefined }) => {
   const [app, loading, status, refreshApp] = useManageApp(id);
   const maintainers = useManageMaintainers(user.role === "admin");
 
@@ -20,10 +20,10 @@ const ManagePage = ({ id, user }: { id: string; user: UserData }) => {
 
   return (
     <>
-      <ManageHeader app={app} breadcrumb="Edit" />
+      <ManageHeader app={app} breadcrumb="Edit" currentLocale={currentLocale} />
 
       <div class="grow">
-        <ManageAppForm user={user} app={app} maintainers={maintainers} onSave={refreshApp} />
+        <ManageAppForm user={user} app={app} maintainers={maintainers} onSave={refreshApp} currentLocale={currentLocale} />
 
         <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
 

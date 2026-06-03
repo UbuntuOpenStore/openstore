@@ -1,11 +1,11 @@
 import { useState, useCallback } from "preact/hooks";
-import { getClientApiKey } from "@/lib/utils";
+import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
 import SvgSpinner from "../icons/Spinner";
 import type { AppManageData } from "@/lib/schema";
 
-const DeleteApp = ({ app }: { app: AppManageData }) => {
+const DeleteApp = ({ app, currentLocale }: { app: AppManageData; currentLocale: string | undefined }) => {
   const [deleting, setDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -37,7 +37,7 @@ const DeleteApp = ({ app }: { app: AppManageData }) => {
 
       if (response.ok) {
         setDialogOpen(false);
-        window.location.href = "/manage/";
+        window.location.href = getRelativeLocaleUrl(currentLocale, "/manage/");
       } else {
         const data = await response.json();
         setDeleteError(data.message || "Failed to delete app");

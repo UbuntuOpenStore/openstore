@@ -17,9 +17,10 @@ type ManageAppFormProps = {
   app: AppManageData;
   maintainers: (UserData & { display_name: string })[];
   onSave: () => void;
+  currentLocale: string | undefined;
 };
 
-const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) => {
+const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale }: ManageAppFormProps) => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -502,7 +503,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave }: ManageAppFormProps) =
             )}
           </div>
 
-          <DeleteApp app={app} />
+          <DeleteApp app={app} currentLocale={currentLocale} />
         </section>
       </form>
 

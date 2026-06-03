@@ -2,23 +2,24 @@
 import ManagePage from "@/components/manage/ManagePage";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getUser } from "@/lib/user";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
 export const prerender = false;
 
 const { id } = Astro.params;
 if (!id) {
-  return Astro.redirect("/manage/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/manage/"));
 }
 
 const apikey = Astro.cookies.get("apikey")?.value;
 if (!apikey) {
-  return Astro.redirect("/login/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
 
 const user = await getUser(apikey);
 if (!user) {
   Astro.cookies.delete("apikey");
-  return Astro.redirect("/login/");
+  return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
 ---
 
@@ -28,5 +29,5 @@ if (!user) {
   description="The open source app store for Ubuntu Touch"
   schema={undefined}
 >
-  <ManagePage id={id} user={user} client:only="preact" />
+  <ManagePage id={id} user={user} currentLocale={Astro.currentLocale} client:only="preact" />
 </BaseLayout>

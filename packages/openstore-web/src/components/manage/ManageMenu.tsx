@@ -1,9 +1,10 @@
 import SvgNavigationMenu from "../icons/NavigationMenu";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { getRelativeLocaleUrl } from "@/lib/utils";
 
-const ManageMenu = ({ id }: { id: string }) => {
-  const baseUrl = `/manage/${id}/`;
+const ManageMenu = ({ id, currentLocale }: { id: string; currentLocale: string | undefined }) => {
+  const baseUrl = getRelativeLocaleUrl(currentLocale, `/manage/${id}/`);
 
   return (
     <DropdownMenu>

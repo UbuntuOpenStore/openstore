@@ -8,7 +8,7 @@ const CHANNEL_MAP = {
   [Channel.FOCAL as string]: "Stable",
 };
 
-const StatsPage = ({ id }: { id: string }) => {
+const StatsPage = ({ id, currentLocale }: { id: string; currentLocale: string | undefined }) => {
   const [app, loading, status] = useManageApp(id);
 
   if (loading) {
@@ -25,7 +25,7 @@ const StatsPage = ({ id }: { id: string }) => {
 
   return (
     <>
-      <ManageHeader app={app} breadcrumb="Stats" />
+      <ManageHeader app={app} breadcrumb="Stats" currentLocale={currentLocale} />
 
       <section class="section space-y-2 grow mb-8">
         <h2 class="text-2xl">Download Stats</h2>
