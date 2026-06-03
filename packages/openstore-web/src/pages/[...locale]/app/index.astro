@@ -1,0 +1,9 @@
+---
+import { getStaticPathsForLocales } from "@/lib/i18n";
+
+export async function getStaticPaths() {
+  return getStaticPathsForLocales();
+}
+
+return Astro.redirect("/apps/");
+---

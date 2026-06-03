@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-06-03T04:43:52.286Z\n"
-"PO-Revision-Date: 2026-06-03T04:43:52.286Z\n"
+"POT-Creation-Date: 2026-06-03T14:03:39.234Z\n"
+"PO-Revision-Date: 2026-06-03T14:03:39.234Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -854,96 +854,6 @@ msgstr "Login via GitLab"
 msgid "Login via Ubuntu One"
 msgstr "Login via Ubuntu One"
 
-msgid "Manage your OpenStore profile information"
-msgstr "Manage your OpenStore profile information"
-
-msgid "View public profile"
-msgstr "View public profile"
-
-msgid "An error occurred while saving your profile"
-msgstr "An error occurred while saving your profile"
-
-msgid "Username"
-msgstr "Username"
-
-msgid "Username cannot be changed"
-msgstr "Username cannot be changed"
-
-msgid "Email"
-msgstr "Email"
-
-msgid "Email is managed by your login provider"
-msgstr "Email is managed by your login provider"
-
-msgid "Avatar"
-msgstr "Avatar"
-
-msgid "Upload new avatar"
-msgstr "Upload new avatar"
-
-msgid "Profile picture"
-msgstr "Profile picture"
-
-msgid "JPG or PNG, max 2MB"
-msgstr "JPG or PNG, max 2MB"
-
-msgid "Biography"
-msgstr "Biography"
-
-msgid "Short bio"
-msgstr "Short bio"
-
-msgid "Maximum 200 characters"
-msgstr "Maximum 200 characters"
-
-msgid "Contact Links"
-msgstr "Contact Links"
-
-msgid "Website URL"
-msgstr "Website URL"
-
-msgid "GitHub Profile URL"
-msgstr "GitHub Profile URL"
-
-msgid "GitLab Profile URL"
-msgstr "GitLab Profile URL"
-
-msgid "UBports Forum Username"
-msgstr "UBports Forum Username"
-
-msgid "Donation URL"
-msgstr "Donation URL"
-
-msgid "Saving..."
-msgstr "Saving..."
-
-msgid "Save"
-msgstr "Save"
-
-msgid "API Key"
-msgstr "API Key"
-
-msgid "Your API Key"
-msgstr "Your API Key"
-
-msgid "Show API Key"
-msgstr "Show API Key"
-
-msgid "Hide API Key"
-msgstr "Hide API Key"
-
-msgid "Copy to clipboard"
-msgstr "Copy to clipboard"
-
-msgid "Copied!"
-msgstr "Copied!"
-
-msgid "Keep your API key secure and do not share it with others"
-msgstr "Keep your API key secure and do not share it with others"
-
-msgid "This key allows access to your account"
-msgstr "This key allows access to your account"
-
 msgid "None"
 msgstr "None"
 
@@ -1167,3 +1077,93 @@ msgstr "webapp"
 
 msgid "View all apps by this user"
 msgstr "View all apps by this user"
+
+msgid "Manage your OpenStore profile information"
+msgstr "Manage your OpenStore profile information"
+
+msgid "View public profile"
+msgstr "View public profile"
+
+msgid "An error occurred while saving your profile"
+msgstr "An error occurred while saving your profile"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Username cannot be changed"
+msgstr "Username cannot be changed"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Email is managed by your login provider"
+msgstr "Email is managed by your login provider"
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Upload new avatar"
+msgstr "Upload new avatar"
+
+msgid "Profile picture"
+msgstr "Profile picture"
+
+msgid "JPG or PNG, max 2MB"
+msgstr "JPG or PNG, max 2MB"
+
+msgid "Biography"
+msgstr "Biography"
+
+msgid "Short bio"
+msgstr "Short bio"
+
+msgid "Maximum 200 characters"
+msgstr "Maximum 200 characters"
+
+msgid "Contact Links"
+msgstr "Contact Links"
+
+msgid "Website URL"
+msgstr "Website URL"
+
+msgid "GitHub Profile URL"
+msgstr "GitHub Profile URL"
+
+msgid "GitLab Profile URL"
+msgstr "GitLab Profile URL"
+
+msgid "UBports Forum Username"
+msgstr "UBports Forum Username"
+
+msgid "Donation URL"
+msgstr "Donation URL"
+
+msgid "Saving..."
+msgstr "Saving..."
+
+msgid "Save"
+msgstr "Save"
+
+msgid "API Key"
+msgstr "API Key"
+
+msgid "Your API Key"
+msgstr "Your API Key"
+
+msgid "Show API Key"
+msgstr "Show API Key"
+
+msgid "Hide API Key"
+msgstr "Hide API Key"
+
+msgid "Copy to clipboard"
+msgstr "Copy to clipboard"
+
+msgid "Copied!"
+msgstr "Copied!"
+
+msgid "Keep your API key secure and do not share it with others"
+msgstr "Keep your API key secure and do not share it with others"
+
+msgid "This key allows access to your account"
+msgstr "This key allows access to your account"

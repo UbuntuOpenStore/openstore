@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import { getRelativeLocaleUrlList } from "astro:i18n";
 
 // Only using the ones that have >75% translations
 import ar from '../locales/ar.json';
@@ -77,5 +78,15 @@ export async function initializeI18N(locale = 'en-us') {
     nsSeparator: false,
     keySeparator: false,
     fallbackLng: false,
+  });
+}
+
+export function getStaticPathsForLocales() {
+  const paths = getRelativeLocaleUrlList();
+
+  return paths.map((url) => {
+    const locale = url.split("/")[1];
+
+    return { params: { locale } };
   });
 }

@@ -1,0 +1,10 @@
+---
+import Page from "../index.astro";
+import { getStaticPathsForLocales } from "@/lib/i18n";
+
+export async function getStaticPaths() {
+  return getStaticPathsForLocales();
+}
+---
+
+<Page />

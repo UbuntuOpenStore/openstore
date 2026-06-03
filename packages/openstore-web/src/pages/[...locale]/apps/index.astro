@@ -2,55 +2,29 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SearchApps from "@/components/SearchApps";
 import CategoryList from "@/components/CategoryList.astro";
-import { CategoriesSchema, type CategoryData } from "@/lib/schema";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
-
-await initializeI18N(Astro.currentLocale);
-
-export type Props = {
-  category: CategoryData;
-};
+import { getStaticPathsForLocales } from "@/lib/i18n";
 
 export async function getStaticPaths() {
-  const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/categories?all=true`, {
-    headers: { "X-Source": "openstore-web-next" },
-  });
-  const { data } = await response.json();
-  const categories = CategoriesSchema.parse(data);
-
-  return categories.map((category) => {
-    return {
-      params: {
-        category: category.slug,
-      },
-      props: {
-        category,
-      },
-    };
-  });
+  return getStaticPathsForLocales();
 }
 
-const { category } = Astro.props;
+await initializeI18N(Astro.currentLocale);
 ---
 
 <BaseLayout
   title="OpenStore"
-  pageTitle={category.translation + " | OpenStore"}
+  pageTitle={t("Apps") + " | OpenStore"}
   description={t("The open source app store for Ubuntu Touch")}
-  schema={generateSchema(Astro.url.href, [
-    { name: "Apps", path: "/apps/" },
-    { name: category.category, path: `/apps/${category.slug}/` },
-  ])}
+  schema={generateSchema(Astro.url.href, [{ name: "Apps", path: "/apps/" }])}
 >
   <section class="grow flex flex-row py-3 px-4">
-    <CategoryList class="mx-12 w-96 mb-2 hidden md:block" showDivider={false} linkClass="" selected={category.slug} />
+    <CategoryList class="mx-12 w-96 mb-2 hidden md:block" showDivider={false} linkClass="" />
 
     <div class="w-full">
       <SearchApps
-        category={category.category}
-        categoryName={category.translation}
         messages={{
           all: t("All Types"),
           apps: t("Apps"),

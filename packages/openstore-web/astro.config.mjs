@@ -7,7 +7,6 @@ import { loadEnv } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import db from "@astrojs/db";
 import sitemap from "@astrojs/sitemap";
-import { i18n, filterSitemapByDefaultLocale } from "astro-i18n-aut/integration";
 import localesJson from "./src/locales.json";
 
 // https://docs.astro.build/en/guides/environment-variables/#in-the-astro-config-file
@@ -36,17 +35,11 @@ export default defineConfig({
       },
     }),
     db(),
-    i18n({
-      locales,
-      defaultLocale,
-      exclude: ["pages/api/**/*", "pages/manage/**/*", "pages/admin/**/*"],
-    }),
     sitemap({
       i18n: {
         locales,
         defaultLocale,
       },
-      filter: filterSitemapByDefaultLocale({ defaultLocale }),
     }),
   ],
   i18n: {

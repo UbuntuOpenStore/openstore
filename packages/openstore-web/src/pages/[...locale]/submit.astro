@@ -5,6 +5,12 @@ import { initializeI18N } from "@/lib/i18n";
 import { generateSchema } from "@/lib/json-schema";
 import { t } from "i18next";
 
+import { getStaticPathsForLocales } from "@/lib/i18n";
+
+export async function getStaticPaths() {
+  return getStaticPathsForLocales();
+}
+
 await initializeI18N(Astro.currentLocale);
 ---
 

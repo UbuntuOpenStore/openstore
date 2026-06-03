@@ -4,6 +4,11 @@ import CategoryList from "@/components/CategoryList.astro";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
+import { getStaticPathsForLocales } from "@/lib/i18n";
+
+export async function getStaticPaths() {
+  return getStaticPathsForLocales();
+}
 
 await initializeI18N(Astro.currentLocale);
 ---

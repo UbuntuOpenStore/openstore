@@ -5,6 +5,12 @@ import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
 
+import { getStaticPathsForLocales } from "@/lib/i18n";
+
+export async function getStaticPaths() {
+  return getStaticPathsForLocales();
+}
+
 await initializeI18N(Astro.currentLocale);
 ---
 
@@ -20,7 +26,7 @@ await initializeI18N(Astro.currentLocale);
     <p class="mb-4">
       {
         t(
-          "Promote your app on the OpenStore! Add these badges to your website, code repository, social media, or anywhere on the internet. The badges are available in several different languages and in both PNG and SVG formats."
+          "Promote your app on the OpenStore! Add these badges to your website, code repository, social media, or anywhere on the internet. The badges are available in several different languages and in both PNG and SVG formats.",
         )
       }
     </p>
