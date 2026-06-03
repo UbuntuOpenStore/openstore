@@ -42,7 +42,10 @@ await initializeI18N(Astro.currentLocale);
       badRequest: t("There was an issue with you request, please try again later"),
       serverError: t("There was an issue with our server, please try again later"),
       appstreamMetainfo: t("AppStream Metainfo"),
-      appstreamDescription: t("If your click package includes an AppStream metainfo file (usr/share/metainfo/*.metainfo.xml), the metadata it contains (name, description, keywords, screenshots, changelogs, URLs, license, category) will overwrite the values currently saved for this app. Manage those fields in your metainfo file rather than through the OpenStore."),
+      appstreamDocs: t("AppStream Docs"),
+      appstreamDescription: t(
+        "If your click package includes an AppStream metainfo file (usr/share/metainfo/*.metainfo.xml), the metadata it contains (name, description, keywords, screenshots, changelogs, URLs, license, category) will overwrite the values currently saved for this app. Manage those fields in your metainfo file rather than through the OpenStore.",
+      ),
       clickFiles: t("Click Files"),
       multipleFilesDescription: t("More than one file can be uploaded at a time"),
       changelog: t("Changelog"),

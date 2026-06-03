@@ -7,11 +7,13 @@ import { cn, getClientApiKey } from "@/lib/utils";
 import SvgSave from "../icons/Save";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import SvgInfo from "../icons/Info";
+import SvgExternalLink from "../icons/ExternalLink";
 
 type RevisionFormProps = {
   app: AppManageData;
   messages: {
     appstreamMetainfo: string;
+    appstreamDocs: string;
     appstreamDescription: string;
     clickFiles: string;
     multipleFilesDescription: string;
@@ -77,74 +79,82 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
   const [processing, setProcessing] = useState(false);
   const [files, setFiles] = useState<FileState[]>([]);
 
-  const save = useCallback(async (e: Event) => {
-    e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    if (form.reportValidity()) {
-      setProcessing(true);
+  const save = useCallback(
+    async (e: Event) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      if (form.reportValidity()) {
+        setProcessing(true);
 
-      const formData = new FormData(form);
-      const changelog = formData.get("changelog");
-      const formFiles = formData.getAll("files") as File[];
+        const formData = new FormData(form);
+        const changelog = formData.get("changelog");
+        const formFiles = formData.getAll("files") as File[];
 
-      setFiles(
-        formFiles.map((formFile) => ({
-          name: formFile.name,
-          progress: 0,
-          success: false,
-        }))
-      );
+        setFiles(
+          formFiles.map((formFile) => ({
+            name: formFile.name,
+            progress: 0,
+            success: false,
+          }))
+        );
 
-      const url = `${import.meta.env.PUBLIC_API_URL}api/v3/manage/${app.id}/revision?apikey=${getClientApiKey()}`;
-      let uploadedChangelog = false;
-      for (const formFile of formFiles) {
-        const fileUploadData = new FormData();
-        fileUploadData.append("file", formFile, formFile.name);
-        if (!uploadedChangelog && changelog) {
-          fileUploadData.append("changelog", changelog);
-          uploadedChangelog = true;
+        const url = `${import.meta.env.PUBLIC_API_URL}api/v3/manage/${app.id}/revision?apikey=${getClientApiKey()}`;
+        let uploadedChangelog = false;
+        for (const formFile of formFiles) {
+          const fileUploadData = new FormData();
+          fileUploadData.append("file", formFile, formFile.name);
+          if (!uploadedChangelog && changelog) {
+            fileUploadData.append("changelog", changelog);
+            uploadedChangelog = true;
+          }
+
+          await uploadFile(
+            url,
+            fileUploadData,
+            (progress) => {
+              setFiles((files) => {
+                return files.map((file) => {
+                  if (file.name === formFile.name) {
+                    return { ...file, progress };
+                  }
+
+                  return file;
+                });
+              });
+            },
+            {
+              unknownError: messages.unknownError,
+              networkError: messages.networkError,
+              uploadAborted: messages.uploadAborted,
+            }
+          )
+            .then(() => {
+              setFiles((files) => {
+                return files.map((file) => {
+                  if (file.name === formFile.name) {
+                    return { ...file, success: true };
+                  }
+
+                  return file;
+                });
+              });
+            })
+            .catch((error: string) => {
+              setFiles((files) => {
+                return files.map((file) => {
+                  if (file.name === formFile.name) {
+                    return { ...file, error };
+                  }
+
+                  return file;
+                });
+              });
+            });
         }
-
-        await uploadFile(url, fileUploadData, (progress) => {
-          setFiles((files) => {
-            return files.map((file) => {
-              if (file.name === formFile.name) {
-                return { ...file, progress };
-              }
-
-              return file;
-            });
-          });
-        }, {
-          unknownError: messages.unknownError,
-          networkError: messages.networkError,
-          uploadAborted: messages.uploadAborted,
-        })
-          .then(() => {
-            setFiles((files) => {
-              return files.map((file) => {
-                if (file.name === formFile.name) {
-                  return { ...file, success: true };
-                }
-
-                return file;
-              });
-            });
-          })
-          .catch((error: string) => {
-            setFiles((files) => {
-              return files.map((file) => {
-                if (file.name === formFile.name) {
-                  return { ...file, error };
-                }
-
-                return file;
-              });
-            });
-          });
       }
-    }
-  }, [app.id, messages]);
+    },
+    [app.id, messages]
+  );
 
   if (processing) {
     const allFinished = files.every((file) => file.success || file.error);
@@ -194,7 +204,25 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
           <div>
             <AlertTitle>{messages.appstreamMetainfo}</AlertTitle>
             <AlertDescription>
-              {messages.appstreamDescription}
+              <p>{messages.appstreamDescription}</p>
+              <p>
+                <a
+                  href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-blue-600 underline"
+                >
+                  {messages.appstreamDocs}
+                </a>
+                <a
+                  href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
+                  target="_blank"
+                  rel="noopener"
+                  class="ml-1"
+                >
+                  <SvgExternalLink class="inline text-blue-600" />
+                </a>
+              </p>
             </AlertDescription>
           </div>
         </Alert>
@@ -219,9 +247,7 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
             />
           </div>
         </div>
-        <p class="text-xs text-gray-500 text-right">
-          {messages.multipleFilesDescription}
-        </p>
+        <p class="text-xs text-gray-500 text-right">{messages.multipleFilesDescription}</p>
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>

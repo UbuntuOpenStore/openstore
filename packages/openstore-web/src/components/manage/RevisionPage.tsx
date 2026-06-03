@@ -20,6 +20,7 @@ type RevisionPageProps = {
     badRequest: string;
     serverError: string;
     appstreamMetainfo: string;
+    appstreamDocs: string;
     appstreamDescription: string;
     clickFiles: string;
     multipleFilesDescription: string;
