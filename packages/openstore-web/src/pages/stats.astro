@@ -12,10 +12,16 @@ const statsResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/stats
   headers: { "X-Source": "openstore-web-next" },
 });
 const statsData = await statsResponse.json();
-const { categories, types, frameworks, architectures } = PackageStatsSchema.parse(statsData.data);
+const { categories, types, frameworks, architectures } = PackageStatsSchema.parse(
+  statsData.data
+);
 
-const filteredTypes = Object.fromEntries(Object.entries(types).filter(([type]) => type !== "push"));
-const filteredArchitectures = Object.fromEntries(Object.entries(architectures).filter(([arch]) => arch !== "i386"));
+const filteredTypes = Object.fromEntries(
+  Object.entries(types).filter(([type]) => type !== "push")
+);
+const filteredArchitectures = Object.fromEntries(
+  Object.entries(architectures).filter(([arch]) => arch !== "i386")
+);
 
 const numberFormatter = new Intl.NumberFormat(Astro.currentLocale);
 

@@ -11,7 +11,7 @@ type Props = {
   };
 };
 
-export default function UserMenu({ user, currentLocale, messages }: Props) {
+export default function UserMenu({ user, messages }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

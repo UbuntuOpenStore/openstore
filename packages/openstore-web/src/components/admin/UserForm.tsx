@@ -5,7 +5,6 @@ import SvgSpinner from '../icons/Spinner';
 import SvgCheck from '../icons/Check';
 import SvgClose from '../icons/Close';
 import { type UserData, UserSchema } from '@/lib/schema';
-import { Button } from '../ui/button';
 
 type UserFormProps = {
   user: UserData;

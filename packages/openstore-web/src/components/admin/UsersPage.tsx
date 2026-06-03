@@ -64,7 +64,7 @@ const UsersPage = ({}: UsersPageProps): JSX.Element => {
     setEditingUser(null);
   }, []);
 
-  const handleFormSuccess = useCallback((data: UserData) => {
+  const handleFormSuccess = useCallback((_data: UserData) => {
     loadUsers();
     setIsModalOpen(false);
     setEditingUser(null);

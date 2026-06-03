@@ -101,10 +101,10 @@ export const AppSchema = z.object({
 export type AppData = z.infer<typeof AppSchema>;
 
 export const PackageStatsSchema = z.object({
-  categories: z.record(z.number()),
-  types: z.record(z.number()),
-  frameworks: z.record(z.number()),
-  architectures: z.record(z.number()),
+  categories: z.record(z.string(), z.number()),
+  types: z.record(z.string(), z.number()),
+  frameworks: z.record(z.string(), z.number()),
+  architectures: z.record(z.string(), z.number()),
 });
 
 export type PackageStatsData = z.infer<typeof PackageStatsSchema>;

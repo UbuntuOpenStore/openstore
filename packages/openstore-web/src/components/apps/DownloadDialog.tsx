@@ -8,10 +8,6 @@ import {
 import { Channel, Channels, type AppData } from "@/lib/schema";
 import { getRelativeLocaleUrl } from "@/lib/utils";
 
-function formatChannel(channel: string) {
-  return channel.charAt(0).toUpperCase() + channel.substring(1);
-}
-
 const DownloadDialog = ({ app, messages, currentLocale } : { app: AppData, currentLocale: string | undefined, messages: { download: string, downloadApp: string, olderVersions: string } }) => {
   const downloads = app.downloads.filter((download) => Channels.includes(download.channel as Channel) && download.download_url && download.architecture);
 

@@ -79,7 +79,7 @@ const NamespacesPage = ({}: NamespacesPageProps): JSX.Element => {
     setEditingNamespace(null);
   }, []);
 
-  const handleFormSuccess = useCallback((data: NamespaceData) => {
+  const handleFormSuccess = useCallback((_data: NamespaceData) => {
     loadNamespaces();
     setIsModalOpen(false);
     setEditingNamespace(null);
