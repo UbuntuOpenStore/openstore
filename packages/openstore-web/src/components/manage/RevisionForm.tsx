@@ -10,6 +10,18 @@ import SvgInfo from "../icons/Info";
 
 type RevisionFormProps = {
   app: AppManageData;
+  messages: {
+    appstreamMetainfo: string;
+    appstreamDescription: string;
+    clickFiles: string;
+    multipleFilesDescription: string;
+    changelog: string;
+    upload: string;
+    return: string;
+    unknownError: string;
+    networkError: string;
+    uploadAborted: string;
+  };
 };
 
 type FileState = {
@@ -19,7 +31,12 @@ type FileState = {
   success: boolean;
 };
 
-function uploadFile(url: string, fileUploadData: FormData, progressCallback: (progress: number) => void) {
+function uploadFile(
+  url: string,
+  fileUploadData: FormData,
+  progressCallback: (progress: number) => void,
+  errorMessages: { unknownError?: string; networkError?: string; uploadAborted?: string }
+) {
   return new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener("progress", (event) => {
@@ -39,7 +56,7 @@ function uploadFile(url: string, fileUploadData: FormData, progressCallback: (pr
         } catch (e) {}
         console.log(xhr.responseText, errorBody);
 
-        let message = "An unknown error has occurred";
+        let message = errorMessages.unknownError;
         if (errorBody && typeof errorBody.message === "string") {
           message = errorBody.message;
         }
@@ -48,15 +65,15 @@ function uploadFile(url: string, fileUploadData: FormData, progressCallback: (pr
       }
     });
 
-    xhr.addEventListener("error", () => reject("Network Error"));
-    xhr.addEventListener("abort", () => reject("Upload Aborted"));
+    xhr.addEventListener("error", () => reject(errorMessages.networkError));
+    xhr.addEventListener("abort", () => reject(errorMessages.uploadAborted));
 
     xhr.open("POST", url);
     xhr.send(fileUploadData);
   });
 }
 
-const RevisionForm = ({ app }: RevisionFormProps) => {
+const RevisionForm = ({ app, messages }: RevisionFormProps) => {
   const [processing, setProcessing] = useState(false);
   const [files, setFiles] = useState<FileState[]>([]);
 
@@ -98,6 +115,10 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
               return file;
             });
           });
+        }, {
+          unknownError: messages.unknownError,
+          networkError: messages.networkError,
+          uploadAborted: messages.uploadAborted,
         })
           .then(() => {
             setFiles((files) => {
@@ -123,7 +144,7 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
           });
       }
     }
-  }, []);
+  }, [app.id, messages]);
 
   if (processing) {
     const allFinished = files.every((file) => file.success || file.error);
@@ -155,7 +176,7 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
 
         {allFinished && (
           <button class="btn bg-ubuntu-orange text-white font-bold cursor-pointer" onClick={() => setProcessing(false)}>
-            Return
+            {messages.return}
           </button>
         )}
       </section>
@@ -171,20 +192,9 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
           </div>
 
           <div>
-            <AlertTitle>AppStream Metainfo</AlertTitle>
+            <AlertTitle>{messages.appstreamMetainfo}</AlertTitle>
             <AlertDescription>
-              If your click package includes an{" "}
-              <a
-                href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="underline"
-              >
-                AppStream metainfo file
-              </a>{" "}
-              (<code>usr/share/metainfo/*.metainfo.xml</code>), the metadata it contains (name, description, keywords, screenshots,
-              changelogs, URLs, license, category) will overwrite the values currently saved for this app. Manage those fields in your
-              metainfo file rather than through the OpenStore.
+              {messages.appstreamDescription}
             </AlertDescription>
           </div>
         </Alert>
@@ -195,7 +205,7 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
       <section class="section space-y-4">
         <div class="form-group">
           <label for="files" class="form-label">
-            Click Files
+            {messages.clickFiles}
           </label>
           <div class="w-full">
             <input
@@ -209,7 +219,9 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
             />
           </div>
         </div>
-        <p class="text-xs text-gray-500 text-right">More than one file can be uploaded at a time</p>
+        <p class="text-xs text-gray-500 text-right">
+          {messages.multipleFilesDescription}
+        </p>
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
@@ -217,7 +229,7 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
       <section class="section space-y-4">
         <div class="form-group">
           <label for="changelog" class="form-label">
-            Changelog
+            {messages.changelog}
           </label>
           <textarea id="changelog" name="changelog" class="form-input" rows={4}></textarea>
         </div>
@@ -227,7 +239,7 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
 
       <section class="section flex gap-4 items-center">
         <button type="submit" class="btn bg-ubuntu-orange text-white font-bold cursor-pointer">
-          Upload
+          {messages.upload}
         </button>
       </section>
     </form>

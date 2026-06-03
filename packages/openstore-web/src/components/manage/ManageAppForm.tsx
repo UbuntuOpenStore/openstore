@@ -6,7 +6,7 @@ import { useCallback, useRef, useState } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
-import { getClientApiKey } from "@/lib/utils";
+import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
 import DeleteApp from "./DeleteApp";
 import SvgExternalLink from "../icons/ExternalLink";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
@@ -17,9 +17,22 @@ type ManageAppFormProps = {
   maintainers: (UserData & { display_name: string })[];
   onSave: () => void;
   currentLocale: string | undefined;
+  messages: {
+    deleteApp: string;
+    deleteApplication: string;
+    cancel: string;
+    confirmDelete: string;
+    deleting: string;
+    areYouSure: string;
+    hasRevisionsWarning: string;
+    cannotBeUndone: string;
+    error: string;
+    failedToDelete: string;
+    errorOccurred: string;
+  };
 };
 
-const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale }: ManageAppFormProps) => {
+const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages }: ManageAppFormProps) => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -152,7 +165,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale }: Manage
             <label for="published" class="form-label">
               Published
               {app.published && (
-                <a href={`/app/${app.id}/`} target="_blank">
+                <a href={getRelativeLocaleUrl(currentLocale, `/app/${app.id}/`)} target="_blank">
                   <SvgExternalLink class="inline-block w-4 h-4 ml-1 mt-[-5px]" />
                 </a>
               )}
@@ -503,7 +516,23 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale }: Manage
             )}
           </div>
 
-          <DeleteApp app={app} currentLocale={currentLocale} />
+          <DeleteApp
+            app={app}
+            currentLocale={currentLocale}
+            messages={{
+              deleteApp: messages.deleteApp,
+              deleteApplication: messages.deleteApplication,
+              cancel: messages.cancel,
+              confirmDelete: messages.confirmDelete,
+              deleting: messages.deleting,
+              areYouSure: messages.areYouSure,
+              hasRevisionsWarning: messages.hasRevisionsWarning,
+              cannotBeUndone: messages.cannotBeUndone,
+              error: messages.error,
+              failedToDelete: messages.failedToDelete,
+              errorOccurred: messages.errorOccurred,
+            }}
+          />
         </section>
       </form>
 

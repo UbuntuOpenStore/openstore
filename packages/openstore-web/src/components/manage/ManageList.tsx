@@ -28,24 +28,58 @@ type ManageListProps = {
   isAdmin: boolean;
   userId: string;
   currentLocale: string | undefined;
+  messages: {
+    filters: string;
+    filterByType: string;
+    allTypes: string;
+    apps: string;
+    bookmarks: string;
+    webApps: string;
+    filterByStatus: string;
+    allApps: string;
+    published: string;
+    notPublished: string;
+    filterByOwner: string;
+    myAppsOnly: string;
+    search: string;
+    sortBy: string;
+    sortOptions: string;
+    switchToListView: string;
+    switchToGridView: string;
+    submit: string;
+    errorLoadingApps: string;
+    totalDownloads: string;
+    latest: string;
+    previousPage: string;
+    nextPage: string;
+    noAppsFound: string;
+    titleAZ: string;
+    titleZA: string;
+    mostPopular: string;
+    leastPopular: string;
+    newest: string;
+    oldest: string;
+    latestUpdate: string;
+    oldestUpdate: string;
+  };
 };
 
 type ViewMode = "grid" | "list";
 
-const SORT_OPTIONS = [
-  { value: "name", label: "Title (A-Z)" },
-  { value: "-name", label: "Title (Z-A)" },
-  { value: "-calculated_rating", label: "Most Popular" },
-  { value: "calculated_rating", label: "Least Popular" },
-  { value: "-published_date", label: "Newest" },
-  { value: "published_date", label: "Oldest" },
-  { value: "-updated_date", label: "Latest Update" },
-  { value: "updated_date", label: "Oldest Update" },
-];
-
-const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps) => {
+const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: ManageListProps) => {
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
   const urlPage = parseInt(hashParams.get("page") ?? "0");
+
+  const SORT_OPTIONS = [
+    { value: "name", label: messages.titleAZ },
+    { value: "-name", label: messages.titleZA },
+    { value: "-calculated_rating", label: messages.mostPopular },
+    { value: "calculated_rating", label: messages.leastPopular },
+    { value: "-published_date", label: messages.newest },
+    { value: "published_date", label: messages.oldest },
+    { value: "-updated_date", label: messages.latestUpdate },
+    { value: "updated_date", label: messages.oldestUpdate },
+  ];
 
   const [page, setPage] = useState(isNaN(urlPage) ? 0 : urlPage);
   const [totalPages, setTotalPages] = useState(0);
@@ -160,7 +194,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
           <div class="w-80 relative">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={messages.search}
               aria-label="Search"
               class="w-full h-full py-2 px-4 pr-10 rounded-full border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
               value={localSearch}
@@ -172,17 +206,24 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
             </div>
           </div>
 
-          <ManageFilterDialog type={query.type} owner={query.owner} published={query.published} isAdmin={isAdmin} onChange={setFilters} />
+          <ManageFilterDialog
+            type={query.type}
+            owner={query.owner}
+            published={query.published}
+            isAdmin={isAdmin}
+            onChange={setFilters}
+            messages={messages}
+          />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" class="whitespace-nowrap min-w-[120px]">
-                <span class="hidden md:inline">Sort by: </span>
+                <span class="hidden md:inline">{messages.sortBy} </span>
                 {SORT_OPTIONS.find((option) => option.value === query.sort)!.label}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-56 mr-4">
-              <DropdownMenuLabel>Sort Options</DropdownMenuLabel>
+              <DropdownMenuLabel>{messages.sortOptions}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {SORT_OPTIONS.map((option) => (
                 <DropdownMenuItem key={option.value} onClick={() => setSort(option.value)}>
@@ -195,7 +236,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
           <Button
             variant="outline"
             onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-            title={viewMode === "grid" ? "Switch to list view" : "Switch to grid view"}
+            title={viewMode === "grid" ? messages.switchToListView : messages.switchToGridView}
             class="px-4 py-2"
           >
             {viewMode === "grid" ? <SvgList class="h-4 w-4" /> : <SvgGrid class="h-4 w-4" />}
@@ -203,12 +244,12 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
         </div>
 
         <a href={getRelativeLocaleUrl(currentLocale, "/submit/")} class="btn bg-ubuntu-orange text-white inline-block">
-          Submit
+          {messages.submit}
         </a>
       </div>
 
       {error ? (
-        <div class="h-full text-2xl text-red">There was an error loading the app list. Please try again later.</div>
+        <div class="h-full text-2xl text-red">{messages.errorLoadingApps}</div>
       ) : (
         <>
           {loading ? (
@@ -242,7 +283,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
                             <p>{app.publisher}</p>
                             <TopRating ratings={app.ratings} />
                             <p class={app.published ? "text-ubuntu-purple" : "text-gray-400"}>
-                              {app.published ? "Published" : "Not Published"}
+                              {app.published ? messages.published : messages.notPublished}
                             </p>
                           </div>
                         </a>
@@ -270,7 +311,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
                               <div class="text-lg font-bold break-words">{app.name}</div>
                               <p class="text-gray-600">{app.publisher}</p>
                               <p class={app.published ? "text-ubuntu-purple" : "text-gray-400"}>
-                                {app.published ? "Published" : "Not Published"}
+                                {app.published ? messages.published : messages.notPublished}
                               </p>
                             </div>
                           </div>
@@ -281,9 +322,11 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
 
                           <div class="flex-shrink-0 md:w-[180px] text-left md:text-right">
                             <div class="text-gray-600">
-                              Total Downloads: <span class="font-bold">{app.totalDownloads?.toLocaleString() ?? 0}</span>
+                              {messages.totalDownloads} <span class="font-bold">{app.totalDownloads?.toLocaleString() ?? 0}</span>
                             </div>
-                            <div class="text-sm text-gray-500">Latest: {app.latestDownloads?.toLocaleString() ?? 0}</div>
+                            <div class="text-sm text-gray-500">
+                              {messages.latest} {app.latestDownloads?.toLocaleString() ?? 0}
+                            </div>
                           </div>
                         </a>
                       ))}
@@ -296,14 +339,14 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale }: ManageListProps)
                       totalPages={totalPages}
                       onPageChanged={(p) => setPageWrapper(p)}
                       messages={{
-                        previous: "Go back a page",
-                        next: "Go to the next page",
+                        previous: messages.previousPage,
+                        next: messages.nextPage,
                       }}
                     />
                   )}
                 </>
               ) : (
-                <div class="h-full text-2xl">No apps found</div>
+                <div class="h-full text-2xl">{messages.noAppsFound}</div>
               )}
             </>
           )}

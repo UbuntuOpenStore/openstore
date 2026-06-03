@@ -2,6 +2,8 @@
 import StatsPage from "@/components/manage/StatsPage";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getRelativeLocaleUrl } from "@/lib/utils";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
 
 export const prerender = false;
 
@@ -14,6 +16,8 @@ const apikey = Astro.cookies.get("apikey")?.value;
 if (!apikey) {
   return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
+
+await initializeI18N(Astro.currentLocale);
 ---
 
 <BaseLayout
@@ -22,5 +26,29 @@ if (!apikey) {
   description="The open source app store for Ubuntu Touch"
   schema={undefined}
 >
-  <StatsPage id={id} currentLocale={Astro.currentLocale} client:only="preact" />
+  <StatsPage
+    id={id}
+    currentLocale={Astro.currentLocale}
+    messages={{
+      manage: t("Manage"),
+      edit: t("Edit"),
+      newRevision: t("New Revision"),
+      stats: t("Stats"),
+      badge: t("Badge"),
+      downloadStats: t("Download Stats"),
+      revision: t("Revision"),
+      channel: t("Channel"),
+      arch: t("Arch"),
+      framework: t("Framework"),
+      version: t("Version"),
+      downloads: t("Downloads"),
+      total: t("Total"),
+      notFound: t("The app you are looking for does not exist"),
+      forbidden: t("You are not allowed to access this app"),
+      unauthorized: t("You must be logged in to see this app"),
+      badRequest: t("There was an issue with you request, please try again later"),
+      serverError: t("There was an issue with our server, please try again later"),
+    }}
+    client:only="preact"
+  />
 </BaseLayout>

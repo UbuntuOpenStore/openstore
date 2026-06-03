@@ -3,6 +3,8 @@ import ManageList from "@/components/manage/ManageList";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getUser } from "@/lib/user";
 import { getRelativeLocaleUrl } from "@/lib/utils";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
 
 export const prerender = false;
 
@@ -24,12 +26,54 @@ if (!user) {
   Astro.cookies.delete("apikey");
   return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
+
+await initializeI18N(Astro.currentLocale);
 ---
 
 <BaseLayout title="OpenStore" pageTitle="Manage | OpenStore" description="The open source app store for Ubuntu Touch" schema={undefined}>
   <section class="section space-y-4 grow">
     <h1 class="text-4xl">Welcome {user.name || user.username}</h1>
 
-    <ManageList apikey={apikey} isAdmin={user.role === "admin"} userId={user._id} currentLocale={Astro.currentLocale} client:only="preact" />
+    <ManageList
+      apikey={apikey}
+      isAdmin={user.role === "admin"}
+      userId={user._id}
+      currentLocale={Astro.currentLocale}
+      messages={{
+        filters: t("Filters"),
+        filterByType: t("Filter by Type"),
+        allTypes: t("All Types"),
+        apps: t("Apps"),
+        bookmarks: t("Bookmarks"),
+        webApps: t("Web Apps"),
+        filterByStatus: t("Filter by Status"),
+        allApps: t("All Apps"),
+        published: t("Published"),
+        notPublished: t("Not Published"),
+        filterByOwner: t("Filter by Owner"),
+        myAppsOnly: t("My Apps Only"),
+        search: t("Search..."),
+        sortBy: t("Sort by: "),
+        sortOptions: t("Sort Options"),
+        switchToListView: t("Switch to list view"),
+        switchToGridView: t("Switch to grid view"),
+        submit: t("Submit"),
+        errorLoadingApps: t("There was an error loading the app list. Please try again later."),
+        totalDownloads: t("Total Downloads:"),
+        latest: t("Latest:"),
+        previousPage: t("Go back a page"),
+        nextPage: t("Go to the next page"),
+        noAppsFound: t("No apps found"),
+        titleAZ: t("Title (A-Z)"),
+        titleZA: t("Title (Z-A)"),
+        mostPopular: t("Most Popular"),
+        leastPopular: t("Least Popular"),
+        newest: t("Newest"),
+        oldest: t("Oldest"),
+        latestUpdate: t("Latest Update"),
+        oldestUpdate: t("Oldest Update"),
+      }}
+      client:only="preact"
+    />
   </section>
 </BaseLayout>

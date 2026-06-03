@@ -3,6 +3,8 @@ import ManagePage from "@/components/manage/ManagePage";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getUser } from "@/lib/user";
 import { getRelativeLocaleUrl } from "@/lib/utils";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
 
 export const prerender = false;
 
@@ -21,6 +23,8 @@ if (!user) {
   Astro.cookies.delete("apikey");
   return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
+
+await initializeI18N(Astro.currentLocale);
 ---
 
 <BaseLayout
@@ -29,5 +33,42 @@ if (!user) {
   description="The open source app store for Ubuntu Touch"
   schema={undefined}
 >
-  <ManagePage id={id} user={user} currentLocale={Astro.currentLocale} client:only="preact" />
+  <ManagePage
+    id={id}
+    user={user}
+    currentLocale={Astro.currentLocale}
+    messages={{
+      manage: t("Manage"),
+      edit: t("Edit"),
+      newRevision: t("New Revision"),
+      stats: t("Stats"),
+      badge: t("Badge"),
+      packageDetails: t("Package Details"),
+      id: t("ID"),
+      publisher: t("Publisher"),
+      publishedDate: t("Published Date"),
+      updatedDate: t("Updated Date"),
+      architectures: t("Architectures"),
+      architecture: t("Architecture"),
+      translationLanguages: t("Translation Languages"),
+      none: t("None"),
+      notFound: t("The app you are looking for does not exist"),
+      forbidden: t("You are not allowed to access this app"),
+      unauthorized: t("You must be logged in to see this app"),
+      badRequest: t("There was an issue with you request, please try again later"),
+      serverError: t("There was an issue with our server, please try again later"),
+      deleteApp: t("Delete App"),
+      deleteApplication: t("Delete Application"),
+      cancel: t("Cancel"),
+      confirmDelete: t("Confirm Delete"),
+      deleting: t("Deleting..."),
+      areYouSure: t("Are you sure you want to delete this app?"),
+      hasRevisionsWarning: t("This app has revisions which will also be deleted. This action cannot be undone."),
+      cannotBeUndone: t("This action cannot be undone."),
+      error: t("Error"),
+      failedToDelete: t("Failed to delete app"),
+      errorOccurred: t("An error occurred while deleting the app"),
+    }}
+    client:only="preact"
+  />
 </BaseLayout>

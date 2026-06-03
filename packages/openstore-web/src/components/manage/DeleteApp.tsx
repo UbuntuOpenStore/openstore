@@ -5,7 +5,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import SvgSpinner from "../icons/Spinner";
 import type { AppManageData } from "@/lib/schema";
 
-const DeleteApp = ({ app, currentLocale }: { app: AppManageData; currentLocale: string | undefined }) => {
+type DeleteAppProps = {
+  app: AppManageData;
+  currentLocale: string | undefined;
+  messages: {
+    deleteApp: string;
+    deleteApplication: string;
+    cancel: string;
+    confirmDelete: string;
+    deleting: string;
+    areYouSure: string;
+    hasRevisionsWarning: string;
+    cannotBeUndone: string;
+    error: string;
+    failedToDelete: string;
+    errorOccurred: string;
+  };
+};
+
+const DeleteApp = ({ app, currentLocale, messages }: DeleteAppProps) => {
   const [deleting, setDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -40,14 +58,14 @@ const DeleteApp = ({ app, currentLocale }: { app: AppManageData; currentLocale: 
         window.location.href = getRelativeLocaleUrl(currentLocale, "/manage/");
       } else {
         const data = await response.json();
-        setDeleteError(data.message || "Failed to delete app");
+        setDeleteError(data.message);
         setDeleting(false);
       }
     } catch (error) {
-      setDeleteError("An error occurred while deleting the app");
+      setDeleteError(messages.errorOccurred);
       setDeleting(false);
     }
-  }, [app]);
+  }, [app, currentLocale, messages]);
 
   const cancelDelete = useCallback(() => {
     handleCloseDialog();
@@ -56,28 +74,26 @@ const DeleteApp = ({ app, currentLocale }: { app: AppManageData; currentLocale: 
   return (
     <>
       <button class="btn bg-red-600 text-white font-bold cursor-pointer" onClick={handleOpenDialog}>
-        Delete App
+        {messages.deleteApp}
       </button>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent class="max-w-md">
           <DialogHeader>
-            <DialogTitle class="text-red-600">Delete Application</DialogTitle>
+            <DialogTitle class="text-red-600">{messages.deleteApplication}</DialogTitle>
           </DialogHeader>
 
           <div class="py-4">
             {deleteError && (
               <Alert variant="destructive" class="mb-4">
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{messages.error}</AlertTitle>
                 <AlertDescription>{deleteError}</AlertDescription>
               </Alert>
             )}
 
-            <p class="mb-4">Are you sure you want to delete this app?</p>
+            <p class="mb-4">{messages.areYouSure}</p>
             <p class="text-red-600 mb-4">
-              {app.revisions?.length > 0
-                ? "This app has revisions which will also be deleted. This action cannot be undone."
-                : "This action cannot be undone."}
+              {app.revisions?.length > 0 ? messages.hasRevisionsWarning : messages.cannotBeUndone}
             </p>
           </div>
 
@@ -87,16 +103,16 @@ const DeleteApp = ({ app, currentLocale }: { app: AppManageData; currentLocale: 
               onClick={cancelDelete}
               disabled={deleting}
             >
-              Cancel
+              {messages.cancel}
             </button>
             <button class="btn bg-red-600 text-white font-bold cursor-pointer" onClick={handleDelete} disabled={deleting}>
               {deleting ? (
                 <>
                   <SvgSpinner class="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  {messages.deleting}
                 </>
               ) : (
-                "Confirm Delete"
+                messages.confirmDelete
               )}
             </button>
           </DialogFooter>

@@ -6,7 +6,45 @@ import ManageAppForm from "./ManageAppForm";
 import type { UserData } from "@/lib/schema";
 import { useManageMaintainers } from "@/lib/use-manage-maintainers";
 
-const ManagePage = ({ id, user, currentLocale }: { id: string; user: UserData; currentLocale: string | undefined }) => {
+type ManagePageProps = {
+  id: string;
+  user: UserData;
+  currentLocale: string | undefined;
+  messages: {
+    manage: string;
+    edit: string;
+    newRevision: string;
+    stats: string;
+    badge: string;
+    packageDetails: string;
+    id: string;
+    publisher: string;
+    publishedDate: string;
+    updatedDate: string;
+    architectures: string;
+    architecture: string;
+    translationLanguages: string;
+    none: string;
+    notFound: string;
+    forbidden: string;
+    unauthorized: string;
+    badRequest: string;
+    serverError: string;
+    deleteApp: string;
+    deleteApplication: string;
+    cancel: string;
+    confirmDelete: string;
+    deleting: string;
+    areYouSure: string;
+    hasRevisionsWarning: string;
+    cannotBeUndone: string;
+    error: string;
+    failedToDelete: string;
+    errorOccurred: string;
+  };
+};
+
+const ManagePage = ({ id, user, currentLocale, messages }: ManagePageProps) => {
   const [app, loading, status, refreshApp] = useManageApp(id);
   const maintainers = useManageMaintainers(user.role === "admin");
 
@@ -15,55 +53,79 @@ const ManagePage = ({ id, user, currentLocale }: { id: string; user: UserData; c
   }
 
   if (!app) {
-    return <ManageError status={status} />;
+    return (
+      <ManageError
+        status={status}
+        messages={{
+          notFound: messages.notFound,
+          forbidden: messages.forbidden,
+          unauthorized: messages.unauthorized,
+          badRequest: messages.badRequest,
+          serverError: messages.serverError,
+        }}
+      />
+    );
   }
 
   return (
     <>
-      <ManageHeader app={app} breadcrumb="Edit" currentLocale={currentLocale} />
+      <ManageHeader
+        app={app}
+        breadcrumb={messages.edit}
+        currentLocale={currentLocale}
+        messages={{
+          manage: messages.manage,
+          edit: messages.edit,
+          newRevision: messages.newRevision,
+          stats: messages.stats,
+          badge: messages.badge,
+        }}
+      />
 
       <div class="grow">
-        <ManageAppForm user={user} app={app} maintainers={maintainers} onSave={refreshApp} currentLocale={currentLocale} />
+        <ManageAppForm user={user} app={app} maintainers={maintainers} onSave={refreshApp} currentLocale={currentLocale} messages={messages} />
 
         <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
 
         <section class="section space-y-2">
-          <h2 class="text-2xl">Package Details</h2>
+          <h2 class="text-2xl">{messages.packageDetails}</h2>
 
           <table>
             <tbody>
               <tr class="border-b-1 border-b-gray-300">
-                <td class="p-2 font-bold">ID</td>
+                <td class="p-2 font-bold">{messages.id}</td>
                 <td>{app.id}</td>
               </tr>
 
               <tr class="border-b-1 border-b-gray-300">
-                <td class="p-2 font-bold">Publisher</td>
-                <td>{app.publisher || "None"}</td>
+                <td class="p-2 font-bold">{messages.publisher}</td>
+                <td>{app.publisher || messages.none}</td>
               </tr>
 
               {app.published_date && (
                 <tr class="border-b-1 border-b-gray-300">
-                  <td class="p-2 font-bold">Published Date</td>
+                  <td class="p-2 font-bold">{messages.publishedDate}</td>
                   <td>{new Date(app.published_date).toLocaleString()}</td>
                 </tr>
               )}
 
               {app.updated_date && (
                 <tr class="border-b-1 border-b-gray-300">
-                  <td class="p-2 font-bold">Updated Date</td>
+                  <td class="p-2 font-bold">{messages.updatedDate}</td>
                   <td>{new Date(app.updated_date).toLocaleString()}</td>
                 </tr>
               )}
 
               <tr class="border-b-1 border-b-gray-300">
-                <td class="p-2 font-bold">{app.architectures.length > 1 ? "Architectures" : "Architecture"}</td>
-                <td>{app.architectures.length > 0 ? app.architectures.join(", ") : "None"}</td>
+                <td class="p-2 font-bold">
+                  {app.architectures.length > 1 ? messages.architectures : messages.architecture}
+                </td>
+                <td>{app.architectures.length > 0 ? app.architectures.join(", ") : messages.none}</td>
               </tr>
 
               <tr class="border-b-1 border-b-gray-300">
-                <td class="p-2 pr-4 font-bold whitespace-nowrap">Translation Languages</td>
-                <td>{app.languages.length > 0 ? app.languages.join(", ") : "None"}</td>
+                <td class="p-2 pr-4 font-bold whitespace-nowrap">{messages.translationLanguages}</td>
+                <td>{app.languages.length > 0 ? app.languages.join(", ") : messages.none}</td>
               </tr>
             </tbody>
           </table>

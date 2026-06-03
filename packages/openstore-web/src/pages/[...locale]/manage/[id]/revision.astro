@@ -2,6 +2,8 @@
 import RevisionPage from "@/components/manage/RevisionPage";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getRelativeLocaleUrl } from "@/lib/utils";
+import { initializeI18N } from "@/lib/i18n";
+import { t } from "i18next";
 
 export const prerender = false;
 
@@ -14,6 +16,8 @@ const apikey = Astro.cookies.get("apikey")?.value;
 if (!apikey) {
   return Astro.redirect(getRelativeLocaleUrl(Astro.currentLocale, "/login/"));
 }
+
+await initializeI18N(Astro.currentLocale);
 ---
 
 <BaseLayout
@@ -22,5 +26,32 @@ if (!apikey) {
   description="The open source app store for Ubuntu Touch"
   schema={undefined}
 >
-  <RevisionPage id={id} currentLocale={Astro.currentLocale} client:only="preact" />
+  <RevisionPage
+    id={id}
+    currentLocale={Astro.currentLocale}
+    messages={{
+      manage: t("Manage"),
+      edit: t("Edit"),
+      newRevision: t("New Revision"),
+      stats: t("Stats"),
+      badge: t("Badge"),
+      revision: t("Revision"),
+      notFound: t("The app you are looking for does not exist"),
+      forbidden: t("You are not allowed to access this app"),
+      unauthorized: t("You must be logged in to see this app"),
+      badRequest: t("There was an issue with you request, please try again later"),
+      serverError: t("There was an issue with our server, please try again later"),
+      appstreamMetainfo: t("AppStream Metainfo"),
+      appstreamDescription: t("If your click package includes an AppStream metainfo file (usr/share/metainfo/*.metainfo.xml), the metadata it contains (name, description, keywords, screenshots, changelogs, URLs, license, category) will overwrite the values currently saved for this app. Manage those fields in your metainfo file rather than through the OpenStore."),
+      clickFiles: t("Click Files"),
+      multipleFilesDescription: t("More than one file can be uploaded at a time"),
+      changelog: t("Changelog"),
+      upload: t("Upload"),
+      return: t("Return"),
+      unknownError: t("An unknown error has occurred"),
+      networkError: t("Network Error"),
+      uploadAborted: t("Upload Aborted"),
+    }}
+    client:only="preact"
+  />
 </BaseLayout>

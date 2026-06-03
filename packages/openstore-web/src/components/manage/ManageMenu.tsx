@@ -3,7 +3,18 @@ import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { getRelativeLocaleUrl } from "@/lib/utils";
 
-const ManageMenu = ({ id, currentLocale }: { id: string; currentLocale: string | undefined }) => {
+type ManageMenuProps = {
+  id: string;
+  currentLocale: string | undefined;
+  messages: {
+    edit: string;
+    newRevision: string;
+    stats: string;
+    badge: string;
+  };
+};
+
+const ManageMenu = ({ id, currentLocale, messages }: ManageMenuProps) => {
   const baseUrl = getRelativeLocaleUrl(currentLocale, `/manage/${id}/`);
 
   return (
@@ -16,22 +27,22 @@ const ManageMenu = ({ id, currentLocale }: { id: string; currentLocale: string |
       <DropdownMenuContent>
         <DropdownMenuItem asChild>
           <a href={baseUrl} className="cursor-pointer">
-            Edit
+            {messages.edit}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <a href={`${baseUrl}revision/`} className="cursor-pointer">
-            New Revision
+            {messages.newRevision}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <a href={`${baseUrl}stats/`} className="cursor-pointer">
-            Stats
+            {messages.stats}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <a href={`${baseUrl}badge/`} className="cursor-pointer">
-            Badge
+            {messages.badge}
           </a>
         </DropdownMenuItem>
       </DropdownMenuContent>
