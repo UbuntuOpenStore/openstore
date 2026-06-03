@@ -1,7 +1,6 @@
 import type { AppManageData } from "@/lib/schema";
 import { useCallback, useState } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
-import type { JSX } from "preact/jsx-runtime";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { cn, getClientApiKey } from "@/lib/utils";
@@ -61,12 +60,13 @@ const RevisionForm = ({ app }: RevisionFormProps) => {
   const [processing, setProcessing] = useState(false);
   const [files, setFiles] = useState<FileState[]>([]);
 
-  const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
+  const save = useCallback(async (e: Event) => {
     e.preventDefault();
-    if (e.currentTarget.reportValidity()) {
+    const form = e.currentTarget as HTMLFormElement;
+    if (form.reportValidity()) {
       setProcessing(true);
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const changelog = formData.get("changelog");
       const formFiles = formData.getAll("files") as File[];
 

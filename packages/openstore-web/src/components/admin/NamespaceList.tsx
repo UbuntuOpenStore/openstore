@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'preact/hooks';
-import { type JSX } from 'preact';
 import SvgSpinner from '../icons/Spinner';
 import SvgClose from '../icons/Close';
 import { getClientApiKey } from '../../lib/utils';
@@ -53,8 +52,8 @@ const NamespaceList = ({ namespaces = [], onEdit, onDeleted }: NamespaceListProp
     }
   }, [onDeleted]);
 
-  const handleSearchChange = useCallback((e: JSX.TargetedEvent<HTMLInputElement>) => {
-    setSearchQuery(e.currentTarget.value.toLowerCase());
+  const handleSearchChange = useCallback((e: Event) => {
+    setSearchQuery((e.currentTarget as HTMLInputElement).value.toLowerCase());
   }, []);
 
   const filteredNamespaces = namespaces.filter((namespace) => {

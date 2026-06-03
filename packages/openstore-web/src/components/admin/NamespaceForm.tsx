@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
-import { type JSX } from 'preact';
 import SvgSpinner from '../icons/Spinner';
 import SvgCheck from '../icons/Check';
 import SvgClose from '../icons/Close';
@@ -71,8 +70,9 @@ const NamespaceForm = ({ namespace, existingOwners = [], onSuccess }: NamespaceF
     }
   }, []);
 
-  const handleSearchChange = useCallback((e: JSX.TargetedEvent<HTMLInputElement>) => {
-    const query = e.currentTarget.value;
+  const handleSearchChange = useCallback((e: Event) => {
+    const target = e.currentTarget as HTMLInputElement;
+    const query = target.value;
     setSearchQuery(query);
     searchUsers(query);
   }, [searchUsers]);
@@ -84,14 +84,15 @@ const NamespaceForm = ({ namespace, existingOwners = [], onSuccess }: NamespaceF
     setSearchResults([]);
   }, []);
 
-  const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
+  const save = useCallback(async (e: Event) => {
     e.preventDefault();
-    if (e.currentTarget.reportValidity()) {
+    const form = e.currentTarget as HTMLFormElement;
+    if (form.reportValidity()) {
       setSaving(true);
       setSuccess(false);
       setError('');
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const namespaceValue = formData.get('namespace') as string;
       const typeValue = formData.get('type') as string;
 

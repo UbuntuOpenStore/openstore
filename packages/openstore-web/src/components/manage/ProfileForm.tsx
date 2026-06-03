@@ -7,7 +7,6 @@ import SvgGitlab from "../icons/Gitlab";
 import SvgUbuntuone from "../icons/Ubuntuone";
 import type { UserData } from "@/lib/schema";
 import { getClientApiKey } from "@/lib/utils";
-import type { JSX } from "preact/jsx-runtime";
 
 type ProfileFormProps = {
   user: UserData;
@@ -42,14 +41,15 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const save = useCallback(
-    async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
+    async (e: Event) => {
       e.preventDefault();
-      if (e.currentTarget.reportValidity()) {
+      const form = e.currentTarget as HTMLFormElement;
+      if (form.reportValidity()) {
         setSaving(true);
         setSuccess(false);
         setError("");
 
-        const formData = new FormData(e.currentTarget);
+        const formData = new FormData(form);
 
         // Convert GitHub username to URL
         const githubUsername = formData.get("github_username");

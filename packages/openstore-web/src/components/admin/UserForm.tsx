@@ -27,12 +27,13 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
     description: user.description || '',
   });
 
-  const handleInputChange = useCallback((e: JSX.TargetedEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.currentTarget;
+  const handleInputChange = useCallback((e: Event) => {
+    const target = e.currentTarget as HTMLInputElement | HTMLTextAreaElement;
+    const { name, value } = target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleSubmit = useCallback(async (e: JSX.TargetedEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: Event) => {
     e.preventDefault();
     setSaving(true);
     setError('');

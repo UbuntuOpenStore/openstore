@@ -1,6 +1,5 @@
 import { useCallback, useState } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
-import type { JSX } from "preact/jsx-runtime";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
@@ -11,14 +10,15 @@ const SubmitAppForm = ({ currentLocale }: { currentLocale: string | undefined })
   const [error, setError] = useState("");
 
   const apikey = getClientApiKey();
-  const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
+  const save = useCallback(async (e: Event) => {
     e.preventDefault();
-    if (e.currentTarget.reportValidity()) {
+    const form = e.currentTarget as HTMLFormElement;
+    if (form.reportValidity()) {
       setSaving(true);
       setSuccess(false);
       setError("");
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/manage/?apikey=${apikey}`, {
         method: "POST",
         body: JSON.stringify({

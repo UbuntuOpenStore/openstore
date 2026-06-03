@@ -29,7 +29,7 @@ export type Props = {
 };
 
 const { review, currentVersion } = Astro.props;
-const Icon = ICON_MAP[review.rating];
+const Icon = ICON_MAP[review.rating as RatingType];
 const isOlderVersion = currentVersion && review.version !== currentVersion;
 ---
 

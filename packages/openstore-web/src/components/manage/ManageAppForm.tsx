@@ -4,7 +4,6 @@ import { APP_TYPE_OPTIONS, CATEGORIES, LICENSES } from "@/lib/constants";
 import SortableScreenshots from "./SortableScreenshots";
 import { useCallback, useRef, useState } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
-import type { JSX } from "preact/jsx-runtime";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { getClientApiKey } from "@/lib/utils";
@@ -59,14 +58,15 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale }: Manage
     if (confirmRemoveVersion) removeExistingVersionChangelog(confirmRemoveVersion);
   }, [confirmRemoveVersion, removeExistingVersionChangelog]);
 
-  const save = useCallback(async (e: JSX.TargetedSubmitEvent<HTMLFormElement>) => {
+  const save = useCallback(async (e: Event) => {
     e.preventDefault();
-    if (e.currentTarget.reportValidity()) {
+    const form = e.currentTarget as HTMLFormElement;
+    if (form.reportValidity()) {
       setSaving(true);
       setSuccess(false);
       setError("");
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const entries = Array.from(formData.entries());
 
       const newFormData = new FormData();
