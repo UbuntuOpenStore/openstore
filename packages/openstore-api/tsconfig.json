@@ -19,7 +19,8 @@
     "sourceMap": true,
     "lib": ["es2022"],
     "rootDir": "src",
-    "typeRoots": ["./types", "./node_modules/@types/"],
+    "typeRoots": ["./types", "./node_modules/@types/", "../../node_modules/@types/"],
+    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "useUnknownInCatchVariables": false
   }
