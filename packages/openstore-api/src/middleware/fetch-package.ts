@@ -1,5 +1,4 @@
 import { type Request, type Response, type NextFunction } from 'express';
-import { pick } from 'lodash';
 
 import { Package, type PackageRequestFilters } from '../db/package';
 import { NotFoundError } from '../exceptions';
@@ -10,7 +9,8 @@ export function fetchPackage(published = false, useQuery = false) {
   return asyncErrorWrapper(async (req: Request, res: Response, next: NextFunction) => {
     let filters: PackageRequestFilters = {};
     if (useQuery) {
-      filters = pick(Package.parseRequestFilters(req), 'frameworks', 'architectures', 'channel');
+      const { frameworks, architectures, channel } = Package.parseRequestFilters(req);
+      filters = { frameworks, architectures, channel };
     }
 
     if (published) {

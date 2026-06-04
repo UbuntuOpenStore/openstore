@@ -1,10 +1,9 @@
 import { type Request } from 'express';
-import isString from 'lodash/isString';
 
 export function getData(req: Request, name: string, defaultData = ''): string {
   if (req.query && req.query[name]) {
     const value = req.query[name];
-    if (isString(value)) {
+    if (typeof value === 'string') {
       return value.trim();
     }
   }
@@ -21,7 +20,7 @@ export function getDataInt(req: Request, name: string, defaultData = 0): number 
   if (req.query && req.query[name]) {
     const value = req.query[name];
 
-    if (isString(value)) {
+    if (typeof value === 'string') {
       returnValue = parseInt(value.trim(), 10);
     }
   }
@@ -40,7 +39,7 @@ export function getDataArray(req: Request, name: string, defaultData: string[] =
       return value as string[];
     }
 
-    if (isString(value)) {
+    if (typeof value === 'string') {
       return value.split(',');
     }
   }
@@ -59,7 +58,7 @@ export function getDataArray(req: Request, name: string, defaultData: string[] =
 export function getDataBoolean(req: Request, name: string, defaultData = false): boolean {
   if (req.query && req.query[name] !== undefined) {
     const value = req.query[name];
-    if (isString(value)) {
+    if (typeof value === 'string') {
       return value.toLowerCase() === 'true';
     }
 
@@ -67,7 +66,7 @@ export function getDataBoolean(req: Request, name: string, defaultData = false):
   }
 
   if (req.body && req.body[name] !== undefined) {
-    if (isString(req.body[name])) {
+    if (typeof req.body[name] === 'string') {
       return req.body[name].toLowerCase() === 'true';
     }
 
@@ -80,7 +79,7 @@ export function getDataBoolean(req: Request, name: string, defaultData = false):
 export function getDataBooleanOrUndefined(req: Request, name: string): boolean | undefined {
   if (req.query && req.query[name] !== undefined && req.query[name] !== '') {
     const value = req.query[name];
-    if (isString(value)) {
+    if (typeof value === 'string') {
       return value.toLowerCase() === 'true';
     }
 
@@ -88,7 +87,7 @@ export function getDataBooleanOrUndefined(req: Request, name: string): boolean |
   }
 
   if (req.body && req.body[name] !== undefined && req.body[name] !== '') {
-    if (isString(req.body[name])) {
+    if (typeof req.body[name] === 'string') {
       return req.body[name].toLowerCase() === 'true';
     }
 

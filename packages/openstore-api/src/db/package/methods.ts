@@ -6,7 +6,6 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { isURL } from 'class-validator';
-import { difference, omit } from 'lodash';
 import { type Schema } from 'mongoose';
 import { v4 } from 'uuid';
 
@@ -711,7 +710,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         .filter((revision) => !!revision);
 
       const originalManifest = this.manifest || {};
-      const manifest = { ...omit(originalManifest, 'hooks'), hooks: {} };
+      const { hooks: _hooks, ...manifestWithoutHooks } = originalManifest;
+      const manifest = { ...manifestWithoutHooks, hooks: {} };
       for (const [key, value] of Object.entries(originalManifest.hooks ?? {})) {
         // @ts-ignore
         manifest.hooks[key.replace(/__/g, '.')] = value;
@@ -1008,7 +1008,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         }
 
         const permissions = currentRevisions[0].permissions ?? [];
-        if (permissions.length > 0 && difference(parseData.permissions, permissions).length > 0) {
+        if (permissions.length > 0 && parseData.permissions.filter((p) => !permissions.includes(p)).length > 0) {
           throw new UserError(MISMATCHED_PERMISSIONS);
         }
       }

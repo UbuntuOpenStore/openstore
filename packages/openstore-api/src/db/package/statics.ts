@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 
 import { type Request } from 'express';
-import uniq from 'lodash/uniq';
 import { type FilterQuery, type Schema, type Types } from 'mongoose';
 
 import { UserError } from '../../exceptions';
@@ -156,7 +155,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       // Handle non-pluralized form
       ...getDataArray(req, 'package_type'),
     ];
-    const packageTypes = packageTypeParams.length > 0 ? (uniq(packageTypeParams) as PackageType[]) : [PackageType.CLICK];
+    const packageTypes = packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : [PackageType.CLICK];
 
     const architecture = getData(req, 'architecture').toLowerCase() as Architecture;
     let architectures: Architecture[] = [];
@@ -193,7 +192,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       limit,
       skip: getDataInt(req, 'skip', 0),
       sort: getData(req, 'sort', 'relevance'),
-      types: uniq(types) as AppType[],
+      types: [...new Set(types)] as AppType[],
       packageTypes,
       ids: getDataArray(req, 'apps'),
       frameworks: getDataArray(req, 'frameworks'),
