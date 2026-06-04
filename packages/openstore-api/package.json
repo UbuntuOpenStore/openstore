@@ -10,7 +10,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "NODE_PATH=./dist node --heapsnapshot-signal=SIGUSR2 -r dotenv/config dist/index.js",
+    "start": "NODE_PATH=./dist node --heapsnapshot-signal=SIGUSR2 --env-file=.env dist/index.js",
     "dev": "nodemon ./src/index.ts",
     "build": "tsc",
     "type-check": "tsc --noemit",
@@ -19,22 +19,19 @@
     "lint": "oxlint ./src/**/*.ts --fix",
     "lint:nofix": "oxlint ./src/**/*.ts",
     "lint:json": "jsonlint -q ./src/api/json/category_icons.json",
-    "test": "NODE_ENV=testing node -r tsconfig-paths/register -r ts-node/register -r dotenv/config --test-concurrency=1 --test src/**/*.test.ts",
-    "test:ci": "NODE_ENV=ci node -r tsconfig-paths/register -r ts-node/register -r dotenv/config --test-concurrency=1 --test src/**/*.test.ts",
-    "test:snapshot": "SNAPSHOT_TEST=true NODE_ENV=testing node -r tsconfig-paths/register -r ts-node/register -r dotenv/config --test-concurrency=1 --test src/tests/snapshots.test.ts",
+    "test": "NODE_ENV=testing node -r tsconfig-paths/register -r ts-node/register --env-file=.env --test-concurrency=1 --test src/**/*.test.ts",
+    "test:ci": "NODE_ENV=ci node -r tsconfig-paths/register -r ts-node/register --env-file=.env --test-concurrency=1 --test src/**/*.test.ts",
+    "test:snapshot": "SNAPSHOT_TEST=true NODE_ENV=testing node -r tsconfig-paths/register -r ts-node/register --env-file=.env --test-concurrency=1 --test src/tests/snapshots.test.ts",
     "update-pot-file": "npm run ts-command update-pot-file",
-    "command": "bash -c 'NODE_PATH=./dist node -r dotenv/config ./dist/commands/\"$0\".js -- \"${@:1}\"'",
+    "command": "bash -c 'NODE_PATH=./dist node --env-file=.env ./dist/commands/\"$0\".js -- \"${@:1}\"'",
     "ts-command": "bash -c 'NODE_PATH=./src ts-node ./src/commands/\"$0\".ts -- \"${@:1}\"'"
   },
   "dependencies": {
     "@sentry/node": "^8.32.0",
     "axios": "^1.12.2",
-    "body-parser": "^1.20.3",
-    "class-validator": "^0.14.1",
     "click-parser": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.1.0",
-    "dotenv": "^17.2.3",
     "express": "^4.21.0",
     "gettext-parser": "^8.0.0",
     "meilisearch": "^0.53.0",
@@ -51,7 +48,6 @@
     "sanitize-html": "^2.17.0",
     "shuffle-array": "^1.0.1",
     "sleepjs": "^4.0.3",
-    "uuid": "^13.0.0",
     "winston": "^3.18.3",
     "yaml": "^2.9.0",
     "zod": "^3.25.76"
@@ -72,7 +68,6 @@
     "@types/sanitize-html": "^2.13.0",
     "@types/shuffle-array": "^1.0.5",
     "@types/supertest": "^6.0.2",
-    "@types/uuid": "^10.0.0",
     "jsonlint": "^1.6.3",
     "nodemon": "^3.1.10",
     "nyc": "^17.1.0",
@@ -83,7 +78,7 @@
     "typescript": "^6.0.3"
   },
   "nodemonConfig": {
-    "exec": "node -r tsconfig-paths/register -r ts-node/register -r dotenv/config ./src/index.ts",
+    "exec": "node -r tsconfig-paths/register -r ts-node/register --env-file=.env ./src/index.ts",
     "ext": "ts, js, json",
     "ignore": [
       "**/*.test.ts",

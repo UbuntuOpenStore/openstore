@@ -3,7 +3,6 @@ import path from 'path';
 import express, { type Request, type Response } from 'express';
 import { Types } from 'mongoose';
 import multer from 'multer';
-import { v4 as uuidv4 } from 'uuid';
 
 import { User } from '../db/user';
 import { type ProfileUpdateData } from '../db/user/types';
@@ -17,7 +16,7 @@ const avatarStorage = multer.diskStorage({
     cb(null, config.avatar_dir);
   },
   filename: (req, file, cb) => {
-    const uniqueName = uuidv4();
+    const uniqueName = crypto.randomUUID();
     const ext = path.extname(file.originalname);
     cb(null, `${uniqueName}${ext}`);
   },

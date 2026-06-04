@@ -1,7 +1,6 @@
 import cluster from 'cluster';
 
 import * as Sentry from '@sentry/node';
-import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import session from 'cookie-session';
 import express, { type Request, type Response, type NextFunction } from 'express';
@@ -68,8 +67,8 @@ export function setup() {
   });
 
   app.use(cookieParser());
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json());
   app.use(methodOverride());
   app.use(
     session({

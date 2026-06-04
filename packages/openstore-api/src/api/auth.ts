@@ -8,7 +8,6 @@ import { Strategy as GitLabStrategy } from 'passport-gitlab2';
 import { Strategy as LocalAPIKeyStrategy } from 'passport-localapikey';
 // @ts-ignore
 import { Strategy as UbuntuStrategy } from 'passport-ubuntu';
-import { v4 } from 'uuid';
 
 import { type HydratedUser, User } from '../db/user';
 import { logger, config, asyncErrorWrapper } from '../utils';
@@ -138,7 +137,7 @@ passport.use(
           let user = existing;
           if (!user) {
             user = new User();
-            user.apikey = v4();
+            user.apikey = crypto.randomUUID();
             user.username = `${Math.random()}`;
             user.language = 'en';
           }
@@ -198,7 +197,7 @@ if (config.github.clientID && config.github.clientSecret) {
             let user = existing;
             if (!user) {
               user = new User();
-              user.apikey = v4();
+              user.apikey = crypto.randomUUID();
               user.language = 'en';
             }
 
@@ -248,7 +247,7 @@ if (config.gitlab.clientID && config.gitlab.clientSecret) {
             let user = existing;
             if (!user) {
               user = new User();
-              user.apikey = v4();
+              user.apikey = crypto.randomUUID();
               user.language = 'en';
             }
 

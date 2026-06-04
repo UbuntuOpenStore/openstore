@@ -5,9 +5,8 @@ import { existsSync } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';
 
-import { isURL } from 'class-validator';
 import { type Schema } from 'mongoose';
-import { v4 } from 'uuid';
+import { z } from 'zod';
 
 import { UserError } from '../../exceptions';
 import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
@@ -57,6 +56,11 @@ import {
   The filesize is stored in kilobytes (from the click package
   https://gitlab.com/ubports/development/core/click/-/blob/main/click_package/build.py#L241
 */
+const urlSchema = z.string().url();
+function isURL(value: string): boolean {
+  return urlSchema.safeParse(value).success;
+}
+
 function toBytes(filesizeKb: number) {
   return filesizeKb * 1024;
 }
@@ -281,7 +285,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
                 return null;
               }
 
-              const tmpPath = path.join('/tmp', `${v4()}${ext}`);
+              const tmpPath = path.join('/tmp', `${crypto.randomUUID()}${ext}`);
               await fs.writeFile(tmpPath, Buffer.from(await response.arrayBuffer()));
 
               const filename = `${this.id as string}-screenshot-${urlHash}${ext}`;
@@ -922,7 +926,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
           console.warn(`Failed to remove screenshot ${file.path}:`, error);
         }
       } else {
-        const id = v4();
+        const id = crypto.randomUUID();
         const filename = `${this.id as string}-screenshot-${id}${ext}`;
 
         await moveFile(screenshotFiles[i].path, `${config.screenshot_dir}/${filename}`);
@@ -948,8 +952,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       }
     }
 
-    const uuid = v4();
-    const filename = `${this.id as string}-banner-${uuid}${ext}`;
+    const filename = `${this.id as string}-banner-${crypto.randomUUID()}${ext}`;
 
     await moveFile(bannerFile.path, `${config.banner_dir}/${filename}`);
 
