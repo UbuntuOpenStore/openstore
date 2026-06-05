@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
 import { RATINGS } from './constants';
 import { setupStatics } from './statics';
@@ -16,8 +16,12 @@ export const reviewSchema = new Schema<IReview, ReviewModel, IReviewMethods>({
 });
 
 reviewSchema.methods.serialize = function () {
+  if (this.user == null || this.user instanceof Types.ObjectId) {
+    throw new Error('User not populated');
+  }
+
   let comment: null | { body: string; date: number } = null;
-  if (this.comment) {
+  if (this.comment && !(this.comment instanceof Types.ObjectId)) {
     comment = {
       body: this.comment.body,
       date: this.comment.date.getTime(),

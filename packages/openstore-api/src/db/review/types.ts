@@ -1,6 +1,7 @@
 import { type Request } from 'express';
-import { type FilterQuery, type HydratedDocument, type Model, type Types } from 'mongoose';
+import { type FilterQuery, type HydratedDocument, type Model, type PopulatedDoc, type Types } from 'mongoose';
 
+import { type HydratedComment } from '../comment/types';
 import { type HydratedPackage } from '../package/types';
 import { type HydratedUser } from '../user/types';
 import { type Ratings } from './constants';
@@ -8,12 +9,12 @@ import { type Ratings } from './constants';
 export interface IReview {
   pkg: Types.ObjectId;
   version: string;
-  user: Types.ObjectId;
+  user: PopulatedDoc<HydratedUser>;
   rating: Ratings;
   body?: string;
   date: Date;
   redacted: boolean;
-  comment: Types.ObjectId;
+  comment: PopulatedDoc<HydratedComment> | null;
 }
 
 export type SerializedReview = {

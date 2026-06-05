@@ -29,7 +29,7 @@ lockSchema.statics.acquire = async function (name: string) {
     const now = Date.now();
 
     // Remove expired locks
-    await this.findOneAndRemove({ name, expire: { $lt: new Date(now) } });
+    await this.findOneAndDelete({ name, expire: { $lt: new Date(now) } });
 
     const newLock = new this({
       name,

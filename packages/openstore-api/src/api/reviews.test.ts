@@ -112,7 +112,7 @@ describe('Reviews', () => {
       assert.ok(review?.date);
       assert.equal(review?.redacted, false);
       assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user.toString(), user1._id.toString());
+      assert.equal(review?.user?.toString(), user1._id.toString());
     });
 
     test('updates own review', async () => {
@@ -146,7 +146,7 @@ describe('Reviews', () => {
       assert.ok(review?.date);
       assert.equal(review?.redacted, false);
       assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user.toString(), user1._id.toString());
+      assert.equal(review?.user?.toString(), user1._id.toString());
 
       pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');
       checkRatings = {};
@@ -225,7 +225,7 @@ describe('Reviews', () => {
       assert.ok(review?.date);
       assert.equal(review?.redacted, false);
       assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user.toString(), user1._id.toString());
+      assert.equal(review?.user?.toString(), user1._id.toString());
     });
 
     test('throws a 400 when updating a redacted review', async () => {
@@ -252,7 +252,7 @@ describe('Reviews', () => {
       assert.ok(review?.date);
       assert.equal(review?.redacted, false);
       assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user.toString(), user1._id.toString());
+      assert.equal(review?.user?.toString(), user1._id.toString());
     });
 
     test('allows reviews for snap packages', async () => {

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-06-03T16:30:22.208Z\n"
-"PO-Revision-Date: 2026-06-03T16:30:22.208Z\n"
+"POT-Creation-Date: 2026-06-05T13:33:38.003Z\n"
+"PO-Revision-Date: 2026-06-05T13:33:38.004Z\n"
 
 msgid "New!"
 msgstr "New!"
@@ -938,6 +938,9 @@ msgstr "Revision"
 
 msgid "AppStream Metainfo"
 msgstr "AppStream Metainfo"
+
+msgid "AppStream Docs"
+msgstr "AppStream Docs"
 
 msgid ""
 "If your click package includes an AppStream metainfo file "
