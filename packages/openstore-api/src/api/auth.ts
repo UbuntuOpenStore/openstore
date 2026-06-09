@@ -11,16 +11,13 @@ import { Strategy as UbuntuStrategy } from 'passport-ubuntu';
 
 import { type HydratedUser, User } from '../db/user';
 import { logger, config, asyncErrorWrapper } from '../utils';
+import { githubProfileSchema, gitlabProfileSchema, ubuntuProfileSchema } from '../utils/auth.schema';
 
 // Passport doesn't seem to have nice types for the `done` callback
 export interface GenericCallback {
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/prefer-function-type
   (err: any, arg1?: any, arg2?: any): void;
 }
-
-export type PassportProfile = {
-  [key: string]: any;
-};
 
 function replaceName(name?: string, email?: string): string {
   if (email?.endsWith('@ubports.com')) {
@@ -124,11 +121,21 @@ passport.use(
       realm: config.server.host,
       stateless: true,
     },
-    (identifier: string, profile: PassportProfile, callback: GenericCallback) => {
+    (identifier: string, profile: unknown, callback: GenericCallback) => {
+      const result = ubuntuProfileSchema.safeParse(profile);
+      if (!result.success) {
+        callback(result.error);
+        return;
+      }
+
+      const parsedProfile = result.data;
+
       User.findOne({ ubuntu_id: identifier })
         .then((user) => {
-          if (!user && profile.email) {
-            return User.findOne({ email: Array.isArray(profile.email) ? profile.email[0] : profile.email }).then((emailUser) => emailUser);
+          if (!user && parsedProfile.email) {
+            return User.findOne({ email: Array.isArray(parsedProfile.email) ? parsedProfile.email[0] : parsedProfile.email }).then(
+              (emailUser) => emailUser,
+            );
           }
 
           return user;
@@ -142,18 +149,18 @@ passport.use(
             user.language = 'en';
           }
 
-          function uboneParameter(value: string | string[]) {
+          function uboneParameter(value: string | string[] | undefined | null) {
             if (Array.isArray(value)) {
               return value.length >= 1 ? value[0] : null;
             }
-            return value;
+            return value ?? null;
           }
 
           user.ubuntu_id = identifier;
-          user.email = uboneParameter(profile.email) || user.email;
-          user.name = replaceName(uboneParameter(profile.fullname) || user.name, user.email);
-          user.username = replaceName(uboneParameter(profile.nickname) || user.username, user.email);
-          user.language = uboneParameter(profile.language) || user.language;
+          user.email = uboneParameter(parsedProfile.email) || user.email;
+          user.name = replaceName(uboneParameter(parsedProfile.fullname) || user.name, user.email);
+          user.username = replaceName(uboneParameter(parsedProfile.nickname) || user.username, user.email);
+          user.language = uboneParameter(parsedProfile.language) || user.language;
 
           return user.save();
         })
@@ -180,14 +187,20 @@ if (config.github.clientID && config.github.clientSecret) {
         callbackURL: `${config.server.host}/auth/github/callback`,
         scope: ['user:email'],
       },
-      (accessToken: string, refreshToken: string, profile: PassportProfile, callback: GenericCallback) => {
-        User.findOne({ github_id: profile.id })
-          .then((user) => {
-            const emails = profile.emails
-              .filter((email: { verified: boolean; value: string }) => email.verified)
-              .map((email: { verified: boolean; value: string }) => email.value);
+      (accessToken: string, refreshToken: string, profile: unknown, callback: GenericCallback) => {
+        const result = githubProfileSchema.safeParse(profile);
+        if (!result.success) {
+          callback(result.error);
+          return;
+        }
 
-            if (!user && emails) {
+        const parsedProfile = result.data;
+
+        User.findOne({ github_id: parsedProfile.id })
+          .then((user) => {
+            const emails = (parsedProfile.emails ?? []).filter((email) => email.verified).map((email) => email.value);
+
+            if (!user && emails.length > 0) {
               return User.findOne({ email: { $in: emails } }).then((emailUser) => emailUser);
             }
 
@@ -201,10 +214,11 @@ if (config.github.clientID && config.github.clientSecret) {
               user.language = 'en';
             }
 
-            user.github_id = profile.id;
-            user.email = !user.email && profile.emails.length >= 1 ? profile.emails[0].value : user.email;
-            user.name = replaceName(user.name ? user.name : profile.displayName, user.email);
-            user.username = replaceName(user.username ? user.username : profile.username, user.email);
+            user.github_id = parsedProfile.id;
+            user.email =
+              !user.email && parsedProfile.emails && parsedProfile.emails.length >= 1 ? parsedProfile.emails[0].value : user.email;
+            user.name = replaceName(user.name ? user.name : parsedProfile.displayName, user.email);
+            user.username = replaceName(user.username ? user.username : parsedProfile.username, user.email);
 
             return user.save();
           })
@@ -232,10 +246,18 @@ if (config.gitlab.clientID && config.gitlab.clientSecret) {
         clientSecret: config.gitlab.clientSecret,
         callbackURL: `${config.server.host}/auth/gitlab/callback`,
       },
-      (accessToken: string, refreshToken: string, profile: PassportProfile, callback: GenericCallback) => {
-        User.findOne({ gitlab_id: profile.id })
+      (accessToken: string, refreshToken: string, profile: unknown, callback: GenericCallback) => {
+        const result = gitlabProfileSchema.safeParse(profile);
+        if (!result.success) {
+          callback(result.error);
+          return;
+        }
+
+        const parsedProfile = result.data;
+
+        User.findOne({ gitlab_id: parsedProfile.id })
           .then((user) => {
-            const emails = profile.emails.map((email: { value: string }) => email.value);
+            const emails = (parsedProfile.emails ?? []).map((email) => email.value);
 
             if (!user && emails.length > 0) {
               return User.findOne({ email: { $in: emails } }).then((emailUser) => emailUser);
@@ -251,10 +273,11 @@ if (config.gitlab.clientID && config.gitlab.clientSecret) {
               user.language = 'en';
             }
 
-            user.gitlab_id = profile.id;
-            user.email = !user.email && profile.emails.length > 0 ? profile.emails[0].value : user.email;
-            user.name = replaceName(user.name ? user.name : profile.displayName, user.email);
-            user.username = replaceName(user.username ? user.username : profile.username, user.email);
+            user.gitlab_id = parsedProfile.id;
+            user.email =
+              !user.email && parsedProfile.emails && parsedProfile.emails.length > 0 ? parsedProfile.emails[0].value : user.email;
+            user.name = replaceName(user.name ? user.name : parsedProfile.displayName, user.email);
+            user.username = replaceName(user.username ? user.username : parsedProfile.username, user.email);
 
             return user.save();
           })
