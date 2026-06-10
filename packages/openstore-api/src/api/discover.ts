@@ -191,7 +191,7 @@ async function getCategoryApps(
   ];
 
   const discoverCategoriesApps = await Promise.all(
-    categories.map((category) => {
+    categories.map(async (category) => {
       if (category.ids.length === 0) {
         return [];
       }

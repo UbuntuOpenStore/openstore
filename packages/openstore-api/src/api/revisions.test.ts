@@ -225,7 +225,7 @@ describe('Revisions GET', () => {
   test('fails if arch is not specified or is invalid', async () => {
     package1.revisions = package1.revisions.map((revision: HydratedRevision) => {
       return {
-        ...revision,
+        ...revision.toObject(),
         architecture: Architecture.ARM64,
       };
     }) as any;

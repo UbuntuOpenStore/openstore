@@ -14,7 +14,7 @@ export async function cleanMongoose() {
   const db = mongoose.connection.db!;
   const collections = await db.listCollections().toArray();
   await Promise.all(
-    collections.map(({ name }) => {
+    collections.map(async ({ name }) => {
       if (name === 'system.profile') {
         return null;
       }

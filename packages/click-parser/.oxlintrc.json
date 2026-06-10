@@ -2,5 +2,14 @@
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
   "env": {
     "node": true
-  }
+  },
+  "extends": ["../../.oxlintrc.json"],
+  "overrides": [
+    {
+      "files": ["test/test.ts"],
+      "rules": {
+        "no-floating-promises": "off",
+      }
+    }
+  ]
 }

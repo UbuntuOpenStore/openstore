@@ -56,7 +56,7 @@ export function bufferToWebReadableStream(buffer: Buffer): ReadableStream<Uint8A
   });
 }
 
-export function parseJsonFile(data: Uint8Array | undefined): unknown | undefined {
+export function parseJsonFile(data: Uint8Array | undefined): unknown {
   if (!data) {
     return undefined;
   }

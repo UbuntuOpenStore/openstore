@@ -35,7 +35,7 @@ process.on('unhandledRejection', (err) => {
   });
 });
 
-export function captureException(err: string | unknown | Error, route: string) {
+export function captureException(err: unknown, route: string) {
   if (process.env.NODE_ENV !== 'testing' && process.env.NODE_ENV !== 'ci') {
     console.log(`Error from route: ${route}`);
     console.error(err);

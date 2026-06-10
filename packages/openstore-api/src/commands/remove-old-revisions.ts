@@ -19,7 +19,7 @@ if (DRY_RUN) {
 Package.find({ id: { $in: limitedApps } })
   .then((pkgs) => {
     return Promise.all(
-      pkgs.map((pkg) => {
+      pkgs.map(async (pkg) => {
         if (pkg.revisions) {
           const fileCounts: { [key: string]: number } = {};
 
