@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from 'express';
 
 import { Package } from '../db/package';
-import { Architecture, type Channel } from '../db/package/types';
+import { Architecture, HydratedRevision, type Channel } from '../db/package/types';
 import { UserError } from '../exceptions';
 import { getDataArray, getData, success, asyncErrorWrapper } from '../utils';
 import { handleChannel } from '../utils/channels';
@@ -15,9 +15,9 @@ async function revisionsByVersion(req: Request, res: Response) {
 
   const defaultChannel = handleChannel(getData(req, 'channel'));
   const frameworks = getDataArray(req, 'frameworks', []);
-  const architecture = getData(req, 'architecture').toLowerCase() as Architecture;
+  const architecture = getData(req, 'architecture').toLowerCase() as Architecture | undefined;
 
-  if (!Object.values(Architecture).includes(architecture) || !architecture) {
+  if (!architecture || !Object.values(Architecture).includes(architecture)) {
     throw new UserError(INVALID_ARCH);
   }
 
@@ -39,7 +39,7 @@ async function revisionsByVersion(req: Request, res: Response) {
           rev.version === version &&
           rev.channel === channel &&
           (rev.architecture === architecture || rev.architecture === Architecture.ALL),
-      )[0];
+      )[0] as HydratedRevision | undefined;
       const revision = revisionData ? revisionData.revision : 0;
 
       const { revisionData: latestRevisionData } = pkg.getLatestRevision(channel, architecture, undefined, frameworks);

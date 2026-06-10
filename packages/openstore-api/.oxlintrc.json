@@ -4,12 +4,17 @@
     "node": true
   },
   "extends": ["../../.oxlintrc.json"],
+  "rules": {
+    "typescript/no-unnecessary-condition": "error",
+    "typescript/no-unnecessary-type-assertion": "error"
+  },
   "overrides": [
     {
       "files": ["src/**/*.test.ts"],
       "rules": {
         "no-floating-promises": "off",
-        "typescript/no-base-to-string": "off"
+        "typescript/no-base-to-string": "off",
+        "typescript/no-unnecessary-condition": "off"
       }
     }
   ]

@@ -1,3 +1,5 @@
+// oxlint-disable typescript/no-unnecessary-condition
+
 import { type Request } from 'express';
 
 export function getData(req: Request, name: string, defaultData = ''): string {

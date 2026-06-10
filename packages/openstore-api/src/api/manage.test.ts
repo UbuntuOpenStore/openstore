@@ -796,8 +796,8 @@ describe('Manage', () => {
 
         const pkg = await Package.findOneByFilters(package1.id);
         assert.equal(pkg?.screenshots.length, 2);
-        assert.equal(pkg?.screenshots[0], res.body.data.screenshots[1].replace('http://local.open-store.io/screenshots/', ''));
-        assert.equal(pkg?.screenshots[1], res.body.data.screenshots[0].replace('http://local.open-store.io/screenshots/', ''));
+        assert.equal(pkg.screenshots[0], res.body.data.screenshots[1].replace('http://local.open-store.io/screenshots/', ''));
+        assert.equal(pkg.screenshots[1], res.body.data.screenshots[0].replace('http://local.open-store.io/screenshots/', ''));
       });
 
       test('clears out urls', async (t) => {

@@ -40,14 +40,14 @@ export const CATEGORY_MAPPING: Record<string, string> = {
   utilities: 'Utilities',
 };
 
-export const ARCH_MAPPING: Record<string, Architecture> = {
+export const ARCH_MAPPING: Partial<Record<string, Architecture>> = {
   amd64: Architecture.AMD64,
   arm64: Architecture.ARM64,
   armhf: Architecture.ARMHF,
   all: Architecture.ALL,
 };
 
-export const SNAP_CHANNEL_MAPPING: Record<string, SnapChannel> = {
+export const SNAP_CHANNEL_MAPPING: Partial<Record<string, SnapChannel>> = {
   stable: SnapChannel.STABLE,
   candidate: SnapChannel.CANDIDATE,
   beta: SnapChannel.BETA,
@@ -268,7 +268,7 @@ export async function searchSnaps(prefix: string, fetchFn = fetch, sleepFn = sle
   }
 
   const data = (await response.json()) as { results: SnapSearchResult[] };
-  const results = data.results || [];
+  const results = data.results;
 
   snaps = results.map((snap) => snap.name);
 
@@ -366,7 +366,7 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
 
   const stableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
   const stableOrFirst = stableRevision || v2Data['channel-map'][0];
-  const snapCategory = v2Data.snap.categories?.[0]?.name?.toLowerCase() || 'utilities';
+  const snapCategory = v2Data.snap.categories?.[0]?.name.toLowerCase() || 'utilities';
   const openStoreCategory = CATEGORY_MAPPING[snapCategory] || 'Utilities';
   const contactUrls = v2Data.snap.links?.contact || [];
   const websiteUrls = v2Data.snap.links?.website || [];
@@ -401,8 +401,8 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
     device_compatibilities: Array.from(deviceCompatibilitiesSet),
     locked: false,
     published: true,
-    published_date: stableOrFirst?.['created-at'] || new Date().toISOString(),
-    updated_date: stableOrFirst?.channel['released-at'] || new Date().toISOString(),
+    published_date: stableOrFirst['created-at'] || new Date().toISOString(),
+    updated_date: stableOrFirst.channel['released-at'] || new Date().toISOString(),
     revisions: revisions as unknown as IPackage['revisions'],
     icon,
     package_type: PackageType.SNAP,
@@ -410,8 +410,8 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
     external_id: v2Data.name,
     snap_data: {
       channels: Array.from(channelsSet),
-      confinement: (stableOrFirst?.confinement as SnapConfinement) || ('strict' as SnapConfinement),
-      base: stableOrFirst?.base || '',
+      confinement: stableOrFirst.confinement as SnapConfinement,
+      base: stableOrFirst.base,
     },
   };
 }

@@ -107,12 +107,12 @@ describe('Reviews', () => {
 
       const review = await Review.findOne({ user: user1._id });
       assert.equal(review?.body, 'great app');
-      assert.equal(review?.version, '1.0.0');
-      assert.equal(review?.rating, 'THUMBS_UP');
-      assert.ok(review?.date);
-      assert.equal(review?.redacted, false);
-      assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user?.toString(), user1._id.toString());
+      assert.equal(review.version, '1.0.0');
+      assert.equal(review.rating, 'THUMBS_UP');
+      assert.ok(review.date);
+      assert.equal(review.redacted, false);
+      assert.equal(review.pkg.toString(), package1._id.toString());
+      assert.equal(review.user?.toString(), user1._id.toString());
     });
 
     test('updates own review', async () => {
@@ -121,7 +121,7 @@ describe('Reviews', () => {
 
       let pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');
       let checkRatings: Record<string, number> = {};
-      if (pkg && pkg.rating_counts) {
+      if (pkg) {
         const initial: Record<string, number> = {};
         checkRatings = pkg.rating_counts.reduce((accumulator, count) => {
           return {
@@ -140,17 +140,17 @@ describe('Reviews', () => {
       assert.equal(reviews.length, 1);
 
       const review = reviews[0];
-      assert.equal(review?.body, 'great app');
-      assert.equal(review?.version, '1.0.0');
-      assert.equal(review?.rating, 'THUMBS_UP');
-      assert.ok(review?.date);
-      assert.equal(review?.redacted, false);
-      assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user?.toString(), user1._id.toString());
+      assert.equal(review.body, 'great app');
+      assert.equal(review.version, '1.0.0');
+      assert.equal(review.rating, 'THUMBS_UP');
+      assert.ok(review.date);
+      assert.equal(review.redacted, false);
+      assert.equal(review.pkg.toString(), package1._id.toString());
+      assert.equal(review.user?.toString(), user1._id.toString());
 
       pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');
       checkRatings = {};
-      if (pkg && pkg.rating_counts) {
+      if (pkg) {
         const initial: Record<string, number> = {};
         checkRatings = pkg.rating_counts.reduce((accumulator, count) => {
           return {
@@ -220,12 +220,12 @@ describe('Reviews', () => {
 
       const review = await Review.findOne({ user: user1._id });
       assert.equal(review?.body, 'great app');
-      assert.equal(review?.version, '1.0.0');
-      assert.equal(review?.rating, 'THUMBS_UP');
-      assert.ok(review?.date);
-      assert.equal(review?.redacted, false);
-      assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user?.toString(), user1._id.toString());
+      assert.equal(review.version, '1.0.0');
+      assert.equal(review.rating, 'THUMBS_UP');
+      assert.ok(review.date);
+      assert.equal(review.redacted, false);
+      assert.equal(review.pkg.toString(), package1._id.toString());
+      assert.equal(review.user?.toString(), user1._id.toString());
     });
 
     test('throws a 400 when updating a redacted review', async () => {
@@ -246,13 +246,13 @@ describe('Reviews', () => {
       assert.equal(reviews.length, 1);
 
       const review = reviews[0];
-      assert.equal(review?.body, 'really great app');
-      assert.equal(review?.version, '1.0.0');
-      assert.equal(review?.rating, 'THUMBS_UP');
-      assert.ok(review?.date);
-      assert.equal(review?.redacted, false);
-      assert.equal(review?.pkg.toString(), package1._id.toString());
-      assert.equal(review?.user?.toString(), user1._id.toString());
+      assert.equal(review.body, 'really great app');
+      assert.equal(review.version, '1.0.0');
+      assert.equal(review.rating, 'THUMBS_UP');
+      assert.ok(review.date);
+      assert.equal(review.redacted, false);
+      assert.equal(review.pkg.toString(), package1._id.toString());
+      assert.equal(review.user?.toString(), user1._id.toString());
     });
 
     test('allows reviews for snap packages', async () => {
@@ -281,8 +281,8 @@ describe('Reviews', () => {
 
       const review = await Review.findOne({ user: user1._id, pkg: (await Package.findOne({ id: 'snap.package' }))?._id });
       assert.equal(review?.body, 'great app');
-      assert.equal(review?.version, '1.0.0');
-      assert.equal(review?.rating, 'THUMBS_UP');
+      assert.equal(review.version, '1.0.0');
+      assert.equal(review.rating, 'THUMBS_UP');
     });
   });
 

@@ -9,7 +9,7 @@ type AppstreamLocalized = { text: string; lang: string };
 export function getAppstreamLocalizedString(items: AppstreamLocalized[] | undefined): string | undefined {
   if (!items || items.length === 0) return undefined;
   const en = items.find((item) => item.lang === 'en' || item.lang === '');
-  return (en ?? items[0])?.text || undefined;
+  return (en ?? items[0]).text || undefined;
 }
 
 const SPDX_MAP: Record<string, string> = {

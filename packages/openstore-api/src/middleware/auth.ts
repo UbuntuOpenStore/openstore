@@ -6,19 +6,19 @@ import { error } from '../utils';
 import { ACCOUNT_DISABLED } from '../utils/error-messages';
 
 export function userRole(req: Request, res: Response, next: NextFunction) {
-  req.isAdminUser = req.isAuthenticated() && req.user && req.user.role === 'admin';
-  req.isTrustedUser = req.isAuthenticated() && req.user && req.user.role === 'trusted';
+  req.isAdminUser = req.isAuthenticated() && req.user.role === 'admin';
+  req.isTrustedUser = req.isAuthenticated() && req.user.role === 'trusted';
 
-  if (req.isAuthenticated() && req.user && req.user.role !== 'disabled') {
+  if (req.isAuthenticated() && req.user.role !== 'disabled') {
     next();
   } else {
-    const reason = req.isAuthenticated() && req.user?.disabled_reason;
+    const reason = req.isAuthenticated() && req.user.disabled_reason;
     error(res, reason ? `${ACCOUNT_DISABLED}: ${reason}` : ACCOUNT_DISABLED, 403);
   }
 }
 
 export function adminOnly(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && req.user && req.user.role === 'admin') {
+  if (req.isAuthenticated() && req.user.role === 'admin') {
     next();
   } else {
     error(res, 'Forbidden', 403);

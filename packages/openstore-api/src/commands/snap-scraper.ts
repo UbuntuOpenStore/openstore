@@ -34,12 +34,7 @@ async function syncSnapPackages(options: { search?: string; force?: boolean } = 
           const latestStableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
           const existingLatestRevision = existingPackage.revisions[existingPackage.revisions.length - 1];
 
-          if (
-            !options.force &&
-            latestStableRevision &&
-            existingLatestRevision &&
-            latestStableRevision.version === existingLatestRevision.version
-          ) {
+          if (!options.force && latestStableRevision && latestStableRevision.version === existingLatestRevision.version) {
             console.log(`  Skipped (already up to date): ${snapName}`);
             totalSkipped++;
             continue;

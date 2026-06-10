@@ -52,7 +52,7 @@ async function upsertReview(req: Request, res: Response) {
     error(res, CANNOT_REVIEW_OWN_APP, 400);
     return;
   }
-  if (!req.pkg.revisions || !req.pkg.revisions.find((revision) => revision.version === version)) {
+  if (!req.pkg.revisions.find((revision) => revision.version === version)) {
     error(res, VERSION_NOT_FOUND, 404);
     return;
   }

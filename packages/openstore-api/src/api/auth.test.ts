@@ -267,7 +267,7 @@ describe('Auth API', () => {
 
       const dbUser = await User.findById(existingUser._id);
       assert.equal(dbUser?.name, 'Updated Name');
-      assert.equal(dbUser?.username, 'updatedname');
+      assert.equal(dbUser.username, 'updatedname');
     });
 
     test('links account by email when no ubuntu_id match exists', async () => {
