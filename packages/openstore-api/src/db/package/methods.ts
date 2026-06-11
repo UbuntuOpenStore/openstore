@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+// oxlint-disable typescript/no-unnecessary-condition
 
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
@@ -697,6 +697,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
           }
 
           const revision = {
+            // oxlint-disable-next-line typescript/no-misused-spread
             ...rData.toObject(),
             _id: undefined,
             download_url: rData.download_url ? this.getDownloadUrl(rData.channel, rData.architecture, rData.version) : null,

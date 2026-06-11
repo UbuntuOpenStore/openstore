@@ -1004,7 +1004,7 @@ describe('Package', () => {
         'base64',
       );
 
-      t.mock.method(globalThis, 'fetch', async (url: string) => ({
+      t.mock.method(globalThis, 'fetch', async () => ({
         ok: true,
         headers: { get: () => 'image/png' },
         arrayBuffer: async () => pngData.buffer,
@@ -1043,7 +1043,7 @@ describe('Package', () => {
         'base64',
       );
 
-      t.mock.method(globalThis, 'fetch', async (url: string) => ({
+      t.mock.method(globalThis, 'fetch', async () => ({
         ok: true,
         headers: { get: () => 'image/png' },
         arrayBuffer: async () => pngData.buffer,
@@ -1079,7 +1079,7 @@ describe('Package', () => {
         'base64',
       );
 
-      const fetchMock = t.mock.method(globalThis, 'fetch', async (url: string) => ({
+      const fetchMock = t.mock.method(globalThis, 'fetch', async () => ({
         ok: true,
         headers: { get: () => 'image/png' },
         arrayBuffer: async () => pngData.buffer,

@@ -225,6 +225,7 @@ export class PackageSearch implements PackageSearchInterface {
 
     return {
       hits: results.hits,
+      // oxlint-disable-next-line typescript/no-unnecessary-condition
       count: results.estimatedTotalHits ?? results.hits.length,
     };
   }

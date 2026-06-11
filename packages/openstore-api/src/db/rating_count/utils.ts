@@ -17,9 +17,8 @@ export async function recalculatePackageRatings(pkgId: Types.ObjectId) {
   }
 
   let calculatedRating = 0;
-  if (!pkg.rating_counts) {
-    pkg.rating_counts = [] as any;
-  }
+  // oxlint-disable-next-line typescript/no-unnecessary-condition
+  pkg.rating_counts = pkg.rating_counts ?? [];
 
   const reviewQuery: FilterQuery<IReview> = { pkg: pkgId };
   const reviews = await Review.find(reviewQuery);

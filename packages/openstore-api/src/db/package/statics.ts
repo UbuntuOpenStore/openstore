@@ -120,7 +120,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     packageTypes: PackageType[] = [PackageType.CLICK],
   ): Promise<CategoryStat[]> {
     const match: FilterQuery<IPackage> = { published: true, package_type: { $in: packageTypes } };
-    if (channels) {
+    if (channels.length > 0) {
       match.channels = { $in: channels };
     }
 
@@ -157,7 +157,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     ];
     const packageTypes = packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : [PackageType.CLICK];
 
-    const architecture = getData(req, 'architecture').toLowerCase() as Architecture;
+    const architecture = getData(req, 'architecture').toLowerCase() as Architecture | undefined;
     let architectures: Architecture[] = [];
     if (architecture) {
       architectures = [architecture];
@@ -385,7 +385,8 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       pkgs = hits.map((pkg: any) => {
         return new this({
           ...pkg,
-          rating_counts: ratingCounts[pkg.id] || [],
+          // oxlint-disable-next-line typescript/no-unnecessary-condition
+          rating_counts: ratingCounts[pkg.id] ?? [],
         });
       });
     }

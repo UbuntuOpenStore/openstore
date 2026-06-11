@@ -14,8 +14,8 @@ ratingCountSchema.statics.getCountsByIds = async function (ids: string[]) {
 
   const ratingCounts = await this.find(query).exec();
 
-  return ratingCounts.reduce((accumulation: { [key: string]: HydratedRatingCount[] }, ratingCount: HydratedRatingCount) => {
-    const value = accumulation[ratingCount.package_id] ? [...accumulation[ratingCount.package_id], ratingCount] : [ratingCount];
+  return ratingCounts.reduce((accumulation: { [key: string]: HydratedRatingCount[] | undefined }, ratingCount: HydratedRatingCount) => {
+    const value = accumulation[ratingCount.package_id] ? [...accumulation[ratingCount.package_id]!, ratingCount] : [ratingCount];
 
     return {
       ...accumulation,
