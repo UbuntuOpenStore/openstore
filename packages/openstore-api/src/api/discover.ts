@@ -14,7 +14,7 @@ import { RatingCount } from '../db/rating_count';
 import { success, getData, getDataArray, setLang, gettext, asyncErrorWrapper } from '../utils';
 import { handleChannel } from '../utils/channels';
 import { config } from '../utils/config';
-import { type DiscoverHighlight, type DiscoverData } from './types';
+import { type DiscoverHighlight, type DiscoverCategory, type DiscoverData } from './types';
 
 const router = express.Router();
 
@@ -282,16 +282,14 @@ async function refreshRatings(discover: DiscoverData) {
 function translateDiscover(lang: string, discover: DiscoverData) {
   setLang(lang);
 
-  const cloneDiscover: DiscoverData = JSON.parse(JSON.stringify(discover));
-  cloneDiscover.categories = cloneDiscover.categories.map((category) => {
-    return {
+  return {
+    ...discover,
+    categories: discover.categories.map((category) => ({
       ...category,
       name: gettext(category.name),
       tagline: category.tagline ? gettext(category.tagline) : '',
-    };
-  });
-
-  return cloneDiscover;
+    })),
+  };
 }
 
 /**
@@ -328,16 +326,20 @@ router.get(
       }
 
       const discover: DiscoverData = {
-        highlights: JSON.parse(JSON.stringify(discoverData.highlights)),
-        categories: JSON.parse(JSON.stringify(discoverData.categories)),
+        highlights: discoverData.highlights as DiscoverHighlight[],
+        categories: discoverData.categories as DiscoverCategory[],
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         highlight: {} as DiscoverHighlight, // Will be set by getHighlights
       };
 
-      await getHighlights(discover, channel, architecture, frameworks, req.apiVersion);
-      await getCategoryApps(discover, channel, architecture, frameworks, req.apiVersion);
-      await getNewAndUpdatedApps(discover, channel, architecture, frameworks, req.apiVersion);
-      await getPopularApps(discover, channel, architecture, frameworks, req.apiVersion);
+      await Promise.all([
+        getHighlights(discover, channel, architecture, frameworks, req.apiVersion),
+        getCategoryApps(discover, channel, architecture, frameworks, req.apiVersion),
+      ]);
+      await Promise.all([
+        getNewAndUpdatedApps(discover, channel, architecture, frameworks, req.apiVersion),
+        getPopularApps(discover, channel, architecture, frameworks, req.apiVersion),
+      ]);
 
       discover.categories = discover.categories.filter((category) => category.apps.length > 0);
       discover.categories = discover.categories.map((category) => {
@@ -352,7 +354,7 @@ router.get(
       success(res, translateDiscover(lang, discover));
     } else {
       // Cache hit
-      const discover: DiscoverData = JSON.parse(JSON.stringify(cachedData.data));
+      const discover: DiscoverData = structuredClone(cachedData.data);
       await refreshRatings(discover);
 
       success(res, translateDiscover(lang, discover));

@@ -127,6 +127,12 @@ packageSchema.index(
   },
 );
 
+// Compound index for ID-based lookups (highlights, category apps)
+packageSchema.index({ id: 1, published: 1, package_type: 1 });
+
+// Compound index for list queries (new/updated, popular)
+packageSchema.index({ published: 1, package_type: 1, nsfw: 1 });
+
 setupMethods(packageSchema);
 setupVirtuals(packageSchema);
 setupStatics(packageSchema);
