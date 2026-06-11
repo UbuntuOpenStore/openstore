@@ -124,7 +124,7 @@ describe('Discover API', () => {
 
     const res = await request(app).get(route).expect(500);
     assert.equal(res.body.success, false);
-    assert.equal(mockFn.mock.callCount(), 3);
+    assert.equal(mockFn.mock.callCount(), 1);
   });
 
   test('returns data', async (t) => {
