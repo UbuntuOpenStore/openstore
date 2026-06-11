@@ -135,6 +135,20 @@ packageSchema.index({ published: 1, package_type: 1, nsfw: 1 });
 
 packageSchema.index({ package_type: 1 });
 
+// Index for maintainer-based queries (user package management)
+packageSchema.index({ maintainer: 1, published: 1 });
+
+// Indexes for sorted discover queries (new, updated, popular)
+packageSchema.index({ published: 1, package_type: 1, published_date: -1 });
+packageSchema.index({ published: 1, package_type: 1, updated_date: -1 });
+packageSchema.index({ published: 1, package_type: 1, calculated_rating: -1 });
+
+// Index for author/publisher filtering
+packageSchema.index({ author: 1 });
+
+// Index for category filtering
+packageSchema.index({ category: 1, published: 1 });
+
 setupMethods(packageSchema);
 setupVirtuals(packageSchema);
 setupStatics(packageSchema);
