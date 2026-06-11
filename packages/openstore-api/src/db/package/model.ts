@@ -133,6 +133,8 @@ packageSchema.index({ id: 1, published: 1, package_type: 1 });
 // Compound index for list queries (new/updated, popular)
 packageSchema.index({ published: 1, package_type: 1, nsfw: 1 });
 
+packageSchema.index({ package_type: 1 });
+
 setupMethods(packageSchema);
 setupVirtuals(packageSchema);
 setupStatics(packageSchema);
