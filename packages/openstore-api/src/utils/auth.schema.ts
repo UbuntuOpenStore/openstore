@@ -9,11 +9,13 @@ const emailSchema = z.object({
   value: z.string(),
 });
 
+const stringOrArray = z.union([z.string(), z.array(z.string())]).optional();
+
 export const ubuntuProfileSchema = z.object({
-  email: z.union([z.string(), z.array(z.string())]).optional(),
-  fullname: z.string().optional(),
-  nickname: z.string().optional(),
-  language: z.string().optional(),
+  email: stringOrArray,
+  fullname: stringOrArray,
+  nickname: stringOrArray,
+  language: stringOrArray,
 });
 
 export const githubProfileSchema = z.object({
