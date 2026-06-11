@@ -87,7 +87,8 @@ async function getHighlights(
         const serializedApp = highlightedApp.serialize(architecture, channel, frameworks, apiVersion);
 
         return {
-          ...highlight,
+          id: highlight.id,
+          description: highlight.description,
           image: serializedApp.banner,
           app: serializedApp,
         };
@@ -211,7 +212,9 @@ async function getCategoryApps(
     const apps = discoverCategoriesApps[index].map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
 
     return {
-      ...category,
+      name: category.name,
+      tagline: category.tagline,
+      referral: category.referral,
       ids: shuffle(category.ids),
       apps: shuffle(apps),
     };
