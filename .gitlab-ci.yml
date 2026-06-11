@@ -30,7 +30,6 @@ api-test:
     - mongo:latest
   script:
     - npm run build -w click-parser
-    - cp packages/openstore-api/.env.example packages/openstore-api/.env
     - npm run test:ci -w openstore-api
 
 api-build:
