@@ -8,7 +8,7 @@
     {
       "files": ["test/test.ts"],
       "rules": {
-        "no-floating-promises": "off",
+        "no-floating-promises": "off"
       }
     }
   ]
