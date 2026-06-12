@@ -2,14 +2,14 @@ import { z } from 'zod';
 
 const verifiedEmailSchema = z.object({
   value: z.string(),
-  verified: z.boolean().optional(),
+  verified: z.boolean().nullish(),
 });
 
 const emailSchema = z.object({
   value: z.string(),
 });
 
-const stringOrArray = z.union([z.string(), z.array(z.string())]).optional();
+const stringOrArray = z.union([z.string(), z.array(z.string())]).nullish();
 
 export const ubuntuProfileSchema = z.object({
   email: stringOrArray,
@@ -20,16 +20,16 @@ export const ubuntuProfileSchema = z.object({
 
 export const githubProfileSchema = z.object({
   id: z.string(),
-  username: z.string().optional(),
-  displayName: z.string().optional(),
-  emails: z.array(verifiedEmailSchema).optional(),
+  username: z.string().nullish(),
+  displayName: z.string().nullish(),
+  emails: z.array(verifiedEmailSchema).nullish(),
 });
 
 export const gitlabProfileSchema = z.object({
   id: z.string(),
-  username: z.string().optional(),
-  displayName: z.string().optional(),
-  emails: z.array(emailSchema).optional(),
+  username: z.string().nullish(),
+  displayName: z.string().nullish(),
+  emails: z.array(emailSchema).nullish(),
 });
 
 export type UbuntuProfile = z.infer<typeof ubuntuProfileSchema>;

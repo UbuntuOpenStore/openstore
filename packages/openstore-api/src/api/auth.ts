@@ -217,8 +217,8 @@ if (config.github.clientID && config.github.clientSecret) {
             user.github_id = parsedProfile.id;
             user.email =
               !user.email && parsedProfile.emails && parsedProfile.emails.length >= 1 ? parsedProfile.emails[0].value : user.email;
-            user.name = replaceName(user.name ? user.name : parsedProfile.displayName, user.email);
-            user.username = replaceName(user.username ? user.username : parsedProfile.username, user.email);
+            user.name = replaceName(user.name ? user.name : (parsedProfile.displayName ?? undefined), user.email);
+            user.username = replaceName(user.username ? user.username : (parsedProfile.username ?? undefined), user.email);
 
             return user.save();
           })
@@ -276,8 +276,8 @@ if (config.gitlab.clientID && config.gitlab.clientSecret) {
             user.gitlab_id = parsedProfile.id;
             user.email =
               !user.email && parsedProfile.emails && parsedProfile.emails.length > 0 ? parsedProfile.emails[0].value : user.email;
-            user.name = replaceName(user.name ? user.name : parsedProfile.displayName, user.email);
-            user.username = replaceName(user.username ? user.username : parsedProfile.username, user.email);
+            user.name = replaceName(user.name ? user.name : (parsedProfile.displayName ?? undefined), user.email);
+            user.username = replaceName(user.username ? user.username : (parsedProfile.username ?? undefined), user.email);
 
             return user.save();
           })
