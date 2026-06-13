@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 
+import { UserError } from '../../exceptions';
+import { NO_REVISIONS } from '../../utils/error-messages';
 import { setupMethods } from './methods';
 import { setupStatics } from './statics';
 import {
@@ -107,6 +109,13 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   // Number of ratings in each category
   rating_counts: [{ type: Schema.Types.ObjectId, ref: 'RatingCount' }],
   calculated_rating: Number,
+});
+
+packageSchema.pre('save', function (next) {
+  if (this.published && this.revisions.length === 0) {
+    return next(new UserError(NO_REVISIONS));
+  }
+  next();
 });
 
 packageSchema.index(

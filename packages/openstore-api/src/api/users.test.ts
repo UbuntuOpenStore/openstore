@@ -300,7 +300,7 @@ describe('Users API', () => {
 
       let pkg: TestPackage;
       [pkg] = await Promise.all([
-        factory.package({ maintainer: regularUser._id.toString(), published: true }),
+        factory.package({ maintainer: regularUser._id.toString(), published: true, revisions: [{}] }),
         factory.review({ user: regularUser._id, redacted: false }),
       ]);
 
@@ -319,7 +319,7 @@ describe('Users API', () => {
       const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
       const [pkg] = await Promise.all([
-        factory.package({ maintainer: regularUser._id.toString(), published: true }),
+        factory.package({ maintainer: regularUser._id.toString(), published: true, revisions: [{}] }),
         factory.review({ user: regularUser._id, redacted: false }),
       ]);
 

@@ -659,13 +659,11 @@ describe('Manage', () => {
       });
 
       test('unpublishes the package', async (t) => {
+        package1.revisions.push({});
         package1.published = true;
         await package1.save();
 
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
-
-        package1.revisions.push({});
-        await package1.save();
 
         const res = await request(app).put(route).send({ published: false }).expect(200);
 

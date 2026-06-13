@@ -16,6 +16,7 @@ export default {
       author: `Author ${Math.random()}`,
       updated_date: new Date().toISOString(),
       ...data,
+      revisions: data.revisions ?? (data.published ? [{ revision: 1 }] : undefined),
     });
 
     return pkg.save();

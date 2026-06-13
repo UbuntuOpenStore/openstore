@@ -147,7 +147,7 @@ router.put(
       delete req.body.desktop_names_override;
     }
 
-    const published = req.body.published === 'true' || req.body.published === true;
+    const published = req.body.published === 'true' || req.body.published === true || req.body.published === 'on';
     if (published && req.pkg.revisions.length === 0) {
       error(res, NO_REVISIONS, 400);
       return;
