@@ -50,6 +50,7 @@ describe('Package', () => {
         channel: Channel.FOCAL,
         nsfw: [null, false],
         publisherId: '',
+        published: undefined,
       });
     });
 
@@ -167,6 +168,16 @@ describe('Package', () => {
       });
 
       assert.deepEqual(parsed, {
+        $or: [
+          {
+            package_type: {
+              $ne: 'snap',
+            },
+          },
+          {
+            'snap_data.channels': 'stable',
+          },
+        ],
         package_type: { $in: [PackageType.CLICK, PackageType.SNAP] },
       });
     });
@@ -346,6 +357,9 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              content_rating: {
+                content_attributes: [],
+              },
             },
             {
               architecture: Architecture.ARMHF,
@@ -364,6 +378,9 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              content_rating: {
+                content_attributes: [],
+              },
             },
           ],
           filesize: 10240,
@@ -407,6 +424,9 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              content_rating: {
+                content_attributes: [],
+              },
             },
             {
               architecture: Architecture.ARM64,
@@ -425,8 +445,15 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              content_rating: {
+                content_attributes: [],
+              },
             },
           ],
+          content_rating: {
+            type: '',
+            content_attributes: [],
+          },
         });
       });
 
@@ -464,6 +491,9 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            content_rating: {
+              content_attributes: [],
+            },
           },
           {
             architecture: Architecture.ARM64,
@@ -482,6 +512,9 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            content_rating: {
+              content_attributes: [],
+            },
           },
         ]);
 
@@ -504,6 +537,9 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            content_rating: {
+              content_attributes: [],
+            },
           },
         ]);
 
@@ -526,6 +562,9 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            content_rating: {
+              content_attributes: [],
+            },
           },
         ]);
       });
@@ -953,7 +992,10 @@ describe('Package', () => {
       assert.equal(pkg.translation_url, 'https://translate.example.com');
       assert.equal(pkg.license, 'MIT/X/Expat License');
       assert.equal(pkg.category, 'Developer Tools');
-      assert.deepEqual(pkg.version_changelogs, [{ version: '1.0.0', changelog: 'Initial release' }]);
+      assert.deepEqual(
+        pkg.version_changelogs?.map((vc) => ({ version: vc.version, changelog: vc.changelog })),
+        [{ version: '1.0.0', changelog: 'Initial release' }],
+      );
     });
 
     test('leaves existing values unchanged when no AppStream data', async () => {

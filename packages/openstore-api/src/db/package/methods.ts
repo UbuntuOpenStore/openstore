@@ -796,7 +796,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         permissions: revisionData ? (revisionData.permissions ?? []) : [],
         read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
         write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
-        content_rating: revisionData ? revisionData.content_rating : undefined,
+        content_rating: revisionData?.content_rating
+          ? {
+              type: revisionData.content_rating.type || '',
+              content_attributes: revisionData.content_rating.content_attributes || [],
+            }
+          : undefined,
         desktop_names: desktopNames,
         package_type: this.package_type,
         source_store: this.source_store,
