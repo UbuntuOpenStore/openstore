@@ -28,6 +28,10 @@ async function reindex() {
     const totalBatches = Math.ceil(totalPackages / BATCH_SIZE);
 
     for await (const pkg of cursor) {
+      if (pkg.revisions.length === 0) {
+        continue;
+      }
+
       await recalculatePackageRatings(pkg._id);
       batch.push(pkg);
 
