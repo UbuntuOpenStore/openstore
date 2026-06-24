@@ -82,11 +82,18 @@ export class PackageSearch implements PackageSearchInterface {
     /*
       Map calculated_rating -> rating_bucket using logarithmic buckets (25 -> 1, 50 -> 2, 100 -> 3, etc.).
       For relevant searching, this gives a boost to higher rated packages without over-prioritizing small differences in rating.
+
+      Having any ratings is better than no ratings, so we give a boost to packages with ratings over 0. Because of how log2 works
+      anything < 25 is negative, so we just make that 1 and adjust the scale by 2 for anything after 25.
     */
     const rating = item.calculated_rating ?? 0;
     doc.rating_bucket = 0;
     if (rating > 0) {
-      doc.rating_bucket = Math.max(0, Math.floor(Math.log2(rating / 25)) + 1);
+      if (rating < 25) {
+        doc.rating_bucket = 1;
+      } else {
+        doc.rating_bucket = Math.floor(Math.log2(rating / 25)) + 2;
+      }
     }
 
     return doc;
