@@ -5,7 +5,7 @@ import { Architecture, PackageType, SourceStore, SnapChannel } from '../db/packa
 import {
   fetchSnapDetailsV2,
   transformSnapToPackage,
-  parseSnapYamlPlugs,
+  parseSnapYaml,
   discoverSnaps,
   CATEGORY_MAPPING,
   ARCH_MAPPING,
@@ -187,6 +187,7 @@ describe('Snap Scraper Utils', () => {
       assert.equal(result.revisions?.length, 2);
       const firstRevision = (result.revisions as any)?.[0];
       assert.deepEqual(firstRevision?.permissions, ['audio-playback', 'network', 'x11']);
+      assert.deepEqual(firstRevision?.snap_data?.connections, []);
 
       assert.equal(result.snap_data?.confinement, 'strict');
       assert.equal(result.snap_data?.base, 'core18');
@@ -577,7 +578,7 @@ describe('Snap Scraper Utils', () => {
     });
   });
 
-  describe('parseSnapYamlPlugs', () => {
+  describe('parseSnapYaml', () => {
     test('should extract plugs from app definitions', () => {
       const snapYaml = [
         'name: myapp',
@@ -590,8 +591,8 @@ describe('Snap Scraper Utils', () => {
         '    - audio-playback',
       ].join('\n');
 
-      const plugs = parseSnapYamlPlugs(snapYaml);
-      assert.deepEqual(plugs, ['audio-playback', 'network', 'x11']);
+      const { permissions } = parseSnapYaml(snapYaml);
+      assert.deepEqual(permissions, ['audio-playback', 'network', 'x11']);
     });
 
     test('should deduplicate plugs across multiple apps', () => {
@@ -610,13 +611,13 @@ describe('Snap Scraper Utils', () => {
         '    - wayland',
       ].join('\n');
 
-      const plugs = parseSnapYamlPlugs(snapYaml);
-      assert.deepEqual(plugs, ['network', 'wayland', 'x11']);
+      const { permissions } = parseSnapYaml(snapYaml);
+      assert.deepEqual(permissions, ['network', 'wayland', 'x11']);
     });
 
     test('should return ["unknown"] when no apps or plugs defined', () => {
-      assert.deepEqual(parseSnapYamlPlugs('name: myapp\nversion: 1.0'), ['unknown']);
-      assert.deepEqual(parseSnapYamlPlugs('name: myapp\napps:\n  myapp:\n    command: bin/myapp'), ['unknown']);
+      assert.deepEqual(parseSnapYaml('name: myapp\nversion: 1.0').permissions, ['unknown']);
+      assert.deepEqual(parseSnapYaml('name: myapp\napps:\n  myapp:\n    command: bin/myapp').permissions, ['unknown']);
     });
 
     test('should return ["unconfined"] for classic confinement', () => {
@@ -630,11 +631,114 @@ describe('Snap Scraper Utils', () => {
         '    - network',
       ].join('\n');
 
-      assert.deepEqual(parseSnapYamlPlugs(snapYaml), ['unconfined']);
+      assert.deepEqual(parseSnapYaml(snapYaml).permissions, ['unconfined']);
     });
 
     test('should return ["unknown"] on invalid YAML', () => {
-      assert.deepEqual(parseSnapYamlPlugs('invalid: yaml: {{{'), ['unknown']);
+      assert.deepEqual(parseSnapYaml('invalid: yaml: {{{').permissions, ['unknown']);
+    });
+    test('should extract slots from snap.yaml', () => {
+      const snapYaml = [
+        'name: myapp',
+        'slots:',
+        '  my-slot:',
+        '    interface: content',
+        '    content: my-shared-data',
+        '  other-slot:',
+        '    interface: dbus',
+        '    bus: session',
+      ].join('\n');
+
+      const { connections } = parseSnapYaml(snapYaml);
+      assert.equal(connections.length, 2);
+      assert.equal(connections[0].name, 'my-slot');
+      assert.equal(connections[0].interface, 'content');
+      assert.equal(connections[0].type, 'slot');
+      assert.equal(connections[1].name, 'other-slot');
+      assert.equal(connections[1].interface, 'dbus');
+      assert.equal(connections[1].type, 'slot');
+    });
+
+    test('should extract plugs with default-provider', () => {
+      const snapYaml = [
+        'name: myapp',
+        'plugs:',
+        '  shared-content:',
+        '    interface: content',
+        '    content: shared-data',
+        '    default-provider: other-snap',
+        '    target: $SNAP/data',
+      ].join('\n');
+
+      const { connections } = parseSnapYaml(snapYaml);
+      assert.equal(connections.length, 1);
+      assert.deepEqual(connections[0], {
+        name: 'shared-content',
+        interface: 'content',
+        type: 'plug',
+        snap: 'other-snap',
+        label: '',
+      });
+    });
+
+    test('should extract both slots and plugs with default-provider', () => {
+      const snapYaml = [
+        'name: myapp',
+        'plugs:',
+        '  content-plug:',
+        '    interface: content',
+        '    content: remote-data',
+        '    default-provider: remote-snap',
+        'slots:',
+        '  content-slot:',
+        '    interface: content',
+        '    content: local-data',
+      ].join('\n');
+
+      const { connections } = parseSnapYaml(snapYaml);
+      assert.equal(connections.length, 2);
+      assert.deepEqual(connections[0], {
+        name: 'content-plug',
+        interface: 'content',
+        type: 'plug',
+        snap: 'remote-snap',
+        label: '',
+      });
+      assert.equal(connections[1].name, 'content-slot');
+      assert.equal(connections[1].interface, 'content');
+      assert.equal(connections[1].type, 'slot');
+    });
+
+    test('should ignore simple plugs without default-provider', () => {
+      const snapYaml = ['name: myapp', 'plugs:', '  simple-plug: null', '  other-plug:', '    interface: some-iface'].join('\n');
+
+      const { connections } = parseSnapYaml(snapYaml);
+      assert.equal(connections.length, 0);
+    });
+
+    test('should return empty connections on invalid YAML', () => {
+      assert.deepEqual(parseSnapYaml('invalid: yaml: {{{').connections, []);
+    });
+
+    test('should extract label from content interface connections', () => {
+      const snapYaml = [
+        'name: myapp',
+        'plugs:',
+        '  content-plug:',
+        '    interface: content',
+        '    content: my-content',
+        '    default-provider: content-snap',
+        '    label: my-label',
+      ].join('\n');
+
+      const { connections } = parseSnapYaml(snapYaml);
+      assert.equal(connections.length, 1);
+      assert.equal(connections[0].label, 'my-label');
+    });
+
+    test('should return empty connections when no plugs or slots defined', () => {
+      const snapYaml = 'name: myapp\nversion: 1.0';
+      assert.deepEqual(parseSnapYaml(snapYaml).connections, []);
     });
   });
 });

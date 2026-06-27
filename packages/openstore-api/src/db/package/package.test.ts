@@ -357,6 +357,7 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              snap_data: undefined,
               content_rating: {
                 content_attributes: [],
               },
@@ -378,6 +379,7 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              snap_data: undefined,
               content_rating: {
                 content_attributes: [],
               },
@@ -424,6 +426,7 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              snap_data: undefined,
               content_rating: {
                 content_attributes: [],
               },
@@ -445,6 +448,7 @@ describe('Package', () => {
               read_paths: [],
               write_paths: [],
               desktop_names: [],
+              snap_data: undefined,
               content_rating: {
                 content_attributes: [],
               },
@@ -491,6 +495,7 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            snap_data: undefined,
             content_rating: {
               content_attributes: [],
             },
@@ -512,6 +517,7 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            snap_data: undefined,
             content_rating: {
               content_attributes: [],
             },
@@ -537,6 +543,7 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            snap_data: undefined,
             content_rating: {
               content_attributes: [],
             },
@@ -562,6 +569,7 @@ describe('Package', () => {
             read_paths: [],
             write_paths: [],
             desktop_names: [],
+            snap_data: undefined,
             content_rating: {
               content_attributes: [],
             },

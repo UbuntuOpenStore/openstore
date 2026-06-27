@@ -1,4 +1,5 @@
 import { parse as parseYaml } from 'yaml';
+import { z } from 'zod';
 
 import {
   Architecture,
@@ -11,6 +12,7 @@ import {
   SnapChannel,
   type IPackage,
   type IRevision,
+  type SnapConnection,
   AppType,
 } from '../db/package/types';
 
@@ -180,26 +182,86 @@ export interface SnapV2Response {
   'snap-id': string;
 }
 
-export function parseSnapYamlPlugs(snapYaml: string): string[] {
-  try {
-    const parsed = parseYaml(snapYaml) as {
-      confinement?: string;
-      apps?: Record<string, { plugs?: string[] }>;
-    };
+const connectionDefSchema = z
+  .object({
+    interface: z.string().optional(),
+    'default-provider': z.string().optional(),
+    label: z.string().optional(),
+  })
+  .passthrough();
 
-    if (parsed.confinement === 'classic') {
-      return ['unconfined'];
+const appDefSchema = z
+  .object({
+    plugs: z.array(z.string()).optional(),
+  })
+  .passthrough();
+
+const connectionSectionSchema = z.record(z.union([z.null(), connectionDefSchema]));
+
+function extractPermissions(parsed: Record<string, unknown>): string[] {
+  const confinement = z.string().safeParse(parsed.confinement);
+  if (confinement.success && confinement.data === 'classic') {
+    return ['unconfined'];
+  }
+
+  const apps = z.record(appDefSchema).safeParse(parsed.apps);
+  if (!apps.success) {
+    return ['unknown'];
+  }
+
+  const plugsSet = new Set<string>();
+  for (const app of Object.values(apps.data)) {
+    for (const plug of app.plugs ?? []) {
+      plugsSet.add(plug);
     }
+  }
+  return plugsSet.size > 0 ? Array.from(plugsSet).sort() : ['unknown'];
+}
 
-    const plugsSet = new Set<string>();
-    for (const app of Object.values(parsed.apps || {})) {
-      for (const plug of app.plugs || []) {
-        plugsSet.add(plug);
+function extractConnections(parsed: Record<string, unknown>): SnapConnection[] {
+  const connections: SnapConnection[] = [];
+
+  const plugSection = connectionSectionSchema.safeParse(parsed.plugs);
+  if (plugSection.success) {
+    for (const [plugName, plugDef] of Object.entries(plugSection.data)) {
+      const provider = plugDef?.['default-provider'];
+      if (provider) {
+        connections.push({
+          name: plugName,
+          interface: plugDef.interface ?? 'unknown',
+          type: 'plug',
+          snap: provider,
+          label: plugDef.label ?? '',
+        });
       }
     }
-    return plugsSet.size > 0 ? Array.from(plugsSet).sort() : ['unknown'];
+  }
+
+  const slotSection = connectionSectionSchema.safeParse(parsed.slots);
+  if (slotSection.success) {
+    for (const [slotName, slotDef] of Object.entries(slotSection.data)) {
+      connections.push({
+        name: slotName,
+        interface: slotDef?.interface ?? 'unknown',
+        type: 'slot',
+        snap: '',
+        label: slotDef?.label ?? '',
+      });
+    }
+  }
+
+  return connections;
+}
+
+export function parseSnapYaml(snapYaml: string): { permissions: string[]; connections: SnapConnection[] } {
+  try {
+    const parsed = parseYaml(snapYaml) as Record<string, unknown>;
+    return {
+      permissions: extractPermissions(parsed),
+      connections: extractConnections(parsed),
+    };
   } catch {
-    return ['unknown'];
+    return { permissions: ['unknown'], connections: [] };
   }
 }
 
@@ -343,6 +405,7 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
 
   const revisions: Partial<IRevision>[] = v2Data['channel-map'].map((channelMap) => {
     const arch = ARCH_MAPPING[channelMap.channel.architecture] || Architecture.AMD64;
+    const parsed = channelMap['snap-yaml'] ? parseSnapYaml(channelMap['snap-yaml']) : null;
 
     return {
       revision: channelMap.revision,
@@ -356,10 +419,11 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
       filesize: 0, // We don't have the install size, so don't show it in the app
       downloadSize: channelMap.download.size,
       created_date: channelMap['created-at'],
-      permissions: channelMap['snap-yaml'] ? parseSnapYamlPlugs(channelMap['snap-yaml']) : ['unknown'],
+      permissions: parsed?.permissions ?? ['unknown'],
       snap_data: {
         grade: SnapGrade.STABLE,
         risk: channelMap.channel.risk,
+        connections: parsed?.connections ?? [],
       },
     };
   });

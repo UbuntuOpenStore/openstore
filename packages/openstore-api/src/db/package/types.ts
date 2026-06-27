@@ -73,9 +73,18 @@ export enum SnapGrade {
   DEVEL = 'devel',
 }
 
+export type SnapConnection = {
+  name: string;
+  interface: string;
+  type: 'plug' | 'slot';
+  snap: string;
+  label: string;
+};
+
 export type RevisionSnapData = {
   grade: SnapGrade;
   risk: string;
+  connections?: SnapConnection[];
 };
 
 export type ContentRating = {
@@ -129,6 +138,7 @@ export type SerializedRatings = {
 export type SerializedSnapData = {
   grade?: SnapGrade;
   risk?: string;
+  connections?: SnapConnection[];
 };
 
 export type SerializedPackageSnapData = {

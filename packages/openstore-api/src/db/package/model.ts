@@ -4,6 +4,7 @@ import { UserError } from '../../exceptions';
 import { NO_REVISIONS } from '../../utils/error-messages';
 import { setupMethods } from './methods';
 import { setupStatics } from './statics';
+import { type SnapConnection } from './types';
 import {
   type RevisionModel,
   type PackageModel,
@@ -14,6 +15,17 @@ import {
   SourceStore,
 } from './types';
 import { setupVirtuals } from './virtuals';
+
+const snapConnectionSchema = new Schema<SnapConnection>(
+  {
+    name: String,
+    interface: String,
+    type: String,
+    snap: String,
+    label: String,
+  },
+  { _id: false },
+);
 
 const revisionSchema = new Schema<IRevision, RevisionModel>({
   revision: Number,
@@ -34,8 +46,13 @@ const revisionSchema = new Schema<IRevision, RevisionModel>({
   write_paths: [String],
   desktop_names: [String],
   snap_data: {
-    grade: String,
-    risk: String,
+    type: {
+      grade: String,
+      risk: String,
+      connections: [snapConnectionSchema],
+    },
+    default: undefined,
+    _id: false,
   },
   content_rating: {
     type: { type: String },

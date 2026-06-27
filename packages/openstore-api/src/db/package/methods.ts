@@ -704,6 +704,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
             installedSize: toBytes(rData.filesize),
             downloadSize: rData.downloadSize ?? 0,
             architecture: rData.architecture ?? 'armhf',
+            snap_data: rData.snap_data?.grade
+              ? {
+                  grade: rData.snap_data.grade,
+                  risk: rData.snap_data.risk,
+                }
+              : undefined,
 
             // deprecated, remove in next version of the api
             filesize: toBytes(rData.filesize),
@@ -843,6 +849,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
                       : null,
                     installedSize: toBytes(downloadRevisionData.filesize),
                     downloadSize: downloadRevisionData.downloadSize ?? 0,
+                    snap_data: downloadRevisionData.snap_data?.grade
+                      ? {
+                          grade: downloadRevisionData.snap_data.grade,
+                          risk: downloadRevisionData.snap_data.risk,
+                        }
+                      : undefined,
 
                     // deprecated, remove in next version of the api
                     filesize: toBytes(downloadRevisionData.filesize),
