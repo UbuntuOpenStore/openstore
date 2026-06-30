@@ -428,6 +428,10 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
     };
   });
 
+  const lomiriCompatible = revisions.some(
+    (rev) => rev.snap_data?.grade === 'stable' && rev.snap_data.connections?.some((c) => c.interface === 'lomiri-ui-toolkit'),
+  );
+
   const stableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
   const stableOrFirst = stableRevision || v2Data['channel-map'][0];
   const snapCategory = v2Data.snap.categories?.[0]?.name.toLowerCase() || 'utilities';
@@ -467,6 +471,7 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
     published: true,
     published_date: stableOrFirst['created-at'] || new Date().toISOString(),
     updated_date: stableOrFirst.channel['released-at'] || new Date().toISOString(),
+    lomiri_compatible: lomiriCompatible,
     revisions: revisions as unknown as IPackage['revisions'],
     icon,
     package_type: PackageType.SNAP,

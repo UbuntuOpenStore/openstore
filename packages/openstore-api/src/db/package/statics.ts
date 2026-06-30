@@ -224,7 +224,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       nsfw,
       publisherId,
       published,
-      //lomiri_compatible,
+      lomiri_compatible,
     }: PackageRequestFilters,
     textSearch = true,
   ): FilterQuery<IPackage> {
@@ -299,6 +299,10 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
 
     if (nsfw && nsfw.length > 0) {
       query.nsfw = { $in: nsfw };
+    }
+
+    if (lomiri_compatible !== undefined) {
+      query.lomiri_compatible = lomiri_compatible;
     }
 
     if (publisherId) {

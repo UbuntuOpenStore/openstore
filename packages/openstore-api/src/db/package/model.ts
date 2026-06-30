@@ -126,6 +126,7 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   // Number of ratings in each category
   rating_counts: [{ type: Schema.Types.ObjectId, ref: 'RatingCount' }],
   calculated_rating: Number,
+  lomiri_compatible: Boolean,
 });
 
 packageSchema.pre('save', function (next) {

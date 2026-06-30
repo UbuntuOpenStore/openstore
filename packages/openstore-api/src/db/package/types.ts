@@ -313,6 +313,7 @@ export interface IPackage {
   banner?: string;
   rating_counts: Types.DocumentArray<HydratedRatingCount>;
   calculated_rating?: number;
+  lomiri_compatible: boolean;
 }
 
 export interface BodyUpdate {

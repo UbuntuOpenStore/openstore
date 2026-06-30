@@ -75,17 +75,11 @@ export class PackageSearch implements PackageSearchInterface {
 
     doc.search_name = item.name;
     doc.snap_data_channels = item.snap_data?.channels ?? [];
-
-    if (item.package_type === PackageType.CLICK) {
-      doc.lomiri_compatible = true;
-    } else {
-      doc.lomiri_compatible = item.revisions.some(
-        (rev) => rev.snap_data?.risk === 'stable' && rev.snap_data.connections?.some((conn) => conn.interface === 'lomiri-ui-toolkit'),
-      );
-    }
-
     doc.category = doc.category ? doc.category.replace(/&/g, '_').replace(/ /g, '_').toLowerCase() : '';
-    doc.nsfw = !!doc.nsfw; // Force a boolean
+
+    // Force booleans
+    doc.nsfw = !!doc.nsfw;
+    doc.lomiri_compatible = !!item.lomiri_compatible;
 
     if (doc.keywords) {
       doc.keywords = doc.keywords.map((keyword: string) => keyword.toLowerCase().trim()).filter(Boolean);

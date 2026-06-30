@@ -347,6 +347,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         }
       }
     }
+
+    this.lomiri_compatible = true;
   });
 
   packageSchema.method<HydratedPackage>('updateVideoUrl', function (url: string) {
