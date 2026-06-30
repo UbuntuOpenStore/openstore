@@ -262,6 +262,7 @@ export type PackageRequestFilters = {
   nsfw?: (boolean | null)[];
   publisherId?: string;
   published?: boolean;
+  lomiri_compatible?: boolean;
 };
 
 export interface IPackage {

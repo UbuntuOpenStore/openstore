@@ -52,8 +52,13 @@ export class PackageSearch implements PackageSearchInterface {
   }
 
   convert(item: HydratedPackage): Record<string, any> {
-    const doc: Partial<IPackage> & { search_name?: string; originalId?: string; rating_bucket?: number; snap_data_channels?: string[] } =
-      {};
+    const doc: Partial<IPackage> & {
+      search_name?: string;
+      originalId?: string;
+      rating_bucket?: number;
+      snap_data_channels?: string[];
+      lomiri_compatible?: boolean;
+    } = {};
 
     // Store the original ID for reference
     doc.originalId = item.id;
@@ -70,6 +75,15 @@ export class PackageSearch implements PackageSearchInterface {
 
     doc.search_name = item.name;
     doc.snap_data_channels = item.snap_data?.channels ?? [];
+
+    if (item.package_type === PackageType.CLICK) {
+      doc.lomiri_compatible = true;
+    } else {
+      doc.lomiri_compatible = item.revisions.some(
+        (rev) => rev.snap_data?.risk === 'stable' && rev.snap_data.connections?.some((conn) => conn.interface === 'lomiri-ui-toolkit'),
+      );
+    }
+
     doc.category = doc.category ? doc.category.replace(/&/g, '_').replace(/ /g, '_').toLowerCase() : '';
     doc.nsfw = !!doc.nsfw; // Force a boolean
 
@@ -132,7 +146,18 @@ export class PackageSearch implements PackageSearchInterface {
     return { success: true };
   }
 
-  parseFilters({ types, ids, packageTypes, frameworks, architectures, category, author, channel, nsfw }: PackageRequestFilters): string[] {
+  parseFilters({
+    types,
+    ids,
+    packageTypes,
+    frameworks,
+    architectures,
+    category,
+    author,
+    channel,
+    nsfw,
+    lomiri_compatible,
+  }: PackageRequestFilters): string[] {
     const filters: string[] = [];
 
     if (types && types.length > 0) {
@@ -180,6 +205,10 @@ export class PackageSearch implements PackageSearchInterface {
 
     // Only include snaps that have a stable channel
     filters.push(`package_type != snap OR snap_data_channels = "stable"`);
+
+    if (lomiri_compatible !== undefined) {
+      filters.push(`lomiri_compatible = ${lomiri_compatible}`);
+    }
 
     return filters;
   }
@@ -271,6 +300,7 @@ export class PackageSearch implements PackageSearchInterface {
         'device_compatibilities',
         'package_type',
         'snap_data_channels',
+        'lomiri_compatible',
       ],
       sortableAttributes: ['name', 'updated_date', 'published_date', 'calculated_rating', 'rating_bucket'],
       rankingRules: ['words', 'typo', 'proximity', 'sort', 'attribute', 'exactness'],

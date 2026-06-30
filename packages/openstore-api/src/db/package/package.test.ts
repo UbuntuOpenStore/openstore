@@ -51,6 +51,7 @@ describe('Package', () => {
         nsfw: [null, false],
         publisherId: '',
         published: undefined,
+        lomiri_compatible: undefined,
       });
     });
 

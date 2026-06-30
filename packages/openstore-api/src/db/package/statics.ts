@@ -187,6 +187,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     }
 
     const published = getDataBooleanOrUndefined(req, 'published');
+    const lomiri_compatible = getDataBooleanOrUndefined(req, 'lomiri_compatible');
 
     return {
       limit,
@@ -204,6 +205,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       channel,
       nsfw,
       published,
+      lomiri_compatible,
     };
   };
 
@@ -222,6 +224,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       nsfw,
       publisherId,
       published,
+      //lomiri_compatible,
     }: PackageRequestFilters,
     textSearch = true,
   ): FilterQuery<IPackage> {
