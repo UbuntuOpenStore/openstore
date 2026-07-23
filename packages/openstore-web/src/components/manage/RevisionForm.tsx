@@ -26,10 +26,15 @@ type RevisionFormProps = {
   };
 };
 
+type UploadError = {
+  message: string;
+  reasons?: string[];
+};
+
 type FileState = {
   name: string;
   progress: number;
-  error?: string;
+  error?: UploadError;
   success: boolean;
 };
 
@@ -56,19 +61,19 @@ function uploadFile(
         try {
           errorBody = JSON.parse(xhr.responseText);
         } catch (e) {}
-        console.log(xhr.responseText, errorBody);
 
-        let message = errorMessages.unknownError;
-        if (errorBody && typeof errorBody.message === "string") {
-          message = errorBody.message;
-        }
+        const message =
+          errorBody && typeof errorBody.message === "string" ? errorBody.message : errorMessages.unknownError;
 
-        reject(message);
+        const data = errorBody?.data as Record<string, unknown> | undefined;
+        const reasons = Array.isArray(data?.reasons) ? (data.reasons as string[]) : undefined;
+
+        reject({ message, reasons });
       }
     });
 
-    xhr.addEventListener("error", () => reject(errorMessages.networkError));
-    xhr.addEventListener("abort", () => reject(errorMessages.uploadAborted));
+    xhr.addEventListener("error", () => reject({ message: errorMessages.networkError }));
+    xhr.addEventListener("abort", () => reject({ message: errorMessages.uploadAborted }));
 
     xhr.open("POST", url);
     xhr.send(fileUploadData);
@@ -139,7 +144,7 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
                 });
               });
             })
-            .catch((error: string) => {
+            .catch((error: UploadError) => {
               setFiles((files) => {
                 return files.map((file) => {
                   if (file.name === formFile.name) {
@@ -179,7 +184,18 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
             <div>
               <p>{file.name}</p>
               {file.progress > 0 && !file.success && !file.error && <p>{file.progress}%</p>}
-              {file.error && <p>{file.error}</p>}
+              {file.error && (
+                <>
+                  <p>{file.error.message}</p>
+                  {file.error.reasons && file.error.reasons.length > 0 && (
+                    <ul class="list-disc list-inside mt-1 text-sm">
+                      {file.error.reasons.map((reason) => (
+                        <li>{reason}</li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              )}
             </div>
           </div>
         ))}
