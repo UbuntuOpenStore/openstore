@@ -293,7 +293,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       if (textSearch) {
         query.$text = { $search: search };
       } else {
-        query.name = { $regex: search, $options: 'i' };
+        query.name = { $regex: search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
       }
     }
 
