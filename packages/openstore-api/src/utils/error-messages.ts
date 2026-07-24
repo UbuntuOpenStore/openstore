@@ -40,5 +40,6 @@ export const REVIEW_REDACTED = 'Redacted reviews cannot be edited';
 export const USER_NOT_FOUND = 'User not found';
 export const ACCOUNT_DISABLED = 'Your account has been disabled at this time';
 
+export const INVALID_URL = 'The provided URL is not valid';
 export const SNAP_DOWNLOAD_NOT_SUPPORTED = 'Downloads are not supported for snap packages';
 export const SNAP_MANAGEMENT_NOT_SUPPORTED = 'Snap packages cannot be managed through this API';

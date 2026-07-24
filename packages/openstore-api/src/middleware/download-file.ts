@@ -5,12 +5,25 @@ import axios from 'axios';
 import { type Request, type Response, type NextFunction } from 'express';
 
 import { error, config, captureException, logger } from '../utils';
+import { INVALID_URL } from '../utils/error-messages';
 
 export async function downloadFile(req: Request, res: Response, next: NextFunction) {
   if (!req.file && req.body && req.body.downloadUrl) {
-    let filename = path.basename(req.body.downloadUrl);
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(req.body.downloadUrl);
+    } catch {
+      error(res, INVALID_URL, 400);
+      return;
+    }
 
-    // Strip extra hashes & params
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      error(res, INVALID_URL, 400);
+      return;
+    }
+
+    let filename = path.basename(parsedUrl.pathname);
+
     if (filename.includes('?')) {
       filename = filename.substring(0, filename.indexOf('?'));
     }
