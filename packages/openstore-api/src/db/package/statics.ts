@@ -7,6 +7,18 @@ import { UserError } from '../../exceptions';
 import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from '../../utils';
 import { handleChannel } from '../../utils/channels';
 import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH } from '../../utils/error-messages';
+
+const VALID_SORT_VALUES = new Set([
+  'relevance',
+  'name',
+  '-name',
+  'calculated_rating',
+  '-calculated_rating',
+  'published_date',
+  '-published_date',
+  'updated_date',
+  '-updated_date',
+]);
 import { RatingCount } from '../rating_count/model';
 import { packageSearchInstance } from './search-factory';
 import {
@@ -189,10 +201,13 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     const published = getDataBooleanOrUndefined(req, 'published');
     const lomiri_compatible = getDataBooleanOrUndefined(req, 'lomiri_compatible');
 
+    const sortRaw = getData(req, 'sort', 'relevance');
+    const sort = VALID_SORT_VALUES.has(sortRaw) ? sortRaw : 'relevance';
+
     return {
       limit,
       skip: getDataInt(req, 'skip', 0),
-      sort: getData(req, 'sort', 'relevance'),
+      sort,
       types: [...new Set(types)] as AppType[],
       packageTypes,
       ids: getDataArray(req, 'apps'),
@@ -334,7 +349,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
 
     const findQuery = this.find(query).populate('rating_counts');
 
-    if (sort === 'relevance') {
+    if (!sort || sort === 'relevance') {
       if (query.$text) {
         void findQuery.select({ score: { $meta: 'textScore' } });
         void findQuery.sort({ score: { $meta: 'textScore' } });

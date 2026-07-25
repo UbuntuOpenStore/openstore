@@ -119,6 +119,49 @@ describe('Package', () => {
       } as any);
       assert.deepEqual(parsed.packageTypes, [PackageType.SNAP, PackageType.CLICK]);
     });
+
+    test('defaults sort to relevance when not specified', () => {
+      const parsed = Package.parseRequestFilters({ query: {} } as any);
+      assert.equal(parsed.sort, 'relevance');
+    });
+
+    test('accepts valid sort values', () => {
+      const validSorts = [
+        'relevance',
+        'name',
+        '-name',
+        'calculated_rating',
+        '-calculated_rating',
+        'published_date',
+        '-published_date',
+        'updated_date',
+        '-updated_date',
+      ];
+
+      for (const sort of validSorts) {
+        const parsed = Package.parseRequestFilters({ query: { sort } } as any);
+        assert.equal(parsed.sort, sort, `sort "${sort}" should be accepted`);
+      }
+    });
+
+    test('falls back to relevance for invalid sort values', () => {
+      const invalidSorts = ['asdf', '-invalid', 'downloads', '-downloads', 'created_date'];
+
+      for (const sort of invalidSorts) {
+        const parsed = Package.parseRequestFilters({ query: { sort } } as any);
+        assert.equal(parsed.sort, 'relevance', `sort "${sort}" should fall back to relevance`);
+      }
+    });
+
+    test('falls back to relevance for empty sort value', () => {
+      const parsed = Package.parseRequestFilters({ query: { sort: '' } } as any);
+      assert.equal(parsed.sort, 'relevance');
+    });
+
+    test('falls back to relevance for sort from body', () => {
+      const parsed = Package.parseRequestFilters({ query: {}, body: { sort: 'invalid' } } as any);
+      assert.equal(parsed.sort, 'relevance');
+    });
   });
 
   describe('parseFilters', () => {
