@@ -42,5 +42,6 @@ export const ACCOUNT_DISABLED = 'Your account has been disabled at this time';
 
 export const INVALID_URL = 'The provided URL is not valid';
 export const INVALID_FILENAME = 'The provided URL does not contain a valid filename';
+export const UNSUPPORTED_SCREENSHOT_TYPE = 'Screenshots must be PNG, JPEG, or SVG images';
 export const SNAP_DOWNLOAD_NOT_SUPPORTED = 'Downloads are not supported for snap packages';
 export const SNAP_MANAGEMENT_NOT_SUPPORTED = 'Snap packages cannot be managed through this API';

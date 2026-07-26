@@ -17,6 +17,7 @@ import {
   extractAppstreamChangelogs,
 } from '../../utils/appstream-helpers';
 import * as clickParser from '../../utils/click-parser-async';
+import { compressImage } from '../../utils/compress-image';
 import { compressSvg } from '../../utils/compress-svg';
 import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 import {
@@ -28,6 +29,7 @@ import {
   NO_ALL,
   NO_NON_ALL,
   NON_ASCENDING_VERSION,
+  UNSUPPORTED_SCREENSHOT_TYPE,
   WRONG_PACKAGE,
 } from '../../utils/error-messages';
 import { type HydratedRatingCount } from '../rating_count/types';
@@ -291,6 +293,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
               const filename = `${this.id as string}-screenshot-${urlHash}${ext}`;
               await moveFile(tmpPath, `${config.screenshot_dir}/${filename}`);
+              await compressImage(`${config.screenshot_dir}/${filename}`);
               return filename;
             } catch (err) {
               console.warn(`Failed to download AppStream screenshot ${url}:`, err);
@@ -938,19 +941,24 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       const file = screenshotFiles[i];
 
       const ext = path.extname(file.originalname);
-      if (!['.png', '.jpg', '.jpeg'].includes(ext)) {
-        // Reject anything not an image we support
+      if (!['.png', '.jpg', '.jpeg', '.svg'].includes(ext)) {
         try {
           await fs.unlink(file.path);
         } catch (error) {
           // Ignore errors if file doesn't exist or can't be removed
           console.warn(`Failed to remove screenshot ${file.path}:`, error);
         }
+        throw new UserError(UNSUPPORTED_SCREENSHOT_TYPE);
       } else {
         const id = crypto.randomUUID();
         const filename = `${this.id as string}-screenshot-${id}${ext}`;
 
         await moveFile(screenshotFiles[i].path, `${config.screenshot_dir}/${filename}`);
+        if (ext === '.svg') {
+          await compressSvg(`${config.screenshot_dir}/${filename}`);
+        } else {
+          await compressImage(`${config.screenshot_dir}/${filename}`);
+        }
 
         this.screenshots.push(filename);
       }
@@ -1099,6 +1107,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         const localIconPath = this.getIconFilePath(ext);
         await fs.copyFile(parseData.icon, localIconPath);
         await compressSvg(localIconPath);
+        await compressImage(localIconPath);
 
         this.icon = localIconPath;
       }

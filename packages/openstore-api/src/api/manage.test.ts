@@ -729,15 +729,15 @@ describe('Manage', () => {
           .put(route)
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', notAScreenshot)
-          .expect(200);
+          .expect(400);
 
-        assert.ok(res.body.success);
-        assert.equal(res.body.data.screenshots.length, 1);
+        assert.equal(res.body.success, false);
+        assert.match(res.body.message, /Screenshots must be PNG, JPEG, or SVG/);
 
-        assert.equal(removeSpy.mock.callCount(), 1);
+        assert.equal(removeSpy.mock.callCount(), 0);
 
         const pkg = await Package.findOneByFilters(package1.id);
-        assert.equal(pkg?.screenshots.length, 1);
+        assert.equal(pkg?.screenshots.length, 0);
       });
 
       test('removes screenshots', async (t) => {
