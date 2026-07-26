@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import session from 'cookie-session';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import methodOverride from 'method-override';
+import multer from 'multer';
 import passport from 'passport';
 
 import { logger, config, success, error } from '../utils';
@@ -136,6 +137,19 @@ export function setup() {
     }
 
     res.redirect('/login');
+  });
+
+  app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+        error(res, 'An unexpected file field was received', 400);
+        return;
+      }
+      error(res, 'File upload error', 400);
+      return;
+    }
+
+    next(err);
   });
 
   app.use((req: Request, res: Response) => {
