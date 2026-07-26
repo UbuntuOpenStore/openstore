@@ -17,8 +17,7 @@ import {
   extractAppstreamChangelogs,
 } from '../../utils/appstream-helpers';
 import * as clickParser from '../../utils/click-parser-async';
-import { compressImage } from '../../utils/compress-image';
-import { compressSvg } from '../../utils/compress-svg';
+import { compressImage } from '../../utils/compress';
 import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 import {
   EXISTING_VERSION,
@@ -954,11 +953,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         const filename = `${this.id as string}-screenshot-${id}${ext}`;
 
         await moveFile(screenshotFiles[i].path, `${config.screenshot_dir}/${filename}`);
-        if (ext === '.svg') {
-          await compressSvg(`${config.screenshot_dir}/${filename}`);
-        } else {
-          await compressImage(`${config.screenshot_dir}/${filename}`);
-        }
+        await compressImage(`${config.screenshot_dir}/${filename}`);
 
         this.screenshots.push(filename);
       }
@@ -984,7 +979,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     const filename = `${this.id as string}-banner-${crypto.randomUUID()}${ext}`;
 
     await moveFile(bannerFile.path, `${config.banner_dir}/${filename}`);
-    await compressSvg(`${config.banner_dir}/${filename}`);
+    await compressImage(`${config.banner_dir}/${filename}`);
 
     this.banner = filename;
     return true;
@@ -1106,7 +1101,6 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
         const localIconPath = this.getIconFilePath(ext);
         await fs.copyFile(parseData.icon, localIconPath);
-        await compressSvg(localIconPath);
         await compressImage(localIconPath);
 
         this.icon = localIconPath;
