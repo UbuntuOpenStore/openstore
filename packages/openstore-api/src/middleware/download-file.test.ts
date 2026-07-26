@@ -139,4 +139,64 @@ describe('downloadFile middleware', () => {
     assert.equal(res.body.success, false);
     assert.equal(res.body.message, messages.INVALID_URL);
   });
+
+  test('returns error for URL with no path segment', async () => {
+    const req = createReq({ body: { downloadUrl: 'https://example.com' } });
+    const res = createRes();
+
+    await downloadFile(req, res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.message, messages.INVALID_FILENAME);
+  });
+
+  test('returns error for URL with root path only', async () => {
+    const req = createReq({ body: { downloadUrl: 'https://example.com/' } });
+    const res = createRes();
+
+    await downloadFile(req, res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.message, messages.INVALID_FILENAME);
+  });
+
+  test('returns error for URL without .click extension', async () => {
+    const req = createReq({ body: { downloadUrl: 'https://example.com/file.zip' } });
+    const res = createRes();
+
+    await downloadFile(req, res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.message, messages.INVALID_FILENAME);
+  });
+
+  test('returns error for URL with IPv4 address', async () => {
+    const req = createReq({ body: { downloadUrl: 'http://127.0.0.1/file.click' } });
+    const res = createRes();
+
+    await downloadFile(req, res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.message, messages.INVALID_URL);
+  });
+
+  test('returns error for URL with IPv6 address', async () => {
+    const req = createReq({ body: { downloadUrl: 'http://[::1]/file.click' } });
+    const res = createRes();
+
+    await downloadFile(req, res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.message, messages.INVALID_URL);
+  });
+
+  test('returns error for URL with localhost hostname', async () => {
+    const req = createReq({ body: { downloadUrl: 'http://localhost/file.click' } });
+    const res = createRes();
+
+    await downloadFile(req, res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.message, messages.INVALID_URL);
+  });
 });

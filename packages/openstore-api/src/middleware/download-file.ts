@@ -1,11 +1,16 @@
+import crypto from 'crypto';
 import fs from 'fs';
+import net from 'net';
 import path from 'path';
 
 import axios from 'axios';
 import { type Request, type Response, type NextFunction } from 'express';
 
 import { error, config, captureException, logger } from '../utils';
-import { INVALID_URL } from '../utils/error-messages';
+import { INVALID_URL, INVALID_FILENAME } from '../utils/error-messages';
+
+const DOWNLOAD_TIMEOUT_MS = 30_000;
+const MAX_CONTENT_LENGTH = 800 * 1024 * 1024; // 800 MB
 
 export async function downloadFile(req: Request, res: Response, next: NextFunction) {
   if (!req.file && req.body && req.body.downloadUrl) {
@@ -22,6 +27,12 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
       return;
     }
 
+    const hostname = parsedUrl.hostname.replace(/^\[|\]$/g, '');
+    if (net.isIP(hostname) || hostname === 'localhost') {
+      error(res, INVALID_URL, 400);
+      return;
+    }
+
     let filename = path.basename(parsedUrl.pathname);
 
     if (filename.includes('?')) {
@@ -32,10 +43,20 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
       filename = filename.substring(0, filename.indexOf('#'));
     }
 
+    if (!filename.endsWith('.click')) {
+      error(res, INVALID_FILENAME, 400);
+      return;
+    }
+
+    let tmpfile: string | undefined;
     try {
-      const response = await axios.get(req.body.downloadUrl, { responseType: 'stream' });
+      const response = await axios.get(req.body.downloadUrl, {
+        responseType: 'stream',
+        timeout: DOWNLOAD_TIMEOUT_MS,
+        maxContentLength: MAX_CONTENT_LENGTH,
+      });
       if (response.status === 200) {
-        const tmpfile = `${config.data_dir}/${filename}`;
+        tmpfile = `${config.data_dir}/${crypto.randomUUID()}.click`;
         const writer = fs.createWriteStream(tmpfile);
         let cleaned = false;
 
@@ -50,8 +71,15 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
           }
         };
 
-        writer.on('error', (err) => {
+        const cleanupAndRemove = () => {
           cleanup();
+          if (tmpfile) {
+            fs.unlink(tmpfile, () => {});
+          }
+        };
+
+        writer.on('error', (err) => {
+          cleanupAndRemove();
           captureException(err, req.originalUrl);
           error(res, 'Failed to download remote file', 400);
         });
@@ -63,7 +91,7 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
               {
                 originalname: filename,
                 path: tmpfile,
-                size: fs.statSync(tmpfile).size,
+                size: fs.statSync(tmpfile!).size,
               } as any,
             ],
           };
@@ -72,18 +100,18 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
 
         // Handle request abort/timeout
         req.on('close', () => {
-          cleanup();
+          cleanupAndRemove();
           logger.debug('Request closed during file download');
         });
 
         req.on('aborted', () => {
-          cleanup();
+          cleanupAndRemove();
           logger.debug('Request aborted during file download');
         });
 
         // Handle stream errors from axios response
         response.data.on('error', (err: Error) => {
-          cleanup();
+          cleanupAndRemove();
           captureException(err, req.originalUrl);
           if (!res.headersSent) {
             error(res, 'Failed to download remote file', 400);
@@ -96,6 +124,9 @@ export async function downloadFile(req: Request, res: Response, next: NextFuncti
       }
     } catch (err) {
       captureException(err, req.originalUrl);
+      if (tmpfile) {
+        fs.unlink(tmpfile, () => {});
+      }
       if (!res.headersSent) {
         error(res, 'Failed to download remote file', 400);
       }
