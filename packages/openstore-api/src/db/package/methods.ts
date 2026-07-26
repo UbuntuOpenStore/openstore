@@ -17,6 +17,7 @@ import {
   extractAppstreamChangelogs,
 } from '../../utils/appstream-helpers';
 import * as clickParser from '../../utils/click-parser-async';
+import { compressSvg } from '../../utils/compress-svg';
 import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 import {
   EXISTING_VERSION,
@@ -975,6 +976,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     const filename = `${this.id as string}-banner-${crypto.randomUUID()}${ext}`;
 
     await moveFile(bannerFile.path, `${config.banner_dir}/${filename}`);
+    await compressSvg(`${config.banner_dir}/${filename}`);
 
     this.banner = filename;
     return true;
@@ -1096,6 +1098,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
         const localIconPath = this.getIconFilePath(ext);
         await fs.copyFile(parseData.icon, localIconPath);
+        await compressSvg(localIconPath);
 
         this.icon = localIconPath;
       }
