@@ -12,7 +12,7 @@ import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import categoryIcons from './json/category_icons.json';
 
 describe('Categories API', () => {
-  const route = '/api/v3/categories/';
+  const route = '/api/v4/categories/';
   let app: App;
 
   before(async () => {

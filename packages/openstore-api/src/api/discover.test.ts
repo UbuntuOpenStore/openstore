@@ -16,7 +16,7 @@ import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { config } from '../utils/config';
 
 describe('Discover API', () => {
-  const route = '/api/v3/discover/';
+  const route = '/api/v4/discover/';
   let app: App;
 
   before(async () => {

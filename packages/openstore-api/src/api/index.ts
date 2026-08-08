@@ -93,8 +93,11 @@ export function setup() {
   app.use('/api/v3/categories', categories);
 
   app.use('/api/v4/apps', apps);
+  app.use('/api/v4/stats', stats);
+  app.use('/api/v4/manage', manage);
   app.use('/api/v4/discover', discover);
   app.use('/api/v4/revisions', revisions);
+  app.use('/api/v4/categories', categories);
   app.use('/api/v4/admin', admin);
 
   app.use(express.static(config.server.static_root));

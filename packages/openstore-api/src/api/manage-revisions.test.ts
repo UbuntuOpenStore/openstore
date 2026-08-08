@@ -61,8 +61,8 @@ describe('Manage Revision POST', () => {
       factory.package(),
     ]);
 
-    route1 = `/api/v3/manage/${package1.id}/revision?apikey=${user.apikey}`;
-    route2 = `/api/v3/manage/${package2.id}/revision?apikey=${user.apikey}`;
+    route1 = `/api/v4/manage/${package1.id}/revision?apikey=${user.apikey}`;
+    route2 = `/api/v4/manage/${package2.id}/revision?apikey=${user.apikey}`;
   });
 
   afterEach(async () => {
@@ -70,7 +70,7 @@ describe('Manage Revision POST', () => {
   });
 
   test('blocks access when not logged in', async () => {
-    await request(app).post(`/api/v3/manage/${package1.id}/revision`).expect(401);
+    await request(app).post(`/api/v4/manage/${package1.id}/revision`).expect(401);
   });
 
   describe('admin user', () => {
@@ -214,7 +214,7 @@ describe('Manage Revision POST', () => {
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
       const res = await request(app)
-        .post(`/api/v3/manage/foo/revision?apikey=${user.apikey}`)
+        .post(`/api/v4/manage/foo/revision?apikey=${user.apikey}`)
         .attach('file', emptyClick)
         .field('channel', Channel.FOCAL)
         .expect(404);

@@ -54,12 +54,12 @@ describe('Snapshots', () => {
       // TODO maybe make a parameter to return the non-randomized data?
       /*
       test('discover matches with prod', async () => {
-        await testRoute('/api/v3/discover');
+        await testRoute('/api/v4/discover');
       });
       */
 
       test('categories matches with prod', async () => {
-        await testRoute('/api/v3/categories');
+        await testRoute('/api/v4/categories');
       });
 
       // TODO test revisions api

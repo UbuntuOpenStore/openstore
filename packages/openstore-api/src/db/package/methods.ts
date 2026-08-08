@@ -598,7 +598,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
   });
 
   packageSchema.method<HydratedPackage>('getDownloadUrl', function (channel: Channel, arch: Architecture, version?: string) {
-    let url: string = `${config.server.host}/api/v3/apps/${this.id as string}/download/${channel}/${arch}`;
+    let url: string = `${config.server.host}/api/v4/apps/${this.id as string}/download/${channel}/${arch}`;
     if (version) {
       url = `${url}/${version}`;
     }

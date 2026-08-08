@@ -11,7 +11,7 @@ import factory, { type TestPackage } from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 
 describe('Revisions GET', () => {
-  const route = '/api/v3/revisions';
+  const route = '/api/v4/revisions';
   let app: App;
   let package1: TestPackage;
 

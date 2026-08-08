@@ -23,7 +23,7 @@ import { config } from '../utils/config';
 import * as messages from '../utils/error-messages';
 
 describe('Apps API', () => {
-  const route = '/api/v3/apps/';
+  const route = '/api/v4/apps/';
   let app: App;
   let package1: TestPackage;
   let package2: TestPackage;

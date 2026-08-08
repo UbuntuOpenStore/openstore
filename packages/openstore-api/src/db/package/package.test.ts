@@ -275,14 +275,14 @@ describe('Package', () => {
       test('generates a download url without a version', () => {
         assert.equal(
           package1.getDownloadUrl(Channel.FOCAL, Architecture.ARMHF),
-          'http://local.open-store.io/api/v3/apps/app.id/download/focal/armhf',
+          'http://local.open-store.io/api/v4/apps/app.id/download/focal/armhf',
         );
       });
 
       test('generates a download url with a version', () => {
         assert.equal(
           package1.getDownloadUrl(Channel.FOCAL, Architecture.ARMHF, '1.0.0'),
-          'http://local.open-store.io/api/v3/apps/app.id/download/focal/armhf/1.0.0',
+          'http://local.open-store.io/api/v4/apps/app.id/download/focal/armhf/1.0.0',
         );
       });
     });
@@ -389,7 +389,7 @@ describe('Package', () => {
               channel: Channel.FOCAL,
               created_date: now,
               download_sha512: 'shasum',
-              download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/arm64/1.0.0',
+              download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/arm64/1.0.0',
               downloads: 0,
               downloadSize: 8,
               installedSize: 10240,
@@ -411,7 +411,7 @@ describe('Package', () => {
               channel: Channel.FOCAL,
               created_date: now,
               download_sha512: 'shasum',
-              download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/armhf/1.0.0',
+              download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/armhf/1.0.0',
               downloads: 0,
               downloadSize: 8,
               installedSize: 10240,
@@ -458,7 +458,7 @@ describe('Package', () => {
               channel: Channel.FOCAL,
               created_date: now,
               download_sha512: 'shasum',
-              download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/armhf/1.0.0',
+              download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/armhf/1.0.0',
               downloads: 0,
               downloadSize: 8,
               installedSize: 10240,
@@ -480,7 +480,7 @@ describe('Package', () => {
               channel: Channel.FOCAL,
               created_date: now,
               download_sha512: 'shasum',
-              download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/arm64/1.0.0',
+              download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/arm64/1.0.0',
               downloads: 0,
               downloadSize: 8,
               installedSize: 10240,
@@ -527,7 +527,7 @@ describe('Package', () => {
             channel: Channel.FOCAL,
             created_date: now,
             download_sha512: 'shasum',
-            download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/arm64/1.0.0',
+            download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/arm64/1.0.0',
             downloads: 0,
             downloadSize: 8,
             installedSize: 10240,
@@ -549,7 +549,7 @@ describe('Package', () => {
             channel: Channel.FOCAL,
             created_date: now,
             download_sha512: 'shasum',
-            download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/arm64/1.0.1',
+            download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/arm64/1.0.1',
             downloads: 0,
             downloadSize: 8,
             installedSize: 10240,
@@ -575,7 +575,7 @@ describe('Package', () => {
             channel: Channel.FOCAL,
             created_date: now,
             download_sha512: 'shasum',
-            download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/arm64/1.0.0',
+            download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/arm64/1.0.0',
             downloads: 0,
             downloadSize: 8,
             installedSize: 10240,
@@ -601,7 +601,7 @@ describe('Package', () => {
             channel: Channel.FOCAL,
             created_date: now,
             download_sha512: 'shasum',
-            download_url: 'http://local.open-store.io/api/v3/apps/app.id/download/focal/arm64/1.0.1',
+            download_url: 'http://local.open-store.io/api/v4/apps/app.id/download/focal/arm64/1.0.1',
             downloads: 0,
             downloadSize: 8,
             installedSize: 10240,

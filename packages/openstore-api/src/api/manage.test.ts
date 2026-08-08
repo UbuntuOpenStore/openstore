@@ -41,13 +41,13 @@ describe('Manage', () => {
     let package1: TestPackage;
 
     beforeEach(async () => {
-      route = `/api/v3/manage/?apikey=${user.apikey}`;
+      route = `/api/v4/manage/?apikey=${user.apikey}`;
 
       [package1] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
     });
 
     test('blocks access when not logged in', async () => {
-      await request(app).get('/api/v3/manage/').expect(401);
+      await request(app).get('/api/v4/manage/').expect(401);
     });
 
     describe('admin user', () => {
@@ -156,11 +156,11 @@ describe('Manage', () => {
 
     beforeEach(async () => {
       [package1, package2] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
-      route = `/api/v3/manage/${package1.id}?apikey=${user.apikey}`;
+      route = `/api/v4/manage/${package1.id}?apikey=${user.apikey}`;
     });
 
     test('blocks access when not logged in', async () => {
-      await request(app).get(`/api/v3/manage/${package1.id}`).expect(401);
+      await request(app).get(`/api/v4/manage/${package1.id}`).expect(401);
     });
 
     describe('admin user', () => {
@@ -173,7 +173,7 @@ describe('Manage', () => {
       });
 
       test('404s on a bad id', async () => {
-        await request(app).get(`/api/v3/manage/foo?apikey=${user.apikey}`).expect(404);
+        await request(app).get(`/api/v4/manage/foo?apikey=${user.apikey}`).expect(404);
       });
     });
 
@@ -192,7 +192,7 @@ describe('Manage', () => {
       });
 
       test('can not see other apps', async () => {
-        await request(app).get(`/api/v3/manage/${package2.id}?apikey=${user.apikey}`).expect(403);
+        await request(app).get(`/api/v4/manage/${package2.id}?apikey=${user.apikey}`).expect(403);
       });
 
       test('cannot manage snap packages', async () => {
@@ -204,7 +204,7 @@ describe('Manage', () => {
           source_store: SourceStore.SNAPCRAFT,
         });
 
-        const res = await request(app).get(`/api/v3/manage/${snapPackage.id}?apikey=${user.apikey}`).expect(403);
+        const res = await request(app).get(`/api/v4/manage/${snapPackage.id}?apikey=${user.apikey}`).expect(403);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.SNAP_MANAGEMENT_NOT_SUPPORTED);
@@ -245,7 +245,7 @@ describe('Manage', () => {
     let user2: TestUser;
 
     beforeEach(async () => {
-      route = `/api/v3/manage/?apikey=${user.apikey}`;
+      route = `/api/v4/manage/?apikey=${user.apikey}`;
       package1 = await factory.package({ maintainer: user._id, name: 'User app' });
       user2 = await factory.user();
 
@@ -264,7 +264,7 @@ describe('Manage', () => {
     });
 
     test('blocks access when not logged in', async () => {
-      await request(app).post('/api/v3/manage/').expect(401);
+      await request(app).post('/api/v4/manage/').expect(401);
     });
 
     describe('admin user', () => {
@@ -531,12 +531,12 @@ describe('Manage', () => {
     beforeEach(async () => {
       [package1, package2] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
 
-      route = `/api/v3/manage/${package1.id}?apikey=${user.apikey}`;
-      route2 = `/api/v3/manage/${package2.id}?apikey=${user.apikey}`;
+      route = `/api/v4/manage/${package1.id}?apikey=${user.apikey}`;
+      route2 = `/api/v4/manage/${package2.id}?apikey=${user.apikey}`;
     });
 
     test('blocks access when not logged in', async () => {
-      await request(app).put(`/api/v3/manage/${package1.id}`).expect(401);
+      await request(app).put(`/api/v4/manage/${package1.id}`).expect(401);
     });
 
     describe('admin user', () => {
@@ -602,7 +602,7 @@ describe('Manage', () => {
       });
 
       test('fails with a bad id', async () => {
-        await request(app).put(`/api/v3/manage/foo?apikey=${user.apikey}`).expect(404);
+        await request(app).put(`/api/v4/manage/foo?apikey=${user.apikey}`).expect(404);
       });
 
       test('does not allow modifying another users package', async () => {
@@ -864,8 +864,8 @@ describe('Manage', () => {
 
     beforeEach(async () => {
       [package1, package2] = await Promise.all([factory.package({ maintainer: user._id, name: 'User app' }), factory.package()]);
-      route = `/api/v3/manage/${package1.id}?apikey=${user.apikey}`;
-      route2 = `/api/v3/manage/${package2.id}?apikey=${user.apikey}`;
+      route = `/api/v4/manage/${package1.id}?apikey=${user.apikey}`;
+      route2 = `/api/v4/manage/${package2.id}?apikey=${user.apikey}`;
     });
 
     describe('admin user', () => {
@@ -889,7 +889,7 @@ describe('Manage', () => {
       });
 
       test('fails with a bad id', async () => {
-        await request(app).delete(`/api/v3/manage/foo?apikey=${user.apikey}`).expect(404);
+        await request(app).delete(`/api/v4/manage/foo?apikey=${user.apikey}`).expect(404);
       });
 
       test('does not allow modifying another users package', async () => {
@@ -950,7 +950,7 @@ describe('Manage', () => {
         changelog: 'Legacy changelog',
       });
 
-      route = `/api/v3/manage/${pkg.id}?apikey=${user.apikey}`;
+      route = `/api/v4/manage/${pkg.id}?apikey=${user.apikey}`;
     });
 
     test('can update version-specific changelogs', async (t) => {
