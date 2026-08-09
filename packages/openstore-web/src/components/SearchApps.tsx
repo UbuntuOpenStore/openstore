@@ -22,7 +22,6 @@ import SearchBar from "./SearchBar";
 const PAGE_SIZE = 32;
 const DEFAULT_SORT = "-published_date";
 const DEFAULT_TYPE = "";
-const DEFAULT_CHANNEL = "focal";
 
 type Props = {
   category?: string;
@@ -86,7 +85,7 @@ const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) 
     search: storeTerm || hash.get("search") || "",
     sort: hash.get("sort") ?? DEFAULT_SORT,
     type: hash.get("type") ?? DEFAULT_TYPE,
-    channel: hash.get("channel") ?? DEFAULT_CHANNEL,
+    channel: hash.get("channel") ?? "",
     showNsfw: hash.get("nsfw") === "true" ? true : undefined,
   });
   const [apps, setApps] = useState<SlimAppData[]>([]);
@@ -139,7 +138,7 @@ const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) 
     if (category) {
       updateHash.append("category", category);
     }
-    if (query.channel !== DEFAULT_CHANNEL) {
+    if (query.channel) {
       updateHash.append("channel", query.channel);
     }
     if (page > 0) {

@@ -1,15 +1,19 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Channel, Channels, type AppData } from "@/lib/schema";
 import { getRelativeLocaleUrl } from "@/lib/utils";
 
-const DownloadDialog = ({ app, messages, currentLocale } : { app: AppData, currentLocale: string | undefined, messages: { download: string, downloadApp: string, olderVersions: string } }) => {
-  const downloads = app.downloads.filter((download) => Channels.includes(download.channel as Channel) && download.download_url && download.architecture);
+const DownloadDialog = ({
+  app,
+  messages,
+  currentLocale,
+}: {
+  app: AppData;
+  currentLocale: string | undefined;
+  messages: { download: string; downloadApp: string; olderVersions: string };
+}) => {
+  const downloads = app.downloads.filter(
+    (download) => Channels.includes(download.channel as Channel) && download.download_url && download.architecture
+  );
 
   if (downloads.length === 0) {
     return null;
@@ -23,21 +27,23 @@ const DownloadDialog = ({ app, messages, currentLocale } : { app: AppData, curre
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle class="mb-4">{messages.downloadApp.replace("%{app}", app.name)}</DialogTitle>
-            <div class="mt-4 space-y-4">
-              {downloads.map((download) => (
-                <a href={download.download_url!} target="_blank" class="btn w-full bg-ubuntu-purple text-white font-bold">
-                  v{download.version} ({download.architecture})
-                </a>
-              ))}
-            </div>
+          <div class="mt-4 space-y-4">
+            {downloads.map((download) => (
+              <a href={download.download_url!} target="_blank" class="btn w-full bg-ubuntu-purple text-white font-bold">
+                v{download.version} ({download.architecture}){download.channel !== Channel.FOCAL && ` - ${download.channel}`}
+              </a>
+            ))}
+          </div>
 
-            <div class="pt-4 text-center">
-              <a href={getRelativeLocaleUrl(currentLocale, `/app/${app.id}/versions/`)} class="underline">{messages.olderVersions}</a>
-            </div>
+          <div class="pt-4 text-center">
+            <a href={getRelativeLocaleUrl(currentLocale, `/app/${app.id}/versions/`)} class="underline">
+              {messages.olderVersions}
+            </a>
+          </div>
         </DialogHeader>
       </DialogContent>
     </Dialog>
   );
-}
+};
 
 export default DownloadDialog;
