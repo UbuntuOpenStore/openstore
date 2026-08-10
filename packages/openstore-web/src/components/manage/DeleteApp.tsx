@@ -43,7 +43,7 @@ const DeleteApp = ({ app, currentLocale, messages }: DeleteAppProps) => {
 
     try {
       const apiKey = getClientApiKey();
-      const url = `${import.meta.env.PUBLIC_API_URL}api/v3/manage/${app.id}?force=true&apikey=${apiKey}`;
+      const url = `${import.meta.env.PUBLIC_API_URL}api/v4/manage/${app.id}?force=true&apikey=${apiKey}`;
 
       const response = await fetch(url, {
         method: "DELETE",

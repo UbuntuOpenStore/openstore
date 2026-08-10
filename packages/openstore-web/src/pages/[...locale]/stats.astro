@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 
 await initializeI18N(Astro.currentLocale);
 
-const statsResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/stats`, {
+const statsResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/stats`, {
   headers: { "X-Source": "openstore-web-next" },
 });
 const statsData = await statsResponse.json();

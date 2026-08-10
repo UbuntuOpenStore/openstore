@@ -100,7 +100,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
     setLoading(true);
 
     const skip = page * PAGE_SIZE;
-    const url = new URL(`${import.meta.env.PUBLIC_API_URL}api/v3/manage`);
+    const url = new URL(`${import.meta.env.PUBLIC_API_URL}api/v4/manage`);
     url.searchParams.append("apikey", apikey);
     url.searchParams.append("limit", PAGE_SIZE.toString());
     url.searchParams.append("skip", skip.toString());
