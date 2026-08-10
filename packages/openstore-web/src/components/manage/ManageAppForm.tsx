@@ -124,7 +124,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
       newFormData.append("nsfw", formData.get("nsfw") ? "on" : "off");
       newFormData.append("locked", formData.get("locked") ? "on" : "off");
 
-      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/manage/${app.id}?apikey=${getClientApiKey()}`, {
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/manage/${app.id}?apikey=${getClientApiKey()}`, {
         method: "PUT",
         body: newFormData,
         headers: { "X-Source": "openstore-web-next" },

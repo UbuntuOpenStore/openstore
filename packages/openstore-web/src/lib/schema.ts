@@ -17,7 +17,6 @@ export enum Architecture {
 
 export enum Channel {
   FOCAL = 'focal',
-  XENIAL = 'xenial',
 }
 
 export enum AppType {

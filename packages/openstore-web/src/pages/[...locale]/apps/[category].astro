@@ -13,7 +13,7 @@ export type Props = {
 };
 
 export async function getStaticPaths() {
-  const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/categories?all=true`, {
+  const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/categories?all=true`, {
     headers: { "X-Source": "openstore-web-next" },
   });
   const { data } = await response.json();

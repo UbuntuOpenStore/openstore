@@ -103,7 +103,7 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
           }))
         );
 
-        const url = `${import.meta.env.PUBLIC_API_URL}api/v4/manage/${app.id}/revision?apikey=${getClientApiKey()}`;
+        const url = `${import.meta.env.PUBLIC_API_URL}api/v3/manage/${app.id}/revision?apikey=${getClientApiKey()}`;
         let uploadedChangelog = false;
         for (const formFile of formFiles) {
           const fileUploadData = new FormData();

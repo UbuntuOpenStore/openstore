@@ -28,7 +28,7 @@ const SubmitAppForm = ({ currentLocale, messages }: { currentLocale: string | un
       setError("");
 
       const formData = new FormData(form);
-      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/manage/?apikey=${apikey}`, {
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v3/manage/?apikey=${apikey}`, {
        method: "POST",
        body: JSON.stringify({
          id: formData.get("id"),
