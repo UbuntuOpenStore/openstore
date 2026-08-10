@@ -429,7 +429,7 @@ export function transformSnapToPackage(v2Data: SnapV2Response): Partial<IPackage
   });
 
   const lomiriCompatible = revisions.some(
-    (rev) => rev.snap_data?.grade === 'stable' && rev.snap_data.connections?.some((c) => c.interface === 'lomiri-ui-toolkit'),
+    (rev) => rev.snap_data?.grade === 'stable' && rev.snap_data.connections?.some((c) => c.name === 'lomiri-ui-toolkit'),
   );
 
   const stableRevision = v2Data['channel-map'].find((cm) => cm.channel.risk === 'stable');
