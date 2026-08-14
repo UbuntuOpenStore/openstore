@@ -5,6 +5,7 @@ import { type FilterQuery } from 'mongoose';
 
 import { Package } from '../db/package';
 import { type IPackage } from '../db/package/types';
+import { recalculatePackageRatings } from '../db/rating_count/utils';
 
 const query: FilterQuery<IPackage> = {};
 if (process.argv[3]) {
@@ -20,6 +21,7 @@ async function updateCalculated() {
     const task = (async () => {
       console.log(pkg.id);
       pkg.updateCalculatedProperties();
+      await recalculatePackageRatings(pkg._id);
 
       await pkg.save();
     })();
