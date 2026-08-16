@@ -21,7 +21,7 @@ async function updateCalculated() {
     const task = (async () => {
       console.log(pkg.id);
       pkg.updateCalculatedProperties();
-      await recalculatePackageRatings(pkg._id);
+      await recalculatePackageRatings(pkg.id);
 
       await pkg.save();
     })();

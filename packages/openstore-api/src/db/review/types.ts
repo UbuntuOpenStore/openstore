@@ -8,6 +8,7 @@ import { type Ratings } from './constants';
 
 export interface IReview {
   pkg: Types.ObjectId;
+  package_id: string;
   version: string;
   user: PopulatedDoc<HydratedUser>;
   rating: Ratings;
@@ -38,7 +39,7 @@ export type ReviewRequestFilters = {
   limit: number;
   skip: number;
   from?: number;
-  pkg: any; // The mongoose _id is an any type
+  package_id: string;
   user?: any;
 };
 

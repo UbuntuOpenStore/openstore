@@ -19,13 +19,15 @@ export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewM
     rating: Ratings,
     body?: string,
   ): Promise<HydratedReview> {
-    let ownReview = await this.findOne({ pkg: pkg._id, user: user._id });
+    let ownReview = await this.findOne({ package_id: pkg.id, user: user._id });
     if (!ownReview) {
       ownReview = new this();
       ownReview.pkg = pkg._id;
       ownReview.user = user._id;
       ownReview.redacted = false;
     }
+
+    ownReview.package_id = pkg.id;
 
     if (ownReview.redacted) {
       throw new UserError(REVIEW_REDACTED);
@@ -53,13 +55,13 @@ export function setupStatics(reviewSchema: Schema<IReview, ReviewModel, IReviewM
       limit,
       skip: getDataInt(req, 'skip', 0),
       from: getDataInt(req, 'from'),
-      pkg: req.pkg._id,
+      package_id: req.pkg.id,
       user,
     };
   };
 
-  reviewSchema.statics.parseFilters = function ({ pkg, user, from }: ReviewRequestFilters): FilterQuery<IReview> {
-    const query: FilterQuery<IReview> = { pkg, redacted: false };
+  reviewSchema.statics.parseFilters = function ({ package_id, user, from }: ReviewRequestFilters): FilterQuery<IReview> {
+    const query: FilterQuery<IReview> = { package_id, redacted: false };
 
     if (from) {
       query.date = { $lt: new Date(from) };

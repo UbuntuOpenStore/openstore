@@ -55,11 +55,11 @@ describe('Reviews', () => {
     });
 
     await Promise.all([
-      factory.review({ pkg: package1._id, user: user3._id, rating: Ratings.HAPPY }),
-      factory.review({ pkg: package1._id, user: user4._id, rating: Ratings.NEUTRAL }),
+      factory.review({ pkg: package1._id, package_id: package1.id, user: user3._id, rating: Ratings.HAPPY }),
+      factory.review({ pkg: package1._id, package_id: package1.id, user: user4._id, rating: Ratings.NEUTRAL }),
     ]);
 
-    await recalculatePackageRatings(package1._id);
+    await recalculatePackageRatings(package1.id);
   });
 
   describe('GET', () => {
@@ -72,7 +72,7 @@ describe('Reviews', () => {
     });
 
     test('shows own review', async () => {
-      await factory.review({ pkg: package1._id, user: user1._id });
+      await factory.review({ pkg: package1._id, package_id: package1.id, user: user1._id });
       const res = await request(app).get(`${route}&filter=apikey`).expect(200);
 
       assert.ok(res.body.success);
@@ -90,7 +90,7 @@ describe('Reviews', () => {
     });
 
     test('does not return redacted reviews', async () => {
-      await factory.review({ pkg: package1._id, user: user1._id, redacted: true });
+      await factory.review({ pkg: package1._id, package_id: package1.id, user: user1._id, redacted: true });
       const res = await request(app).get(route).expect(200);
 
       assert.ok(res.body.success);
@@ -116,8 +116,8 @@ describe('Reviews', () => {
     });
 
     test('updates own review', async () => {
-      await factory.review({ pkg: package1._id, user: user1._id, rating: Ratings.THUMBS_DOWN });
-      await recalculatePackageRatings(package1._id);
+      await factory.review({ pkg: package1._id, package_id: package1.id, user: user1._id, rating: Ratings.THUMBS_DOWN });
+      await recalculatePackageRatings(package1.id);
 
       let pkg = await Package.findOne({ id: package1.id }).populate('rating_counts');
       let checkRatings: Record<string, number> = {};
@@ -229,7 +229,7 @@ describe('Reviews', () => {
     });
 
     test('throws a 400 when updating a redacted review', async () => {
-      await factory.review({ pkg: package1._id, user: user1._id, redacted: true });
+      await factory.review({ pkg: package1._id, package_id: package1.id, user: user1._id, redacted: true });
       const res = await request(app).put(route).send({ body: 'great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(400);
 
       assert.equal(res.body.success, false);
@@ -237,7 +237,7 @@ describe('Reviews', () => {
     });
 
     test('updates existing review when to create another review', async () => {
-      await factory.review({ pkg: package1._id, user: user1._id });
+      await factory.review({ pkg: package1._id, package_id: package1.id, user: user1._id });
       const res = await request(app).post(route).send({ body: 'really great app', version: '1.0.0', rating: 'THUMBS_UP' }).expect(200);
 
       assert.ok(res.body.success);

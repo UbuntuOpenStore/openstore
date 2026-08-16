@@ -6,6 +6,7 @@ import { type IReview, type IReviewMethods, type ReviewModel } from './types';
 
 export const reviewSchema = new Schema<IReview, ReviewModel, IReviewMethods>({
   pkg: { type: Schema.Types.ObjectId, ref: 'Package' },
+  package_id: { type: String, index: true },
   version: String,
   user: { type: Schema.Types.ObjectId, ref: 'User' },
   rating: { type: String, enum: RATINGS },

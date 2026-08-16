@@ -66,7 +66,7 @@ async function upsertReview(req: Request, res: Response) {
   }
 
   const review = await Review.createOrUpdateExisting(req.pkg, req.user!, version, rating, body);
-  await recalculatePackageRatings(req.pkg._id);
+  await recalculatePackageRatings(req.pkg.id);
 
   success(res, { review_id: review._id });
 }

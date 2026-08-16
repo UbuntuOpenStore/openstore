@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { type FilterQuery, type Types } from 'mongoose';
+import { type FilterQuery } from 'mongoose';
 
 import { logger } from '../../utils';
 import { Package } from '../package/model';
@@ -9,19 +9,20 @@ import { Review } from '../review/model';
 import { type IReview } from '../review/types';
 import { RatingCount } from './model';
 
-export async function recalculatePackageRatings(pkgId: Types.ObjectId) {
-  let pkg = await Package.findOne({ _id: pkgId }).populate('rating_counts');
+export async function recalculatePackageRatings(pkgId: string) {
+  const pkg = await Package.findOne({ id: pkgId });
   if (!pkg) {
     logger.error('Failed to recalculate ratings: could not find package');
     return null;
   }
 
   let calculatedRating = 0;
-  // oxlint-disable-next-line typescript/no-unnecessary-condition
-  pkg.rating_counts = pkg.rating_counts ?? [];
 
-  const reviewQuery: FilterQuery<IReview> = { pkg: pkgId };
+  const reviewQuery: FilterQuery<IReview> = { package_id: pkgId };
   const reviews = await Review.find(reviewQuery);
+
+  const ratingCountsByIds = await RatingCount.getCountsByIds([pkgId]);
+  const ratingCounts = ratingCountsByIds[pkgId] ?? [];
 
   for (const ratingName of RATINGS) {
     let count = 0;
@@ -32,10 +33,10 @@ export async function recalculatePackageRatings(pkgId: Types.ObjectId) {
     calculatedRating += RATING_MAP[ratingName as keyof typeof RATING_MAP] * count;
 
     let updatedCount = false;
-    for (const ratingCount of pkg.rating_counts) {
+    for (const ratingCount of ratingCounts) {
       if (ratingCount.name === ratingName) {
         ratingCount.count = count;
-        ratingCount.package_id = pkg.id;
+        ratingCount.package_id = pkgId;
 
         /* eslint-disable-next-line no-await-in-loop */
         await ratingCount.save();
@@ -49,7 +50,7 @@ export async function recalculatePackageRatings(pkgId: Types.ObjectId) {
       const ratingCount = new RatingCount();
       ratingCount.name = ratingName as Ratings;
       ratingCount.count = count;
-      ratingCount.package_id = pkg.id;
+      ratingCount.package_id = pkgId;
 
       /* eslint-disable-next-line no-await-in-loop */
       await ratingCount.save();
@@ -60,6 +61,6 @@ export async function recalculatePackageRatings(pkgId: Types.ObjectId) {
 
   // TODO only save the rating_counts & calculated_rating
   pkg.calculated_rating = calculatedRating;
-  pkg = await pkg.save();
-  return pkg;
+  const savedPkg = await pkg.save();
+  return savedPkg;
 }

@@ -32,7 +32,7 @@ async function reindex() {
         continue;
       }
 
-      await recalculatePackageRatings(pkg._id);
+      await recalculatePackageRatings(pkg.id);
       batch.push(pkg);
 
       if (batch.length < BATCH_SIZE) {
