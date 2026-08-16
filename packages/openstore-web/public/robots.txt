@@ -1,2 +1,17 @@
 User-agent: *
 Disallow: /api/*/apps/*/download/*
+
+User-Agent: PetalBot
+Disallow: /
+
+User-Agent: meta-externalagent
+Disallow: /
+
+User-Agent: Bytespider
+Disallow: /
+
+User-Agent: Amazonbot
+Disallow: /
+
+User-Agent: Applebot
+Disallow: /
