@@ -14,7 +14,7 @@ export type Props = {
 
 export async function getStaticPaths() {
   const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/categories?all=true`, {
-    headers: { "X-Source": "openstore-web-next" },
+    headers: { "X-Source": "openstore-web-next", "User-Agent": "open-store.io" },
   });
   const { data } = await response.json();
   const categories = CategoriesSchema.parse(data);

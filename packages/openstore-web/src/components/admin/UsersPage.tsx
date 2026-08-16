@@ -1,49 +1,45 @@
-import { useState, useEffect, useCallback } from 'preact/hooks';
-import { type JSX } from 'preact';
-import { getClientApiKey } from '../../lib/utils';
-import SvgSpinner from '../icons/Spinner';
-import SvgClose from '../icons/Close';
-import UserForm from './UserForm';
-import UsersList from './UsersList';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
-import { type UserData, UserListSchema } from '@/lib/schema';
+import { useState, useEffect, useCallback } from "preact/hooks";
+import { type JSX } from "preact";
+import { getClientApiKey } from "../../lib/utils";
+import SvgSpinner from "../icons/Spinner";
+import SvgClose from "../icons/Close";
+import UserForm from "./UserForm";
+import UsersList from "./UsersList";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { type UserData, UserListSchema } from "@/lib/schema";
 
 type UsersPageProps = {};
 
 const UsersPage = ({}: UsersPageProps): JSX.Element => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch(
-        `${import.meta.env.PUBLIC_API_URL}api/users?apikey=${getClientApiKey()}`,
-        {
-          headers: { 'X-Source': 'openstore-web-next' }
-        }
-      );
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users?apikey=${getClientApiKey()}`, {
+        headers: { "X-Source": "openstore-web-next" },
+      });
 
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
           const userData = UserListSchema.parse(data.data);
           setUsers(userData);
-        }
-        else {
-          setError(data.message || 'Failed to load users');
+        } else {
+          setError(data.message || "Failed to load users");
         }
       } else {
         setError(`Error: ${response.status} ${response.statusText}`);
       }
     } catch (err) {
       console.error(err);
-      setError('Error loading users');
+      setError("Error loading users");
     } finally {
       setLoading(false);
     }
@@ -64,18 +60,17 @@ const UsersPage = ({}: UsersPageProps): JSX.Element => {
     setEditingUser(null);
   }, []);
 
-  const handleFormSuccess = useCallback((_data: UserData) => {
-    loadUsers();
-    setIsModalOpen(false);
-    setEditingUser(null);
-  }, [loadUsers]);
+  const handleFormSuccess = useCallback(
+    (_data: UserData) => {
+      loadUsers();
+      setIsModalOpen(false);
+      setEditingUser(null);
+    },
+    [loadUsers]
+  );
 
   const handleRoleChanged = useCallback((userId: string, role: string | undefined) => {
-    setUsers((current) =>
-      current.map(user =>
-        user._id === userId ? { ...user, role } : user
-      )
-    );
+    setUsers((current) => current.map((user) => (user._id === userId ? { ...user, role } : user)));
   }, []);
 
   if (loading && users.length === 0) {
@@ -92,9 +87,7 @@ const UsersPage = ({}: UsersPageProps): JSX.Element => {
         <SvgClose class="text-red-600" />
         <div>
           An error occurred:
-          <p>
-            {error}
-          </p>
+          <p>{error}</p>
         </div>
       </div>
     );
@@ -106,23 +99,14 @@ const UsersPage = ({}: UsersPageProps): JSX.Element => {
         <h2 class="text-2xl font-semibold">User Management</h2>
       </div>
 
-      <UsersList
-        users={users}
-        onEdit={handleEdit}
-        onRoleChanged={handleRoleChanged}
-      />
+      <UsersList users={users} onEdit={handleEdit} onRoleChanged={handleRoleChanged} />
 
       <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
         <DialogContent class="max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>
-          {editingUser && (
-            <UserForm
-              user={editingUser}
-              onSuccess={handleFormSuccess}
-            />
-          )}
+          {editingUser && <UserForm user={editingUser} onSuccess={handleFormSuccess} />}
         </DialogContent>
       </Dialog>
     </div>

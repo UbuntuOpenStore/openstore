@@ -17,7 +17,9 @@ const CHANNEL_MAP = {
 
 const { id } = Astro.params;
 
-const appResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}`, { headers: { "X-Source": "openstore-web-next" } });
+const appResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}`, {
+  headers: { "X-Source": "openstore-web-next", "User-Agent": "open-store.io" },
+});
 if (appResponse.status === 404) {
   return new Response(null, {
     status: 404,
@@ -38,7 +40,7 @@ const formattedRevisions = revisions
 
       return { ...acc, [current.version]: { ...versionData, [key]: current } };
     },
-    {} as { [version: string]: { [key: string]: AppRevisionData } }
+    {} as { [version: string]: { [key: string]: AppRevisionData } },
   );
 
 function titleCase(value: string) {
@@ -59,7 +61,7 @@ function titleCase(value: string) {
       { name: app.name, path: `/app/${app.id}/` },
       { name: `${app.name} - Versions`, path: `/app/${app.id}/versions/` },
     ],
-    app
+    app,
   )}
 >
   <section class="section flex">

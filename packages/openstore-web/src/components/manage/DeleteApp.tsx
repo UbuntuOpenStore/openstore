@@ -92,9 +92,7 @@ const DeleteApp = ({ app, currentLocale, messages }: DeleteAppProps) => {
             )}
 
             <p class="mb-4">{messages.areYouSure}</p>
-            <p class="text-red-600 mb-4">
-              {app.revisions?.length > 0 ? messages.hasRevisionsWarning : messages.cannotBeUndone}
-            </p>
+            <p class="text-red-600 mb-4">{app.revisions?.length > 0 ? messages.hasRevisionsWarning : messages.cannotBeUndone}</p>
           </div>
 
           <DialogFooter class="flex gap-2">

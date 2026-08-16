@@ -38,7 +38,7 @@ appUrl.searchParams.set("publisher_id", userData._id);
 appUrl.searchParams.set("limit", "32");
 appUrl.searchParams.set("sort", "-published_date");
 const appsResponse = await fetch(appUrl, {
-  headers: { "X-Source": "openstore-web-next" },
+  headers: { "X-Source": "openstore-web-next", "User-Agent": "open-store.io" },
 });
 
 let hasMoreApps = false;

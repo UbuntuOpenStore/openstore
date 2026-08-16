@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'preact/hooks';
-import { type JSX } from 'preact';
-import { getClientApiKey } from '../../lib/utils';
-import SvgSpinner from '../icons/Spinner';
-import SvgCheck from '../icons/Check';
-import SvgClose from '../icons/Close';
-import { type UserData, UserSchema } from '@/lib/schema';
+import { useState, useCallback } from "preact/hooks";
+import { type JSX } from "preact";
+import { getClientApiKey } from "../../lib/utils";
+import SvgSpinner from "../icons/Spinner";
+import SvgCheck from "../icons/Check";
+import SvgClose from "../icons/Close";
+import { type UserData, UserSchema } from "@/lib/schema";
 
 type UserFormProps = {
   user: UserData;
@@ -14,66 +14,66 @@ type UserFormProps = {
 const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    name: user.name || '',
-    username: user.username || '',
-    email: user.email || '',
-    website_url: user.website_url || '',
-    github_profile_url: user.github_profile_url || '',
-    gitlab_profile_url: user.gitlab_profile_url || '',
-    ubports_forum_username: user.ubports_forum_username || '',
-    donation_url: user.donation_url || '',
-    description: user.description || '',
+    name: user.name || "",
+    username: user.username || "",
+    email: user.email || "",
+    website_url: user.website_url || "",
+    github_profile_url: user.github_profile_url || "",
+    gitlab_profile_url: user.gitlab_profile_url || "",
+    ubports_forum_username: user.ubports_forum_username || "",
+    donation_url: user.donation_url || "",
+    description: user.description || "",
   });
 
   const handleInputChange = useCallback((e: Event) => {
     const target = e.currentTarget as HTMLInputElement | HTMLTextAreaElement;
     const { name, value } = target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleSubmit = useCallback(async (e: Event) => {
-    e.preventDefault();
-    setSaving(true);
-    setError('');
-    setSuccess(false);
+  const handleSubmit = useCallback(
+    async (e: Event) => {
+      e.preventDefault();
+      setSaving(true);
+      setError("");
+      setSuccess(false);
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.PUBLIC_API_URL}api/users/${user._id}?apikey=${getClientApiKey()}`,
-        {
-          method: 'PUT',
+      try {
+        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/${user._id}?apikey=${getClientApiKey()}`, {
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
-            'X-Source': 'openstore-web-next'
+            "Content-Type": "application/json",
+            "X-Source": "openstore-web-next",
           },
-          body: JSON.stringify(formData)
-        }
-      );
+          body: JSON.stringify(formData),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          const updatedUser = UserSchema.parse(data.data);
-          setSuccess(true);
-          if (onSuccess) {
-            onSuccess(updatedUser);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            const updatedUser = UserSchema.parse(data.data);
+            setSuccess(true);
+            if (onSuccess) {
+              onSuccess(updatedUser);
+            }
+          } else {
+            setError(data.message || "Failed to update user");
           }
         } else {
-          setError(data.message || 'Failed to update user');
+          const data = await response.json();
+          setError(data.message || `Error: ${response.status}`);
         }
-      } else {
-        const data = await response.json();
-        setError(data.message || `Error: ${response.status}`);
+      } catch (err) {
+        console.error(err);
+        setError("Error updating user profile");
+      } finally {
+        setSaving(false);
       }
-    } catch (err) {
-      console.error(err);
-      setError('Error updating user profile');
-    } finally {
-      setSaving(false);
-    }
-  }, [user._id, formData, onSuccess]);
+    },
+    [user._id, formData, onSuccess]
+  );
 
   return (
     <div>
@@ -93,7 +93,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium mb-1">Username</label>
+          <label htmlFor="username" className="block text-sm font-medium mb-1">
+            Username
+          </label>
           <input
             type="text"
             id="username"
@@ -108,7 +110,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+          <label htmlFor="name" className="block text-sm font-medium mb-1">
+            Name
+          </label>
           <input
             type="text"
             id="name"
@@ -121,7 +125,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
+            Email
+          </label>
           <input
             type="email"
             id="email"
@@ -134,7 +140,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="website_url" className="block text-sm font-medium mb-1">Website URL</label>
+          <label htmlFor="website_url" className="block text-sm font-medium mb-1">
+            Website URL
+          </label>
           <input
             type="url"
             id="website_url"
@@ -147,7 +155,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="github_profile_url" className="block text-sm font-medium mb-1">GitHub Profile</label>
+          <label htmlFor="github_profile_url" className="block text-sm font-medium mb-1">
+            GitHub Profile
+          </label>
           <input
             type="url"
             id="github_profile_url"
@@ -160,7 +170,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="gitlab_profile_url" className="block text-sm font-medium mb-1">GitLab Profile</label>
+          <label htmlFor="gitlab_profile_url" className="block text-sm font-medium mb-1">
+            GitLab Profile
+          </label>
           <input
             type="url"
             id="gitlab_profile_url"
@@ -173,7 +185,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="ubports_forum_username" className="block text-sm font-medium mb-1">UBports Forum Username</label>
+          <label htmlFor="ubports_forum_username" className="block text-sm font-medium mb-1">
+            UBports Forum Username
+          </label>
           <input
             type="text"
             id="ubports_forum_username"
@@ -186,7 +200,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="donation_url" className="block text-sm font-medium mb-1">Donation URL</label>
+          <label htmlFor="donation_url" className="block text-sm font-medium mb-1">
+            Donation URL
+          </label>
           <input
             type="url"
             id="donation_url"
@@ -199,7 +215,9 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
+          <label htmlFor="description" className="block text-sm font-medium mb-1">
+            Description
+          </label>
           <textarea
             id="description"
             name="description"
@@ -219,7 +237,7 @@ const UserForm = ({ user, onSuccess }: UserFormProps): JSX.Element => {
                 Saving...
               </>
             ) : (
-              'Save Changes'
+              "Save Changes"
             )}
           </button>
         </div>

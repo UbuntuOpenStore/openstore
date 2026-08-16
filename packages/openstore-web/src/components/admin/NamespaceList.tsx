@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'preact/hooks';
-import SvgSpinner from '../icons/Spinner';
-import SvgClose from '../icons/Close';
-import { getClientApiKey } from '../../lib/utils';
-import { type NamespaceData } from '@/lib/schema';
+import { useState, useCallback } from "preact/hooks";
+import SvgSpinner from "../icons/Spinner";
+import SvgClose from "../icons/Close";
+import { getClientApiKey } from "../../lib/utils";
+import { type NamespaceData } from "@/lib/schema";
 
 type NamespaceListProps = {
   namespaces: NamespaceData[];
@@ -12,8 +12,8 @@ type NamespaceListProps = {
 
 const NamespaceList = ({ namespaces = [], onEdit, onDeleted }: NamespaceListProps) => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleDeleteClick = useCallback((namespace: NamespaceData) => {
     if (window.confirm(`Are you sure you want to delete the namespace ${namespace.namespace}?`)) {
@@ -21,36 +21,36 @@ const NamespaceList = ({ namespaces = [], onEdit, onDeleted }: NamespaceListProp
     }
   }, []);
 
-  const deleteNamespace = useCallback(async (id: string) => {
-    setDeletingId(id);
-    setError('');
+  const deleteNamespace = useCallback(
+    async (id: string) => {
+      setDeletingId(id);
+      setError("");
 
-    try {
-      const response = await fetch(
-        `${import.meta.env.PUBLIC_API_URL}api/v4/admin/namespaces/${id}?apikey=${getClientApiKey()}`,
-        {
-          method: 'DELETE',
-          headers: { 'X-Source': 'openstore-web-next' }
-        }
-      );
+      try {
+        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/admin/namespaces/${id}?apikey=${getClientApiKey()}`, {
+          method: "DELETE",
+          headers: { "X-Source": "openstore-web-next" },
+        });
 
-      if (response.ok) {
-        onDeleted(id);
-      } else {
-        const errorBody = await response.json();
-        let message = "An error occurred";
-        if (errorBody && typeof errorBody.message === 'string') {
-          message = errorBody.message;
+        if (response.ok) {
+          onDeleted(id);
+        } else {
+          const errorBody = await response.json();
+          let message = "An error occurred";
+          if (errorBody && typeof errorBody.message === "string") {
+            message = errorBody.message;
+          }
+          setError(message);
         }
-        setError(message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+        console.error(err);
+      } finally {
+        setDeletingId(null);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      console.error(err);
-    } finally {
-      setDeletingId(null);
-    }
-  }, [onDeleted]);
+    },
+    [onDeleted]
+  );
 
   const handleSearchChange = useCallback((e: Event) => {
     setSearchQuery((e.currentTarget as HTMLInputElement).value.toLowerCase());
@@ -85,17 +85,13 @@ const NamespaceList = ({ namespaces = [], onEdit, onDeleted }: NamespaceListProp
           <SvgClose class="text-red-600" />
           <div>
             An error occurred:
-            <p>
-              {error}
-            </p>
+            <p>{error}</p>
           </div>
         </div>
       )}
 
       {filteredNamespaces.length === 0 ? (
-        <div class="text-center py-8 text-gray-500">
-          No namespaces found
-        </div>
+        <div class="text-center py-8 text-gray-500">No namespaces found</div>
       ) : (
         <div class="overflow-x-auto">
           <table class="min-w-full table-auto">
@@ -111,22 +107,16 @@ const NamespaceList = ({ namespaces = [], onEdit, onDeleted }: NamespaceListProp
               {filteredNamespaces.map((namespace) => (
                 <tr key={namespace.id} class="border-b">
                   <td class="px-4 py-2">{namespace.namespace}</td>
-                  <td class="px-4 py-2">
-                    {namespace.type === 'exact' ? "Exact" : "Wildcard"}
-                  </td>
+                  <td class="px-4 py-2">{namespace.type === "exact" ? "Exact" : "Wildcard"}</td>
                   <td class="px-4 py-2">
                     {namespace.owner ? (
                       <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
                           {namespace.owner.avatar ? (
-                            <img
-                              src={namespace.owner.avatar}
-                              alt={namespace.owner.username}
-                              class="w-full h-full object-cover"
-                            />
+                            <img src={namespace.owner.avatar} alt={namespace.owner.username} class="w-full h-full object-cover" />
                           ) : (
                             <div class="w-full h-full flex items-center justify-center text-gray-400">
-                              {namespace.owner.username?.substring(0, 1).toUpperCase() || 'U'}
+                              {namespace.owner.username?.substring(0, 1).toUpperCase() || "U"}
                             </div>
                           )}
                         </div>

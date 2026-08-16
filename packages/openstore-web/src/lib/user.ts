@@ -30,7 +30,7 @@ export async function getUser(apikey: string, useCache = true): Promise<UserData
     }
   }
 
-  const userResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/me?apikey=${apikey}`, { headers: { 'X-Source': 'openstore-web-next' } });
+  const userResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/me?apikey=${apikey}`, { headers: { 'X-Source': 'openstore-web-next', "User-Agent": "open-store.io" } });
 
   if (userResponse.status !== 200) {
     return undefined;
@@ -72,7 +72,7 @@ export async function getUserById(id: string): Promise<UserData | undefined> {
   try {
     console.log(`${import.meta.env.PUBLIC_API_URL}api/users/${id}`)
     const userResponse = await fetch(`${import.meta.env.PUBLIC_API_URL}api/users/${id}`, {
-      headers: { 'X-Source': 'openstore-web-next' }
+      headers: { 'X-Source': 'openstore-web-next', "User-Agent": "open-store.io" }
     });
 
     if (userResponse.status !== 200) {
