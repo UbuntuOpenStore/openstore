@@ -67,8 +67,19 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
           $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
         },
         {
+          $unwind: '$revisions',
+        },
+        {
+          $match: { 'revisions.framework': { $nin: [null, ''] } },
+        },
+        {
           $group: {
-            _id: '$framework',
+            _id: { pkg: '$_id', framework: '$revisions.framework' },
+          },
+        },
+        {
+          $group: {
+            _id: '$_id.framework',
             count: { $sum: 1 },
           },
         },
