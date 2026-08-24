@@ -8,6 +8,7 @@ import methodOverride from 'method-override';
 import multer from 'multer';
 import passport from 'passport';
 
+import { UserError } from '../exceptions';
 import { logger, config, success, error } from '../utils';
 import admin from './admin';
 import apps from './apps';
@@ -149,6 +150,11 @@ export function setup() {
         return;
       }
       error(res, 'File upload error', 400);
+      return;
+    }
+
+    if (err instanceof UserError) {
+      error(res, err.message, err.httpCode);
       return;
     }
 
