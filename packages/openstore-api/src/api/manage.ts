@@ -82,7 +82,7 @@ router.post(
   userRole,
   downloadFile,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    if (!req.body.id || !req.body.id.trim()) {
+    if (!req.body || !req.body.id || !req.body.id.trim()) {
       error(res, NO_APP_NAME, 400);
       return;
     }
