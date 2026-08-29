@@ -176,6 +176,9 @@ packageSchema.index({ author: 1 });
 // Index for category filtering
 packageSchema.index({ category: 1, published: 1 });
 
+// Index for category stats aggregation (categories API)
+packageSchema.index({ package_type: 1, published: 1, category: 1, channels: 1, lomiri_compatible: 1 });
+
 setupMethods(packageSchema);
 setupVirtuals(packageSchema);
 setupStatics(packageSchema);

@@ -76,4 +76,15 @@ describe('Categories API', () => {
     assert.ok(res.body.success);
     assert.equal(res.body.data.length, 2);
   });
+
+  test('filters by lomiri_compatible', async () => {
+    await factory.package({ published: true, category: 'Utilities', lomiri_compatible: false, channels: [DEFAULT_CHANNEL] });
+
+    const res = await request(app).get(`${route}?lomiri_compatible=false`).expect(200);
+
+    assert.ok(res.body.success);
+    assert.equal(res.body.data.length, 1);
+    assert.equal(res.body.data[0].category, 'Utilities');
+    assert.equal(res.body.data[0].count, 1);
+  });
 });

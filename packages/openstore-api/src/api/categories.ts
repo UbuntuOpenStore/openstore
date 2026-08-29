@@ -2,7 +2,7 @@ import express, { type Request, type Response } from 'express';
 
 import { Package } from '../db/package';
 import { PackageType } from '../db/package/types';
-import { setLang, gettext, config, success, getData, getDataArray, asyncErrorWrapper } from '../utils';
+import { setLang, gettext, config, success, getData, getDataArray, getDataBooleanOrUndefined, asyncErrorWrapper } from '../utils';
 import { handleChannel } from '../utils/channels';
 import categoryIcons from './json/category_icons.json';
 
@@ -20,6 +20,7 @@ router.get(
     const channel = handleChannel(getData(req, 'channel'));
     const packageTypeParams = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
     const packageTypes = packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [PackageType.CLICK];
+    const lomiriCompatible = getDataBooleanOrUndefined(req, 'lomiri_compatible');
     let categories = categoryNames.map((category) => {
       return {
         name: category,
@@ -30,7 +31,7 @@ router.get(
     if (!req.query.all) {
       // By default we only return categories that have apps. The `all` flag tells us to return everything.
 
-      categories = (await Package.categoryStats([channel], packageTypes)).map((stats) => {
+      categories = (await Package.categoryStats([channel], packageTypes, lomiriCompatible)).map((stats) => {
         return {
           ...stats,
           name: stats._id,

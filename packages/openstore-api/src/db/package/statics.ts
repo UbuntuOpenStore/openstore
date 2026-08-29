@@ -141,10 +141,14 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
   packageSchema.statics.categoryStats = async function (
     channels: Channel[],
     packageTypes: PackageType[] = [PackageType.CLICK],
+    lomiriCompatible?: boolean,
   ): Promise<CategoryStat[]> {
     const match: FilterQuery<IPackage> = { published: true, package_type: { $in: packageTypes } };
     if (channels.length > 0) {
       match.channels = { $in: channels };
+    }
+    if (lomiriCompatible !== undefined) {
+      match.lomiri_compatible = lomiriCompatible;
     }
 
     const results = await this.aggregate([
