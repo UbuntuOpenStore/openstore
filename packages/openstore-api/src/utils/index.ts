@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 export * from './api-links';
 export * from './checksum';
 export * from './click-parser-async';

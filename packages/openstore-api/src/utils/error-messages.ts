@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 export const APP_NOT_FOUND = 'App not found';
 export const DOWNLOAD_NOT_FOUND_FOR_CHANNEL = 'Download not available for this channel';
 export const INVALID_CHANNEL = 'The provided channel is not valid';

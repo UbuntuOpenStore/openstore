@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { type AppData, RatingType } from "@/lib/schema";
 import SvgThumbsUp from "@/components/icons/ThumbsUp";
 import SvgNeutral from "@/components/icons/Neutral";

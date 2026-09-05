@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 export enum Ratings {
   THUMBS_UP = 'THUMBS_UP',
   THUMBS_DOWN = 'THUMBS_DOWN',

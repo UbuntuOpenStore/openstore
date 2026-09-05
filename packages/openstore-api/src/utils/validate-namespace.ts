@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { ReservedNamespace } from '../db/reserved_namespace';
 import { AuthorizationError } from '../exceptions';
 

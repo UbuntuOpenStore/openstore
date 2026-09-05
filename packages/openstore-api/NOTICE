@@ -1,0 +1,14 @@
+# Dual-Licensed Files
+
+The following files contain contributions from authors who did not sign a contributor agreement, and are dual-licensed under `GPL-3.0-or-later OR AGPL-3.0-or-later`:
+
+- `src/api/apps.ts`
+- `src/api/auth.ts`
+- `src/api/manage.ts`
+- `src/api/reviews.ts`
+- `src/db/package/model.ts`
+- `src/db/package/statics.ts`
+
+These files retain their original GPL-3 licensing option in addition to the project's AGPL-3 license.
+
+All other files in this package are licensed under `AGPL-3.0-or-later` only.

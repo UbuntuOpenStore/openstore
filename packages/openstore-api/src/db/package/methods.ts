@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // oxlint-disable typescript/no-unnecessary-condition
 
 import { createHash } from 'crypto';

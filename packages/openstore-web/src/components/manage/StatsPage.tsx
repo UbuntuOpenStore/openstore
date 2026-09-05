@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import ManageHeader from "@/components/manage/ManageHeader";
 import ManageError from "./ManageError";
 import Loading from "../Loading";

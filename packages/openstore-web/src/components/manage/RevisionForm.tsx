@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import type { AppManageData } from "@/lib/schema";
 import { useCallback, useState } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";

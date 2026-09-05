@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { useState } from "preact/hooks";
 import CopyToClipboard from "./CopyToClipboard";
 import { localeSlugToCode } from "@/lib/utils";

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 

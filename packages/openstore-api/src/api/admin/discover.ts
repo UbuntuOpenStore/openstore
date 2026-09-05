@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import express, { type Request, type Response } from 'express';
 import { z } from 'zod/v4';
 

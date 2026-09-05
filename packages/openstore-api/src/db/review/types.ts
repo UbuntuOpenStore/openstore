@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { type Request } from 'express';
 import { type FilterQuery, type HydratedDocument, type Model, type PopulatedDoc, type Types } from 'mongoose';
 

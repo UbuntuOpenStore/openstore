@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // @ts-check
 import { defineConfig } from "astro/config";
 import node from "@astrojs/node";

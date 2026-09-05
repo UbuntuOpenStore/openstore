@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { XMLParser } from 'fast-xml-parser';
 import type { z } from 'zod/v4';
 

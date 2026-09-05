@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import type { AppData } from "@/lib/schema";
 import SvgBuggy from "@/components/icons/Buggy";
 import SvgHappy from "@/components/icons/Happy";

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { type Schema } from 'mongoose';
 
 import { type IDiscover, type IDiscoverMethods, type DiscoverModel, type IHighlight, type ICategory } from './types';

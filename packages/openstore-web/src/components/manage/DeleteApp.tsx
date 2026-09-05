@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { useState, useCallback } from "preact/hooks";
 import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";

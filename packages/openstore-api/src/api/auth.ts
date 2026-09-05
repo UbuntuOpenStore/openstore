@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later OR AGPL-3.0-or-later
 import express, { type NextFunction, type Request, type Response } from 'express';
 import passport from 'passport';
 // @ts-ignore

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { useState, useCallback } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
 import SvgClose from "../icons/Close";

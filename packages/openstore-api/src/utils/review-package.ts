@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import childProcess from 'child_process';
 
 import { UserError } from '../exceptions';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import type { DiscoverData } from "@/lib/schema";
 import { getRelativeLocaleUrl } from "@/lib/utils";

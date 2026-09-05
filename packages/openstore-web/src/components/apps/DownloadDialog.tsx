@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Channel, Channels, type AppData } from "@/lib/schema";
 import { getRelativeLocaleUrl } from "@/lib/utils";

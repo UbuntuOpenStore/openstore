@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { AppManageSchema, type AppData, type AppManageData, type UserData } from "@/lib/schema";
 import { Switch } from "../ui/switch";
 import { APP_TYPE_OPTIONS, CATEGORIES, LICENSES } from "@/lib/constants";

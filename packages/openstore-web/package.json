@@ -14,6 +14,7 @@
     "convert-po": "bash -c 'for file in po/*.po; do LANG=$(basename \"$file\" .po); i18next-conv -l \"$LANG\" -s \"po/$LANG.po\" -t \"src/locales/$LANG.json\"; done'",
     "pot-file": "node ./scripts/extract-strings.js"
   },
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/db": "^0.21.3",

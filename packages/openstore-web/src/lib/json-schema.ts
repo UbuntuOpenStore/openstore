@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import type { AppData } from "./schema";
 
 export function generateSchema(url: string, breadcrumbs: { name: string, path: string }[], app?: AppData) {

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { Schema, Types, model } from 'mongoose';
 
 import { RATINGS } from './constants';

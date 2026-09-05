@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { useStore } from "@nanostores/preact";
 import { searchTerm, searchTermInitialized } from "@/stores";
 import SvgSearch from "./icons/Search";

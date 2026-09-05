@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { useEffect, useState } from "preact/hooks";
 import { UserListSchema, type UserData } from "./schema";
 import { getClientApiKey } from "./utils";

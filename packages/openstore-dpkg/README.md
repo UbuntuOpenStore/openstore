@@ -6,5 +6,5 @@ This includes a minimal amount of the dpkg source code from https://git.dpkg.org
 with some parts stripped out for size. The full code is not included as a submodule
 due to the large size of the git tree.
 
-The dpkg source code is released under the GPLv2. The rest of the code in here
-follows the same license as the OpenStore.
+The dpkg source code is released under the GPLv2. The wrapper code in this package
+is licensed under GPL-3.0.

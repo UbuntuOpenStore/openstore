@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 /**
  * Migration script to add source_store and package_type to existing packages
  * This should be run once to migrate existing click packages before importing snaps

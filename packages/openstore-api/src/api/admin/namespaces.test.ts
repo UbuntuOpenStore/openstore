@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { strictEqual } from 'node:assert/strict';
 import { beforeEach, before, after, describe, it } from 'node:test';
 

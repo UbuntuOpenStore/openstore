@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://gitlab.com/theopenstore/openstore/-/issues"
   },
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0-or-later",
   "author": "Brian Douglass",
   "repository": {
     "type": "git",

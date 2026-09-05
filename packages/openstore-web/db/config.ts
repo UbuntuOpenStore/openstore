@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { column, defineDb, defineTable } from 'astro:db';
 
 const UserCache = defineTable({

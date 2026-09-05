@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later OR AGPL-3.0-or-later
 /* eslint-disable no-restricted-syntax */
 import express, { type Request, type Response } from 'express';
 

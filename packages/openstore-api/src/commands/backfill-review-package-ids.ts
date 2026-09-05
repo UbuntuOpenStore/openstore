@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import 'db'; // Make sure the database connection gets setup
 import { Package } from '../db/package';
 import { Review } from '../db/review';

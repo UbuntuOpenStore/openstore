@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { type Document, type Model, type Types, type HydratedDocument } from 'mongoose';
 
 export interface IReservedNamespace extends Document {

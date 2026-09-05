@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later OR AGPL-3.0-or-later
 import { existsSync } from 'fs';
 import fs from 'fs/promises';
 

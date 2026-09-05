@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 /* eslint-disable max-classes-per-file */
 
 export class HttpError extends Error {

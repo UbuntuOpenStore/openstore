@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { MeiliSearch, type SearchParams } from 'meilisearch';
 
 import { config, logger } from '../../utils';

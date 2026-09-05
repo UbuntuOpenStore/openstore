@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 /* eslint-disable no-param-reassign */
 
 import { type Request } from 'express';

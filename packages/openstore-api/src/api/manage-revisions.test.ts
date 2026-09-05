@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import assert from 'node:assert/strict';
 import { test, describe, beforeEach, before, after, afterEach } from 'node:test';
 import path from 'path';

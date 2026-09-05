@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import { PackageSearch as MeilisearchPackageSearch } from '../db/package/search-meilisearch';
 
 const meilisearchSearch = new MeilisearchPackageSearch();

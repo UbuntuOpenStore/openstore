@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 import i18next from 'i18next';
 import { getRelativeLocaleUrlList } from "astro:i18n";
 
