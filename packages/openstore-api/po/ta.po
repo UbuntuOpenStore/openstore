@@ -143,8 +143,7 @@ msgstr "கருவிகள்"
 
 # Discovery section category tagline for "Tools"
 msgid "Even the simplest tools can empower people to do great things"
-msgstr ""
-"எளிமையான கருவிகள் கூட பெரிய காரியங்களைச் செய்ய மக்களுக்கு அதிகாரம் அளிக்கும்"
+msgstr "எளிமையான கருவிகள் கூட பெரிய காரியங்களைச் செய்ய மக்களுக்கு அதிகாரம் அளிக்கும்"
 
 # Discovery section category name
 msgid "Toolbox"
@@ -189,7 +188,8 @@ msgstr "விளையாட்டு உதவியாளர்கள்"
 # Discovery section category tagline for "Game Helpers"
 msgid "No matter what the game, everyone can agree, games are fun."
 msgstr ""
-"என்ன விளையாட்டு இருந்தாலும், எல்லோரும் ஒப்புக் கொள்ளலாம், விளையாட்டுகள் வேடிக்கையாக இருக்கின்றன."
+"என்ன விளையாட்டு இருந்தாலும், எல்லோரும் ஒப்புக் கொள்ளலாம், விளையாட்டுகள் வேடிக்கையாக "
+"இருக்கின்றன."
 
 # Discovery section category name
 msgid "News"
