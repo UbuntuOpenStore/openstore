@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
@@ -6,20 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-06-05T13:33:38.003Z\n"
-"PO-Revision-Date: 2026-06-05T13:33:38.004Z\n"
-
-msgid "New!"
-msgstr "New!"
-
-msgid "App"
-msgstr "App"
-
-msgid "Bookmark"
-msgstr "Bookmark"
-
-msgid "Web App"
-msgstr "Web App"
+"POT-Creation-Date: 2026-09-10T03:14:49.228Z\n"
+"PO-Revision-Date: 2026-09-10T03:14:49.228Z\n"
 
 msgid "Report an Issue"
 msgstr "Report an Issue"
@@ -635,6 +622,18 @@ msgstr "Full System Access"
 
 msgid "Unknown Permissions"
 msgstr "Unknown Permissions"
+
+msgid "New!"
+msgstr "New!"
+
+msgid "App"
+msgstr "App"
+
+msgid "Bookmark"
+msgstr "Bookmark"
+
+msgid "Web App"
+msgstr "Web App"
 
 msgid "Download"
 msgstr "Download"

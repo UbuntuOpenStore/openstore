@@ -1,11 +1,10 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Discover from "@/components/Discover.astro";
+import Discover from "@/components/Discover";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
-import Loading from "@/components/Loading";
 
 await initializeI18N(Astro.currentLocale);
 ---
@@ -21,7 +20,14 @@ await initializeI18N(Astro.currentLocale);
     <p>{t("The open source app store for Ubuntu Touch")}</p>
   </section>
 
-  <Discover server:defer>
-    <Loading slot="fallback" />
-  </Discover>
+  <Discover
+    messages={{
+      new: t("New!"),
+      app: t("App"),
+      bookmark: t("Bookmark"),
+      webapp: t("Web App"),
+    }}
+    currentLocale={Astro.currentLocale}
+    client:only="preact"
+  />
 </BaseLayout>
