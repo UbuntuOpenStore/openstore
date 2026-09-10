@@ -358,7 +358,7 @@ router.get(
       success(res, translateDiscover(lang, discover));
     } else {
       // Cache hit
-      const discover: DiscoverData = structuredClone(cachedData.data);
+      const discover = cachedData.data;
       await refreshRatings(discover);
 
       success(res, translateDiscover(lang, discover));
