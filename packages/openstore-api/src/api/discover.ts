@@ -10,7 +10,7 @@ import shuffle from 'shuffle-array';
 import { Discover } from '../db/discover';
 import { Package } from '../db/package';
 import { serializeRatings } from '../db/package/methods';
-import { Architecture, type Channel, AppType, PackageType } from '../db/package/types';
+import { Architecture, type Channel, AppType, PackageType, SerializedPackage } from '../db/package/types';
 import { RatingCount } from '../db/rating_count';
 import { success, getData, getDataArray, setLang, gettext, asyncErrorWrapper } from '../utils';
 import { handleChannel } from '../utils/channels';
@@ -85,7 +85,9 @@ async function getHighlights(
           return null;
         }
 
-        const serializedApp = highlightedApp.serialize(architecture, channel, frameworks, apiVersion);
+        const serializedApp: Omit<SerializedPackage, 'revisions'> = highlightedApp.serialize(architecture, channel, frameworks, apiVersion);
+        // @ts-ignore
+        delete serializedApp.revisions;
 
         return {
           id: highlight.id,
@@ -161,7 +163,12 @@ async function getNewAndUpdatedApps(
     return 0;
   });
 
-  newAndUpdatedCategory!.apps = newAndUpdatedApps.slice(0, 10).map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
+  newAndUpdatedCategory!.apps = newAndUpdatedApps.slice(0, 10).map((app) => {
+    const serializedApp: Omit<SerializedPackage, 'revisions'> = app.serialize(architecture, channel, frameworks, apiVersion);
+    // @ts-ignore
+    delete serializedApp.revisions;
+    return serializedApp;
+  });
 }
 
 /**
@@ -210,7 +217,12 @@ async function getCategoryApps(
   );
 
   discover.categories = categories.map((category, index) => {
-    const apps = discoverCategoriesApps[index].map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
+    const apps = discoverCategoriesApps[index].map((app) => {
+      const serializedApp: Omit<SerializedPackage, 'revisions'> = app.serialize(architecture, channel, frameworks, apiVersion);
+      // @ts-ignore
+      delete serializedApp.revisions;
+      return serializedApp;
+    });
 
     return {
       name: category.name,
@@ -247,53 +259,52 @@ async function getPopularApps(
   );
 
   const popularCategory = discover.categories.find((category) => category.name === POPULAR);
-  popularCategory!.apps = popularApps.map((app) => app.serialize(architecture, channel, frameworks, apiVersion));
+  popularCategory!.apps = popularApps.map((app) => {
+    const serializedApp: Omit<SerializedPackage, 'revisions'> = app.serialize(architecture, channel, frameworks, apiVersion);
+    // @ts-ignore
+    delete serializedApp.revisions;
+    return serializedApp;
+  });
 }
 
 /**
  * Refresh the ratings in the cached discover data
  */
 async function refreshRatings(discover: DiscoverData) {
-  const ids = discover.categories
-    .reduce<string[]>((accumulator, category) => {
-      return [...accumulator, ...category.ids];
-    }, [])
-    .concat(discover.highlights.map((highlight) => highlight.id));
+  const ids = new Set<string>();
+  for (const highlight of discover.highlights) {
+    ids.add(highlight.id);
+  }
+  for (const category of discover.categories) {
+    for (const id of category.ids) {
+      ids.add(id);
+    }
+  }
 
-  const ratingCounts = await RatingCount.getCountsByIds(ids);
+  const ratingCounts = await RatingCount.getCountsByIds(Array.from(ids));
 
-  discover.highlights = discover.highlights.map((app) => {
-    return {
-      ...app,
-      ratings: serializeRatings(ratingCounts[app.id]),
-    };
-  });
+  for (const highlight of discover.highlights) {
+    highlight.app.ratings = serializeRatings(ratingCounts[highlight.id]);
+  }
+
   discover.highlight = discover.highlights[0];
 
-  discover.categories = discover.categories.map((category) => {
-    return {
-      ...category,
-      apps: category.apps.map((app) => {
-        return {
-          ...app,
-          ratings: serializeRatings(ratingCounts[app.id]),
-        };
-      }),
-    };
-  });
+  for (const category of discover.categories) {
+    for (const app of category.apps) {
+      app.ratings = serializeRatings(ratingCounts[app.id]);
+    }
+  }
 }
 
 function translateDiscover(lang: string, discover: DiscoverData) {
   setLang(lang);
 
-  return {
-    ...discover,
-    categories: discover.categories.map((category) => ({
-      ...category,
-      name: gettext(category.name),
-      tagline: category.tagline ? gettext(category.tagline) : '',
-    })),
-  };
+  for (const category of discover.categories) {
+    category.name = gettext(category.name);
+    category.tagline = category.tagline ? gettext(category.tagline) : '';
+  }
+
+  return discover;
 }
 
 /**
@@ -346,12 +357,9 @@ router.get(
       ]);
 
       discover.categories = discover.categories.filter((category) => category.apps.length > 0);
-      discover.categories = discover.categories.map((category) => {
-        return {
-          ...category,
-          ids: category.apps.map((app) => app.id),
-        };
-      });
+      for (const category of discover.categories) {
+        category.ids = category.apps.map((app) => app.id);
+      }
 
       await setCachedData(cacheKey, discover, frameworks);
 

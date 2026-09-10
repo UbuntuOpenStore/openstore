@@ -5,7 +5,7 @@ export type DiscoverHighlight = {
   id: string;
   image: string;
   description: string;
-  app: SerializedPackage;
+  app: Omit<SerializedPackage, 'revisions'>;
 };
 
 export type DiscoverCategory = {
@@ -13,7 +13,7 @@ export type DiscoverCategory = {
   tagline: string;
   referral: string;
   ids: string[];
-  apps: SerializedPackage[];
+  apps: Omit<SerializedPackage, 'revisions'>[];
 };
 
 export type DiscoverData = {
