@@ -837,41 +837,36 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
       if (this.revisions) {
         const jsonDownloads = Object.values(Channel)
-          .reduce<(SerializedDownload | null)[]>((downloads: (SerializedDownload | null)[], channel: Channel) => {
-            return [
-              ...downloads,
-              ...this.architectures.map((arch) => {
-                if (!Object.values(Architecture).includes(arch)) {
-                  return null; // Filter out unsupported arches like i386 (legacy apps)
-                }
-                const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
-                if (downloadRevisionData) {
-                  const download = {
-                    ...downloadRevisionData.toObject(),
-                    _id: undefined,
-                    architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
-                    download_url: downloadRevisionData.download_url
-                      ? this.getDownloadUrl(channel, arch, downloadRevisionData.version)
-                      : null,
-                    installedSize: toBytes(downloadRevisionData.filesize),
-                    downloadSize: downloadRevisionData.downloadSize ?? 0,
-                    snap_data: downloadRevisionData.snap_data?.grade
-                      ? {
-                          grade: downloadRevisionData.snap_data.grade,
-                          risk: downloadRevisionData.snap_data.risk,
-                        }
-                      : undefined,
+          .flatMap((channel: Channel) =>
+            this.architectures.map((arch): SerializedDownload | null => {
+              if (!Object.values(Architecture).includes(arch)) {
+                return null; // Filter out unsupported arches like i386 (legacy apps)
+              }
+              const { revisionData: downloadRevisionData } = this.getLatestRevision(channel, arch, false, frameworks);
+              if (downloadRevisionData) {
+                const download = {
+                  ...downloadRevisionData.toObject(),
+                  _id: undefined,
+                  architecture: downloadRevisionData.architecture.includes(',') ? arch : downloadRevisionData.architecture,
+                  download_url: downloadRevisionData.download_url ? this.getDownloadUrl(channel, arch, downloadRevisionData.version) : null,
+                  installedSize: toBytes(downloadRevisionData.filesize),
+                  downloadSize: downloadRevisionData.downloadSize ?? 0,
+                  snap_data: downloadRevisionData.snap_data?.grade
+                    ? {
+                        grade: downloadRevisionData.snap_data.grade,
+                        risk: downloadRevisionData.snap_data.risk,
+                      }
+                    : undefined,
 
-                    // deprecated, remove in next version of the api
-                    filesize: toBytes(downloadRevisionData.filesize),
-                  };
-                  delete download._id;
-                  return download;
-                }
-                return null;
-              }),
-            ];
-          }, [])
+                  // deprecated, remove in next version of the api
+                  filesize: toBytes(downloadRevisionData.filesize),
+                };
+                delete download._id;
+                return download;
+              }
+              return null;
+            }),
+          )
           .filter((revision) => {
             return revision && (this.package_type === PackageType.SNAP || revision.download_url);
           }) as SerializedDownload[];
