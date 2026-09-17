@@ -1,14 +1,38 @@
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { test, describe } from 'node:test';
 import path from 'path';
 
 import { parseAppstream } from '../src/appstream';
 import parse from '../src/index';
 
+async function clickParserTempDirs(): Promise<string[]> {
+  const entries = await fs.readdir(tmpdir());
+  return entries.filter((name) => name.startsWith('click-parser-'));
+}
+
 describe('click-parser', () => {
+  test('parses a click package from the temporary directory without changing the input', async () => {
+    const uploadDir = await fs.mkdtemp(path.join(tmpdir(), 'click-upload-'));
+    const filepath = path.join(uploadDir, 'upload.click');
+    const fixture = path.join(__dirname, 'test-qml.bhdouglass_1.0.0_all.click');
+
+    try {
+      await fs.copyFile(fixture, filepath);
+
+      const data = await parse(filepath);
+
+      assert.equal(data.name, 'test-qml.bhdouglass');
+      assert.equal(data.version, '1.0.0');
+      assert.deepEqual(await fs.readFile(filepath), await fs.readFile(fixture));
+    } finally {
+      await fs.rm(uploadDir, { recursive: true, force: true });
+    }
+  });
+
   test('parse qml click package', async () => {
-    const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_1.0.0_all.click'));
+    const data = await parse(path.join(__dirname, 'test-qml.bhdouglass_1.0.0_all.click'), { parseQmlImports: true });
 
     const appstream = data.appstream;
     delete data.appstream;
@@ -331,5 +355,71 @@ describe('click-parser', () => {
       ['https://example.com/screenshot1.png', 'https://example.com/screenshot2.png'],
       'all screenshots should be included when no environment is specified',
     );
+  });
+
+  describe('temp dir cleanup', () => {
+    test('removes temp dir on successful parse', async () => {
+      const before = await clickParserTempDirs();
+      await parse(path.join(__dirname, 'test-html.bhdouglass_1.0.0_all.click'));
+      const after = await clickParserTempDirs();
+      assert.deepEqual(after, before, 'no click-parser-* temp dir should remain after success');
+    });
+
+    test('removes temp dir when input file does not exist', async () => {
+      const before = await clickParserTempDirs();
+      const missing = path.join(tmpdir(), `definitely-missing-${Date.now()}-${Math.random()}.click`);
+      await assert.rejects(() => parse(missing));
+      const after = await clickParserTempDirs();
+      assert.deepEqual(after, before, 'no click-parser-* temp dir should remain after ar failure');
+    });
+
+    test('removes temp dir when file is not a valid click package', async () => {
+      const bogus = path.join(tmpdir(), `bogus-${Date.now()}-${Math.random()}.click`);
+      await fs.writeFile(bogus, 'definitely not an ar archive or a click package\n');
+      const before = await clickParserTempDirs();
+      try {
+        await assert.rejects(() => parse(bogus));
+      } finally {
+        await fs.unlink(bogus).catch(() => {});
+      }
+      const after = await clickParserTempDirs();
+      assert.deepEqual(after, before, 'no click-parser-* temp dir should remain after extraction failure');
+    });
+
+    test('removes temp dir when manifest is not valid JSON', async () => {
+      // Build a click file where the ar step succeeds (single member) but the
+      // "control.tar.gz" payload is gzipped text that is not JSON. The error
+      // path can be either the tar extraction (text is not a valid tar) or
+      // the JSON.parse step inside parseClickPackage, depending on which
+      // fails first; we just assert that the call rejects.
+      const zlib = await import('node:zlib');
+      const tmpClick = path.join(tmpdir(), `bad-manifest-${Date.now()}-${Math.random()}.click`);
+      const controlBytes = zlib.gzipSync(Buffer.from('not a manifest, just some text\n'));
+      const arHeader = (name: string, size: number) => {
+        const nameBuf = Buffer.alloc(16, 0x20);
+        nameBuf.write(name, 0, 'ascii');
+        const sizeStr = size.toString().padEnd(10, ' ') + '`\n';
+        return Buffer.concat([
+          nameBuf,
+          Buffer.from('0           '), // mtime
+          Buffer.from('0     '), // uid
+          Buffer.from('0     '), // gid
+          Buffer.from('100644  '), // mode
+          Buffer.from(sizeStr),
+        ]);
+      };
+      const controlHeader = arHeader('control.tar.gz', controlBytes.length);
+      const clickBytes = Buffer.concat([Buffer.from('!<arch>\n'), controlHeader, controlBytes]);
+
+      await fs.writeFile(tmpClick, clickBytes);
+      const before = await clickParserTempDirs();
+      try {
+        await assert.rejects(() => parse(tmpClick));
+      } finally {
+        await fs.unlink(tmpClick).catch(() => {});
+      }
+      const after = await clickParserTempDirs();
+      assert.deepEqual(after, before, 'no click-parser-* temp dir should remain after manifest parse failure');
+    });
   });
 });

@@ -1,135 +1,151 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { XMLParser } from 'fast-xml-parser';
-import type { z } from 'zod/v4';
+import { execFile } from 'node:child_process';
+import { lstat, readFile } from 'node:fs/promises';
 
-export { XMLParser };
+// Cap stdout buffer at 1 GiB
+const MAX_BUFFER = 1024 * 1024 * 1024;
 
-interface ArFile {
-  name: string;
-  fileData: Buffer;
-}
-
-export function parseArArchive(buffer: Buffer): ArFile[] {
-  const MAGIC = '!<arch>\n';
-  if (buffer.slice(0, 8).toString('ascii') !== MAGIC) {
-    throw new Error('Not a valid AR archive');
-  }
-
-  const files: ArFile[] = [];
-  let offset = 8;
-  while (offset < buffer.length) {
-    if (offset + 60 > buffer.length) {
-      break;
-    }
-
-    const name = buffer
-      .slice(offset, offset + 16)
-      .toString('ascii')
-      .trimEnd();
-    const size = parseInt(
-      buffer
-        .slice(offset + 48, offset + 58)
-        .toString('ascii')
-        .trim(),
-      10,
-    );
-    offset += 60;
-
-    const fileData = buffer.slice(offset, offset + size);
-    offset += size;
-
-    if (size % 2 !== 0) {
-      offset += 1; // pad to even byte boundary
-    }
-
-    files.push({ name, fileData });
-  }
-
-  return files;
-}
-
-export function bufferToWebReadableStream(buffer: Buffer): ReadableStream<Uint8Array> {
-  return new ReadableStream({
-    start(controller) {
-      controller.enqueue(buffer);
-      controller.close();
-    },
+export function execFileAsync(
+  file: string,
+  args: readonly string[] | null,
+  options: Record<string, unknown>,
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    execFile(file, args, options, (err, stdout, stderr) => {
+      if (err) return reject(err);
+      resolve({ stdout: stdout.toString(), stderr: stderr.toString() });
+    });
   });
 }
 
-export function parseJsonFile(data: Uint8Array | undefined): unknown {
-  if (!data) {
-    return undefined;
-  }
-
-  const str = Buffer.from(data).toString();
-  try {
-    return JSON.parse(str);
-  } catch {
-    return undefined;
-  }
+export function stripLeading(name: string): string {
+  return name.replace(/^\.\//, '');
 }
 
-export function parseXmlFile(data: Uint8Array | undefined, parser: XMLParser): Record<string, unknown> | undefined {
-  if (!data) {
-    return undefined;
-  }
-
-  const str = Buffer.from(data).toString();
-  try {
-    return parser.parse(str) as Record<string, unknown>;
-  } catch {
-    return undefined;
-  }
+interface TarListing {
+  files: string[]; // raw tar entries (with leading "./" and trailing slashes for dirs)
+  hasWebappProperties: boolean;
+  qmlFiles: string[];
+  metainfoFile?: string;
+  moLanguages: Set<string>;
 }
 
-export function parseIniFile(data: Uint8Array | undefined): Record<string, unknown> | undefined {
-  if (!data) {
-    return undefined;
-  }
+/**
+ * Run a command inside a bubblewrap sandbox. The host root filesystem is
+ * bind-mounted read-only, /dev and /proc are isolated, /tmp is a fresh
+ * tmpfs, and the work dir is bind-mounted read-write, so the command's only
+ * writable surface on the host is the work dir. Requires `bwrap`
+ * (bubblewrap) on PATH.
+ *
+ * Order matters: --tmpfs /tmp must come before --bind workDir, otherwise
+ * the tmpfs shadows the workdir mount.
+ */
+export async function runInSandbox(cmd: string, args: string[], workDir: string, execOpts: Record<string, unknown> = {}) {
+  return execFileAsync(
+    'bwrap',
+    [
+      '--ro-bind',
+      '/',
+      '/',
+      '--dev',
+      '/dev',
+      '--proc',
+      '/proc',
+      '--tmpfs',
+      '/tmp',
+      '--bind',
+      workDir,
+      workDir,
+      '--unshare-all',
+      '--die-with-parent',
+      '--',
+      cmd,
+      ...args,
+    ],
+    { cwd: workDir, maxBuffer: MAX_BUFFER, ...execOpts },
+  );
+}
 
-  const result: Record<string, unknown> = {};
-  const other: string[] = [];
+export async function listDataTarGz(cwd: string, execOpts: Record<string, unknown> = {}): Promise<TarListing> {
+  const { stdout } = await runInSandbox('tar', ['-tzf', 'data.tar.gz'], cwd, execOpts);
 
-  for (const line of Buffer.from(data).toString().split('\n')) {
-    const lline = line.toLowerCase().trim();
-    if (!(lline[0] === '[' && lline[lline.length - 1] === ']') && lline.length > 0) {
-      const pos = lline.indexOf('=');
-      if (pos > -1) {
-        result[lline.substring(0, pos).trim()] = line
-          .trim()
-          .substring(pos + 1)
-          .trim();
-      } else {
-        other.push(line);
+  const listing: TarListing = {
+    files: [],
+    hasWebappProperties: false,
+    qmlFiles: [],
+    metainfoFile: undefined,
+    moLanguages: new Set(),
+  };
+
+  for (const raw of stdout.split('\n')) {
+    const line = raw.trim();
+    if (!line) {
+      continue;
+    }
+
+    listing.files.push(line);
+
+    if (line === './webapp-properties.json') {
+      listing.hasWebappProperties = true;
+    } else if (line.endsWith('.qml')) {
+      listing.qmlFiles.push(line);
+    } else if (
+      !listing.metainfoFile &&
+      (line.startsWith('./usr/share/metainfo/') || line.startsWith('./usr/share/appdata/')) &&
+      (line.endsWith('.metainfo.xml') || line.endsWith('.appdata.xml'))
+    ) {
+      listing.metainfoFile = line;
+    } else if (line.includes('LC_MESSAGES') && line.includes('.mo')) {
+      const parts = line.split('/');
+      const pos = parts.indexOf('LC_MESSAGES');
+      if (pos >= 1) {
+        const lang = parts[pos - 1].trim();
+        if (lang) {
+          listing.moLanguages.add(lang);
+        }
       }
     }
   }
 
-  if (other.length > 0) {
-    result.other = other;
+  return listing;
+}
+
+export function isPathSafe(member: string): boolean {
+  return !member.split('/').includes('..');
+}
+
+/**
+ * Read an extracted member only if it is a regular file. Archive members that
+ * tar materialized as symlinks (or devices, fifos, etc.) must never be read:
+ * a hostile click package could point a symlink at an arbitrary host file and
+ * readFile would happily follow it, exfiltrating content the parser process
+ * can read (exposed via ParsedData/icon). lstat does not follow symlinks, so
+ * this rejects the member instead.
+ */
+export async function readFileRegular(filePath: string): Promise<Buffer> {
+  const stat = await lstat(filePath);
+  if (stat.isSymbolicLink()) {
+    throw new Error(`Refusing to read symbolic link: ${filePath}`);
   }
 
-  return result;
+  if (!stat.isFile()) {
+    throw new Error(`Refusing to read non-regular file: ${filePath}`);
+  }
+
+  return readFile(filePath);
 }
 
-export function parseJsonAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
-  const raw = parseJsonFile(data);
-  if (raw === undefined) return undefined;
-  const result = schema.safeParse(raw);
-  return result.success ? result.data : undefined;
+export async function extractFiles(cwd: string, members: string[]): Promise<void> {
+  if (members.length === 0) return;
+  for (const member of members) {
+    if (!isPathSafe(member)) {
+      throw new Error(`Unsafe path in tar archive: ${member}`);
+    }
+  }
+
+  await runInSandbox('tar', ['-xzf', 'data.tar.gz', ...members], cwd);
 }
 
-export function parseXmlAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>, parser: XMLParser): T | undefined {
-  const raw = parseXmlFile(data, parser);
-  if (raw === undefined) return undefined;
-  const result = schema.safeParse(raw);
-  return result.success ? result.data : undefined;
-}
-
-export function parseIniAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
-  const raw = parseIniFile(data);
-  if (raw === undefined) return undefined;
-  const result = schema.safeParse(raw);
-  return result.success ? result.data : undefined;
+export async function extractOne(cwd: string, member: string): Promise<void> {
+  return extractFiles(cwd, [member]);
 }
