@@ -25,6 +25,15 @@ const SubmitAppForm = ({
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const [initialValues] = useState(() => {
+    const params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
+
+    return {
+      id: params.get("appId") ?? "",
+      name: params.get("name") ?? "",
+    };
+  });
+
   const apikey = getClientApiKey();
   const save = useCallback(async (e: Event) => {
     e.preventDefault();
@@ -84,7 +93,7 @@ const SubmitAppForm = ({
           <label for="id" class="form-label">
             {messages.appName}
           </label>
-          <input id="id" name="id" type="text" required class="form-input" />
+          <input id="id" name="id" type="text" required class="form-input" defaultValue={initialValues.id} />
         </div>
 
         <div class="flex flex-row-reverse">
@@ -95,7 +104,7 @@ const SubmitAppForm = ({
           <label for="name" class="form-label">
             {messages.appTitle}
           </label>
-          <input id="name" name="name" type="text" required class="form-input" />
+          <input id="name" name="name" type="text" required class="form-input" defaultValue={initialValues.name} />
         </div>
       </section>
 
