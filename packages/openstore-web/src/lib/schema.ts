@@ -162,19 +162,51 @@ export const SlimAppSchema = z.object({
 
 export type SlimAppData = z.infer<typeof SlimAppSchema>;
 
+export const DiscoverAppSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  tagline: z.string(),
+  icon: z.string(),
+  types: z.array(z.string()),
+  package_type: z.string(),
+  published_date: z.string(),
+  ratings: z.object({
+    [RatingType.THUMBS_UP]: z.number(),
+    [RatingType.THUMBS_DOWN]: z.number(),
+    [RatingType.HAPPY]: z.number(),
+    [RatingType.NEUTRAL]: z.number(),
+    [RatingType.BUGGY]: z.number(),
+  }),
+});
+
+export type DiscoverAppData = z.infer<typeof DiscoverAppSchema>;
+
+// Structural subset shared by SlimAppData (search) and DiscoverAppData (v5 discover),
+// so AppList renders both without being coupled to either API shape.
+export type AppListApp = {
+  id: string;
+  name: string;
+  icon: string;
+  ratings: AppData["ratings"];
+  types: AppData["types"];
+  package_type: AppData["package_type"];
+  published_date?: string;
+};
+
 export const DiscoverSchema = z.object({
   highlights: z.array(z.object({
     id: z.string(),
     image: z.string(),
     description: z.string(),
-    app: SlimAppSchema,
+    publisher: z.string(),
+    app: DiscoverAppSchema,
   })),
   categories: z.array(z.object({
     name: z.string(),
     tagline: z.string(),
     referral: z.string(),
-    apps: z.array(SlimAppSchema),
-  }))
+    apps: z.array(DiscoverAppSchema),
+  })),
 });
 
 export type DiscoverData = z.infer<typeof DiscoverSchema>;

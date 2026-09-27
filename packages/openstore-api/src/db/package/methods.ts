@@ -42,6 +42,7 @@ import {
   Channel,
   type SerializedRatings,
   type SerializedPackageSlim,
+  type SerializedDiscoverApp,
   type SerializedDownload,
   DEFAULT_CHANNEL,
   type SerializedPackage,
@@ -657,6 +658,19 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       // Deprecated, remove in the next major version
       framework: '',
       author: this.author || '',
+    };
+  });
+
+  packageSchema.method<HydratedPackage>('serializeDiscoverSlim', function (): SerializedDiscoverApp {
+    return {
+      id: this.id || '',
+      name: this.name || '',
+      tagline: this.tagline || '',
+      icon: this.icon_url,
+      ratings: this.serializeRatings(),
+      types: this.types || [],
+      package_type: this.package_type,
+      published_date: this.published_date || '',
     };
   });
 

@@ -16,11 +16,13 @@ export enum AppType {
 export enum PackageType {
   CLICK = 'click',
   SNAP = 'snap',
+  PACKAGEKIT = 'packagekit',
 }
 
 export enum SourceStore {
   OPENSTORE = 'openstore',
   SNAPCRAFT = 'snapcraft',
+  OS = 'os',
 }
 
 export enum Channel {
@@ -234,6 +236,17 @@ export type SerializedPackageSlim = {
   ratings?: SerializedRatings;
 };
 
+export type SerializedDiscoverApp = {
+  id: string;
+  name: string;
+  tagline: string;
+  icon: string;
+  ratings: SerializedRatings;
+  types: AppType[];
+  package_type: PackageType;
+  published_date: string;
+};
+
 export type PackageStats = {
   categories: { [key: string]: number };
   types: { [key: string]: number };
@@ -383,6 +396,7 @@ export interface IPackageMethods {
   getDownloadUrl: (channel: Channel, arch: Architecture, version?: string) => string;
   serializeRatings: () => SerializedRatings;
   serializeSlim: () => SerializedPackageSlim;
+  serializeDiscoverSlim: () => SerializedDiscoverApp;
   serialize: (
     architecture?: Architecture,
     channel?: Channel,

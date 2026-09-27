@@ -15,7 +15,7 @@ import admin from './admin';
 import apps from './apps';
 import auth from './auth';
 import categories from './categories';
-import discover from './discover';
+import discover, { discoverV5 } from './discover';
 import manage from './manage';
 import revisions from './revisions';
 import rss from './rss';
@@ -64,6 +64,8 @@ export function setup() {
       req.apiVersion = 3;
     } else if (req.originalUrl.startsWith('/api/v4')) {
       req.apiVersion = 4;
+    } else if (req.originalUrl.startsWith('/api/v5')) {
+      req.apiVersion = 5;
     }
 
     next();
@@ -101,6 +103,8 @@ export function setup() {
   app.use('/api/v4/revisions', revisions);
   app.use('/api/v4/categories', categories);
   app.use('/api/v4/admin', admin);
+
+  app.use('/api/v5/discover', discoverV5);
 
   app.use(express.static(config.server.static_root));
 

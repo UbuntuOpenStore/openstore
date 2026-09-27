@@ -25,7 +25,7 @@ const Discover = ({ currentLocale, messages }: Props) => {
   useEffect(() => {
     const lang = localeSlugToCode(currentLocale);
 
-    fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/discover?channel=${DEFAULT_CHANNEL}&lang=${lang}&architecture=${Architecture.ARM64}`, {
+    fetch(`${import.meta.env.PUBLIC_API_URL}api/v5/discover?channel=${DEFAULT_CHANNEL}&lang=${lang}&architecture=${Architecture.ARM64}`, {
       headers: { "X-Source": "openstore-web-next" },
     })
       .then((response) => response.json())

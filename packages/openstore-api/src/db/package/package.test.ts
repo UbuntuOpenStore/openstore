@@ -323,6 +323,27 @@ describe('Package', () => {
         });
       });
 
+      test('serializes for discover (slim)', () => {
+        const serialized = package1.serializeDiscoverSlim();
+
+        assert.deepEqual(serialized, {
+          id: 'app.id',
+          name: 'Best App Ever',
+          tagline: 'such wow',
+          icon: 'http://local.open-store.io/icons/app.id/app.id-0.0.0.png',
+          types: ['app'],
+          package_type: 'click',
+          published_date: now,
+          ratings: {
+            BUGGY: 0,
+            HAPPY: 0,
+            NEUTRAL: 0,
+            THUMBS_DOWN: 0,
+            THUMBS_UP: 0,
+          },
+        });
+      });
+
       test('serializes fully', () => {
         package1.channel_architectures = [ChannelArchitecture.FOCAL_ARMHF, ChannelArchitecture.FOCAL_ARM64];
         package1.device_compatibilities = [

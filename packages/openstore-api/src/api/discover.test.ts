@@ -10,14 +10,29 @@ import { type App } from 'supertest/types';
 import * as api from '.';
 import { Discover } from '../db/discover';
 import { Package } from '../db/package';
-import { Architecture, Channel, ChannelArchitecture, AppType, PackageType, SourceStore } from '../db/package/types';
+import {
+  Architecture,
+  Channel,
+  ChannelArchitecture,
+  AppType,
+  PackageType,
+  SnapChannel,
+  SnapConfinement,
+  SourceStore,
+} from '../db/package/types';
 import { RatingCount } from '../db/rating_count';
 import factory from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { config } from '../utils/config';
 
+function discoverAppIds(res: request.Response): string[] {
+  const categories: Array<{ apps: Array<{ id: string }> }> = res.body.data.categories;
+  return categories.flatMap((category) => category.apps.map((app) => app.id));
+}
+
 describe('Discover API', () => {
   const route = '/api/v4/discover/';
+  const v5Route = '/api/v5/discover/';
   let app: App;
 
   before(async () => {
@@ -209,6 +224,7 @@ describe('Discover API', () => {
       types: [AppType.APP],
       package_type: PackageType.SNAP,
       source_store: SourceStore.SNAPCRAFT,
+      snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
       banner: 'test.svg',
     });
 
@@ -225,5 +241,81 @@ describe('Discover API', () => {
     for (const highlight of res.body.data.highlights) {
       assert.notEqual(highlight.app.id, 'snap.firefox');
     }
+  });
+
+  test('v5 includes snap packages when package_types=snap is requested', async () => {
+    await factory.package({
+      published: true,
+      id: 'snap.firefox',
+      name: 'Firefox Snap',
+      architectures: [Architecture.ALL],
+      channels: [Channel.FOCAL],
+      channel_architectures: [ChannelArchitecture.FOCAL_ALL],
+      device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
+      published_date: new Date().toISOString(),
+      types: [AppType.APP],
+      package_type: PackageType.SNAP,
+      source_store: SourceStore.SNAPCRAFT,
+      snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
+      banner: 'test.svg',
+    });
+
+    const snapRoute = `${v5Route}?package_types=${PackageType.SNAP}`;
+    const res = await request(app).get(snapRoute).expect(200);
+
+    assert.ok(res.body.success);
+
+    const appIds = discoverAppIds(res);
+    assert.ok(appIds.includes('snap.firefox'));
+    assert.ok(!appIds.includes('test.app.2')); // click packages are filtered out
+
+    // Cache hit must keep the snap scoped payload
+    const res2 = await request(app).get(snapRoute).expect(200);
+    assert.ok(discoverAppIds(res2).includes('snap.firefox'));
+  });
+
+  test('v5 returns the minimal payload', async () => {
+    const res = await request(app).get(v5Route).expect(200);
+
+    assert.ok(res.body.success);
+    assert.equal(res.body.data.highlight, undefined);
+    assert.ok(res.body.data.highlights.length > 0);
+    assert.ok(res.body.data.categories.length > 0);
+
+    const slimKeys = ['icon', 'id', 'name', 'package_type', 'published_date', 'ratings', 'tagline', 'types'].sort();
+
+    for (const category of res.body.data.categories) {
+      assert.deepEqual(Object.keys(category).sort(), ['apps', 'name', 'referral', 'tagline']);
+      for (const app of category.apps) {
+        assert.deepEqual(Object.keys(app).sort(), slimKeys);
+        assert.equal(app.manifest, undefined);
+        assert.equal(app.downloads, undefined);
+        assert.equal(app.version_changelogs, undefined);
+      }
+    }
+
+    for (const highlight of res.body.data.highlights) {
+      assert.deepEqual(Object.keys(highlight).sort(), ['app', 'description', 'id', 'image', 'publisher']);
+      assert.equal(highlight.id, 'test.highlight.app');
+      assert.ok(highlight.image);
+      assert.equal(typeof highlight.publisher, 'string');
+      assert.deepEqual(Object.keys(highlight.app).sort(), slimKeys);
+    }
+  });
+
+  test('v4 and v5 caches are isolated', async () => {
+    const v4res = await request(app).get(route).expect(200);
+    const v5res = await request(app).get(v5Route).expect(200);
+
+    assert.ok(v4res.body.data.highlight);
+    assert.ok(v4res.body.data.categories[0].ids);
+    assert.equal(v5res.body.data.highlight, undefined);
+    assert.equal(v5res.body.data.categories[0].ids, undefined);
+
+    // Second round trips: both are now cache hits and must keep their own shapes
+    const v4res2 = await request(app).get(route).expect(200);
+    const v5res2 = await request(app).get(v5Route).expect(200);
+    assert.ok(v4res2.body.data.highlight);
+    assert.equal(v5res2.body.data.highlight, undefined);
   });
 });

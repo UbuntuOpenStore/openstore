@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import type { SlimAppData } from "@/lib/schema";
+import type { AppListApp } from "@/lib/schema";
 import TopRating from "./TopRating";
 import AppTypeBadges from "./AppTypeBadges";
 import { getRelativeLocaleUrl } from "@/lib/utils";
 
-const AppList = ({ apps, messages, currentLocale }: { apps: SlimAppData[], currentLocale: string | undefined, messages: { new: string, app: string, bookmark: string, webapp: string } }) => {
+const AppList = ({ apps, messages, currentLocale }: { apps: AppListApp[], currentLocale: string | undefined, messages: { new: string, app: string, bookmark: string, webapp: string } }) => {
   return (
     <div class="grid grid-cols-2 md:grid-cols-4">
       {
