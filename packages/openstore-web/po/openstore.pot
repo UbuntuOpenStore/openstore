@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-29T03:34:19.640Z\n"
-"PO-Revision-Date: 2026-09-29T03:34:19.640Z\n"
+"POT-Creation-Date: 2026-09-29T03:43:31.527Z\n"
+"PO-Revision-Date: 2026-09-29T03:43:31.528Z\n"
 
 msgid "Report an Issue"
 msgstr "Report an Issue"
@@ -1023,6 +1023,21 @@ msgstr "Filter by Owner"
 
 msgid "My Apps Only"
 msgstr "My Apps Only"
+
+msgid "Filter by Package Type"
+msgstr "Filter by Package Type"
+
+msgid "All Package Types"
+msgstr "All Package Types"
+
+msgid "Click"
+msgstr "Click"
+
+msgid "Snap"
+msgstr "Snap"
+
+msgid "PackageKit"
+msgstr "PackageKit"
 
 msgid "Sort by: "
 msgstr "Sort by: "

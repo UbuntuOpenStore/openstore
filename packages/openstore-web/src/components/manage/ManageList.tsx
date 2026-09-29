@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { AppSearchSchema, AppType, type SlimAppData } from "@/lib/schema";
+import { AppSearchSchema, AppType, PackageType, type SlimAppData } from "@/lib/schema";
 import Pagination from "../Pagination";
 import SvgSpinner from "../icons/Spinner";
 import {
@@ -42,6 +42,11 @@ type ManageListProps = {
     notPublished: string;
     filterByOwner: string;
     myAppsOnly: string;
+    filterByPackageType: string;
+    allPackageTypes: string;
+    click: string;
+    snap: string;
+    packagekit: string;
     search: string;
     sortBy: string;
     sortOptions: string;
@@ -91,6 +96,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
     type: hashParams.get("type") as AppType | undefined,
     owner: hashParams.get("owner") as "me" | undefined,
     published: hashParams.get("published") === "true" ? true : hashParams.get("published") === "false" ? false : undefined,
+    packageType: hashParams.get("package_type") as PackageType | undefined,
   });
   const [apps, setApps] = useState<SlimAppData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -120,6 +126,10 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
       url.searchParams.append("published", query.published.toString());
     }
 
+    if (query.packageType) {
+      url.searchParams.append("package_type", query.packageType);
+    }
+
     const updateParams = new URLSearchParams();
     if (query.search) {
       updateParams.append("search", query.search);
@@ -135,6 +145,9 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
     }
     if (query.published !== undefined) {
       updateParams.append("published", query.published.toString());
+    }
+    if (query.packageType) {
+      updateParams.append("package_type", query.packageType);
     }
     if (page > 0) {
       updateParams.append("page", page.toString());
@@ -172,9 +185,17 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
     setQuery((previous) => ({ ...previous, sort: value }));
   }, []);
 
-  const setFilters = useCallback((type: AppType | undefined, owner: "me" | undefined, published: boolean | undefined) => {
-    setQuery((previous) => ({ ...previous, type, owner, published }));
-  }, []);
+  const setFilters = useCallback(
+    (
+      type: AppType | undefined,
+      owner: "me" | undefined,
+      published: boolean | undefined,
+      packageType: PackageType | undefined
+    ) => {
+      setQuery((previous) => ({ ...previous, type, owner, published, packageType }));
+    },
+    []
+  );
 
   // Debounce search input
   useEffect(() => {
@@ -211,6 +232,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
             type={query.type}
             owner={query.owner}
             published={query.published}
+            packageType={query.packageType}
             isAdmin={isAdmin}
             onChange={setFilters}
             messages={messages}

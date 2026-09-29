@@ -2,15 +2,21 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import SvgFilters from "../icons/Filters";
-import { AppType } from "@/lib/schema";
+import { AppType, PackageType } from "@/lib/schema";
 import { useCallback, useState } from "preact/hooks";
 
 type ManageFilterDialogProps = {
   type: AppType | undefined;
   owner: "me" | undefined;
   published: boolean | undefined;
+  packageType: PackageType | undefined;
   isAdmin: boolean;
-  onChange: (type: AppType | undefined, owner: "me" | undefined, published: boolean | undefined) => void;
+  onChange: (
+    type: AppType | undefined,
+    owner: "me" | undefined,
+    published: boolean | undefined,
+    packageType: PackageType | undefined
+  ) => void;
   messages: {
     filters: string;
     filterByType: string;
@@ -24,14 +30,24 @@ type ManageFilterDialogProps = {
     notPublished: string;
     filterByOwner: string;
     myAppsOnly: string;
+    filterByPackageType: string;
+    allPackageTypes: string;
+    click: string;
+    snap: string;
+    packagekit: string;
   };
 };
 
-const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange, messages }: ManageFilterDialogProps) => {
+const ManageFilterDialog = ({ type, owner, published, packageType, isAdmin, onChange, messages }: ManageFilterDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const onChangeWrapper = useCallback(
-    (newType: AppType | undefined, newowner: "me" | undefined, newPublished: boolean | undefined) => {
-      onChange(newType, newowner, newPublished);
+    (
+      newType: AppType | undefined,
+      newowner: "me" | undefined,
+      newPublished: boolean | undefined,
+      newPackageType: PackageType | undefined
+    ) => {
+      onChange(newType, newowner, newPublished, newPackageType);
       setIsOpen(false);
     },
     [onChange]
@@ -52,12 +68,22 @@ const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange, message
             <h3 class="font-bold text-black">{messages.filterByType}</h3>
 
             <div class="flex items-center space-x-2">
-              <input type="radio" checked={!type} onClick={() => onChangeWrapper(undefined, owner, published)} id="all" />
+              <input
+                type="radio"
+                checked={!type}
+                onClick={() => onChangeWrapper(undefined, owner, published, packageType)}
+                id="all"
+              />
               <label for="all">{messages.allTypes}</label>
             </div>
 
             <div class="flex items-center space-x-2">
-              <input type="radio" checked={type === AppType.APP} onClick={() => onChangeWrapper(AppType.APP, owner, published)} id="apps" />
+              <input
+                type="radio"
+                checked={type === AppType.APP}
+                onClick={() => onChangeWrapper(AppType.APP, owner, published, packageType)}
+                id="apps"
+              />
               <label for="apps">{messages.apps}</label>
             </div>
 
@@ -65,7 +91,7 @@ const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange, message
               <input
                 type="radio"
                 checked={type === AppType.BOOKMARK}
-                onClick={() => onChangeWrapper(AppType.BOOKMARK, owner, published)}
+                onClick={() => onChangeWrapper(AppType.BOOKMARK, owner, published, packageType)}
                 id="bookmarks"
               />
               <label for="bookmarks">{messages.bookmarks}</label>
@@ -75,7 +101,7 @@ const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange, message
               <input
                 type="radio"
                 checked={type === AppType.WEBAPP}
-                onClick={() => onChangeWrapper(AppType.WEBAPP, owner, published)}
+                onClick={() => onChangeWrapper(AppType.WEBAPP, owner, published, packageType)}
                 id="web-apps"
               />
               <label for="web-apps">{messages.webApps}</label>
@@ -89,19 +115,29 @@ const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange, message
               <input
                 type="radio"
                 checked={published === undefined}
-                onClick={() => onChangeWrapper(type, owner, undefined)}
+                onClick={() => onChangeWrapper(type, owner, undefined, packageType)}
                 id="all-status"
               />
               <label for="all-status">{messages.allApps}</label>
             </div>
 
             <div class="flex items-center space-x-2">
-              <input type="radio" checked={published === true} onClick={() => onChangeWrapper(type, owner, true)} id="published" />
+              <input
+                type="radio"
+                checked={published === true}
+                onClick={() => onChangeWrapper(type, owner, true, packageType)}
+                id="published"
+              />
               <label for="published">{messages.published}</label>
             </div>
 
             <div class="flex items-center space-x-2">
-              <input type="radio" checked={published === false} onClick={() => onChangeWrapper(type, owner, false)} id="not-published" />
+              <input
+                type="radio"
+                checked={published === false}
+                onClick={() => onChangeWrapper(type, owner, false, packageType)}
+                id="not-published"
+              />
               <label for="not-published">{messages.notPublished}</label>
             </div>
 
@@ -112,13 +148,67 @@ const ManageFilterDialog = ({ type, owner, published, isAdmin, onChange, message
                 <h3 class="font-bold text-black">{messages.filterByOwner}</h3>
 
                 <div class="flex items-center space-x-2">
-                  <input type="radio" checked={!owner} onClick={() => onChangeWrapper(type, undefined, published)} id="all-apps" />
+                  <input
+                    type="radio"
+                    checked={!owner}
+                    onClick={() => onChangeWrapper(type, undefined, published, packageType)}
+                    id="all-apps"
+                  />
                   <label for="all-apps">{messages.allApps}</label>
                 </div>
 
                 <div class="flex items-center space-x-2">
-                  <input type="radio" checked={owner === "me"} onClick={() => onChangeWrapper(type, "me", published)} id="my-apps" />
+                  <input
+                    type="radio"
+                    checked={owner === "me"}
+                    onClick={() => onChangeWrapper(type, "me", published, packageType)}
+                    id="my-apps"
+                  />
                   <label for="my-apps">{messages.myAppsOnly}</label>
+                </div>
+
+                <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full" />
+
+                <h3 class="font-bold text-black">{messages.filterByPackageType}</h3>
+
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    checked={!packageType}
+                    onClick={() => onChangeWrapper(type, owner, published, undefined)}
+                    id="all-package-types"
+                  />
+                  <label for="all-package-types">{messages.allPackageTypes}</label>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    checked={packageType === PackageType.CLICK}
+                    onClick={() => onChangeWrapper(type, owner, published, PackageType.CLICK)}
+                    id="click"
+                  />
+                  <label for="click">{messages.click}</label>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    checked={packageType === PackageType.SNAP}
+                    onClick={() => onChangeWrapper(type, owner, published, PackageType.SNAP)}
+                    id="snap"
+                  />
+                  <label for="snap">{messages.snap}</label>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    checked={packageType === PackageType.PACKAGEKIT}
+                    onClick={() => onChangeWrapper(type, owner, published, PackageType.PACKAGEKIT)}
+                    id="packagekit"
+                  />
+                  <label for="packagekit">{messages.packagekit}</label>
                 </div>
               </>
             )}
