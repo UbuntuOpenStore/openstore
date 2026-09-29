@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import fs from 'fs/promises';
 import assert from 'node:assert/strict';
-import { test, describe, beforeEach } from 'node:test';
+import { test, describe, beforeEach, after } from 'node:test';
 import os from 'os';
 
 import type { AppstreamExportData } from 'click-parser';
 
 import { Package } from '.';
+import '../index';
 import { UserError } from '../../exceptions';
 import { type TestPackage } from '../../tests/factory';
+import { closeMongoose, waitForMongoose } from '../../tests/utils';
 import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory } from '../../utils/appstream-helpers';
 import { config } from '../../utils/config';
 import { Ratings } from '../review/constants';
@@ -16,6 +18,47 @@ import { serializeRatings } from './methods';
 import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
 
 describe('Package', () => {
+  describe('publishing without revisions', () => {
+    beforeEach(async () => {
+      await waitForMongoose();
+    });
+
+    after(async () => {
+      await closeMongoose();
+    });
+
+    test('fails to save a published click package with no revisions', async () => {
+      const pkg = new Package({ id: 'app.norevisions.click', name: 'No Revisions Click', published: true });
+
+      await assert.rejects(() => pkg.save(), UserError);
+    });
+
+    test('fails to save a published snap package with no revisions', async () => {
+      const pkg = new Package({
+        id: 'app.norevisions.snap',
+        name: 'No Revisions Snap',
+        published: true,
+        package_type: PackageType.SNAP,
+      });
+
+      await assert.rejects(() => pkg.save(), UserError);
+    });
+
+    test('allows a published packagekit package with no revisions', async () => {
+      const pkg = new Package({
+        id: 'app.norevisions.packagekit',
+        name: 'No Revisions Packagekit',
+        published: true,
+        package_type: PackageType.PACKAGEKIT,
+        channel_architectures: [ChannelArchitecture.FOCAL_ALL],
+      });
+
+      await pkg.save();
+      assert.equal(pkg.package_type, PackageType.PACKAGEKIT);
+      assert.equal(!!pkg.published, true);
+    });
+  });
+
   describe('parseRequestFilters', () => {
     test('parses a request', () => {
       const parsed = Package.parseRequestFilters({

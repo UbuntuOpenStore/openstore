@@ -318,6 +318,85 @@ describe('Manage', () => {
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, packageId);
       });
+
+      describe('package_type', () => {
+        test('creates a packagekit package with the expected defaults', async () => {
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'packagekit.app', name: 'App Packagekit', package_type: PackageType.PACKAGEKIT })
+            .expect(200);
+
+          assert.ok(res.body.success);
+          assert.equal(res.body.data.package_type, PackageType.PACKAGEKIT);
+          assert.equal(res.body.data.published, true);
+          assert.deepEqual(res.body.data.channel_architectures, ['focal:all']);
+
+          const pkg = await Package.findOneByFilters('packagekit.app');
+          assert.ok(pkg);
+          assert.equal(pkg.package_type, PackageType.PACKAGEKIT);
+          assert.equal(!!pkg.published, true);
+          assert.deepEqual(pkg.channel_architectures, ['focal:all']);
+          assert.equal(pkg.revisions.length, 0);
+        });
+
+        test('fails without a packagekit. id prefix', async () => {
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'app.packagekit', name: 'App Packagekit', package_type: PackageType.PACKAGEKIT })
+            .expect(400);
+
+          assert.equal(res.body.success, false);
+          assert.equal(res.body.message, messages.INVALID_APP_ID_PREFIX);
+        });
+
+        test('fails without a snap. id prefix', async () => {
+          const res = await request(app).post(route).send({ id: 'app.snap', name: 'App Snap', package_type: PackageType.SNAP }).expect(400);
+
+          assert.equal(res.body.success, false);
+          assert.equal(res.body.message, messages.INVALID_APP_ID_PREFIX);
+        });
+
+        test('defaults to a click package when package_type is not provided', async () => {
+          const res = await request(app).post(route).send({ id: 'app.default', name: 'App Default' }).expect(200);
+
+          assert.ok(res.body.success);
+          assert.equal(res.body.data.package_type, PackageType.CLICK);
+          assert.equal(res.body.data.published, false);
+          assert.deepEqual(res.body.data.channel_architectures, []);
+        });
+
+        test('can explicitly create a click package', async () => {
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'app.explicit.click', name: 'App Explicit Click', package_type: PackageType.CLICK })
+            .expect(200);
+
+          assert.ok(res.body.success);
+          assert.equal(res.body.data.package_type, PackageType.CLICK);
+          assert.equal(res.body.data.published, false);
+        });
+
+        test('does not add the package to the search index', async (t) => {
+          const upsertSpy = t.mock.method(packageSearchInstance, 'upsert', mockSearchMethod);
+
+          await request(app)
+            .post(route)
+            .send({ id: 'packagekit.app.unindexed', name: 'App Unindexed', package_type: PackageType.PACKAGEKIT })
+            .expect(200);
+
+          assert.equal(upsertSpy.mock.callCount(), 0);
+        });
+
+        test('fails with an unknown package_type', async () => {
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'app.bad.type', name: 'App Bad Type', package_type: 'not-a-real-type' })
+            .expect(400);
+
+          assert.equal(res.body.success, false);
+          assert.equal(res.body.message, messages.INVALID_PACKAGE_TYPE);
+        });
+      });
     });
 
     describe('truested user', () => {
@@ -354,6 +433,18 @@ describe('Manage', () => {
         const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
+      });
+
+      test('ignores a package_type and creates a click package', async () => {
+        const res = await request(app)
+          .post(route)
+          .send({ id: 'app.trusted.packagekit', name: 'App Dev', package_type: PackageType.PACKAGEKIT })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.package_type, PackageType.CLICK);
+        assert.equal(res.body.data.published, false);
+        assert.deepEqual(res.body.data.channel_architectures, []);
       });
     });
 
@@ -490,6 +581,22 @@ describe('Manage', () => {
         assert.equal(!!pkg.published, false);
         assert.equal(pkg.maintainer, user._id.toString());
         assert.equal(pkg.maintainer_name, user.name);
+      });
+
+      test('ignores a package_type and creates a click package', async () => {
+        const res = await request(app)
+          .post(route)
+          .send({ id: 'app.community.packagekit', name: 'App Dev', package_type: PackageType.PACKAGEKIT })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.package_type, PackageType.CLICK);
+        assert.equal(res.body.data.published, false);
+        assert.deepEqual(res.body.data.channel_architectures, []);
+
+        const pkg = await Package.findOneByFilters('app.community.packagekit');
+        assert.ok(pkg);
+        assert.equal(pkg.package_type, PackageType.CLICK);
       });
 
       test('fails gracefully', async (t) => {

@@ -109,6 +109,10 @@ export class PackageSearch implements PackageSearchInterface {
   }
 
   async upsert(item: HydratedPackage): Promise<HydratedPackage> {
+    if (item.package_type === PackageType.PACKAGEKIT) {
+      return item;
+    }
+
     const document = this.convert(item);
     await this.client.index(this.indexName).addDocuments([document], { primaryKey: 'id' });
     return item;

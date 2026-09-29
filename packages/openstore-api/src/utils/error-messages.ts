@@ -30,6 +30,8 @@ export const NO_NON_ALL = 'You cannot upload and architecture specific click for
 export const MISMATCHED_FRAMEWORK = 'Framework does not match existing click of a different architecture';
 export const MISMATCHED_PERMISSIONS = 'Permissions do not match existing click of a different architecture';
 export const APP_LOCKED = 'Sorry this app has been locked by an admin';
+export const INVALID_PACKAGE_TYPE = 'The provided package type is not valid';
+export const INVALID_APP_ID_PREFIX = 'The provided app ID prefix is not valid';
 
 export const PARAMETER_MISSING = 'Missing parameters for this endpoint';
 export const REVIEW_TOO_LONG = 'The review is too long';

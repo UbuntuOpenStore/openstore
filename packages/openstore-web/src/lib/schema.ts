@@ -27,6 +27,14 @@ export enum AppType {
   WEBAPP = 'webapp+',
 };
 
+export enum PackageType {
+  CLICK = 'click',
+  SNAP = 'snap',
+  PACKAGEKIT = 'packagekit',
+}
+
+export const PACKAGE_TYPES = Object.values(PackageType) as PackageType[];
+
 export const Channels = Object.values(Channel) as Channel[];
 export const DEFAULT_CHANNEL = Channel.FOCAL;
 

@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 import multer from 'multer';
 
 import { type HydratedLock, Lock } from '../db/lock';
-import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package } from '../db/package';
+import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package, PackageType, ChannelArchitecture } from '../db/package';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { ReservedNamespace } from '../db/reserved_namespace';
 import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
@@ -36,6 +36,8 @@ import {
   NEEDS_MANUAL_REVIEW,
   CLICK_REVIEW_ERROR,
   INVALID_CHANNEL,
+  INVALID_PACKAGE_TYPE,
+  INVALID_APP_ID_PREFIX,
 } from '../utils/error-messages';
 import { clickReview } from '../utils/review-package';
 import { validateNamespace } from '../utils/validate-namespace';
@@ -96,6 +98,21 @@ router.post(
     const name = req.body.name.trim();
     const id = req.body.id.toLowerCase().trim();
 
+    if (!req.isAdminUser && req.body) {
+      delete req.body.package_type;
+    }
+
+    let packageType = PackageType.CLICK;
+    const requestedPackageType = req.body.package_type;
+    if (requestedPackageType) {
+      if (!Object.values(PackageType).includes(requestedPackageType)) {
+        error(res, INVALID_PACKAGE_TYPE, 400);
+        return;
+      }
+
+      packageType = requestedPackageType;
+    }
+
     await validateNamespace(id, req.user!._id.toString(), !!req.isAdminUser);
 
     await Package.checkId(id);
@@ -108,6 +125,21 @@ router.post(
     pkg.name = name;
     pkg.maintainer = req.user!._id.toString();
     pkg.maintainer_name = req.user!.name ? req.user!.name : req.user!.username;
+    pkg.package_type = packageType;
+
+    if (packageType === PackageType.PACKAGEKIT) {
+      pkg.published = true;
+      pkg.channel_architectures = [ChannelArchitecture.FOCAL_ALL];
+    }
+
+    if (
+      (packageType === PackageType.PACKAGEKIT && !id.startsWith('packagekit.')) ||
+      (packageType === PackageType.SNAP && !id.startsWith('snap.'))
+    ) {
+      error(res, INVALID_APP_ID_PREFIX, 400);
+      return;
+    }
+
     pkg = await pkg.save();
 
     success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));

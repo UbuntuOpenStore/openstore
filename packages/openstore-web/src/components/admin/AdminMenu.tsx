@@ -23,6 +23,18 @@ const AdminMenu = ({ currentPath }: AdminMenuProps): JSX.Element => {
         </li>
         <li>
           <a
+            href="/admin/packages/"
+            className={`block py-2 ${
+              currentPath.startsWith('/admin/packages')
+                ? 'text-ubuntu-orange border-b-2 border-ubuntu-orange'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Packages
+          </a>
+        </li>
+        <li>
+          <a
             href="/admin/namespaces/"
             className={`block py-2 ${
               currentPath.startsWith('/admin/namespaces')
