@@ -19,6 +19,7 @@ type ManagePageProps = {
     badge: string;
     packageDetails: string;
     id: string;
+    packageType: string;
     publisher: string;
     publishedDate: string;
     updatedDate: string;
@@ -96,6 +97,11 @@ const ManagePage = ({ id, user, currentLocale, messages }: ManagePageProps) => {
               <tr class="border-b-1 border-b-gray-300">
                 <td class="p-2 font-bold">{messages.id}</td>
                 <td>{app.id}</td>
+              </tr>
+
+              <tr class="border-b-1 border-b-gray-300">
+                <td class="p-2 font-bold">{messages.packageType}</td>
+                <td>{app.package_type || messages.none}</td>
               </tr>
 
               <tr class="border-b-1 border-b-gray-300">

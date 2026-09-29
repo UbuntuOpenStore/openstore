@@ -143,6 +143,21 @@ describe('Package', () => {
       assert.deepEqual(parsed.packageTypes, [PackageType.CLICK]);
     });
 
+    test('uses the provided default package types when not specified', () => {
+      const parsed = Package.parseRequestFilters({ query: {} } as any, [PackageType.CLICK, PackageType.SNAP, PackageType.PACKAGEKIT]);
+      assert.deepEqual(parsed.packageTypes, [PackageType.CLICK, PackageType.SNAP, PackageType.PACKAGEKIT]);
+    });
+
+    test('an explicit package_type overrides the provided default package types', () => {
+      const parsed = Package.parseRequestFilters(
+        {
+          query: { package_type: PackageType.SNAP },
+        } as any,
+        [PackageType.CLICK, PackageType.SNAP, PackageType.PACKAGEKIT],
+      );
+      assert.deepEqual(parsed.packageTypes, [PackageType.SNAP]);
+    });
+
     test('handles package_type parameter', () => {
       const parsed = Package.parseRequestFilters({
         query: { package_type: PackageType.SNAP },

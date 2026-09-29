@@ -170,20 +170,24 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     return results as CategoryStat[];
   };
 
-  packageSchema.statics.parseRequestFilters = function (req: Request): PackageRequestFilters {
+  packageSchema.statics.parseRequestFilters = function (
+    req: Request,
+    defaultPackageTypes: PackageType[] = [PackageType.CLICK],
+  ): PackageRequestFilters {
     const types = [
       ...getDataArray(req, 'types'),
       // Handle non-pluralized form
       ...getDataArray(req, 'type'),
     ];
 
-    // Parse package_type parameter, defaulting to 'click' for backward compatibility
+    // Parse package_type parameter, defaulting to 'click' for backward compatibility.
+    // Callers can override the default (admins get every package type).
     const packageTypeParams = [
       ...getDataArray(req, 'package_types'),
       // Handle non-pluralized form
       ...getDataArray(req, 'package_type'),
     ];
-    const packageTypes = packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : [PackageType.CLICK];
+    const packageTypes = packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : defaultPackageTypes;
 
     const architecture = getData(req, 'architecture').toLowerCase() as Architecture | undefined;
     let architectures: Architecture[] = [];

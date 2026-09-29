@@ -9,7 +9,7 @@ import { type App } from 'supertest/types';
 import * as api from '.';
 import { Package } from '../db/package';
 import { packageSearchInstance } from '../db/package/search-factory';
-import { PackageType, SourceStore } from '../db/package/types';
+import { PackageType, SourceStore, SnapChannel, SnapConfinement } from '../db/package/types';
 import factory, { type TestUser, type TestPackage, type TestReservedNamespace } from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import * as messages from '../utils/error-messages';
@@ -55,6 +55,43 @@ describe('Manage', () => {
       beforeEach(async () => {
         user.role = 'admin';
         await user.save();
+      });
+
+      test('shows apps of every package type for an admin user', async () => {
+        const snap = await factory.package({
+          maintainer: user._id,
+          name: 'Snap app',
+          package_type: PackageType.SNAP,
+          snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
+        });
+        const packagekit = await factory.package({
+          maintainer: user._id,
+          name: 'PackageKit app',
+          package_type: PackageType.PACKAGEKIT,
+        });
+
+        const res = await request(app).get(route).expect(200);
+
+        assert.ok(res.body.success);
+        // package1, the package created in the outer beforeEach, plus the snap and packagekit packages
+        assert.equal(res.body.data.count, 4);
+        const ids = res.body.data.packages.map((p: TestPackage) => p.id);
+        assert.ok(ids.includes(snap.id));
+        assert.ok(ids.includes(packagekit.id));
+      });
+
+      test('an admin can still narrow the list to a single package type', async () => {
+        await factory.package({
+          maintainer: user._id,
+          name: 'PackageKit app',
+          package_type: PackageType.PACKAGEKIT,
+        });
+
+        const res = await request(app).get(`${route}&package_type=${PackageType.PACKAGEKIT}`).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.count, 1);
+        assert.equal(res.body.data.packages[0].package_type, PackageType.PACKAGEKIT);
       });
 
       test('shows all apps for an admin user', async () => {
@@ -121,6 +158,18 @@ describe('Manage', () => {
         assert.equal(res.body.data.packages.length, 1);
         assert.equal(res.body.data.packages[0].id, package1.id);
         assert.equal(res.body.data.packages[0].maintainer, user._id.toString());
+      });
+
+      test('shows only click packages for a community user', async () => {
+        await factory.package({ maintainer: user._id, name: 'Snap app', package_type: PackageType.SNAP });
+        await factory.package({ maintainer: user._id, name: 'PackageKit app', package_type: PackageType.PACKAGEKIT });
+
+        const res = await request(app).get(route).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.count, 1);
+        assert.equal(res.body.data.packages[0].id, package1.id);
+        assert.equal(res.body.data.packages[0].package_type, PackageType.CLICK);
       });
 
       test('fails gracefully', async (t) => {

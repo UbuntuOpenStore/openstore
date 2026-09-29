@@ -422,7 +422,7 @@ export interface PackageModel extends Model<IPackage, unknown, IPackageMethods> 
   incrementDownload: (id: Types.ObjectId, revisionIndex: number) => Promise<void>;
   stats: () => Promise<PackageStats>;
   categoryStats: (channels: Channel[], packageTypes?: PackageType[], lomiriCompatible?: boolean) => Promise<CategoryStat[]>;
-  parseRequestFilters: (req: Request) => PackageRequestFilters;
+  parseRequestFilters: (req: Request, defaultPackageTypes?: PackageType[]) => PackageRequestFilters;
   parseFilters: (filters: PackageRequestFilters, textSearch?: boolean) => FilterQuery<IPackage>;
   countByFilters: (filters: PackageRequestFilters, textSearch?: boolean) => Promise<number>;
   findByFilters: (

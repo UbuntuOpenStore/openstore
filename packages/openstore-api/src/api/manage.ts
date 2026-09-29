@@ -47,14 +47,15 @@ const router = express.Router();
 
 /**
  * Get a list of apps belonging to the logged in user.
- * If the user is an admin, return all apps.
+ * If the user is an admin, return all apps of every package type.
  */
 router.get(
   '/',
   authenticate,
   userRole,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    const filters = Package.parseRequestFilters(req);
+    const defaultPackageTypes = req.isAdminUser ? Object.values(PackageType) : undefined;
+    const filters = Package.parseRequestFilters(req, defaultPackageTypes);
     if (!req.isAdminUser) {
       filters.publisherId = req.user!._id.toString();
     }
