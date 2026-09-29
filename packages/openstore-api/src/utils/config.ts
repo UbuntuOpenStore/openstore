@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import path from 'path';
 
@@ -46,6 +47,16 @@ let configuration = {
   telegram: process.env.TELEGRAM || '',
 };
 
+// Allow running tests concurrently by having them each use a different database. Snapshot runs
+// are excluded: they deliberately read production data.
+const testIsolation =
+  process.env.NODE_TEST_CONTEXT && process.env.SNAPSHOT_TEST !== 'true'
+    ? createHash('sha1')
+        .update(process.argv[1] || '')
+        .digest('hex')
+        .slice(0, 10)
+    : '';
+
 if (process.env.NODE_ENV === 'testing') {
   configuration = {
     ...configuration,
@@ -73,3 +84,10 @@ if (process.env.NODE_ENV === 'testing') {
 }
 
 export const config = configuration;
+
+// Applied last so it covers every `node --test` run, including `NODE_ENV=ci`,
+// which does not go through the `testing` branch above.
+if (testIsolation) {
+  config.mongo.database = `${config.mongo.database}-${testIsolation}`;
+  config.meilisearch.indexPrefix = `${config.meilisearch.indexPrefix}${testIsolation}_`;
+}
