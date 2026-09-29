@@ -182,7 +182,7 @@ router.put(
     }
 
     const published = req.body.published === 'true' || req.body.published === true || req.body.published === 'on';
-    if (published && req.pkg.revisions.length === 0) {
+    if (published && req.pkg.revisions.length === 0 && req.pkg.package_type !== PackageType.PACKAGEKIT) {
       error(res, NO_REVISIONS, 400);
       return;
     }

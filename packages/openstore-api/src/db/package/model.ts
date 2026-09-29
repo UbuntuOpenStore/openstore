@@ -131,11 +131,6 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
 });
 
 packageSchema.pre('save', function (next) {
-  /*
-    Packagekit packages are not built from uploaded click revisions, they are
-    resolved by the store from the distro's package repositories. They are allowed
-    to be published without any revisions attached.
-  */
   if (this.published && this.revisions.length === 0 && this.package_type !== PackageType.PACKAGEKIT) {
     return next(new UserError(NO_REVISIONS));
   }
