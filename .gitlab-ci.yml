@@ -20,6 +20,7 @@ before_script:
 api-check:
   stage: check
   script:
+    - npm run build -w click-parser
     - npm run type-check -w openstore-api
     - npm run lint -w openstore-api
     - npm run lint:json -w openstore-api
