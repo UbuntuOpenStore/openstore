@@ -19,7 +19,8 @@
   },
   "devDependencies": {
     "lefthook": "^2.1.8",
-    "oxfmt": "^0.51.0"
+    "oxfmt": "^0.51.0",
+    "typescript": "^6.0.2"
   },
   "overrides": {
     "react": "npm:@preact/compat@^18.3.2",
