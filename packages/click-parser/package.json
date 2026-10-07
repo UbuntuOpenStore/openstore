@@ -1,17 +1,16 @@
 {
   "name": "click-parser",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "description": "Extract data from Ubuntu's click packages",
   "keywords": [
     "click",
     "clickable",
-    "deb",
-    "debian",
-    "package",
-    "scope",
     "ubports",
     "ubuntu",
-    "ubuntu-touch"
+    "ubuntu-touch",
+    "openstore",
+    "open-store",
+    "open-store.io"
   ],
   "homepage": "https://gitlab.com/theopenstore/openstore",
   "bugs": {
