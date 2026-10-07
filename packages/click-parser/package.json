@@ -37,7 +37,7 @@
   "scripts": {
     "build": "tsc",
     "type-check": "tsc --noemit",
-    "test": "node -r ts-node/register --experimental-test-module-mocks --test test/*.ts",
+    "test": "node -r tsx/cjs --test --experimental-test-module-mocks test/*.ts",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "oxlint src/*.ts test/*.ts bin/click-parser",
@@ -50,7 +50,7 @@
   "devDependencies": {
     "@types/node": "^22.7.0",
     "oxlint": "^1.66.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }

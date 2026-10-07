@@ -1,7 +1,4 @@
 {
-  "ts-node": {
-    "files": true
-  },
   "files": ["src/index.ts", "types/express.d.ts"],
   "include": ["src"],
   "exclude": ["**/node_modules", "**/.*/", "**/dist"],

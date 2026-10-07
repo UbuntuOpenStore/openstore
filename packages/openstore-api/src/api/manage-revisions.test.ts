@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+import './manage-revisions.mocks';
 import assert from 'node:assert/strict';
-import { test, describe, beforeEach, before, after, afterEach } from 'node:test';
+import { test, describe, beforeEach, before, after, afterEach, mock } from 'node:test';
 import path from 'path';
 
 import request from 'supertest';
@@ -13,9 +14,8 @@ import { packageSearchInstance } from '../db/package/search-factory';
 import { Architecture, Channel } from '../db/package/types';
 import factory, { type TestPackage, type TestUser } from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
-import * as clickParser from '../utils/click-parser-async';
 import * as messages from '../utils/error-messages';
-import * as reviewPackage from '../utils/review-package';
+import { clickReviewMock, parseClickPackageMock, resetManageRevisionMocks } from './manage-revisions.mocks';
 
 const GOOD_REVIEW = { manualReviewMessages: [], errorMessages: [], warningMessages: [] };
 const MANUAL_REVIEW = {
@@ -46,11 +46,13 @@ describe('Manage Revision POST', () => {
   });
 
   after(async () => {
+    mock.reset();
     await closeMongoose();
   });
 
   beforeEach(async () => {
     await cleanMongoose();
+    resetManageRevisionMocks();
 
     user = await factory.user();
     [package1, package2] = await Promise.all([
@@ -83,8 +85,8 @@ describe('Manage Revision POST', () => {
     test('allows access to other packages', async (t) => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package2.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -94,8 +96,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route2).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(parseMock.mock.callCount(), 1);
-      assert.equal(reviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -103,8 +105,8 @@ describe('Manage Revision POST', () => {
     test('does not fail for manual review', async (t) => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => MANUAL_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => MANUAL_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -114,8 +116,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -126,8 +128,8 @@ describe('Manage Revision POST', () => {
       package1.skip_review = true;
       await package1.save();
 
-      const reviewSpy = t.mock.method(reviewPackage, 'clickReview');
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      // review is expected not to be called (skip_review); the module mock defaults to the real impl
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -137,8 +139,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewSpy.mock.callCount(), 0);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 0);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -153,8 +155,8 @@ describe('Manage Revision POST', () => {
     test('does not fail for manual review', async (t) => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => MANUAL_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => MANUAL_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -164,8 +166,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -239,7 +241,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => MANUAL_REVIEW);
+      clickReviewMock.mock.mockImplementation(async () => MANUAL_REVIEW);
 
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
@@ -247,7 +249,7 @@ describe('Manage Revision POST', () => {
       assert.equal(res.body.message, messages.NEEDS_MANUAL_REVIEW);
       assert.equal(res.body.data?.reasons.length, MANUAL_REVIEW.manualReviewMessages.length);
       assert.equal(res.body.data?.reasons[0], MANUAL_REVIEW.manualReviewMessages[0]);
-      assert.equal(reviewMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -256,7 +258,7 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => ERROR_REVIEW);
+      clickReviewMock.mock.mockImplementation(async () => ERROR_REVIEW);
 
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
@@ -264,7 +266,7 @@ describe('Manage Revision POST', () => {
       assert.equal(res.body.message, messages.CLICK_REVIEW_ERROR);
       assert.equal(res.body.data?.reasons.length, ERROR_REVIEW.errorMessages.length);
       assert.equal(res.body.data?.reasons[0], ERROR_REVIEW.errorMessages[0]);
-      assert.equal(reviewMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -285,8 +287,8 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: 'foo',
         version: '1.0.0',
         architecture: 'armhf',
@@ -296,8 +298,8 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.WRONG_PACKAGE);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -306,15 +308,15 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({}));
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({}));
 
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.MALFORMED_MANIFEST);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -323,9 +325,9 @@ describe('Manage Revision POST', () => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
       // Simulate clickParser returning an invalid version string
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '...not_a_valid_version!',
         architecture: 'armhf',
@@ -336,8 +338,8 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.INVALID_VERSION);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -356,8 +358,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('2.0.0', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-16.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0', // Lower version
         architecture: Architecture.ARMHF,
@@ -369,8 +371,8 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.NON_ASCENDING_VERSION);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -382,8 +384,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('...invalid!!!', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARMHF,
@@ -394,8 +396,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.equal(res.body.success, true);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -407,8 +409,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('1.0.0', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARMHF,
@@ -420,8 +422,8 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.EXISTING_VERSION);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -434,8 +436,8 @@ describe('Manage Revision POST', () => {
       package1.architectures = [Architecture.ARM64];
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARMHF,
@@ -456,8 +458,8 @@ describe('Manage Revision POST', () => {
       assert.equal(data.architectures.length, 2);
       assert.ok(data.architectures.includes(Architecture.ARMHF));
       assert.ok(data.architectures.includes(Architecture.ARM64));
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -469,8 +471,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('1.0.0', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ALL,
@@ -485,8 +487,8 @@ describe('Manage Revision POST', () => {
         res.body.message,
         'You cannot upload a click with the architecture "all" for the same version as an architecture specific click',
       );
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -498,8 +500,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('1.0.0', Channel.FOCAL, Architecture.ALL, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARMHF,
@@ -514,8 +516,8 @@ describe('Manage Revision POST', () => {
         res.body.message,
         'You cannot upload and architecture specific click for the same version as a click with the architecture "all"',
       );
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -527,8 +529,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('1.0.0', Channel.FOCAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARMHF,
@@ -540,8 +542,8 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.MISMATCHED_FRAMEWORK);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -556,8 +558,8 @@ describe('Manage Revision POST', () => {
       ]);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARMHF,
@@ -570,8 +572,8 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.MISMATCHED_PERMISSIONS);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -586,8 +588,8 @@ describe('Manage Revision POST', () => {
       ]);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARM64,
@@ -599,8 +601,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -612,8 +614,8 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('1.0.0', Channel.XENIAL, Architecture.ARM64, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8, []);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: Architecture.ARM64,
@@ -625,8 +627,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -652,8 +654,8 @@ describe('Manage Revision POST', () => {
 
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -668,8 +670,8 @@ describe('Manage Revision POST', () => {
         .expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
 
@@ -687,7 +689,7 @@ describe('Manage Revision POST', () => {
       package1.createNextRevision('0.0.1', Channel.FOCAL, Architecture.ARMHF, 'ubuntu-sdk-20.04', 'url', 'shasum', 10, 8);
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
 
       // TODO setup elastic search for testing in CI
       const mockSearchMethod = (process.env.NODE_ENV === 'ci' ? () => {} : undefined) as any;
@@ -713,7 +715,7 @@ describe('Manage Revision POST', () => {
       assert.equal(data.revisions[1].architecture, Architecture.ARMHF);
       assert.equal(data.revisions[1].framework, 'ubuntu-sdk-20.04.1');
 
-      assert.equal(reviewMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
       assert.equal(usertSpy.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
@@ -743,8 +745,8 @@ describe('Manage Revision POST', () => {
       package1.architectures = [Architecture.ARM64];
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '2.0.0',
         architecture: Architecture.ALL,
@@ -761,8 +763,8 @@ describe('Manage Revision POST', () => {
       assert.equal(data.architectures[0], Architecture.ALL);
       assert.equal(data.downloads.length, 1);
       assert.equal(data.downloads[0].architecture, Architecture.ALL);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -775,8 +777,8 @@ describe('Manage Revision POST', () => {
       package1.architectures = [Architecture.ALL];
       await package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '2.0.0',
         architecture: Architecture.ARMHF,
@@ -793,8 +795,8 @@ describe('Manage Revision POST', () => {
       assert.equal(data.architectures[0], Architecture.ARMHF);
       assert.equal(data.downloads.length, 1);
       assert.equal(data.downloads[0].architecture, Architecture.ARMHF);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -806,8 +808,8 @@ describe('Manage Revision POST', () => {
       package1.skip_review = true;
       package1.save();
 
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -817,8 +819,8 @@ describe('Manage Revision POST', () => {
       const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(reviewMock.mock.callCount(), 1);
-      assert.equal(parseMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
@@ -838,8 +840,8 @@ describe('Manage Revision POST', () => {
       await lock.save();
 
       const saveSpy = t.mock.method(Lock.prototype, 'save');
-      const reviewMock = t.mock.method(reviewPackage, 'clickReview', async () => GOOD_REVIEW);
-      const parseMock = t.mock.method(clickParser, 'parseClickPackage', async () => ({
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
         name: package1.id,
         version: '1.0.0',
         architecture: 'armhf',
@@ -854,8 +856,8 @@ describe('Manage Revision POST', () => {
         .expect(200);
 
       assert.ok(res.body.success);
-      assert.equal(parseMock.mock.callCount(), 1);
-      assert.equal(reviewMock.mock.callCount(), 1);
+      assert.equal(parseClickPackageMock.mock.callCount(), 1);
+      assert.equal(clickReviewMock.mock.callCount(), 1);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
 

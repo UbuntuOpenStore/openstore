@@ -19,12 +19,12 @@
     "lint": "oxlint --fix",
     "lint:nofix": "oxlint",
     "lint:json": "jsonlint -q ./src/api/json/category_icons.json",
-    "test": "NODE_ENV=testing TS_NODE_TRANSPILE_ONLY=true node -r tsconfig-paths/register -r ts-node/register --env-file-if-exists=.env --test-concurrency=${TEST_CONCURRENCY:-4} --test src/**/*.test.ts src/**/**/*.test.ts",
-    "test:ci": "NODE_ENV=ci TS_NODE_TRANSPILE_ONLY=true node -r tsconfig-paths/register -r ts-node/register --env-file-if-exists=.env --test-concurrency=${TEST_CONCURRENCY:-4} --test src/**/*.test.ts src/**/**/*.test.ts",
-    "test:snapshot": "SNAPSHOT_TEST=true NODE_ENV=testing TS_NODE_TRANSPILE_ONLY=true node -r tsconfig-paths/register -r ts-node/register --env-file-if-exists=.env --test-concurrency=1 --test src/tests/snapshots.test.ts",
+    "test": "NODE_ENV=testing TS_NODE_TRANSPILE_ONLY=true node -r tsx/cjs --experimental-test-module-mocks --env-file-if-exists=.env --test-concurrency=${TEST_CONCURRENCY:-4} --test 'src/**/*.test.ts' 'src/**/**/*.test.ts'",
+    "test:ci": "NODE_ENV=ci TS_NODE_TRANSPILE_ONLY=true node -r tsx/cjs --experimental-test-module-mocks --env-file-if-exists=.env --test-concurrency=${TEST_CONCURRENCY:-4} --test 'src/**/*.test.ts' 'src/**/**/*.test.ts'",
+    "test:snapshot": "SNAPSHOT_TEST=true NODE_ENV=testing TS_NODE_TRANSPILE_ONLY=true node -r tsx/cjs --experimental-test-module-mocks --env-file-if-exists=.env --test-concurrency=1 --test src/tests/snapshots.test.ts",
     "update-pot-file": "npm run ts-command update-pot-file",
     "command": "bash -c 'NODE_PATH=./dist node --env-file-if-exists=.env ./dist/commands/\"$0\".js -- \"${@:1}\"'",
-    "ts-command": "bash -c 'NODE_PATH=./src ts-node ./src/commands/\"$0\".ts -- \"${@:1}\"'"
+    "ts-command": "bash -c 'NODE_PATH=./src node -r tsx/cjs ./src/commands/\"$0\".ts -- \"${@:1}\"'"
   },
   "dependencies": {
     "@sentry/node": "^8.32.0",
@@ -76,12 +76,11 @@
     "nyc": "^17.1.0",
     "oxlint": "^1.66.0",
     "supertest": "^7.1.4",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^6.0.3"
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   },
   "nodemonConfig": {
-    "exec": "node -r tsconfig-paths/register -r ts-node/register --env-file-if-exists=.env ./src/index.ts",
+    "exec": "node -r tsx/cjs --env-file-if-exists=.env ./src/index.ts",
     "ext": "ts, js, json",
     "ignore": [
       "**/*.test.ts",
