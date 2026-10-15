@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose';
 
 import { UserError } from '../../exceptions';
 import { NO_REVISIONS } from '../../utils/error-messages';
-import { setupMethods } from './methods';
+import { DESCRIPTION_MAX_LENGTH, setupMethods, TEXT_MAX_LENGTH } from './methods';
 import { setupStatics } from './statics';
 import { type SnapConnection } from './types';
 import {
@@ -65,25 +65,25 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   id: { type: String, index: true },
 
   // Presentation
-  name: String,
-  tagline: String,
-  description: String,
+  name: { type: String, maxlength: TEXT_MAX_LENGTH },
+  tagline: { type: String, maxlength: TEXT_MAX_LENGTH },
+  description: { type: String, maxlength: DESCRIPTION_MAX_LENGTH },
   changelog: String,
-  version_changelogs: [{ version: String, changelog: String }],
+  version_changelogs: [{ version: String, changelog: { type: String, maxlength: TEXT_MAX_LENGTH } }],
   screenshots: [String],
 
   // Discovery
   category: String,
-  keywords: [String],
+  keywords: [{ type: String, maxlength: TEXT_MAX_LENGTH }],
   nsfw: Boolean,
 
   // Info
   license: String,
-  source: String,
-  support_url: String,
-  donate_url: String,
-  video_url: String,
-  translation_url: String,
+  source: { type: String, maxlength: TEXT_MAX_LENGTH },
+  support_url: { type: String, maxlength: TEXT_MAX_LENGTH },
+  donate_url: { type: String, maxlength: TEXT_MAX_LENGTH },
+  video_url: { type: String, maxlength: TEXT_MAX_LENGTH },
+  translation_url: { type: String, maxlength: TEXT_MAX_LENGTH },
   maintainer: String,
   maintainer_name: String, // TODO deprecate
 

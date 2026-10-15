@@ -9,7 +9,7 @@ import path from 'path';
 import { type Schema } from 'mongoose';
 import { z } from 'zod';
 
-import { UserError } from '../../exceptions';
+import { UserError, ValidationError } from '../../exceptions';
 import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
 import {
   getAppstreamLocalizedString,
@@ -61,6 +61,20 @@ import {
   https://gitlab.com/ubports/development/core/click/-/blob/main/click_package/build.py#L241
 */
 const urlSchema = z.string().url();
+
+/** Maximum allowed length of an app description. */
+export const DESCRIPTION_MAX_LENGTH = 3072;
+
+/** Maximum allowed length of the short app text fields (title, tag line, changelogs, keywords, and URLs). */
+export const TEXT_MAX_LENGTH = 1024;
+
+/** Throws a ValidationError when a value exceeds the given maximum length. */
+function validateMaxLength(label: string, value: string | undefined | null, maxLength: number): void {
+  if (value != null && value.length > maxLength) {
+    throw new ValidationError(`${label} must be ${maxLength} characters or less`);
+  }
+}
+
 function isURL(value: string): boolean {
   return urlSchema.safeParse(value).success;
 }
@@ -217,9 +231,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     this.qml_imports = qmlImports;
 
     // Don't overwrite the these if they already exists
-    this.name = this.name ? this.name : (data.title ?? '');
-    this.description = this.description ? this.description : sanitize(data.description);
-    this.tagline = this.tagline ? this.tagline : sanitize(data.description);
+    this.name = this.name ? this.name : (data.title ?? '').slice(0, TEXT_MAX_LENGTH);
+    this.description = this.description ? this.description : sanitize((data.description ?? '').slice(0, DESCRIPTION_MAX_LENGTH));
+    this.tagline = this.tagline ? this.tagline : sanitize((data.description ?? '').slice(0, TEXT_MAX_LENGTH));
 
     // Apply AppStream metainfo data if present — it is the source of truth for mapped fields
     if (data.appstream) {
@@ -227,17 +241,17 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
       const asName = getAppstreamLocalizedString(as.name);
       if (asName) {
-        this.name = asName;
+        this.name = asName.slice(0, TEXT_MAX_LENGTH);
       }
 
       const asSummary = getAppstreamLocalizedString(as.summary);
       if (asSummary) {
-        this.tagline = sanitize(asSummary);
+        this.tagline = sanitize(asSummary.slice(0, TEXT_MAX_LENGTH));
       }
 
       const asDescription = getAppstreamLocalizedString(as.description);
       if (asDescription) {
-        this.description = sanitize(asDescription);
+        this.description = sanitize(asDescription.slice(0, DESCRIPTION_MAX_LENGTH));
       }
 
       const asKeywords = as.keywords
@@ -245,7 +259,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         .map((k) => k.text)
         .filter(Boolean);
       if (asKeywords.length > 0) {
-        this.keywords = asKeywords;
+        this.keywords = asKeywords.map((keyword) => keyword.slice(0, TEXT_MAX_LENGTH));
       }
 
       const incomingUrls = as.screenshots.slice(0, 5).filter((url) => isURL(url));
@@ -323,10 +337,16 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
       const asChangelogs = extractAppstreamChangelogs(as);
       if (asChangelogs.length > 0) {
-        this.version_changelogs = asChangelogs;
+        this.version_changelogs = asChangelogs.map(({ version, changelog }) => ({
+          version,
+          changelog: changelog.slice(0, TEXT_MAX_LENGTH),
+        }));
       }
 
       for (const url of as.urls) {
+        if (url.url.length > TEXT_MAX_LENGTH) {
+          continue;
+        }
         if (url.type === 'homepage' && isURL(url.url)) {
           this.support_url = url.url;
         }
@@ -408,6 +428,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       this.updated_date = new Date().toISOString();
     }
 
+    validateMaxLength('Title', body.name, TEXT_MAX_LENGTH);
     this.name = body.name ? body.name : this.name;
     this.category = body.category ?? this.category;
     this.license = body.license ?? this.license;
@@ -422,15 +443,28 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
         this.version_changelogs = parsedChangelogs
           .filter(({ version }) => isValidVersion(version))
-          .map(({ version, changelog }) => ({ version, changelog: sanitize(changelog) }));
+          .map(({ version, changelog }) => {
+            validateMaxLength('Changelog', changelog, TEXT_MAX_LENGTH);
+            return { version, changelog: sanitize(changelog) };
+          });
       } catch (err) {
+        if (err instanceof ValidationError) {
+          throw err;
+        }
         console.error('Failed to parse version_changelogs', err);
       }
     }
 
+    validateMaxLength('Description', body.description ?? this.description, DESCRIPTION_MAX_LENGTH);
     this.description = sanitize(body.description ?? this.description ?? '');
+    validateMaxLength('Tag line', body.tagline, TEXT_MAX_LENGTH);
     this.tagline = sanitize(body.tagline ?? this.tagline ?? '');
 
+    validateMaxLength('Source URL', body.source, TEXT_MAX_LENGTH);
+    validateMaxLength('Support URL', body.support_url, TEXT_MAX_LENGTH);
+    validateMaxLength('Donate URL', body.donate_url, TEXT_MAX_LENGTH);
+    validateMaxLength('Translation URL', body.translation_url, TEXT_MAX_LENGTH);
+    validateMaxLength('Video URL', body.video_url, TEXT_MAX_LENGTH);
     this.source = isURL(body.source ?? '') || body.source === '' ? body.source : (this.source ?? '');
     this.support_url = isURL(body.support_url ?? '') || body.support_url === '' ? body.support_url : (this.support_url ?? '');
     this.donate_url = isURL(body.donate_url ?? '') || body.donate_url === '' ? body.donate_url : (this.donate_url ?? '');
@@ -472,7 +506,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
     let keywords = body.keywords ?? [];
     if (!Array.isArray(keywords)) {
+      validateMaxLength('Keywords', keywords, TEXT_MAX_LENGTH);
       keywords = keywords.split(',');
+    } else {
+      for (const keyword of keywords) {
+        validateMaxLength('Keyword', keyword, TEXT_MAX_LENGTH);
+      }
     }
 
     this.keywords = keywords.map((keyword) => keyword.trim());
@@ -1120,8 +1159,10 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     }
 
     if (changelog) {
-      const updatedChangelog = this.changelog ? `${changelog.trim()}\n\n${this.changelog}` : changelog.trim();
+      const trimmedChangelog = changelog.trim();
+      const updatedChangelog = this.changelog ? `${trimmedChangelog}\n\n${this.changelog}` : trimmedChangelog;
       this.changelog = sanitize(updatedChangelog);
+      const versionChangelog = sanitize(trimmedChangelog.slice(0, TEXT_MAX_LENGTH));
 
       if (!this.version_changelogs) {
         this.version_changelogs = [];
@@ -1129,9 +1170,9 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
       const found = this.version_changelogs.find((vc) => vc.version === version);
       if (found) {
-        found.changelog = sanitize(changelog.trim());
+        found.changelog = versionChangelog;
       } else {
-        this.version_changelogs.push({ version, changelog: sanitize(changelog.trim()) });
+        this.version_changelogs.push({ version, changelog: versionChangelog });
       }
     }
 

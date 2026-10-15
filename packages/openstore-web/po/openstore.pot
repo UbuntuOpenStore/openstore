@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-29T03:43:31.527Z\n"
-"PO-Revision-Date: 2026-09-29T03:43:31.528Z\n"
+"POT-Creation-Date: 2026-10-13T03:58:16.964Z\n"
+"PO-Revision-Date: 2026-10-13T03:58:16.968Z\n"
 
 msgid "Report an Issue"
 msgstr "Report an Issue"
@@ -935,6 +935,12 @@ msgstr "Failed to delete app"
 
 msgid "An error occurred while deleting the app"
 msgstr "An error occurred while deleting the app"
+
+msgid "%{current} / %{max} characters"
+msgstr "%{current} / %{max} characters"
+
+msgid "Description must be 3072 characters or less"
+msgstr "Description must be 3072 characters or less"
 
 msgid "Revision"
 msgstr "Revision"

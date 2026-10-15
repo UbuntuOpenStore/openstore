@@ -43,6 +43,10 @@ type ManagePageProps = {
     error: string;
     failedToDelete: string;
     errorOccurred: string;
+    descriptionMaxLength: number;
+    descriptionCharsTemplate: string;
+    descriptionTooLong: string;
+    textMaxLength: number;
   };
 };
 

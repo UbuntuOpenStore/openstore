@@ -800,6 +800,140 @@ describe('Manage', () => {
         assert.equal(pkg?.name, 'Foo Bar');
       });
 
+      test('accepts a description at the 3072 character limit', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const description = 'a'.repeat(3072);
+
+        const res = await request(app).put(route).send({ description }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.description, description);
+        assert.equal(removeSpy.mock.callCount(), 1);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.description, description);
+      });
+
+      test('rejects a description that exceeds the 3072 character limit', async () => {
+        const longDescription = 'a'.repeat(3073);
+
+        await request(app).put(route).send({ description: longDescription }).expect(400);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.ok(pkg);
+        assert.notEqual(pkg?.description, longDescription);
+      });
+
+      test('accepts a title at the 1024 character limit', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const name = 'a'.repeat(1024);
+
+        const res = await request(app).put(route).send({ name }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.name, name);
+        assert.equal(removeSpy.mock.callCount(), 1);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.name, name);
+      });
+
+      test('rejects a title that exceeds the 1024 character limit', async () => {
+        const longName = 'a'.repeat(1025);
+
+        await request(app).put(route).send({ name: longName }).expect(400);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.ok(pkg);
+        assert.notEqual(pkg?.name, longName);
+      });
+
+      test('accepts a tag line at the 1024 character limit', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const tagline = 'a'.repeat(1024);
+
+        const res = await request(app).put(route).send({ tagline }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.tagline, tagline);
+        assert.equal(removeSpy.mock.callCount(), 1);
+      });
+
+      test('rejects a tag line that exceeds the 1024 character limit', async () => {
+        const longTagline = 'a'.repeat(1025);
+
+        await request(app).put(route).send({ tagline: longTagline }).expect(400);
+      });
+
+      test('accepts keywords at the 1024 character limit', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const keywords = 'a'.repeat(1024);
+
+        const res = await request(app).put(route).send({ keywords }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(removeSpy.mock.callCount(), 1);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.deepEqual(pkg?.keywords, [keywords]);
+      });
+
+      test('rejects keywords that exceed the 1024 character limit', async () => {
+        const longKeywords = 'a'.repeat(1025);
+
+        await request(app).put(route).send({ keywords: longKeywords }).expect(400);
+      });
+
+      test('accepts a version changelog at the 1024 character limit', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const changelog = 'a'.repeat(1024);
+
+        const res = await request(app)
+          .put(route)
+          .send({ version_changelogs: [{ version: '1.0.0', changelog }] })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(removeSpy.mock.callCount(), 1);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.version_changelogs?.[0]?.changelog, changelog);
+      });
+
+      test('rejects a version changelog that exceeds the 1024 character limit', async () => {
+        const longChangelog = 'a'.repeat(1025);
+
+        await request(app)
+          .put(route)
+          .send({ version_changelogs: [{ version: '1.0.0', changelog: longChangelog }] })
+          .expect(400);
+      });
+
+      test('accepts a url at the 1024 character limit', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const supportUrl = `https://example.com/${'a'.repeat(1024 - 'https://example.com/'.length)}`;
+
+        const res = await request(app).put(route).send({ support_url: supportUrl }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(removeSpy.mock.callCount(), 1);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.support_url, supportUrl);
+      });
+
+      test('rejects a url that exceeds the 1024 character limit', async () => {
+        const longUrl = `https://example.com/${'a'.repeat(1025 - 'https://example.com/'.length)}`;
+
+        await request(app).put(route).send({ support_url: longUrl }).expect(400);
+      });
+
       test('publishes the package', async (t) => {
         const upsertSpy = t.mock.method(packageSearchInstance, 'upsert', mockSearchMethod);
 

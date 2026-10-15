@@ -30,6 +30,10 @@ type ManageAppFormProps = {
     error: string;
     failedToDelete: string;
     errorOccurred: string;
+    descriptionMaxLength: number;
+    descriptionCharsTemplate: string;
+    descriptionTooLong: string;
+    textMaxLength: number;
   };
 };
 
@@ -41,6 +45,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
   const [newVersionChangelogs, setNewVersionChangelogs] = useState<Array<{ id: number; version: string; changelog: string }>>([]);
   const [removedVersions, setRemovedVersions] = useState<Set<string>>(new Set());
   const [confirmRemoveVersion, setConfirmRemoveVersion] = useState<string | null>(null);
+  const [descriptionLength, setDescriptionLength] = useState(app.description?.length ?? 0);
   const fileRef = useRef<HTMLInputElement>();
 
   const addNewVersionChangelog = useCallback(() => {
@@ -72,91 +77,101 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
     if (confirmRemoveVersion) removeExistingVersionChangelog(confirmRemoveVersion);
   }, [confirmRemoveVersion, removeExistingVersionChangelog]);
 
-  const save = useCallback(async (e: Event) => {
-    e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    if (form.reportValidity()) {
-      setSaving(true);
-      setSuccess(false);
-      setError("");
+  const save = useCallback(
+    async (e: Event) => {
+      e.preventDefault();
+      const form = e.currentTarget as HTMLFormElement;
+      if (form.reportValidity()) {
+        const descriptionField = form.elements.namedItem("description") as HTMLTextAreaElement | null;
+        const descriptionValue = descriptionField?.value ?? "";
+        if (descriptionValue.length > messages.descriptionMaxLength) {
+          setError(messages.descriptionTooLong);
+          return;
+        }
 
-      const formData = new FormData(form);
-      const entries = Array.from(formData.entries());
+        setSaving(true);
+        setSuccess(false);
+        setError("");
 
-      const newFormData = new FormData();
-      let screenshotFileCount = 0;
+        const formData = new FormData(form);
+        const entries = Array.from(formData.entries());
 
-      const versionChangelogs: AppData["version_changelogs"] = [];
+        const newFormData = new FormData();
+        let screenshotFileCount = 0;
 
-      // Helper function to strip 'v' prefix from version strings
-      const normalizeVersion = (version: string): string => {
-        return version.replace(/^v/, "");
-      };
+        const versionChangelogs: AppData["version_changelogs"] = [];
 
-      for (const [key, value] of entries) {
-        if (key === "screenshot_files") {
-          if (screenshotFileCount < 5) {
-            screenshotFileCount++;
+        // Helper function to strip 'v' prefix from version strings
+        const normalizeVersion = (version: string): string => {
+          return version.replace(/^v/, "");
+        };
+
+        for (const [key, value] of entries) {
+          if (key === "screenshot_files") {
+            if (screenshotFileCount < 5) {
+              screenshotFileCount++;
+              newFormData.append(key, value);
+            }
+          } else if (key === "published" || key === "nsfw" || key === "locked") {
+            // Skip
+          } else if (key.startsWith("version_changelogs[") && key.endsWith("]")) {
+            const versionMatch = key.match(/\[(.*?)\]/);
+            if (versionMatch && versionMatch[1] && typeof value === "string") {
+              const version = normalizeVersion(versionMatch[1]);
+              versionChangelogs.push({ version, changelog: value });
+            }
+          } else if (key.startsWith("new_version_") && typeof value === "string") {
+            const id = key.replace("new_version_", "");
+            const changelog = formData.get(`new_changelog_${id}`);
+            if (value && changelog && typeof changelog === "string") {
+              const version = normalizeVersion(value);
+              versionChangelogs.push({ version, changelog });
+            }
+          } else if (!key.startsWith("new_changelog_")) {
+            // Don't add new_changelog_ fields as they're handled above
             newFormData.append(key, value);
           }
-        } else if (key === "published" || key === "nsfw" || key === "locked") {
-          // Skip
-        } else if (key.startsWith("version_changelogs[") && key.endsWith("]")) {
-          const versionMatch = key.match(/\[(.*?)\]/);
-          if (versionMatch && versionMatch[1] && typeof value === "string") {
-            const version = normalizeVersion(versionMatch[1]);
-            versionChangelogs.push({ version, changelog: value });
+        }
+
+        newFormData.append("version_changelogs", JSON.stringify(versionChangelogs));
+        newFormData.append("published", formData.get("published") ? "on" : "off");
+        newFormData.append("nsfw", formData.get("nsfw") ? "on" : "off");
+        newFormData.append("locked", formData.get("locked") ? "on" : "off");
+
+        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/manage/${app.id}?apikey=${getClientApiKey()}`, {
+          method: "PUT",
+          body: newFormData,
+          headers: { "X-Source": "openstore-web-next" },
+        });
+
+        if (response.ok) {
+          const appData = AppManageSchema.parse((await response.json()).data);
+          setScreenshots(appData.screenshots);
+          setNewVersionChangelogs([]);
+          setRemovedVersions(new Set());
+
+          if (fileRef.current) {
+            fileRef.current.value = "";
           }
-        } else if (key.startsWith("new_version_") && typeof value === "string") {
-          const id = key.replace("new_version_", "");
-          const changelog = formData.get(`new_changelog_${id}`);
-          if (value && changelog && typeof changelog === "string") {
-            const version = normalizeVersion(value);
-            versionChangelogs.push({ version, changelog });
+
+          setSuccess(true);
+
+          onSave();
+        } else {
+          const errorBody = await response.json();
+          let message = "An unknown error has occurred";
+          if (errorBody && typeof errorBody.message === "string") {
+            message = errorBody.message;
           }
-        } else if (!key.startsWith("new_changelog_")) {
-          // Don't add new_changelog_ fields as they're handled above
-          newFormData.append(key, value);
+
+          setError(message);
         }
+
+        setSaving(false);
       }
-
-      newFormData.append("version_changelogs", JSON.stringify(versionChangelogs));
-      newFormData.append("published", formData.get("published") ? "on" : "off");
-      newFormData.append("nsfw", formData.get("nsfw") ? "on" : "off");
-      newFormData.append("locked", formData.get("locked") ? "on" : "off");
-
-      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/manage/${app.id}?apikey=${getClientApiKey()}`, {
-        method: "PUT",
-        body: newFormData,
-        headers: { "X-Source": "openstore-web-next" },
-      });
-
-      if (response.ok) {
-        const appData = AppManageSchema.parse((await response.json()).data);
-        setScreenshots(appData.screenshots);
-        setNewVersionChangelogs([]);
-        setRemovedVersions(new Set());
-
-        if (fileRef.current) {
-          fileRef.current.value = "";
-        }
-
-        setSuccess(true);
-
-        onSave();
-      } else {
-        const errorBody = await response.json();
-        let message = "An unknown error has occurred";
-        if (errorBody && typeof errorBody.message === "string") {
-          message = errorBody.message;
-        }
-
-        setError(message);
-      }
-
-      setSaving(false);
-    }
-  }, []);
+    },
+    [messages.descriptionMaxLength, messages.descriptionTooLong]
+  );
 
   return (
     <>
@@ -184,7 +199,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="name" class="form-label">
               Title
             </label>
-            <input id="name" name="name" type="text" value={app.name} required class="form-input" />
+            <input id="name" name="name" type="text" value={app.name} required maxLength={messages.textMaxLength} class="form-input" />
           </div>
 
           <div class="form-group">
@@ -205,17 +220,40 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="tagline" class="form-label">
               Tag Line
             </label>
-            <input id="tagline" name="tagline" type="text" value={app.tagline} required class="form-input" />
+            <input
+              id="tagline"
+              name="tagline"
+              type="text"
+              value={app.tagline}
+              required
+              maxLength={messages.textMaxLength}
+              class="form-input"
+            />
           </div>
 
           <div class="form-group">
             <label for="description" class="form-label">
               Description
             </label>
-            <textarea id="description" name="description" required class="form-input" rows={4}>
+            <textarea
+              id="description"
+              name="description"
+              required
+              class="form-input"
+              rows={4}
+              onInput={(e) => setDescriptionLength((e.currentTarget as HTMLTextAreaElement).value.length)}
+            >
               {app.description}
             </textarea>
           </div>
+          <p
+            class={`mt-1 text-xs text-right ${descriptionLength > messages.descriptionMaxLength ? "text-red-500" : "text-gray-500"}`}
+            aria-live="polite"
+          >
+            {messages.descriptionCharsTemplate
+              .replace("%{current}", String(descriptionLength))
+              .replace("%{max}", String(messages.descriptionMaxLength))}
+          </p>
 
           <div class="form-group">
             <label class="form-label">Changelogs</label>
@@ -246,6 +284,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                       name={`new_changelog_${entry.id}`}
                       class="form-input w-full resize-vertical"
                       rows={3}
+                      maxLength={messages.textMaxLength}
                       placeholder="Enter changelog for this version..."
                       required
                     ></textarea>
@@ -272,6 +311,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                         name={`version_changelogs[${versionChangelog.version}]`}
                         class="form-input w-full resize-vertical"
                         rows={3}
+                        maxLength={messages.textMaxLength}
                         defaultValue={versionChangelog.changelog}
                       ></textarea>
                     </div>
@@ -373,7 +413,14 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="keywords" class="form-label">
               Keywords
             </label>
-            <input id="keywords" name="keywords" type="text" value={app.keywords.join(", ")} class="form-input" />
+            <input
+              id="keywords"
+              name="keywords"
+              type="text"
+              value={app.keywords.join(", ")}
+              maxLength={messages.textMaxLength}
+              class="form-input"
+            />
           </div>
 
           <div class="form-group">
@@ -400,28 +447,49 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="source" class="form-label">
               Source URL
             </label>
-            <input id="source" name="source" type="text" value={app.source} class="form-input" />
+            <input id="source" name="source" type="text" value={app.source} maxLength={messages.textMaxLength} class="form-input" />
           </div>
 
           <div class="form-group">
             <label for="support_url" class="form-label">
               Support URL
             </label>
-            <input id="support_url" name="support_url" type="text" value={app.support_url} class="form-input" />
+            <input
+              id="support_url"
+              name="support_url"
+              type="text"
+              value={app.support_url}
+              maxLength={messages.textMaxLength}
+              class="form-input"
+            />
           </div>
 
           <div class="form-group">
             <label for="donate_url" class="form-label">
               Donate URL
             </label>
-            <input id="donate_url" name="donate_url" type="text" value={app.donate_url} class="form-input" />
+            <input
+              id="donate_url"
+              name="donate_url"
+              type="text"
+              value={app.donate_url}
+              maxLength={messages.textMaxLength}
+              class="form-input"
+            />
           </div>
 
           <div class="form-group">
             <label for="video_url" class="form-label">
               Video URL
             </label>
-            <input id="video_url" name="video_url" type="text" value={app.video_url} class="form-input" />
+            <input
+              id="video_url"
+              name="video_url"
+              type="text"
+              value={app.video_url}
+              maxLength={messages.textMaxLength}
+              class="form-input"
+            />
           </div>
 
           <p class="mt-1 text-xs text-gray-500 text-right">Only YouTube, Vimeo, Rumble, and PeerTube videos are supported at this time.</p>
@@ -430,7 +498,14 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="translation_url" class="form-label">
               Translation URL
             </label>
-            <input id="translation_url" name="translation_url" type="text" value={app.translation_url} class="form-input" />
+            <input
+              id="translation_url"
+              name="translation_url"
+              type="text"
+              value={app.translation_url}
+              maxLength={messages.textMaxLength}
+              class="form-input"
+            />
           </div>
         </section>
 

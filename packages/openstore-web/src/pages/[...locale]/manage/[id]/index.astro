@@ -70,6 +70,10 @@ await initializeI18N(Astro.currentLocale);
       error: t("Error"),
       failedToDelete: t("Failed to delete app"),
       errorOccurred: t("An error occurred while deleting the app"),
+      descriptionMaxLength: 3072,
+      descriptionCharsTemplate: t("%{current} / %{max} characters"),
+      descriptionTooLong: t("Description must be 3072 characters or less"),
+      textMaxLength: 1024,
     }}
     client:only="preact"
   />

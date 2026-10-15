@@ -8,9 +8,10 @@ import multer from 'multer';
 
 import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package, PackageType, ChannelArchitecture } from '../db/package';
+import { TEXT_MAX_LENGTH } from '../db/package/methods';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { ReservedNamespace } from '../db/reserved_namespace';
-import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
+import { HttpError, UserError, ValidationError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
 import {
   authenticate,
   userRole,
@@ -97,6 +98,9 @@ router.post(
     }
 
     const name = req.body.name.trim();
+    if (name.length > TEXT_MAX_LENGTH) {
+      throw new ValidationError(`Title must be ${TEXT_MAX_LENGTH} characters or less`);
+    }
     const id = req.body.id.toLowerCase().trim();
 
     if (!req.isAdminUser && req.body) {
