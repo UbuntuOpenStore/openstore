@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
 
 import { ValidationError } from '../../exceptions';
 import { config } from '../../utils/config';
+import { TEXT_MAX_LENGTH } from '../../utils/limits';
 import { sanitize } from '../../utils/sanitize';
 import { Package } from '../package';
 import { packageSearchInstance } from '../package/search-factory';
@@ -20,11 +21,11 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
   github_id: String,
   gitlab_id: String,
   username: String,
-  website_url: String,
-  github_profile_url: String,
-  gitlab_profile_url: String,
+  website_url: { type: String, maxlength: TEXT_MAX_LENGTH },
+  github_profile_url: { type: String, maxlength: TEXT_MAX_LENGTH },
+  gitlab_profile_url: { type: String, maxlength: TEXT_MAX_LENGTH },
   ubports_forum_username: String,
-  donation_url: String,
+  donation_url: { type: String, maxlength: TEXT_MAX_LENGTH },
   avatar: String,
   description: { type: String, maxlength: 200 },
 });
@@ -100,6 +101,10 @@ userSchema.method('updateProfile', async function (data: ProfileUpdateData, isAd
   const urlFields: Array<keyof ProfileUpdateData> = ['website_url', 'github_profile_url', 'gitlab_profile_url', 'donation_url'];
   for (const field of urlFields) {
     if (data[field]) {
+      if (data[field].length > TEXT_MAX_LENGTH) {
+        throw new ValidationError(`${field} must be ${TEXT_MAX_LENGTH} characters or less`);
+      }
+
       try {
         const url = new URL(data[field]);
         if (url.protocol !== 'https:') {

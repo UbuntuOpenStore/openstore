@@ -8,7 +8,6 @@ import multer from 'multer';
 
 import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package, PackageType, ChannelArchitecture } from '../db/package';
-import { TEXT_MAX_LENGTH } from '../db/package/methods';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { ReservedNamespace } from '../db/reserved_namespace';
 import { HttpError, UserError, ValidationError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
@@ -40,6 +39,7 @@ import {
   INVALID_PACKAGE_TYPE,
   INVALID_APP_ID_PREFIX,
 } from '../utils/error-messages';
+import { TEXT_MAX_LENGTH } from '../utils/limits';
 import { clickReview } from '../utils/review-package';
 import { validateNamespace } from '../utils/validate-namespace';
 

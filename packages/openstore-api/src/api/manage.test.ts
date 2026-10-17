@@ -888,6 +888,35 @@ describe('Manage', () => {
         await request(app).put(route).send({ keywords: longKeywords }).expect(400);
       });
 
+      test('accepts up to 10 keywords', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const keywordList = Array.from({ length: 10 }, (_, i) => `keyword-${i}`);
+
+        const res = await request(app)
+          .put(route)
+          .send({ keywords: keywordList.join(',') })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(removeSpy.mock.callCount(), 1);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.deepEqual(pkg?.keywords, keywordList);
+      });
+
+      test('rejects more than 10 keywords', async () => {
+        const keywordList = Array.from({ length: 11 }, (_, i) => `keyword-${i}`);
+
+        await request(app)
+          .put(route)
+          .send({ keywords: keywordList.join(',') })
+          .expect(400);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.notDeepEqual(pkg?.keywords, keywordList);
+      });
+
       test('accepts a version changelog at the 1024 character limit', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 

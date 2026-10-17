@@ -234,6 +234,28 @@ describe('Users API', () => {
       assert.notEqual(user.github_profile_url, profileData.github_profile_url);
     });
 
+    test('accepts a profile URL at the 1024 character limit', async () => {
+      const websiteUrl = `https://example.com/${'a'.repeat(1024 - 'https://example.com/'.length)}`;
+
+      const res = await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send({ website_url: websiteUrl }).expect(200);
+
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.website_url, websiteUrl);
+
+      const user = await User.findById(regularUser._id);
+      assert.equal(user?.website_url, websiteUrl);
+    });
+
+    test('rejects a profile URL that exceeds the 1024 character limit', async () => {
+      const websiteUrl = `https://example.com/${'a'.repeat(1025 - 'https://example.com/'.length)}`;
+
+      await request(app).put(`${route}me?apikey=${regularUser.apikey}`).send({ website_url: websiteUrl }).expect(400);
+
+      const user = await User.findById(regularUser._id);
+      assert.ok(user);
+      assert.notEqual(user.website_url, websiteUrl);
+    });
+
     test('returns 401 when not authenticated', async () => {
       await request(app).put(`${route}me`).send({ website_url: 'https://example.com' }).expect(401);
     });

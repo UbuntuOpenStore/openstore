@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-10-13T03:58:16.964Z\n"
-"PO-Revision-Date: 2026-10-13T03:58:16.968Z\n"
+"POT-Creation-Date: 2026-10-16T20:25:41.783Z\n"
+"PO-Revision-Date: 2026-10-16T20:25:41.787Z\n"
 
 msgid "Report an Issue"
 msgstr "Report an Issue"
@@ -942,6 +942,12 @@ msgstr "%{current} / %{max} characters"
 msgid "Description must be 3072 characters or less"
 msgstr "Description must be 3072 characters or less"
 
+msgid "Keywords must be 10 items or less"
+msgstr "Keywords must be 10 items or less"
+
+msgid "Maximum 10 keywords"
+msgstr "Maximum 10 keywords"
+
 msgid "Revision"
 msgstr "Revision"
 
@@ -1099,8 +1105,8 @@ msgstr "Biography"
 msgid "Short bio"
 msgstr "Short bio"
 
-msgid "Maximum 200 characters"
-msgstr "Maximum 200 characters"
+msgid "Description must be 200 characters or less"
+msgstr "Description must be 200 characters or less"
 
 msgid "Contact Links"
 msgstr "Contact Links"

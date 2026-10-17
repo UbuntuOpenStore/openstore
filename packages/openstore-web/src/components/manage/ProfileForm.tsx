@@ -23,7 +23,10 @@ type ProfileFormProps = {
     imageFileTypes: string;
     biography: string;
     shortBio: string;
-    maximumChars: string;
+    descriptionMaxLength: number;
+    charsTemplate: string;
+    descriptionTooLong: string;
+    textMaxLength: number;
     contactLinks: string;
     websiteURL: string;
     githubProfileURL: string;
@@ -39,6 +42,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [descriptionLength, setDescriptionLength] = useState(user.description?.length ?? 0);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const save = useCallback(
@@ -46,6 +50,13 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
       e.preventDefault();
       const form = e.currentTarget as HTMLFormElement;
       if (form.reportValidity()) {
+        const descriptionField = form.elements.namedItem("description") as HTMLTextAreaElement | null;
+        const descriptionValue = descriptionField?.value ?? "";
+        if (descriptionValue.length > messages.descriptionMaxLength) {
+          setError(messages.descriptionTooLong);
+          return;
+        }
+
         setSaving(true);
         setSuccess(false);
         setError("");
@@ -180,9 +191,23 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
           <label for="description" class="form-label">
             {messages.shortBio}
           </label>
-          <textarea id="description" name="description" rows={3} maxLength={200} class="form-input" defaultValue={user.description || ""} />
+          <textarea
+            id="description"
+            name="description"
+            rows={3}
+            class="form-input"
+            defaultValue={user.description || ""}
+            onInput={(e) => setDescriptionLength((e.currentTarget as HTMLTextAreaElement).value.length)}
+          />
         </div>
-        <p class="mt-1 text-xs text-gray-500 text-right">{messages.maximumChars}</p>
+        <p
+          class={`mt-1 text-xs text-right ${descriptionLength > messages.descriptionMaxLength ? "text-red-500" : "text-gray-500"}`}
+          aria-live="polite"
+        >
+          {messages.charsTemplate
+            .replace("%{current}", String(descriptionLength))
+            .replace("%{max}", String(messages.descriptionMaxLength))}
+        </p>
       </section>
 
       <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
@@ -199,6 +224,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             name="website_url"
             type="url"
             placeholder="https://example.com"
+            maxLength={messages.textMaxLength}
             class="form-input"
             defaultValue={user.website_url || ""}
           />
@@ -213,6 +239,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             name="github_username"
             type="text"
             placeholder="username"
+            maxLength={messages.textMaxLength}
             class="form-input"
             defaultValue={user.github_profile_url ? user.github_profile_url.replace("https://github.com/", "") : ""}
           />
@@ -227,6 +254,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             name="gitlab_username"
             type="text"
             placeholder="username"
+            maxLength={messages.textMaxLength}
             class="form-input"
             defaultValue={user.gitlab_profile_url ? user.gitlab_profile_url.replace("https://gitlab.com/", "") : ""}
           />
@@ -241,6 +269,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             name="ubports_forum_username"
             type="text"
             placeholder="username"
+            maxLength={messages.textMaxLength}
             class="form-input"
             defaultValue={user.ubports_forum_username || ""}
           />
@@ -255,6 +284,7 @@ const ProfileForm = ({ user, messages }: ProfileFormProps) => {
             name="donation_url"
             type="url"
             placeholder="https://example.com/donate"
+            maxLength={messages.textMaxLength}
             class="form-input"
             defaultValue={user.donation_url || ""}
           />

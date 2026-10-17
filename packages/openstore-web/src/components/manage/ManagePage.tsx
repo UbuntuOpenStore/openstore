@@ -44,9 +44,12 @@ type ManagePageProps = {
     failedToDelete: string;
     errorOccurred: string;
     descriptionMaxLength: number;
-    descriptionCharsTemplate: string;
+    charsTemplate: string;
     descriptionTooLong: string;
     textMaxLength: number;
+    keywordsMaxCount: number;
+    keywordsTooMany: string;
+    keywordsHint: string;
   };
 };
 

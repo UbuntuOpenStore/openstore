@@ -3,7 +3,8 @@ import { Schema, model } from 'mongoose';
 
 import { UserError } from '../../exceptions';
 import { NO_REVISIONS } from '../../utils/error-messages';
-import { DESCRIPTION_MAX_LENGTH, setupMethods, TEXT_MAX_LENGTH } from './methods';
+import { DESCRIPTION_MAX_LENGTH, TEXT_MAX_LENGTH } from '../../utils/limits';
+import { setupMethods } from './methods';
 import { setupStatics } from './statics';
 import { type SnapConnection } from './types';
 import {

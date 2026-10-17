@@ -32,6 +32,7 @@ import {
   UNSUPPORTED_SCREENSHOT_TYPE,
   WRONG_PACKAGE,
 } from '../../utils/error-messages';
+import { DESCRIPTION_MAX_LENGTH, KEYWORDS_MAX_COUNT, TEXT_MAX_LENGTH } from '../../utils/limits';
 import { type HydratedRatingCount } from '../rating_count/types';
 import { User } from '../user';
 import {
@@ -61,12 +62,6 @@ import {
   https://gitlab.com/ubports/development/core/click/-/blob/main/click_package/build.py#L241
 */
 const urlSchema = z.string().url();
-
-/** Maximum allowed length of an app description. */
-export const DESCRIPTION_MAX_LENGTH = 3072;
-
-/** Maximum allowed length of the short app text fields (title, tag line, changelogs, keywords, and URLs). */
-export const TEXT_MAX_LENGTH = 1024;
 
 /** Throws a ValidationError when a value exceeds the given maximum length. */
 function validateMaxLength(label: string, value: string | undefined | null, maxLength: number): void {
@@ -257,7 +252,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       const asKeywords = as.keywords
         .filter((k) => k.lang === 'en')
         .map((k) => k.text)
-        .filter(Boolean);
+        .filter(Boolean)
+        .slice(0, KEYWORDS_MAX_COUNT);
       if (asKeywords.length > 0) {
         this.keywords = asKeywords.map((keyword) => keyword.slice(0, TEXT_MAX_LENGTH));
       }
@@ -514,7 +510,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       }
     }
 
-    this.keywords = keywords.map((keyword) => keyword.trim());
+    const trimmedKeywords = keywords.map((keyword) => keyword.trim()).filter(Boolean);
+    if (trimmedKeywords.length > KEYWORDS_MAX_COUNT) {
+      throw new ValidationError(`Keywords must be ${KEYWORDS_MAX_COUNT} items or less`);
+    }
+
+    this.keywords = trimmedKeywords;
 
     if (body.nsfw !== undefined) {
       this.nsfw = body.nsfw === 'true' || body.nsfw === 'on' || body.nsfw === true;

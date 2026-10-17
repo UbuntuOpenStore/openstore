@@ -31,9 +31,12 @@ type ManageAppFormProps = {
     failedToDelete: string;
     errorOccurred: string;
     descriptionMaxLength: number;
-    descriptionCharsTemplate: string;
+    charsTemplate: string;
     descriptionTooLong: string;
     textMaxLength: number;
+    keywordsMaxCount: number;
+    keywordsTooMany: string;
+    keywordsHint: string;
   };
 };
 
@@ -46,7 +49,26 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
   const [removedVersions, setRemovedVersions] = useState<Set<string>>(new Set());
   const [confirmRemoveVersion, setConfirmRemoveVersion] = useState<string | null>(null);
   const [descriptionLength, setDescriptionLength] = useState(app.description?.length ?? 0);
+  const [changelogLengths, setChangelogLengths] = useState<Record<string, number>>(() => {
+    const lengths: Record<string, number> = {};
+    for (const versionChangelog of app.version_changelogs) {
+      lengths[`existing-${versionChangelog.version}`] = versionChangelog.changelog?.length ?? 0;
+    }
+    return lengths;
+  });
   const fileRef = useRef<HTMLInputElement>();
+
+  const changelogCharsCounter = useCallback(
+    (key: string) => {
+      const length = changelogLengths[key] ?? 0;
+      return (
+        <p class={`mt-1 text-xs text-right ${length > messages.textMaxLength ? "text-red-500" : "text-gray-500"}`} aria-live="polite">
+          {messages.charsTemplate.replace("%{current}", String(length)).replace("%{max}", String(messages.textMaxLength))}
+        </p>
+      );
+    },
+    [changelogLengths, messages.charsTemplate, messages.textMaxLength]
+  );
 
   const addNewVersionChangelog = useCallback(() => {
     setNewVersionChangelogs((prev) => [...prev, { id: Math.random(), version: "", changelog: "" }]);
@@ -86,6 +108,16 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
         const descriptionValue = descriptionField?.value ?? "";
         if (descriptionValue.length > messages.descriptionMaxLength) {
           setError(messages.descriptionTooLong);
+          return;
+        }
+
+        const keywordsField = form.elements.namedItem("keywords") as HTMLInputElement | null;
+        const keywordList = (keywordsField?.value ?? "")
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean);
+        if (keywordList.length > messages.keywordsMaxCount) {
+          setError(messages.keywordsTooMany);
           return;
         }
 
@@ -170,7 +202,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
         setSaving(false);
       }
     },
-    [messages.descriptionMaxLength, messages.descriptionTooLong]
+    [messages.descriptionMaxLength, messages.descriptionTooLong, messages.keywordsMaxCount, messages.keywordsTooMany]
   );
 
   return (
@@ -250,7 +282,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             class={`mt-1 text-xs text-right ${descriptionLength > messages.descriptionMaxLength ? "text-red-500" : "text-gray-500"}`}
             aria-live="polite"
           >
-            {messages.descriptionCharsTemplate
+            {messages.charsTemplate
               .replace("%{current}", String(descriptionLength))
               .replace("%{max}", String(messages.descriptionMaxLength))}
           </p>
@@ -280,14 +312,23 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                         required
                       />
                     </div>
-                    <textarea
-                      name={`new_changelog_${entry.id}`}
-                      class="form-input w-full resize-vertical"
-                      rows={3}
-                      maxLength={messages.textMaxLength}
-                      placeholder="Enter changelog for this version..."
-                      required
-                    ></textarea>
+                    <div class="flex flex-col w-full">
+                      <textarea
+                        name={`new_changelog_${entry.id}`}
+                        class="form-input w-full resize-vertical"
+                        rows={3}
+                        maxLength={messages.textMaxLength}
+                        placeholder="Enter changelog for this version..."
+                        required
+                        onInput={(e) =>
+                          setChangelogLengths((prev) => ({
+                            ...prev,
+                            [`new-${entry.id}`]: (e.currentTarget as HTMLTextAreaElement).value.length,
+                          }))
+                        }
+                      ></textarea>
+                      {changelogCharsCounter(`new-${entry.id}`)}
+                    </div>
                   </div>
                 ))}
 
@@ -307,13 +348,22 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                           </button>
                         </div>
                       </div>
-                      <textarea
-                        name={`version_changelogs[${versionChangelog.version}]`}
-                        class="form-input w-full resize-vertical"
-                        rows={3}
-                        maxLength={messages.textMaxLength}
-                        defaultValue={versionChangelog.changelog}
-                      ></textarea>
+                      <div class="flex flex-col w-full">
+                        <textarea
+                          name={`version_changelogs[${versionChangelog.version}]`}
+                          class="form-input w-full resize-vertical"
+                          rows={3}
+                          maxLength={messages.textMaxLength}
+                          defaultValue={versionChangelog.changelog}
+                          onInput={(e) =>
+                            setChangelogLengths((prev) => ({
+                              ...prev,
+                              [`existing-${versionChangelog.version}`]: (e.currentTarget as HTMLTextAreaElement).value.length,
+                            }))
+                          }
+                        ></textarea>
+                        {changelogCharsCounter(`existing-${versionChangelog.version}`)}
+                      </div>
                     </div>
                   ))}
               </div>
@@ -422,6 +472,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
               class="form-input"
             />
           </div>
+          <p class="mt-1 text-xs text-gray-500 text-right">{messages.keywordsHint}</p>
 
           <div class="form-group">
             <label for="nsfw" class="form-label">
@@ -447,7 +498,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="source" class="form-label">
               Source URL
             </label>
-            <input id="source" name="source" type="text" value={app.source} maxLength={messages.textMaxLength} class="form-input" />
+            <input id="source" name="source" type="url" value={app.source} maxLength={messages.textMaxLength} class="form-input" />
           </div>
 
           <div class="form-group">
@@ -457,7 +508,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <input
               id="support_url"
               name="support_url"
-              type="text"
+              type="url"
               value={app.support_url}
               maxLength={messages.textMaxLength}
               class="form-input"
@@ -471,7 +522,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <input
               id="donate_url"
               name="donate_url"
-              type="text"
+              type="url"
               value={app.donate_url}
               maxLength={messages.textMaxLength}
               class="form-input"
@@ -482,14 +533,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="video_url" class="form-label">
               Video URL
             </label>
-            <input
-              id="video_url"
-              name="video_url"
-              type="text"
-              value={app.video_url}
-              maxLength={messages.textMaxLength}
-              class="form-input"
-            />
+            <input id="video_url" name="video_url" type="url" value={app.video_url} maxLength={messages.textMaxLength} class="form-input" />
           </div>
 
           <p class="mt-1 text-xs text-gray-500 text-right">Only YouTube, Vimeo, Rumble, and PeerTube videos are supported at this time.</p>
@@ -501,7 +545,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <input
               id="translation_url"
               name="translation_url"
-              type="text"
+              type="url"
               value={app.translation_url}
               maxLength={messages.textMaxLength}
               class="form-input"
