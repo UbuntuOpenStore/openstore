@@ -5,12 +5,12 @@
   "keywords": [
     "click",
     "clickable",
+    "open-store",
+    "open-store.io",
+    "openstore",
     "ubports",
     "ubuntu",
-    "ubuntu-touch",
-    "openstore",
-    "open-store",
-    "open-store.io"
+    "ubuntu-touch"
   ],
   "homepage": "https://gitlab.com/theopenstore/openstore",
   "bugs": {
