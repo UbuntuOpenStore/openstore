@@ -8,11 +8,12 @@ import type { AppstreamExportData } from 'click-parser';
 
 import { Package } from '.';
 import '../index';
-import { UserError } from '../../exceptions';
+import { UserError, ValidationError } from '../../exceptions';
 import { type TestPackage } from '../../tests/factory';
 import { closeMongoose, waitForMongoose } from '../../tests/utils';
 import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory } from '../../utils/appstream-helpers';
 import { config } from '../../utils/config';
+import { DESCRIPTION_MAX_LENGTH, TEXT_MAX_LENGTH } from '../../utils/limits';
 import { Ratings } from '../review/constants';
 import { serializeRatings } from './methods';
 import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
@@ -985,6 +986,37 @@ describe('Package', () => {
 
       await pkg.updateFromBody({ video_url: 'https://notavideosite.com/xyz' });
       assert.equal(pkg.video_url, '');
+    });
+  });
+
+  describe('text field limits', () => {
+    test('updateFromBody rejects text fields that exceed the limits', async () => {
+      const pkg = new Package({ id: 'app.limitcheck', name: 'App' });
+
+      await assert.rejects(() => pkg.updateFromBody({ name: 'a'.repeat(TEXT_MAX_LENGTH + 1) }), ValidationError);
+      await assert.rejects(() => pkg.updateFromBody({ tagline: 'a'.repeat(TEXT_MAX_LENGTH + 1) }), ValidationError);
+      await assert.rejects(() => pkg.updateFromBody({ description: 'a'.repeat(DESCRIPTION_MAX_LENGTH + 1) }), ValidationError);
+      await assert.rejects(() => pkg.updateFromBody({ keywords: ['a'.repeat(TEXT_MAX_LENGTH + 1)] }), ValidationError);
+      await assert.rejects(
+        () => pkg.updateFromBody({ version_changelogs: [{ version: '1.0.0', changelog: 'a'.repeat(TEXT_MAX_LENGTH + 1) }] }),
+        ValidationError,
+      );
+      for (const field of ['source', 'support_url', 'donate_url', 'video_url', 'translation_url'] as const) {
+        await assert.rejects(() => pkg.updateFromBody({ [field]: 'a'.repeat(TEXT_MAX_LENGTH + 1) }), ValidationError);
+      }
+    });
+
+    test('updateFromBody leaves existing over-limit fields alone when they are not being updated', async () => {
+      const pkg = new Package({
+        id: 'app.legacy',
+        name: 'Legacy',
+        description: 'a'.repeat(DESCRIPTION_MAX_LENGTH + 1),
+      });
+
+      await pkg.updateFromBody({ screenshots: [] });
+
+      assert.equal(pkg.name, 'Legacy');
+      assert.equal(pkg.description?.length, DESCRIPTION_MAX_LENGTH + 1);
     });
   });
 

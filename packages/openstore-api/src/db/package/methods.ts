@@ -451,7 +451,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       }
     }
 
-    validateMaxLength('Description', body.description ?? this.description, DESCRIPTION_MAX_LENGTH);
+    validateMaxLength('Description', body.description, DESCRIPTION_MAX_LENGTH);
     this.description = sanitize(body.description ?? this.description ?? '');
     validateMaxLength('Tag line', body.tagline, TEXT_MAX_LENGTH);
     this.tagline = sanitize(body.tagline ?? this.tagline ?? '');
