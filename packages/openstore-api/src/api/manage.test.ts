@@ -917,10 +917,10 @@ describe('Manage', () => {
         assert.notDeepEqual(pkg?.keywords, keywordList);
       });
 
-      test('accepts a version changelog at the 1024 character limit', async (t) => {
+      test('accepts a version changelog at the 2048 character limit', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const changelog = 'a'.repeat(1024);
+        const changelog = 'a'.repeat(2048);
 
         const res = await request(app)
           .put(route)
@@ -934,8 +934,8 @@ describe('Manage', () => {
         assert.equal(pkg?.version_changelogs?.[0]?.changelog, changelog);
       });
 
-      test('rejects a version changelog that exceeds the 1024 character limit', async () => {
-        const longChangelog = 'a'.repeat(1025);
+      test('rejects a version changelog that exceeds the 2048 character limit', async () => {
+        const longChangelog = 'a'.repeat(2049);
 
         await request(app)
           .put(route)

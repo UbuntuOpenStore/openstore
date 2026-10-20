@@ -47,6 +47,7 @@ type ManagePageProps = {
     charsTemplate: string;
     descriptionTooLong: string;
     textMaxLength: number;
+    changelogMaxLength: number;
     keywordsMaxCount: number;
     keywordsTooMany: string;
     keywordsHint: string;

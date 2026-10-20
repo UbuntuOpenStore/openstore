@@ -32,7 +32,7 @@ import {
   UNSUPPORTED_SCREENSHOT_TYPE,
   WRONG_PACKAGE,
 } from '../../utils/error-messages';
-import { DESCRIPTION_MAX_LENGTH, KEYWORDS_MAX_COUNT, TEXT_MAX_LENGTH } from '../../utils/limits';
+import { CHANGELOG_MAX_LENGTH, DESCRIPTION_MAX_LENGTH, KEYWORDS_MAX_COUNT, TEXT_MAX_LENGTH } from '../../utils/limits';
 import { type HydratedRatingCount } from '../rating_count/types';
 import { User } from '../user';
 import {
@@ -335,7 +335,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       if (asChangelogs.length > 0) {
         this.version_changelogs = asChangelogs.map(({ version, changelog }) => ({
           version,
-          changelog: changelog.slice(0, TEXT_MAX_LENGTH),
+          changelog: changelog.slice(0, CHANGELOG_MAX_LENGTH),
         }));
       }
 
@@ -440,7 +440,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         this.version_changelogs = parsedChangelogs
           .filter(({ version }) => isValidVersion(version))
           .map(({ version, changelog }) => {
-            validateMaxLength('Changelog', changelog, TEXT_MAX_LENGTH);
+            validateMaxLength('Changelog', changelog, CHANGELOG_MAX_LENGTH);
             return { version, changelog: sanitize(changelog) };
           });
       } catch (err) {
@@ -1163,7 +1163,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       const trimmedChangelog = changelog.trim();
       const updatedChangelog = this.changelog ? `${trimmedChangelog}\n\n${this.changelog}` : trimmedChangelog;
       this.changelog = sanitize(updatedChangelog);
-      const versionChangelog = sanitize(trimmedChangelog.slice(0, TEXT_MAX_LENGTH));
+      const versionChangelog = sanitize(trimmedChangelog.slice(0, CHANGELOG_MAX_LENGTH));
 
       if (!this.version_changelogs) {
         this.version_changelogs = [];

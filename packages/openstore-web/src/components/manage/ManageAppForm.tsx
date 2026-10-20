@@ -34,6 +34,7 @@ type ManageAppFormProps = {
     charsTemplate: string;
     descriptionTooLong: string;
     textMaxLength: number;
+    changelogMaxLength: number;
     keywordsMaxCount: number;
     keywordsTooMany: string;
     keywordsHint: string;
@@ -62,8 +63,8 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
     (key: string) => {
       const length = changelogLengths[key] ?? 0;
       return (
-        <p class={`mt-1 text-xs text-right ${length > messages.textMaxLength ? "text-red-500" : "text-gray-500"}`} aria-live="polite">
-          {messages.charsTemplate.replace("%{current}", String(length)).replace("%{max}", String(messages.textMaxLength))}
+        <p class={`mt-1 text-xs text-right ${length > messages.changelogMaxLength ? "text-red-500" : "text-gray-500"}`} aria-live="polite">
+          {messages.charsTemplate.replace("%{current}", String(length)).replace("%{max}", String(messages.changelogMaxLength))}
         </p>
       );
     },
@@ -317,7 +318,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                         name={`new_changelog_${entry.id}`}
                         class="form-input w-full resize-vertical"
                         rows={3}
-                        maxLength={messages.textMaxLength}
+                        maxLength={messages.changelogMaxLength}
                         placeholder="Enter changelog for this version..."
                         required
                         onInput={(e) =>
@@ -353,7 +354,7 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                           name={`version_changelogs[${versionChangelog.version}]`}
                           class="form-input w-full resize-vertical"
                           rows={3}
-                          maxLength={messages.textMaxLength}
+                          maxLength={messages.changelogMaxLength}
                           defaultValue={versionChangelog.changelog}
                           onInput={(e) =>
                             setChangelogLengths((prev) => ({

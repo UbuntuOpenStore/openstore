@@ -3,8 +3,11 @@
 /** Maximum allowed length of an app description. */
 export const DESCRIPTION_MAX_LENGTH = 3072;
 
-/** Maximum allowed length of the short app text fields (title, tag line, changelogs, keywords, and URLs). */
+/** Maximum allowed length of the short app text fields (title, tag line, keywords, and URLs). */
 export const TEXT_MAX_LENGTH = 1024;
+
+/** Maximum allowed length of a version changelog entry. */
+export const CHANGELOG_MAX_LENGTH = 2048;
 
 /** Maximum allowed number of keywords per app. */
 export const KEYWORDS_MAX_COUNT = 10;
