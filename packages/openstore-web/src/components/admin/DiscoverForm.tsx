@@ -1,46 +1,48 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { useState } from 'preact/hooks';
-import { type JSX } from 'preact';
-import { getClientApiKey } from '../../lib/utils';
-import SvgSpinner from '../icons/Spinner';
-import SvgCheck from '../icons/Check';
-import SvgClose from '../icons/Close';
-import { type AdminDiscoverData, type AdminHighlightData, type AdminCategoryData } from '../../lib/schema';
+import { useState } from "preact/hooks";
+import { type JSX } from "preact";
+import { getClientApiKey } from "../../lib/utils";
+import SvgSpinner from "../icons/Spinner";
+import SvgCheck from "../icons/Check";
+import SvgClose from "../icons/Close";
+import { type AdminDiscoverData, type AdminHighlightData, type AdminCategoryData } from "../../lib/schema";
 
 type DiscoverFormProps = {
   discoverData: AdminDiscoverData;
   onSuccess: (data: AdminDiscoverData) => void;
 };
 
+const parseAppIds = (raw: string): string[] =>
+  raw
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => id.length > 0);
+
 const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Element => {
-  const [highlights, setHighlights] = useState<AdminHighlightData[]>(
-    JSON.parse(JSON.stringify(discoverData.highlights))
-  );
-  const [categories, setCategories] = useState<AdminCategoryData[]>(
-    JSON.parse(JSON.stringify(discoverData.categories))
-  );
+  const [highlights, setHighlights] = useState<AdminHighlightData[]>(JSON.parse(JSON.stringify(discoverData.highlights)));
+  const [categories, setCategories] = useState<AdminCategoryData[]>(JSON.parse(JSON.stringify(discoverData.categories)));
+  // Raw text of each category's "App IDs" field. Kept separate from the parsed
+  // ids so typing spaces and commas is not immediately reformatted away.
+  const [categoryIdsText, setCategoryIdsText] = useState<string[]>(discoverData.categories.map((category) => category.ids.join(", ")));
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setSubmitting(true);
     setSuccess(false);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch(
-        `${import.meta.env.PUBLIC_API_URL}api/v4/admin/discover?apikey=${getClientApiKey()}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Source': 'openstore-web-next'
-          },
-          body: JSON.stringify({ highlights, categories })
-        }
-      );
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/admin/discover?apikey=${getClientApiKey()}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Source": "openstore-web-next",
+        },
+        body: JSON.stringify({ highlights, categories }),
+      });
 
       const data = await response.json();
 
@@ -48,14 +50,14 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
         setSuccess(true);
         onSuccess({
           highlights: data.data.highlights,
-          categories: data.data.categories
+          categories: data.data.categories,
         });
       } else {
-        setError(data.message || 'Failed to update discover data');
+        setError(data.message || "Failed to update discover data");
       }
     } catch (err) {
       console.error(err);
-      setError('Error updating discover data');
+      setError("Error updating discover data");
     } finally {
       setSubmitting(false);
     }
@@ -68,7 +70,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
   };
 
   const handleAddHighlight = () => {
-    setHighlights([...highlights, { id: '', description: '' }]);
+    setHighlights([...highlights, { id: "", description: "" }]);
   };
 
   const handleRemoveHighlight = (index: number) => {
@@ -76,35 +78,38 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
   };
 
   const handleCategoryChange = (index: number, field: keyof AdminCategoryData, value: string | string[]) => {
-    const newCategories = [...categories];
-    newCategories[index] = { ...newCategories[index], [field]: value };
-    setCategories(newCategories);
+    setCategories((prev) => {
+      const newCategories = [...prev];
+      newCategories[index] = { ...newCategories[index], [field]: value };
+      return newCategories;
+    });
   };
 
   const handleCategoryIdsChange = (index: number, value: string) => {
-    const ids = value.split(',').map(id => id.trim()).filter(id => id.length > 0);
-    handleCategoryChange(index, 'ids', ids);
+    setCategoryIdsText((prev) => {
+      const newText = [...prev];
+      newText[index] = value;
+      return newText;
+    });
+    handleCategoryChange(index, "ids", parseAppIds(value));
   };
 
   const handleAddCategory = () => {
-    setCategories([...categories, { name: '', tagline: '', referral: '', ids: [] }]);
+    setCategories([...categories, { name: "", tagline: "", referral: "", ids: [] }]);
+    setCategoryIdsText((prev) => [...prev, ""]);
   };
 
   const handleRemoveCategory = (index: number) => {
     setCategories(categories.filter((_, i) => i !== index));
+    setCategoryIdsText((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
     <form onSubmit={handleSubmit} class="space-y-8">
-
       <div>
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-semibold">Highlights</h3>
-          <button
-            type="button"
-            onClick={handleAddHighlight}
-            class="btn bg-ubuntu-orange text-white font-bold text-sm px-4 py-2"
-          >
+          <button type="button" onClick={handleAddHighlight} class="btn bg-ubuntu-orange text-white font-bold text-sm px-4 py-2">
             Add Highlight
           </button>
         </div>
@@ -114,11 +119,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
             <div key={index} class="border-2 border-gray-300 rounded-lg p-4">
               <div class="flex justify-between items-center mb-4">
                 <h4 class="text-lg font-medium">Highlight {index + 1}</h4>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveHighlight(index)}
-                  class="btn bg-red-500 text-white text-sm px-3 py-1"
-                >
+                <button type="button" onClick={() => handleRemoveHighlight(index)} class="btn bg-red-500 text-white text-sm px-3 py-1">
                   Remove
                 </button>
               </div>
@@ -132,7 +133,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
                     type="text"
                     required
                     value={highlight.id}
-                    onInput={(e) => handleHighlightChange(index, 'id', e.currentTarget.value)}
+                    onInput={(e) => handleHighlightChange(index, "id", e.currentTarget.value)}
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-ubuntu-orange"
                     placeholder="e.g., openstore.openstore-team"
                   />
@@ -145,7 +146,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
                   <textarea
                     required
                     value={highlight.description}
-                    onInput={(e) => handleHighlightChange(index, 'description', e.currentTarget.value)}
+                    onInput={(e) => handleHighlightChange(index, "description", e.currentTarget.value)}
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-ubuntu-orange"
                     rows={2}
                     placeholder="Description for the highlight"
@@ -160,11 +161,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
       <div>
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-semibold">Categories</h3>
-          <button
-            type="button"
-            onClick={handleAddCategory}
-            class="btn bg-ubuntu-orange text-white font-bold text-sm px-4 py-2"
-          >
+          <button type="button" onClick={handleAddCategory} class="btn bg-ubuntu-orange text-white font-bold text-sm px-4 py-2">
             Add Category
           </button>
         </div>
@@ -174,11 +171,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
             <div key={index} class="border-2 border-gray-300 rounded-lg p-4">
               <div class="flex justify-between items-center mb-4">
                 <h4 class="text-lg font-medium">Category {index + 1}</h4>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveCategory(index)}
-                  class="btn bg-red-500 text-white text-sm px-3 py-1"
-                >
+                <button type="button" onClick={() => handleRemoveCategory(index)} class="btn bg-red-500 text-white text-sm px-3 py-1">
                   Remove
                 </button>
               </div>
@@ -192,7 +185,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
                     type="text"
                     required
                     value={category.name}
-                    onInput={(e) => handleCategoryChange(index, 'name', e.currentTarget.value)}
+                    onInput={(e) => handleCategoryChange(index, "name", e.currentTarget.value)}
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-ubuntu-orange"
                     placeholder="e.g., Games"
                   />
@@ -206,20 +199,18 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
                     type="text"
                     required
                     value={category.tagline}
-                    onInput={(e) => handleCategoryChange(index, 'tagline', e.currentTarget.value)}
+                    onInput={(e) => handleCategoryChange(index, "tagline", e.currentTarget.value)}
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-ubuntu-orange"
                     placeholder="e.g., Fun and entertaining games"
                   />
                 </div>
 
                 <div>
-                  <label class="block text-sm font-medium mb-1">
-                    Referral URL
-                  </label>
+                  <label class="block text-sm font-medium mb-1">Referral URL</label>
                   <input
                     type="text"
                     value={category.referral}
-                    onInput={(e) => handleCategoryChange(index, 'referral', e.currentTarget.value)}
+                    onInput={(e) => handleCategoryChange(index, "referral", e.currentTarget.value)}
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-ubuntu-orange"
                     placeholder="Optional referral URL"
                   />
@@ -231,15 +222,13 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
                   </label>
                   <textarea
                     required
-                    value={category.ids.join(', ')}
+                    value={categoryIdsText[index] ?? category.ids.join(", ")}
                     onInput={(e) => handleCategoryIdsChange(index, e.currentTarget.value)}
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-ubuntu-orange"
                     rows={3}
                     placeholder="Comma-separated app IDs, e.g., app1.author, app2.author"
                   />
-                  <p class="text-sm text-gray-600 mt-1">
-                    Enter app IDs separated by commas
-                  </p>
+                  <p class="text-sm text-gray-600 mt-1">Enter app IDs separated by commas</p>
                 </div>
               </div>
             </div>
@@ -250,11 +239,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
       {/* Submit Button */}
       <section class="section flex gap-4 items-center mb-4">
         <div class="flex gap-2">
-          <button
-            type="submit"
-            disabled={submitting}
-            class="btn bg-ubuntu-orange text-white font-bold cursor-pointer"
-          >
+          <button type="submit" disabled={submitting} class="btn bg-ubuntu-orange text-white font-bold cursor-pointer">
             {submitting ? (
               <>
                 <SvgSpinner class="animate-spin ml-2" />
@@ -273,9 +258,7 @@ const DiscoverForm = ({ discoverData, onSuccess }: DiscoverFormProps): JSX.Eleme
             <SvgClose class="text-red-600" />
             <div>
               An error occurred:
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
           </div>
         )}
