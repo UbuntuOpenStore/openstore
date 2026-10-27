@@ -165,7 +165,7 @@ describe('PackageSearch', () => {
           2,
         );
         assert.equal(
-          search.convert((await factory.package({ id: 'a', name: 'T', calculated_rating: 50 })) as HydratedPackage).rating_bucket,
+          search.convert((await factory.package({ id: 'a2', name: 'T', calculated_rating: 50 })) as HydratedPackage).rating_bucket,
           3,
         );
         assert.equal(

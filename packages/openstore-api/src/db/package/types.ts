@@ -419,6 +419,7 @@ export interface IPackageMethods {
 export type HydratedPackage = HydratedDocument<IPackage, IPackageMethods>;
 
 export interface PackageModel extends Model<IPackage, unknown, IPackageMethods> {
+  createPackageKit: (id: string) => Promise<HydratedPackage>;
   incrementDownload: (id: Types.ObjectId, revisionIndex: number) => Promise<void>;
   stats: () => Promise<PackageStats>;
   categoryStats: (channels: Channel[], packageTypes?: PackageType[], lomiriCompatible?: boolean) => Promise<CategoryStat[]>;

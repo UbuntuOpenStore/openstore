@@ -10,22 +10,23 @@ import { Package } from '.';
 import '../index';
 import { UserError, ValidationError } from '../../exceptions';
 import { type TestPackage } from '../../tests/factory';
-import { closeMongoose, waitForMongoose } from '../../tests/utils';
+import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
 import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory } from '../../utils/appstream-helpers';
 import { config } from '../../utils/config';
-import { CHANGELOG_MAX_LENGTH, DESCRIPTION_MAX_LENGTH, TEXT_MAX_LENGTH } from '../../utils/limits';
+import { CHANGELOG_MAX_LENGTH, DESCRIPTION_MAX_LENGTH, PACKAGEKIT_NAME_MAX_LENGTH, TEXT_MAX_LENGTH } from '../../utils/limits';
 import { Ratings } from '../review/constants';
 import { serializeRatings } from './methods';
 import { Architecture, Channel, AppType, DEFAULT_CHANNEL, ChannelArchitecture, PackageType, SourceStore } from './types';
 
 describe('Package', () => {
+  after(async () => {
+    await closeMongoose();
+  });
+
   describe('publishing without revisions', () => {
     beforeEach(async () => {
       await waitForMongoose();
-    });
-
-    after(async () => {
-      await closeMongoose();
+      await cleanMongoose();
     });
 
     test('fails to save a published click package with no revisions', async () => {
@@ -1310,6 +1311,49 @@ describe('Package', () => {
       } finally {
         config.screenshot_dir = originalScreenshotDir;
         await fs.rm(tmpDir, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('createPackageKit', () => {
+    beforeEach(async () => {
+      await waitForMongoose();
+      await cleanMongoose();
+    });
+
+    test('creates a published packagekit package with the expected defaults', async () => {
+      const pkg = await Package.createPackageKit('packagekit.gimp');
+
+      assert.equal(pkg.id, 'packagekit.gimp');
+      assert.equal(pkg.name, 'gimp');
+      assert.equal(pkg.package_type, PackageType.PACKAGEKIT);
+      assert.equal(!!pkg.published, true);
+      assert.deepEqual(pkg.channel_architectures, [ChannelArchitecture.FOCAL_ALL]);
+      assert.equal(pkg.maintainer, null);
+      assert.equal(pkg.revisions.length, 0);
+      assert.equal(await Package.countDocuments({ id: 'packagekit.gimp' }), 1);
+    });
+
+    test('returns the existing package instead of failing on a duplicate', async () => {
+      const first = await Package.createPackageKit('packagekit.gimp');
+      const second = await Package.createPackageKit('packagekit.gimp');
+
+      assert.equal(second._id.toString(), first._id.toString());
+      assert.equal(await Package.countDocuments({ id: 'packagekit.gimp' }), 1);
+    });
+
+    test('rejects invalid ids', async () => {
+      const invalidIds = [
+        'packagekit.',
+        'packagekit.Invalid',
+        'packagekit.has space',
+        'something.else',
+        `packagekit.${'a'.repeat(PACKAGEKIT_NAME_MAX_LENGTH + 1)}`,
+      ];
+
+      for (const id of invalidIds) {
+        await assert.rejects(() => Package.createPackageKit(id), UserError);
+        assert.equal(await Package.findOneByFilters(id), null);
       }
     });
   });

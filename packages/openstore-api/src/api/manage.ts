@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 import multer from 'multer';
 
 import { type HydratedLock, Lock } from '../db/lock';
-import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package, PackageType, ChannelArchitecture } from '../db/package';
+import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package, PackageType, packageKitDefaults } from '../db/package';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { ReservedNamespace } from '../db/reserved_namespace';
 import { HttpError, UserError, ValidationError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
@@ -133,8 +133,7 @@ router.post(
     pkg.package_type = packageType;
 
     if (packageType === PackageType.PACKAGEKIT) {
-      pkg.published = true;
-      pkg.channel_architectures = [ChannelArchitecture.FOCAL_ALL];
+      Object.assign(pkg, packageKitDefaults());
     }
 
     if (

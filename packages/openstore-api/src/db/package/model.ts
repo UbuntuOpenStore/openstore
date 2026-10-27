@@ -62,7 +62,7 @@ const revisionSchema = new Schema<IRevision, RevisionModel>({
 });
 
 const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
-  id: { type: String, index: true },
+  id: { type: String, index: true, unique: true },
 
   // Presentation
   name: String,

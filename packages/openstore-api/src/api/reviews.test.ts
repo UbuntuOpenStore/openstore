@@ -7,7 +7,8 @@ import { type App } from 'supertest/types';
 
 import * as api from '.';
 import { Package } from '../db/package';
-import { Architecture, Channel, PackageType, SourceStore } from '../db/package/types';
+import { Architecture, Channel, ChannelArchitecture, PackageType, SourceStore } from '../db/package/types';
+import { RatingCount } from '../db/rating_count';
 import { recalculatePackageRatings } from '../db/rating_count/utils';
 import { Ratings, Review } from '../db/review';
 import factory, { type TestPackage, type TestUser } from '../tests/factory';
@@ -284,6 +285,94 @@ describe('Reviews', () => {
       assert.equal(review?.body, 'great app');
       assert.equal(review.version, '1.0.0');
       assert.equal(review.rating, 'THUMBS_UP');
+    });
+
+    describe('PackageKit packages', () => {
+      const packageKitRoute = (id: string) => `/api/v4/apps/${id}/reviews?apikey=${user1.apikey}`;
+
+      test('creates the package and review for an unknown packagekit id', async () => {
+        const res = await request(app)
+          .post(packageKitRoute('packagekit.unknown.app'))
+          .send({ body: 'great app', version: '1.2.3', rating: 'THUMBS_UP' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+
+        const pkg = await Package.findOneByFilters('packagekit.unknown.app');
+        assert.ok(pkg);
+        assert.equal(pkg.package_type, PackageType.PACKAGEKIT);
+        assert.equal(!!pkg.published, true);
+        assert.equal(pkg.maintainer, null);
+        assert.equal(pkg.name, 'unknown.app');
+        assert.deepEqual(pkg.channel_architectures, [ChannelArchitecture.FOCAL_ALL]);
+        assert.equal(pkg.revisions.length, 0);
+        assert.equal(pkg.calculated_rating, 1);
+
+        const review = await Review.findOne({ package_id: 'packagekit.unknown.app', user: user1._id });
+        assert.ok(review);
+        assert.equal(review.body, 'great app');
+        assert.equal(review.version, '1.2.3');
+        assert.equal(review.rating, 'THUMBS_UP');
+
+        const ratingCount = await RatingCount.findOne({ package_id: 'packagekit.unknown.app', name: Ratings.THUMBS_UP });
+        assert.equal(ratingCount?.count, 1);
+      });
+
+      test('does not create packages for unknown non-packagekit ids', async () => {
+        const res = await request(app)
+          .post(packageKitRoute('not.a.packagekit'))
+          .send({ body: 'great app', version: '1.2.3', rating: 'THUMBS_UP' })
+          .expect(404);
+
+        assert.equal(res.body.message, messages.APP_NOT_FOUND);
+        assert.equal(await Package.findOneByFilters('not.a.packagekit'), null);
+      });
+
+      test('rejects an invalid packagekit id without creating a package', async () => {
+        const res = await request(app)
+          .post(packageKitRoute('packagekit.Invalid'))
+          .send({ body: 'great app', version: '1.2.3', rating: 'THUMBS_UP' })
+          .expect(400);
+
+        assert.equal(res.body.message, messages.INVALID_PACKAGEKIT_ID);
+        assert.equal(await Package.findOneByFilters('packagekit.Invalid'), null);
+      });
+
+      test('creates exactly one package for concurrent first reviews', async () => {
+        const id = 'packagekit.concurrent.app';
+        const payload = { body: 'great app', version: '1.2.3', rating: 'THUMBS_UP' };
+
+        const [postRes, putRes] = await Promise.all([
+          request(app).post(packageKitRoute(id)).send(payload),
+          request(app).put(packageKitRoute(id)).send(payload),
+        ]);
+
+        assert.equal(postRes.status, 200);
+        assert.equal(putRes.status, 200);
+        assert.equal(await Package.countDocuments({ id }), 1);
+      });
+
+      test('accepts a free-form version for an existing PackageKit package', async () => {
+        await factory.package({
+          id: 'packagekit.existing',
+          name: 'Existing PackageKit',
+          package_type: PackageType.PACKAGEKIT,
+          published: true,
+          maintainer: user2._id.toString(),
+          channel_architectures: [ChannelArchitecture.FOCAL_ALL],
+          revisions: [],
+        });
+
+        const res = await request(app)
+          .post(packageKitRoute('packagekit.existing'))
+          .send({ body: 'great app', version: '1.2.3-ubuntu2', rating: 'HAPPY' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+
+        const review = await Review.findOne({ package_id: 'packagekit.existing', user: user1._id });
+        assert.equal(review?.version, '1.2.3-ubuntu2');
+      });
     });
   });
 

@@ -11,3 +11,6 @@ export const CHANGELOG_MAX_LENGTH = 2048;
 
 /** Maximum allowed number of keywords per app. */
 export const KEYWORDS_MAX_COUNT = 10;
+
+/** Maximum allowed length of the app name portion of a PackageKit package id (the part after `packagekit.`). */
+export const PACKAGEKIT_NAME_MAX_LENGTH = 128;

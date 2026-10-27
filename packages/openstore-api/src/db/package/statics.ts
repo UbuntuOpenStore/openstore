@@ -7,7 +7,8 @@ import { type FilterQuery, type Schema, type Types } from 'mongoose';
 import { UserError } from '../../exceptions';
 import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from '../../utils';
 import { handleChannel } from '../../utils/channels';
-import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH } from '../../utils/error-messages';
+import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH, INVALID_PACKAGEKIT_ID } from '../../utils/error-messages';
+import { PACKAGEKIT_NAME_MAX_LENGTH } from '../../utils/limits';
 
 const VALID_SORT_VALUES = new Set([
   'relevance',
@@ -21,13 +22,14 @@ const VALID_SORT_VALUES = new Set([
   '-updated_date',
 ]);
 import { RatingCount } from '../rating_count/model';
+import { packageKitDefaults, packageKitName, PACKAGEKIT_ID_REGEX } from './packagekit';
 import { packageSearchInstance } from './search-factory';
 import {
   Architecture,
   type PackageRequestFilters,
   type CategoryStat,
   Channel,
-  type ChannelArchitecture,
+  ChannelArchitecture,
   type PackageModel,
   type PackageStats,
   type IPackage,
@@ -37,6 +39,10 @@ import {
   PackageType,
   SnapChannel,
 } from './types';
+
+function isDuplicateKeyError(err: unknown): boolean {
+  return typeof err === 'object' && err !== null && (err as { code?: number }).code === 11000;
+}
 
 export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPackageMethods>) {
   packageSchema.statics.incrementDownload = async function (id: Types.ObjectId, revisionIndex: number) {
@@ -465,6 +471,51 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     }
     if (id.includes('lomiri')) {
       throw new UserError(BAD_NAMESPACE);
+    }
+  };
+
+  packageSchema.statics.createPackageKit = async function (id: string): Promise<HydratedPackage> {
+    if (packageKitName(id).length > PACKAGEKIT_NAME_MAX_LENGTH || !PACKAGEKIT_ID_REGEX.test(id)) {
+      throw new UserError(INVALID_PACKAGEKIT_ID);
+    }
+
+    this.checkRestrictedId(id);
+
+    // checkId rejects duplicate ids, but the caller may have raced another request
+    // that created the package in the meantime, in which case we reuse it.
+    try {
+      await this.checkId(id);
+    } catch (err) {
+      if (err instanceof UserError && err.message === DUPLICATE_PACKAGE) {
+        const existing = await this.findOneByFilters(id);
+        if (existing) {
+          return existing;
+        }
+      }
+
+      throw err;
+    }
+
+    const pkg = new this({
+      ...packageKitDefaults(),
+      id,
+      name: packageKitName(id),
+      maintainer: null,
+    });
+
+    try {
+      return await pkg.save();
+    } catch (err) {
+      // Another request created the package while we were inserting it. The unique
+      // index on `id` rejects our insert, so reuse the package that won the race.
+      if (isDuplicateKeyError(err)) {
+        const existing = await this.findOneByFilters(id);
+        if (existing) {
+          return existing;
+        }
+      }
+
+      throw err;
     }
   };
 }

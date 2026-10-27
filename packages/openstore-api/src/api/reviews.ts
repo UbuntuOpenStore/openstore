@@ -3,9 +3,10 @@
 import express, { type Request, type Response } from 'express';
 
 import '../db/comment';
+import { PackageType } from '../db/package/types';
 import { recalculatePackageRatings } from '../db/rating_count/utils';
 import { Review, RATINGS, REVIEW_MAX_LEN } from '../db/review';
-import { authenticate, anonymousAuthenticate, userRole, fetchPublishedPackage } from '../middleware';
+import { authenticate, anonymousAuthenticate, userRole, fetchPublishedPackage, fetchOrCreatePackage } from '../middleware';
 import { error, success, apiLinks, asyncErrorWrapper } from '../utils';
 import { PARAMETER_MISSING, REVIEW_TOO_LONG, INVALID_RATING, VERSION_NOT_FOUND, CANNOT_REVIEW_OWN_APP } from '../utils/error-messages';
 
@@ -53,7 +54,8 @@ async function upsertReview(req: Request, res: Response) {
     error(res, CANNOT_REVIEW_OWN_APP, 400);
     return;
   }
-  if (!req.pkg.revisions.find((revision) => revision.version === version)) {
+  // PackageKit packages have no revisions, so any non-empty version is accepted.
+  if (req.pkg.package_type !== PackageType.PACKAGEKIT && !req.pkg.revisions.find((revision) => revision.version === version)) {
     error(res, VERSION_NOT_FOUND, 404);
     return;
   }
@@ -76,14 +78,14 @@ router.post(
   '/',
   authenticate,
   userRole,
-  fetchPublishedPackage(),
+  fetchOrCreatePackage(),
   asyncErrorWrapper(upsertReview, 'There was an error posting your review, please try again later'),
 );
 router.put(
   '/',
   authenticate,
   userRole,
-  fetchPublishedPackage(),
+  fetchOrCreatePackage(),
   asyncErrorWrapper(upsertReview, 'There was an error posting your review, please try again later'),
 );
 
