@@ -93,43 +93,58 @@ export async function getCategoryApps<TApp>(
   frameworks: string[],
   packageTypes: PackageType[],
   serializeApp: (app: HydratedPackage) => TApp,
+  onlyWithApps = false,
 ): Promise<Array<{ name: string; tagline: string; referral: string; ids: string[]; apps: TApp[] }>> {
-  const filteredCategories = shuffle(categories).slice(0, 3);
+  const findCategoryApps = async (category: { ids: string[] }): Promise<HydratedPackage[]> => {
+    if (category.ids.length === 0) {
+      return [];
+    }
+
+    return Package.findByFilters({
+      ids: category.ids,
+      channel,
+      architectures: [architecture, Architecture.ALL],
+      frameworks,
+      published: true,
+      packageTypes,
+    });
+  };
+
+  let selectedCategories: Array<{ category: (typeof categories)[number]; apps: HydratedPackage[] }>;
+
+  if (onlyWithApps) {
+    // Determine which categories have apps for the current filters before
+    // choosing them so that we only return non-empty categories.
+    const categoriesWithApps = await Promise.all(
+      categories.map(async (category) => ({
+        category,
+        apps: await findCategoryApps(category),
+      })),
+    );
+    selectedCategories = shuffle(categoriesWithApps.filter(({ apps }) => apps.length > 0)).slice(0, 3);
+  } else {
+    selectedCategories = shuffle(categories)
+      .slice(0, 3)
+      .map((category) => ({ category, apps: [] as HydratedPackage[] }));
+  }
 
   const allCategories = [
     {
-      name: NEW_AND_UPDATED,
-      tagline: 'Exciting new apps & updates',
-      referral: '',
-      ids: [],
+      category: { name: NEW_AND_UPDATED, tagline: 'Exciting new apps & updates', referral: '', ids: [] },
+      apps: [] as HydratedPackage[],
     },
-    ...filteredCategories,
+    ...selectedCategories,
     {
-      name: POPULAR,
-      tagline: 'Apps with the highest ratings',
-      referral: '',
-      ids: [],
+      category: { name: POPULAR, tagline: 'Apps with the highest ratings', referral: '', ids: [] },
+      apps: [] as HydratedPackage[],
     },
   ];
 
   const discoverCategoriesApps = await Promise.all(
-    allCategories.map(async (category) => {
-      if (category.ids.length === 0) {
-        return [];
-      }
-
-      return Package.findByFilters({
-        ids: category.ids,
-        channel,
-        architectures: [architecture, Architecture.ALL],
-        frameworks,
-        published: true,
-        packageTypes,
-      });
-    }),
+    allCategories.map(async ({ category, apps }) => (apps.length > 0 ? apps : findCategoryApps(category))),
   );
 
-  return allCategories.map((category, index) => ({
+  return allCategories.map(({ category }, index) => ({
     name: category.name,
     tagline: category.tagline,
     referral: category.referral,

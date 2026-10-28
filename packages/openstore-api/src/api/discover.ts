@@ -149,7 +149,7 @@ v5Router.get(
 
       [discover.highlights, categories] = await Promise.all([
         getHighlights(discoverData.highlights, channel, architecture, frameworks, packageTypes, serializeHighlight),
-        getCategoryApps(discoverData.categories, channel, architecture, frameworks, packageTypes, serializeApp),
+        getCategoryApps(discoverData.categories, channel, architecture, frameworks, packageTypes, serializeApp, true),
       ]);
       await Promise.all([
         getNewAndUpdatedApps(categories, channel, architecture, frameworks, packageTypes, serializeApp),

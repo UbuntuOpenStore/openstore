@@ -274,6 +274,55 @@ describe('Discover API', () => {
     assert.ok(discoverAppIds(res2).includes('snap.firefox'));
   });
 
+  test('v5 only selects categories that have apps for the requested package type', async (t) => {
+    const snapPackage = {
+      published: true,
+      architectures: [Architecture.ALL],
+      channels: [Channel.FOCAL],
+      channel_architectures: [ChannelArchitecture.FOCAL_ALL],
+      device_compatibilities: [`${ChannelArchitecture.FOCAL_ALL}:ubuntu-sdk-20.04`],
+      published_date: new Date().toISOString(),
+      types: [AppType.APP],
+      package_type: PackageType.SNAP,
+      source_store: SourceStore.SNAPCRAFT,
+      snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
+      banner: 'test.svg',
+    };
+    const clickPackage = {
+      ...snapPackage,
+      package_type: PackageType.CLICK,
+      source_store: undefined,
+      snap_data: undefined,
+    };
+
+    await Promise.all([
+      factory.package({ ...snapPackage, id: 'snap.available' }),
+      factory.package({ ...clickPackage, id: 'click.only.1' }),
+      factory.package({ ...clickPackage, id: 'click.only.2' }),
+      factory.package({ ...clickPackage, id: 'click.only.3' }),
+    ]);
+
+    await Discover.updateDiscoverData(
+      [],
+      [
+        { name: 'Snap Category', tagline: 'Snap apps', referral: 'SnapCategory', ids: ['snap.available'] },
+        { name: 'Click Category 1', tagline: 'Click apps', referral: 'ClickCategory1', ids: ['click.only.1'] },
+        { name: 'Click Category 2', tagline: 'Click apps', referral: 'ClickCategory2', ids: ['click.only.2'] },
+        { name: 'Click Category 3', tagline: 'Click apps', referral: 'ClickCategory3', ids: ['click.only.3'] },
+      ],
+    );
+
+    // Make the category shuffle deterministic: with this RNG the first category
+    // is the one left out when only three of the four categories are picked.
+    t.mock.method(Math, 'random', () => 0);
+
+    const res = await request(app).get(`${v5Route}?package_types=${PackageType.SNAP}`).expect(200);
+
+    const categoryNames = res.body.data.categories.map((category: { name: string }) => category.name);
+    assert.ok(categoryNames.includes('Snap Category'));
+    assert.ok(!categoryNames.includes('Click Category 1'));
+  });
+
   test('v5 returns the minimal payload', async () => {
     const res = await request(app).get(v5Route).expect(200);
 
