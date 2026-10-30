@@ -19,7 +19,7 @@ reservedNamespaceSchema.method('serialize', function () {
 });
 
 reservedNamespaceSchema.static('findByNamespace', async function (namespace: string) {
-  return await this.findOne({ namespace });
+  return await this.findOne({ namespace }).collation({ locale: 'en', strength: 2 });
 });
 
 reservedNamespaceSchema.static('findAll', async function () {
@@ -31,8 +31,10 @@ reservedNamespaceSchema.static('findByOwnerId', async function (ownerId: string)
 });
 
 reservedNamespaceSchema.static('isPackageIdReserved', async function (packageId: string, userId?: string) {
+  const collation = { locale: 'en', strength: 2 };
+
   // First check for exact matches
-  const exactMatch = await this.findOne({ namespace: packageId, type: 'exact' }).exec();
+  const exactMatch = await this.findOne({ namespace: packageId, type: 'exact' }).collation(collation).exec();
   if (exactMatch) {
     const isOwner = userId && exactMatch.owner_id.toString() === userId;
 
@@ -54,7 +56,9 @@ reservedNamespaceSchema.static('isPackageIdReserved', async function (packageId:
     const wildcardMatch = await this.findOne({
       namespace: { $in: wildcardPatterns },
       type: 'wildcard',
-    }).exec();
+    })
+      .collation(collation)
+      .exec();
 
     if (wildcardMatch) {
       // Package ID is reserved by a wildcard match

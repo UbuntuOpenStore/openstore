@@ -405,11 +405,17 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
   packageSchema.statics.findOneByFilters = async function (
     id: string,
     filters: PackageRequestFilters = {},
+    caseInsensitive = false,
   ): Promise<HydratedPackage | null> {
     const query = this.parseFilters(filters);
     query.id = id;
 
-    const result = await this.findOne(query).populate('rating_counts');
+    const findQuery = this.findOne(query).populate('rating_counts');
+    if (caseInsensitive) {
+      findQuery.collation({ locale: 'en', strength: 2 });
+    }
+
+    const result = await findQuery;
     return result;
   };
 
@@ -450,26 +456,28 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       throw new UserError(NO_SPACES_NAME);
     }
 
-    const existing = await this.findOneByFilters(id);
+    const existing = await this.findOneByFilters(id, {}, true);
     if (existing) {
       throw new UserError(DUPLICATE_PACKAGE);
     }
   };
 
   packageSchema.statics.checkRestrictedId = function (id: string): void {
-    if (id.startsWith('com.ubuntu.') && !id.startsWith('com.ubuntu.developer.')) {
+    const lowerId = id.toLowerCase();
+
+    if (lowerId.startsWith('com.ubuntu.') && !lowerId.startsWith('com.ubuntu.developer.')) {
       throw new UserError(BAD_NAMESPACE);
     }
-    if (id.startsWith('com.canonical.')) {
+    if (lowerId.startsWith('com.canonical.')) {
       throw new UserError(BAD_NAMESPACE);
     }
-    if (id.includes('ubports')) {
+    if (lowerId.includes('ubports')) {
       throw new UserError(BAD_NAMESPACE);
     }
-    if (id.includes('openstore')) {
+    if (lowerId.includes('openstore')) {
       throw new UserError(BAD_NAMESPACE);
     }
-    if (id.includes('lomiri')) {
+    if (lowerId.includes('lomiri')) {
       throw new UserError(BAD_NAMESPACE);
     }
   };

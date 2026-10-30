@@ -425,6 +425,43 @@ describe('Manage', () => {
           assert.equal(res.body.data.published, false);
         });
 
+        test('lowercases click ids', async () => {
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'App.Mixed.Case', name: 'App Mixed Case', package_type: PackageType.CLICK })
+            .expect(200);
+
+          assert.ok(res.body.success);
+          assert.equal(res.body.data.id, 'app.mixed.case');
+          assert.ok(await Package.findOneByFilters('app.mixed.case'));
+        });
+
+        test('preserves the case of packagekit ids', async () => {
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'packagekit.MixedCase', name: 'App Mixed Case', package_type: PackageType.PACKAGEKIT })
+            .expect(200);
+
+          assert.ok(res.body.success);
+          assert.equal(res.body.data.id, 'packagekit.MixedCase');
+          assert.ok(await Package.findOneByFilters('packagekit.MixedCase'));
+        });
+
+        test('fails with an id that differs only in case from an existing package', async () => {
+          await request(app)
+            .post(route)
+            .send({ id: 'packagekit.org.wesnoth.wesnoth', name: 'Wesnoth', package_type: PackageType.PACKAGEKIT })
+            .expect(200);
+
+          const res = await request(app)
+            .post(route)
+            .send({ id: 'packagekit.org.wesnoth.Wesnoth', name: 'Wesnoth', package_type: PackageType.PACKAGEKIT })
+            .expect(400);
+
+          assert.equal(res.body.success, false);
+          assert.equal(res.body.message, messages.DUPLICATE_PACKAGE);
+        });
+
         test('does not add the package to the search index', async (t) => {
           const upsertSpy = t.mock.method(packageSearchInstance, 'upsert', mockSearchMethod);
 
@@ -587,6 +624,32 @@ describe('Manage', () => {
         assert.ok(res.body.message.includes('reserved by another user'));
       });
 
+      test('fails with an exact reserved namespace id that differs only in case', async () => {
+        await factory.reservedNamespace({
+          namespace: 'Reserved.Case.Test',
+          type: 'exact',
+          owner_id: user2._id,
+        });
+
+        const res = await request(app).post(route).send({ id: 'reserved.case.test', name: 'Reserved Case App' }).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.ok(res.body.message.includes('reserved by another user'));
+      });
+
+      test('fails with a wildcard reserved namespace id that differs only in case', async () => {
+        await factory.reservedNamespace({
+          namespace: '*.Reserved.Case.Wildcard',
+          type: 'wildcard',
+          owner_id: user2._id,
+        });
+
+        const res = await request(app).post(route).send({ id: 'app.reserved.case.wildcard', name: 'Reserved Case App' }).expect(403);
+
+        assert.equal(res.body.success, false);
+        assert.ok(res.body.message.includes('reserved by another user'));
+      });
+
       test('succeeds when using their own reserved namespace', async () => {
         // Create a namespace owned by the current user
         const userOwnedNamespace = await factory.reservedNamespace({
@@ -630,6 +693,14 @@ describe('Manage', () => {
         assert.equal(!!pkg.published, false);
         assert.equal(pkg.maintainer, user._id.toString());
         assert.equal(pkg.maintainer_name, user.name);
+      });
+
+      test('lowercases click ids', async () => {
+        const res = await request(app).post(route).send({ id: 'App.Mixed.Case', name: 'App Mixed Case' }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.id, 'app.mixed.case');
+        assert.ok(await Package.findOneByFilters('app.mixed.case'));
       });
 
       test('ignores a package_type and creates a click package', async () => {

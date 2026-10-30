@@ -433,7 +433,7 @@ export interface PackageModel extends Model<IPackage, unknown, IPackageMethods> 
     skip?: number,
     textSearch?: boolean,
   ) => Promise<HydratedPackage[]>;
-  findOneByFilters: (id: string, filters?: PackageRequestFilters) => Promise<HydratedPackage | null>;
+  findOneByFilters: (id: string, filters?: PackageRequestFilters, caseInsensitive?: boolean) => Promise<HydratedPackage | null>;
   searchByFilters: (filters: PackageRequestFilters, full: boolean) => Promise<{ pkgs: HydratedPackage[]; count: number }>;
   checkId: (id: string) => Promise<void>;
   checkRestrictedId: (id: string) => void;

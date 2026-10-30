@@ -1315,6 +1315,20 @@ describe('Package', () => {
     });
   });
 
+  describe('checkRestrictedId', () => {
+    test('rejects restricted namespaces case insensitively', () => {
+      const ids = ['com.ubuntu.App', 'com.canonical.App', 'UBPORTS.app', 'OpenStore.app', 'Lomiri.app'];
+
+      for (const id of ids) {
+        assert.throws(() => Package.checkRestrictedId(id), UserError);
+      }
+    });
+
+    test('allows com.ubuntu.developer ids case insensitively', () => {
+      assert.doesNotThrow(() => Package.checkRestrictedId('com.ubuntu.developer.App'));
+    });
+  });
+
   describe('createPackageKit', () => {
     beforeEach(async () => {
       await waitForMongoose();
@@ -1345,7 +1359,6 @@ describe('Package', () => {
     test('rejects invalid ids', async () => {
       const invalidIds = [
         'packagekit.',
-        'packagekit.Invalid',
         'packagekit.has space',
         'something.else',
         `packagekit.${'a'.repeat(PACKAGEKIT_NAME_MAX_LENGTH + 1)}`,
@@ -1355,6 +1368,22 @@ describe('Package', () => {
         await assert.rejects(() => Package.createPackageKit(id), UserError);
         assert.equal(await Package.findOneByFilters(id), null);
       }
+    });
+
+    test('preserves the case of the id', async () => {
+      const pkg = await Package.createPackageKit('packagekit.Gimp');
+
+      assert.equal(pkg.id, 'packagekit.Gimp');
+      assert.equal(pkg.name, 'Gimp');
+      assert.equal((await Package.findOneByFilters('packagekit.Gimp'))?.id, 'packagekit.Gimp');
+    });
+
+    test('rejects ids differing only in case', async () => {
+      await Package.createPackageKit('packagekit.gimp');
+
+      await assert.rejects(() => Package.createPackageKit('packagekit.Gimp'), UserError);
+      assert.equal(await Package.countDocuments({ id: 'packagekit.gimp' }), 1);
+      assert.equal(await Package.countDocuments({ id: 'packagekit.Gimp' }), 0);
     });
   });
 });

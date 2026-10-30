@@ -328,14 +328,39 @@ describe('Reviews', () => {
         assert.equal(await Package.findOneByFilters('not.a.packagekit'), null);
       });
 
-      test('rejects an invalid packagekit id without creating a package', async () => {
+      test('accepts a packagekit id with upper case letters', async () => {
         const res = await request(app)
           .post(packageKitRoute('packagekit.Invalid'))
           .send({ body: 'great app', version: '1.2.3', rating: 'THUMBS_UP' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+
+        const pkg = await Package.findOneByFilters('packagekit.Invalid');
+        assert.ok(pkg);
+        assert.equal(pkg.id, 'packagekit.Invalid');
+        assert.equal(pkg.package_type, PackageType.PACKAGEKIT);
+      });
+
+      test('rejects an existing package whose id differs only in case', async () => {
+        await factory.package({
+          id: 'packagekit.org.wesnoth.wesnoth',
+          name: 'Wesnoth',
+          package_type: PackageType.PACKAGEKIT,
+          published: true,
+          maintainer: user2._id.toString(),
+          channel_architectures: [ChannelArchitecture.FOCAL_ALL],
+          revisions: [],
+        });
+
+        const res = await request(app)
+          .post(packageKitRoute('packagekit.org.wesnoth.Wesnoth'))
+          .send({ body: 'great app', version: '1.2.3', rating: 'THUMBS_UP' })
           .expect(400);
 
-        assert.equal(res.body.message, messages.INVALID_PACKAGEKIT_ID);
-        assert.equal(await Package.findOneByFilters('packagekit.Invalid'), null);
+        assert.equal(res.body.message, messages.DUPLICATE_PACKAGE);
+        assert.equal(await Package.countDocuments({ id: 'packagekit.org.wesnoth.Wesnoth' }), 0);
+        assert.equal(await Review.findOne({ package_id: 'packagekit.org.wesnoth.wesnoth', user: user1._id }), null);
       });
 
       test('creates exactly one package for concurrent first reviews', async () => {

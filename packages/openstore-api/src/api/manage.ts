@@ -101,7 +101,6 @@ router.post(
     if (name.length > TEXT_MAX_LENGTH) {
       throw new ValidationError(`Title must be ${TEXT_MAX_LENGTH} characters or less`);
     }
-    const id = req.body.id.toLowerCase().trim();
 
     if (!req.isAdminUser && req.body) {
       delete req.body.package_type;
@@ -117,6 +116,10 @@ router.post(
 
       packageType = requestedPackageType;
     }
+
+    // Click ids must be lowercase. Other package types are case sensitive and
+    // keep the case provided by the caller.
+    const id = packageType === PackageType.CLICK ? req.body.id.trim().toLowerCase() : req.body.id.trim();
 
     await validateNamespace(id, req.user!._id.toString(), !!req.isAdminUser);
 
