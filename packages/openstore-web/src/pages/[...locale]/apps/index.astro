@@ -59,6 +59,10 @@ await initializeI18N(Astro.currentLocale);
         currentLocale={Astro.currentLocale}
         client:only="preact"
       />
+
+      <noscript>
+        <p class="text-xl">{t("This feature requires JavaScript")}</p>
+      </noscript>
     </div>
   </section>
 </BaseLayout>

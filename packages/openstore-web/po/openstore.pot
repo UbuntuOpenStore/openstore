@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-10-16T20:25:41.783Z\n"
-"PO-Revision-Date: 2026-10-16T20:25:41.787Z\n"
+"POT-Creation-Date: 2026-11-04T19:20:28.823Z\n"
+"PO-Revision-Date: 2026-11-04T19:20:28.823Z\n"
 
 msgid "Report an Issue"
 msgstr "Report an Issue"
@@ -829,6 +829,9 @@ msgstr "Latest Update"
 
 msgid "Oldest Update"
 msgstr "Oldest Update"
+
+msgid "This feature requires JavaScript"
+msgstr "This feature requires JavaScript"
 
 msgid "Badge"
 msgstr "Badge"
