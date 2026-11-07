@@ -10,7 +10,7 @@ import { type HydratedLock, Lock } from '../db/lock';
 import { DEFAULT_CHANNEL, DEPRECATED_CHANNELS, Package, PackageType, packageKitDefaults } from '../db/package';
 import { packageSearchInstance } from '../db/package/search-factory';
 import { ReservedNamespace } from '../db/reserved_namespace';
-import { HttpError, UserError, ValidationError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
+import { HttpError, UserError, AuthorizationError, NotFoundError, ClickReviewError } from '../exceptions';
 import {
   authenticate,
   userRole,
@@ -29,19 +29,17 @@ import {
   BAD_FILE,
   NO_FILE,
   NO_REVISIONS,
-  NO_APP_NAME,
-  NO_APP_TITLE,
   APP_HAS_REVISIONS,
   APP_LOCKED,
   NEEDS_MANUAL_REVIEW,
   CLICK_REVIEW_ERROR,
   INVALID_CHANNEL,
-  INVALID_PACKAGE_TYPE,
+  NO_LICENSE_SPECIFIED,
   INVALID_APP_ID_PREFIX,
 } from '../utils/error-messages';
-import { TEXT_MAX_LENGTH } from '../utils/limits';
 import { clickReview } from '../utils/review-package';
 import { validateNamespace } from '../utils/validate-namespace';
+import { createAdminAppSchema, createAppSchema } from './manage.schema';
 
 const mupload = multer({ dest: '/tmp' });
 const router = express.Router();
@@ -87,39 +85,24 @@ router.post(
   userRole,
   downloadFile,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    if (!req.body || !req.body.id || !req.body.id.trim()) {
-      error(res, NO_APP_NAME, 400);
+    const body = { ...req.body };
+    if (!req.isAdminUser) {
+      delete body.package_type;
+    }
+
+    const schema = req.isAdminUser ? createAdminAppSchema : createAppSchema;
+    const validation = schema.safeParse(body);
+    if (!validation.success) {
+      error(res, validation.error.issues[0].message, 400);
       return;
     }
 
-    if (!req.body.name || !req.body.name.trim()) {
-      error(res, NO_APP_TITLE, 400);
-      return;
-    }
-
-    const name = req.body.name.trim();
-    if (name.length > TEXT_MAX_LENGTH) {
-      throw new ValidationError(`Title must be ${TEXT_MAX_LENGTH} characters or less`);
-    }
-
-    if (!req.isAdminUser && req.body) {
-      delete req.body.package_type;
-    }
-
-    let packageType = PackageType.CLICK;
-    const requestedPackageType = req.body.package_type;
-    if (requestedPackageType) {
-      if (!Object.values(PackageType).includes(requestedPackageType)) {
-        error(res, INVALID_PACKAGE_TYPE, 400);
-        return;
-      }
-
-      packageType = requestedPackageType;
-    }
+    const { id: requestedId, name, license, source } = validation.data;
+    const packageType = validation.data.package_type ?? PackageType.CLICK;
 
     // Click ids must be lowercase. Other package types are case sensitive and
     // keep the case provided by the caller.
-    const id = packageType === PackageType.CLICK ? req.body.id.trim().toLowerCase() : req.body.id.trim();
+    const id = packageType === PackageType.CLICK ? requestedId.toLowerCase() : requestedId;
 
     await validateNamespace(id, req.user!._id.toString(), !!req.isAdminUser);
 
@@ -134,6 +117,8 @@ router.post(
     pkg.maintainer = req.user!._id.toString();
     pkg.maintainer_name = req.user!.name ? req.user!.name : req.user!.username;
     pkg.package_type = packageType;
+    pkg.license = license;
+    pkg.source = source;
 
     if (packageType === PackageType.PACKAGEKIT) {
       Object.assign(pkg, packageKitDefaults());
@@ -185,6 +170,13 @@ router.put(
       delete req.body.locked;
       delete req.body.type_override;
       delete req.body.desktop_names_override;
+    }
+
+    const existingLicense = req.pkg.license?.trim() ?? '';
+    const license = typeof req.body.license === 'string' ? req.body.license.trim() : '';
+    if (!existingLicense && !license) {
+      error(res, NO_LICENSE_SPECIFIED, 400);
+      return;
     }
 
     const published = req.body.published === 'true' || req.body.published === true || req.body.published === 'on';

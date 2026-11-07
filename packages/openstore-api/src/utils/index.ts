@@ -3,6 +3,7 @@ export * from './api-links';
 export * from './checksum';
 export * from './click-parser-async';
 export * from './limits';
+export * from './licenses';
 export * from './logger';
 export * from './review-package';
 export * from './translations';

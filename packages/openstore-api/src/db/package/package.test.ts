@@ -990,6 +990,23 @@ describe('Package', () => {
     });
   });
 
+  describe('license validation', () => {
+    test('updateFromBody accepts a known license', async () => {
+      const pkg = new Package({ id: 'app.license', name: 'App License' });
+
+      await pkg.updateFromBody({ license: 'GNU GPL v3' });
+
+      assert.equal(pkg.license, 'GNU GPL v3');
+    });
+
+    test('updateFromBody rejects an unknown license', async () => {
+      const pkg = new Package({ id: 'app.license', name: 'App License' });
+
+      await assert.rejects(() => pkg.updateFromBody({ license: 'not-a-license' }), ValidationError);
+      assert.equal(pkg.license, undefined);
+    });
+  });
+
   describe('text field limits', () => {
     test('updateFromBody rejects text fields that exceed the limits', async () => {
       const pkg = new Package({ id: 'app.limitcheck', name: 'App' });

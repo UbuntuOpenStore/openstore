@@ -46,6 +46,8 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [screenshots, setScreenshots] = useState(app.screenshots);
+  const [license, setLicense] = useState(app.license || "");
+  const requiresSource = license !== "" && license.toLowerCase() !== "proprietary";
   const [newVersionChangelogs, setNewVersionChangelogs] = useState<Array<{ id: number; version: string; changelog: string }>>([]);
   const [removedVersions, setRemovedVersions] = useState<Set<string>>(new Set());
   const [confirmRemoveVersion, setConfirmRemoveVersion] = useState<string | null>(null);
@@ -239,11 +241,18 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="license" class="form-label">
               License
             </label>
-            <select id="license" name="license" class="form-input">
-              <option value="">License</option>
-              {LICENSES.map((license) => (
-                <option value={license} selected={app.license === license}>
-                  {license}
+            <select
+              id="license"
+              name="license"
+              class="form-input"
+              required
+              value={license}
+              onChange={(e) => setLicense((e.currentTarget as HTMLSelectElement).value)}
+            >
+              <option value="" disabled></option>
+              {LICENSES.map((licenseOption) => (
+                <option key={licenseOption} value={licenseOption}>
+                  {licenseOption}
                 </option>
               ))}
             </select>
@@ -499,7 +508,15 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
             <label for="source" class="form-label">
               Source URL
             </label>
-            <input id="source" name="source" type="url" value={app.source} maxLength={messages.textMaxLength} class="form-input" />
+            <input
+              id="source"
+              name="source"
+              type="url"
+              value={app.source}
+              maxLength={messages.textMaxLength}
+              required={requiresSource}
+              class="form-input"
+            />
           </div>
 
           <div class="form-group">

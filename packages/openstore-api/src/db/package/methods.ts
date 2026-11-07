@@ -10,7 +10,7 @@ import { type Schema } from 'mongoose';
 import { z } from 'zod';
 
 import { UserError, ValidationError } from '../../exceptions';
-import { sanitize, type ClickParserData, config, moveFile, sha512Checksum } from '../../utils';
+import { sanitize, type ClickParserData, config, isValidLicense, moveFile, sha512Checksum } from '../../utils';
 import {
   getAppstreamLocalizedString,
   mapSpdxLicense,
@@ -22,6 +22,7 @@ import { compressImage } from '../../utils/compress';
 import { compareVersions, isValidVersion } from '../../utils/dpkg-compare-versions';
 import {
   EXISTING_VERSION,
+  INVALID_LICENSE,
   INVALID_VERSION,
   MALFORMED_MANIFEST,
   MISMATCHED_FRAMEWORK,
@@ -427,7 +428,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
     validateMaxLength('Title', body.name, TEXT_MAX_LENGTH);
     this.name = body.name ? body.name : this.name;
     this.category = body.category ?? this.category;
-    this.license = body.license ?? this.license;
+    if (body.license !== undefined) {
+      if (!isValidLicense(body.license)) {
+        throw new ValidationError(INVALID_LICENSE);
+      }
+      this.license = body.license;
+    }
     this.changelog = sanitize(body.changelog ?? this.changelog ?? '');
 
     if (body.version_changelogs) {

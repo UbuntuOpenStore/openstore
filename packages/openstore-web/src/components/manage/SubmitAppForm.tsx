@@ -4,6 +4,7 @@ import SvgSpinner from "../icons/Spinner";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
 import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
+import { LICENSES } from "@/lib/constants";
 
 const SubmitAppForm = ({
   currentLocale,
@@ -14,6 +15,8 @@ const SubmitAppForm = ({
     appName: string;
     appNameDescription: string;
     appTitle: string;
+    license: string;
+    sourceUrl: string;
     submitApp: string;
     save: string;
     failedToUpdateApp: string;
@@ -24,6 +27,8 @@ const SubmitAppForm = ({
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [license, setLicense] = useState("");
+  const requiresSource = license !== "" && license.toLowerCase() !== "proprietary";
 
   const [initialValues] = useState(() => {
     const params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
@@ -49,6 +54,8 @@ const SubmitAppForm = ({
         body: JSON.stringify({
           id: formData.get("id"),
           name: formData.get("name"),
+          license: formData.get("license"),
+          source: formData.get("source"),
         }),
         headers: {
           "Content-Type": "application/json",
@@ -105,6 +112,34 @@ const SubmitAppForm = ({
             {messages.appTitle}
           </label>
           <input id="name" name="name" type="text" required class="form-input" defaultValue={initialValues.name} />
+        </div>
+
+        <div class="form-group">
+          <label for="license" class="form-label">
+            {messages.license}
+          </label>
+          <select
+            id="license"
+            name="license"
+            class="form-input"
+            required
+            value={license}
+            onChange={(e) => setLicense((e.currentTarget as HTMLSelectElement).value)}
+          >
+            <option value="" disabled></option>
+            {LICENSES.map((licenseOption) => (
+              <option key={licenseOption} value={licenseOption}>
+                {licenseOption}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="source" class="form-label">
+            {messages.sourceUrl}
+          </label>
+          <input id="source" name="source" type="url" required={requiresSource} class="form-input" />
         </div>
       </section>
 

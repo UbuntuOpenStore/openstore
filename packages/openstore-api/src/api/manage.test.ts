@@ -324,37 +324,51 @@ describe('Manage', () => {
       });
 
       test('succeeds with a com.ubuntu id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.ubuntu.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'com.ubuntu.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a com.canonical id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.canonical.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'com.canonical.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a ubports id', async () => {
-        const res = await request(app).post(route).send({ id: 'ubports.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'ubports.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a openstore id', async () => {
-        const res = await request(app).post(route).send({ id: 'OpenStore.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'OpenStore.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a lomiri id', async () => {
-        const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'lomiri.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
+      test('creates a package without a license', async () => {
+        const res = await request(app).post(route).send({ id: 'app.admin.no.license', name: 'App Admin No License' }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.license, 'Proprietary');
+
+        const pkg = await Package.findOneByFilters('app.admin.no.license');
+        assert.ok(pkg);
+        assert.equal(pkg.license, undefined);
+      });
+
       test('succeeds with an exact reserved namespace id', async () => {
-        const res = await request(app).post(route).send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' }).expect(200);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: exactReservedNamespace.namespace, name: 'Reserved Exact App' })
+          .expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, exactReservedNamespace.namespace);
@@ -362,7 +376,10 @@ describe('Manage', () => {
 
       test('succeeds with a wildcard reserved namespace id', async () => {
         const packageId = `app.${wildcardReservedNamespace.namespace.substring(2)}`;
-        const res = await request(app).post(route).send({ id: packageId, name: 'Reserved Wildcard App' }).expect(200);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: packageId, name: 'Reserved Wildcard App' })
+          .expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, packageId);
@@ -372,7 +389,7 @@ describe('Manage', () => {
         test('creates a packagekit package with the expected defaults', async () => {
           const res = await request(app)
             .post(route)
-            .send({ id: 'packagekit.app', name: 'App Packagekit', package_type: PackageType.PACKAGEKIT })
+            .send({ license: 'GNU GPL v3', id: 'packagekit.app', name: 'App Packagekit', package_type: PackageType.PACKAGEKIT })
             .expect(200);
 
           assert.ok(res.body.success);
@@ -391,7 +408,7 @@ describe('Manage', () => {
         test('fails without a packagekit. id prefix', async () => {
           const res = await request(app)
             .post(route)
-            .send({ id: 'app.packagekit', name: 'App Packagekit', package_type: PackageType.PACKAGEKIT })
+            .send({ license: 'GNU GPL v3', id: 'app.packagekit', name: 'App Packagekit', package_type: PackageType.PACKAGEKIT })
             .expect(400);
 
           assert.equal(res.body.success, false);
@@ -399,14 +416,17 @@ describe('Manage', () => {
         });
 
         test('fails without a snap. id prefix', async () => {
-          const res = await request(app).post(route).send({ id: 'app.snap', name: 'App Snap', package_type: PackageType.SNAP }).expect(400);
+          const res = await request(app)
+            .post(route)
+            .send({ license: 'GNU GPL v3', id: 'app.snap', name: 'App Snap', package_type: PackageType.SNAP })
+            .expect(400);
 
           assert.equal(res.body.success, false);
           assert.equal(res.body.message, messages.INVALID_APP_ID_PREFIX);
         });
 
         test('defaults to a click package when package_type is not provided', async () => {
-          const res = await request(app).post(route).send({ id: 'app.default', name: 'App Default' }).expect(200);
+          const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'app.default', name: 'App Default' }).expect(200);
 
           assert.ok(res.body.success);
           assert.equal(res.body.data.package_type, PackageType.CLICK);
@@ -417,7 +437,7 @@ describe('Manage', () => {
         test('can explicitly create a click package', async () => {
           const res = await request(app)
             .post(route)
-            .send({ id: 'app.explicit.click', name: 'App Explicit Click', package_type: PackageType.CLICK })
+            .send({ license: 'GNU GPL v3', id: 'app.explicit.click', name: 'App Explicit Click', package_type: PackageType.CLICK })
             .expect(200);
 
           assert.ok(res.body.success);
@@ -428,7 +448,7 @@ describe('Manage', () => {
         test('lowercases click ids', async () => {
           const res = await request(app)
             .post(route)
-            .send({ id: 'App.Mixed.Case', name: 'App Mixed Case', package_type: PackageType.CLICK })
+            .send({ license: 'GNU GPL v3', id: 'App.Mixed.Case', name: 'App Mixed Case', package_type: PackageType.CLICK })
             .expect(200);
 
           assert.ok(res.body.success);
@@ -439,7 +459,7 @@ describe('Manage', () => {
         test('preserves the case of packagekit ids', async () => {
           const res = await request(app)
             .post(route)
-            .send({ id: 'packagekit.MixedCase', name: 'App Mixed Case', package_type: PackageType.PACKAGEKIT })
+            .send({ license: 'GNU GPL v3', id: 'packagekit.MixedCase', name: 'App Mixed Case', package_type: PackageType.PACKAGEKIT })
             .expect(200);
 
           assert.ok(res.body.success);
@@ -450,12 +470,12 @@ describe('Manage', () => {
         test('fails with an id that differs only in case from an existing package', async () => {
           await request(app)
             .post(route)
-            .send({ id: 'packagekit.org.wesnoth.wesnoth', name: 'Wesnoth', package_type: PackageType.PACKAGEKIT })
+            .send({ license: 'GNU GPL v3', id: 'packagekit.org.wesnoth.wesnoth', name: 'Wesnoth', package_type: PackageType.PACKAGEKIT })
             .expect(200);
 
           const res = await request(app)
             .post(route)
-            .send({ id: 'packagekit.org.wesnoth.Wesnoth', name: 'Wesnoth', package_type: PackageType.PACKAGEKIT })
+            .send({ license: 'GNU GPL v3', id: 'packagekit.org.wesnoth.Wesnoth', name: 'Wesnoth', package_type: PackageType.PACKAGEKIT })
             .expect(400);
 
           assert.equal(res.body.success, false);
@@ -467,7 +487,7 @@ describe('Manage', () => {
 
           await request(app)
             .post(route)
-            .send({ id: 'packagekit.app.unindexed', name: 'App Unindexed', package_type: PackageType.PACKAGEKIT })
+            .send({ license: 'GNU GPL v3', id: 'packagekit.app.unindexed', name: 'App Unindexed', package_type: PackageType.PACKAGEKIT })
             .expect(200);
 
           assert.equal(upsertSpy.mock.callCount(), 0);
@@ -476,7 +496,7 @@ describe('Manage', () => {
         test('fails with an unknown package_type', async () => {
           const res = await request(app)
             .post(route)
-            .send({ id: 'app.bad.type', name: 'App Bad Type', package_type: 'not-a-real-type' })
+            .send({ license: 'GNU GPL v3', id: 'app.bad.type', name: 'App Bad Type', package_type: 'not-a-real-type' })
             .expect(400);
 
           assert.equal(res.body.success, false);
@@ -492,31 +512,31 @@ describe('Manage', () => {
       });
 
       test('succeeds with a com.ubuntu id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.ubuntu.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'com.ubuntu.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a com.canonical id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.canonical.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'com.canonical.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a ubports id', async () => {
-        const res = await request(app).post(route).send({ id: 'ubports.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'ubports.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a openstore id', async () => {
-        const res = await request(app).post(route).send({ id: 'OpenStore.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'OpenStore.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('succeeds with a lomiri id', async () => {
-        const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'lomiri.app', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
       });
@@ -524,7 +544,7 @@ describe('Manage', () => {
       test('ignores a package_type and creates a click package', async () => {
         const res = await request(app)
           .post(route)
-          .send({ id: 'app.trusted.packagekit', name: 'App Dev', package_type: PackageType.PACKAGEKIT })
+          .send({ license: 'GNU GPL v3', id: 'app.trusted.packagekit', name: 'App Dev', package_type: PackageType.PACKAGEKIT })
           .expect(200);
 
         assert.ok(res.body.success);
@@ -548,69 +568,102 @@ describe('Manage', () => {
       });
 
       test('fails with no name', async () => {
-        const res = await request(app).post(route).send({ id: 'app.dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'app.dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.NO_APP_TITLE);
       });
 
+      test('fails without a license', async () => {
+        const res = await request(app).post(route).send({ id: 'app.no.license', name: 'App No License' }).expect(400);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.NO_LICENSE_SPECIFIED);
+        assert.equal(await Package.findOneByFilters('app.no.license'), null);
+      });
+
+      test('fails with an empty license', async () => {
+        const res = await request(app).post(route).send({ license: '', id: 'app.empty.license', name: 'App Empty License' }).expect(400);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.NO_LICENSE_SPECIFIED);
+        assert.equal(await Package.findOneByFilters('app.empty.license'), null);
+      });
+
+      test('fails with an invalid license', async () => {
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'not-a-license', id: 'app.invalid.license', name: 'App Invalid License' })
+          .expect(400);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.INVALID_LICENSE);
+        assert.equal(await Package.findOneByFilters('app.invalid.license'), null);
+      });
+
       test('fails with spaces in the id', async () => {
-        const res = await request(app).post(route).send({ id: 'app dev', name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'app dev', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.NO_SPACES_NAME);
       });
 
       test('fails with a duplicate id', async () => {
-        const res = await request(app).post(route).send({ id: package1.id, name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: package1.id, name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.DUPLICATE_PACKAGE);
       });
 
       test('fails with a com.ubuntu id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.ubuntu.app', name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'com.ubuntu.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a com.canonical id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.canonical.app', name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'com.canonical.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a ubports id', async () => {
-        const res = await request(app).post(route).send({ id: 'ubports.app', name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'ubports.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a openstore id', async () => {
-        const res = await request(app).post(route).send({ id: 'OpenStore.app', name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'OpenStore.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('fails with a lomiri id', async () => {
-        const res = await request(app).post(route).send({ id: 'lomiri.app', name: 'App Dev' }).expect(400);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'lomiri.app', name: 'App Dev' }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.BAD_NAMESPACE);
       });
 
       test('succeeds with a com.ubuntu.developer id', async () => {
-        const res = await request(app).post(route).send({ id: 'com.ubuntu.developer.app', name: 'App Dev' }).expect(200);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: 'com.ubuntu.developer.app', name: 'App Dev' })
+          .expect(200);
 
         assert.ok(res.body.success);
       });
 
       test('fails with an exact reserved namespace id', async () => {
-        const res = await request(app).post(route).send({ id: exactReservedNamespace.namespace, name: 'Reserved Exact App' }).expect(403);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: exactReservedNamespace.namespace, name: 'Reserved Exact App' })
+          .expect(403);
 
         assert.equal(res.body.success, false);
         assert.ok(res.body.message.includes('reserved by another user'));
@@ -618,7 +671,10 @@ describe('Manage', () => {
 
       test('fails with a wildcard reserved namespace id', async () => {
         const packageId = `app.${wildcardReservedNamespace.namespace.substring(2)}`;
-        const res = await request(app).post(route).send({ id: packageId, name: 'Reserved Wildcard App' }).expect(403);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: packageId, name: 'Reserved Wildcard App' })
+          .expect(403);
 
         assert.equal(res.body.success, false);
         assert.ok(res.body.message.includes('reserved by another user'));
@@ -631,7 +687,10 @@ describe('Manage', () => {
           owner_id: user2._id,
         });
 
-        const res = await request(app).post(route).send({ id: 'reserved.case.test', name: 'Reserved Case App' }).expect(403);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: 'reserved.case.test', name: 'Reserved Case App' })
+          .expect(403);
 
         assert.equal(res.body.success, false);
         assert.ok(res.body.message.includes('reserved by another user'));
@@ -644,7 +703,10 @@ describe('Manage', () => {
           owner_id: user2._id,
         });
 
-        const res = await request(app).post(route).send({ id: 'app.reserved.case.wildcard', name: 'Reserved Case App' }).expect(403);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: 'app.reserved.case.wildcard', name: 'Reserved Case App' })
+          .expect(403);
 
         assert.equal(res.body.success, false);
         assert.ok(res.body.message.includes('reserved by another user'));
@@ -658,7 +720,10 @@ describe('Manage', () => {
           owner_id: user._id,
         });
 
-        const res = await request(app).post(route).send({ id: userOwnedNamespace.namespace, name: 'User Owned App' }).expect(200);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: userOwnedNamespace.namespace, name: 'User Owned App' })
+          .expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, userOwnedNamespace.namespace);
@@ -673,14 +738,14 @@ describe('Manage', () => {
         });
 
         const packageId = 'app.user.wildcard';
-        const res = await request(app).post(route).send({ id: packageId, name: 'User Wildcard App' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: packageId, name: 'User Wildcard App' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, packageId);
       });
 
       test('creates a new package', async () => {
-        const res = await request(app).post(route).send({ id: 'app.dev', name: 'App Dev' }).expect(200);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'app.dev', name: 'App Dev' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, 'app.dev');
@@ -695,8 +760,32 @@ describe('Manage', () => {
         assert.equal(pkg.maintainer_name, user.name);
       });
 
+      test('creates a new package with a license and source URL', async () => {
+        const res = await request(app)
+          .post(route)
+          .send({
+            license: 'MIT/X/Expat License',
+            id: 'app.licensed',
+            name: 'App Licensed',
+            source: 'https://example.com/source',
+          })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.license, 'MIT/X/Expat License');
+        assert.equal(res.body.data.source, 'https://example.com/source');
+
+        const pkg = await Package.findOneByFilters('app.licensed');
+        assert.ok(pkg);
+        assert.equal(pkg.license, 'MIT/X/Expat License');
+        assert.equal(pkg.source, 'https://example.com/source');
+      });
+
       test('lowercases click ids', async () => {
-        const res = await request(app).post(route).send({ id: 'App.Mixed.Case', name: 'App Mixed Case' }).expect(200);
+        const res = await request(app)
+          .post(route)
+          .send({ license: 'GNU GPL v3', id: 'App.Mixed.Case', name: 'App Mixed Case' })
+          .expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.id, 'app.mixed.case');
@@ -706,7 +795,7 @@ describe('Manage', () => {
       test('ignores a package_type and creates a click package', async () => {
         const res = await request(app)
           .post(route)
-          .send({ id: 'app.community.packagekit', name: 'App Dev', package_type: PackageType.PACKAGEKIT })
+          .send({ license: 'GNU GPL v3', id: 'app.community.packagekit', name: 'App Dev', package_type: PackageType.PACKAGEKIT })
           .expect(200);
 
         assert.ok(res.body.success);
@@ -724,7 +813,7 @@ describe('Manage', () => {
           throw new Error();
         });
 
-        const res = await request(app).post(route).send({ id: 'app.dev', name: 'App Dev' }).expect(500);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'app.dev', name: 'App Dev' }).expect(500);
 
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
@@ -738,7 +827,7 @@ describe('Manage', () => {
       });
 
       test('blocks access for a disabled user', async () => {
-        const res = await request(app).post(route).send({ id: 'app.dev', name: 'App Dev' }).expect(403);
+        const res = await request(app).post(route).send({ license: 'GNU GPL v3', id: 'app.dev', name: 'App Dev' }).expect(403);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.ACCOUNT_DISABLED);
@@ -778,7 +867,10 @@ describe('Manage', () => {
 
         const user2 = await factory.user();
 
-        const res = await request(app).put(route).send({ maintainer: user2._id, type_override: 'webapp', locked: true }).expect(200);
+        const res = await request(app)
+          .put(route)
+          .send({ license: 'GNU GPL v3', maintainer: user2._id, type_override: 'webapp', locked: true })
+          .expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.maintainer, user2._id.toString());
@@ -794,7 +886,7 @@ describe('Manage', () => {
       test('can update any package', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route2).send({ name: 'Foo Bar' }).expect(200);
+        const res = await request(app).put(route2).send({ license: 'GNU GPL v3', name: 'Foo Bar' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
@@ -811,7 +903,7 @@ describe('Manage', () => {
         package2.locked = true;
         await package2.save();
 
-        const res = await request(app).put(route2).send({ name: 'Foo Bar' }).expect(200);
+        const res = await request(app).put(route2).send({ license: 'GNU GPL v3', name: 'Foo Bar' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
@@ -838,7 +930,7 @@ describe('Manage', () => {
       });
 
       test('does not allow publishing without revisions', async () => {
-        const res = await request(app).put(route).send({ published: true }).expect(400);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', published: true }).expect(400);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.NO_REVISIONS);
@@ -847,7 +939,10 @@ describe('Manage', () => {
       test('does not allow changing admin only fields', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route).send({ maintainer: 'foo', type_override: 'webapp', locked: true }).expect(200);
+        const res = await request(app)
+          .put(route)
+          .send({ license: 'GNU GPL v3', maintainer: 'foo', type_override: 'webapp', locked: true })
+          .expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.maintainer, user._id.toString());
@@ -860,7 +955,7 @@ describe('Manage', () => {
       test('updates successfully', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route).send({ name: 'Foo Bar' }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', name: 'Foo Bar' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
@@ -871,12 +966,47 @@ describe('Manage', () => {
         assert.equal(pkg?.name, 'Foo Bar');
       });
 
+      test('requires a license when the app does not have one', async () => {
+        await Package.updateOne({ _id: package1._id }, { $unset: { license: 1 } });
+
+        const res = await request(app).put(route).send({ name: 'Foo Bar' }).expect(400);
+
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.message, messages.NO_LICENSE_SPECIFIED);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.name, 'User app');
+      });
+
+      test('allows setting a license when the app does not have one', async () => {
+        await Package.updateOne({ _id: package1._id }, { $unset: { license: 1 } });
+
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3' }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.license, 'GNU GPL v3');
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.license, 'GNU GPL v3');
+      });
+
+      test('allows updating an app that already has a license without sending one', async () => {
+        package1.license = 'GNU GPL v3';
+        await package1.save();
+
+        const res = await request(app).put(route).send({ name: 'Foo Bar' }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.name, 'Foo Bar');
+        assert.equal(res.body.data.license, 'GNU GPL v3');
+      });
+
       test('accepts a description at the 3072 character limit', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
         const description = 'a'.repeat(3072);
 
-        const res = await request(app).put(route).send({ description }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', description }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.description, description);
@@ -889,7 +1019,7 @@ describe('Manage', () => {
       test('rejects a description that exceeds the 3072 character limit', async () => {
         const longDescription = 'a'.repeat(3073);
 
-        await request(app).put(route).send({ description: longDescription }).expect(400);
+        await request(app).put(route).send({ license: 'GNU GPL v3', description: longDescription }).expect(400);
 
         const pkg = await Package.findOneByFilters(package1.id);
         assert.ok(pkg);
@@ -901,7 +1031,7 @@ describe('Manage', () => {
 
         const name = 'a'.repeat(1024);
 
-        const res = await request(app).put(route).send({ name }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', name }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, name);
@@ -914,7 +1044,7 @@ describe('Manage', () => {
       test('rejects a title that exceeds the 1024 character limit', async () => {
         const longName = 'a'.repeat(1025);
 
-        await request(app).put(route).send({ name: longName }).expect(400);
+        await request(app).put(route).send({ license: 'GNU GPL v3', name: longName }).expect(400);
 
         const pkg = await Package.findOneByFilters(package1.id);
         assert.ok(pkg);
@@ -926,7 +1056,7 @@ describe('Manage', () => {
 
         const tagline = 'a'.repeat(1024);
 
-        const res = await request(app).put(route).send({ tagline }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', tagline }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.tagline, tagline);
@@ -936,7 +1066,7 @@ describe('Manage', () => {
       test('rejects a tag line that exceeds the 1024 character limit', async () => {
         const longTagline = 'a'.repeat(1025);
 
-        await request(app).put(route).send({ tagline: longTagline }).expect(400);
+        await request(app).put(route).send({ license: 'GNU GPL v3', tagline: longTagline }).expect(400);
       });
 
       test('accepts keywords at the 1024 character limit', async (t) => {
@@ -944,7 +1074,7 @@ describe('Manage', () => {
 
         const keywords = 'a'.repeat(1024);
 
-        const res = await request(app).put(route).send({ keywords }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', keywords }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(removeSpy.mock.callCount(), 1);
@@ -956,7 +1086,7 @@ describe('Manage', () => {
       test('rejects keywords that exceed the 1024 character limit', async () => {
         const longKeywords = 'a'.repeat(1025);
 
-        await request(app).put(route).send({ keywords: longKeywords }).expect(400);
+        await request(app).put(route).send({ license: 'GNU GPL v3', keywords: longKeywords }).expect(400);
       });
 
       test('accepts up to 10 keywords', async (t) => {
@@ -966,7 +1096,7 @@ describe('Manage', () => {
 
         const res = await request(app)
           .put(route)
-          .send({ keywords: keywordList.join(',') })
+          .send({ license: 'GNU GPL v3', keywords: keywordList.join(',') })
           .expect(200);
 
         assert.ok(res.body.success);
@@ -981,7 +1111,7 @@ describe('Manage', () => {
 
         await request(app)
           .put(route)
-          .send({ keywords: keywordList.join(',') })
+          .send({ license: 'GNU GPL v3', keywords: keywordList.join(',') })
           .expect(400);
 
         const pkg = await Package.findOneByFilters(package1.id);
@@ -995,7 +1125,7 @@ describe('Manage', () => {
 
         const res = await request(app)
           .put(route)
-          .send({ version_changelogs: [{ version: '1.0.0', changelog }] })
+          .send({ license: 'GNU GPL v3', version_changelogs: [{ version: '1.0.0', changelog }] })
           .expect(200);
 
         assert.ok(res.body.success);
@@ -1010,7 +1140,7 @@ describe('Manage', () => {
 
         await request(app)
           .put(route)
-          .send({ version_changelogs: [{ version: '1.0.0', changelog: longChangelog }] })
+          .send({ license: 'GNU GPL v3', version_changelogs: [{ version: '1.0.0', changelog: longChangelog }] })
           .expect(400);
       });
 
@@ -1019,7 +1149,7 @@ describe('Manage', () => {
 
         const supportUrl = `https://example.com/${'a'.repeat(1024 - 'https://example.com/'.length)}`;
 
-        const res = await request(app).put(route).send({ support_url: supportUrl }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', support_url: supportUrl }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(removeSpy.mock.callCount(), 1);
@@ -1031,7 +1161,7 @@ describe('Manage', () => {
       test('rejects a url that exceeds the 1024 character limit', async () => {
         const longUrl = `https://example.com/${'a'.repeat(1025 - 'https://example.com/'.length)}`;
 
-        await request(app).put(route).send({ support_url: longUrl }).expect(400);
+        await request(app).put(route).send({ license: 'GNU GPL v3', support_url: longUrl }).expect(400);
       });
 
       test('publishes the package', async (t) => {
@@ -1040,7 +1170,7 @@ describe('Manage', () => {
         package1.revisions.push({});
         await package1.save();
 
-        const res = await request(app).put(route).send({ published: true }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', published: true }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(upsertSpy.mock.callCount(), 1);
@@ -1056,7 +1186,7 @@ describe('Manage', () => {
 
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
-        const res = await request(app).put(route).send({ published: false }).expect(200);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', published: false }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(removeSpy.mock.callCount(), 1);
@@ -1070,7 +1200,7 @@ describe('Manage', () => {
           throw new Error();
         });
 
-        const res = await request(app).put(route).expect(500);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3' }).expect(500);
 
         assert.equal(res.body.success, false);
         assert.equal(findMock.mock.callCount(), 1);
@@ -1081,7 +1211,7 @@ describe('Manage', () => {
         package1.locked = true;
         await package1.save();
 
-        const res = await request(app).put(route).send({ published: true, locked: false }).expect(403);
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', published: true, locked: false }).expect(403);
 
         assert.equal(res.body.success, false);
         assert.equal(res.body.message, messages.APP_LOCKED);
@@ -1096,6 +1226,7 @@ describe('Manage', () => {
 
         const res = await request(app)
           .put(route)
+          .field('license', 'GNU GPL v3')
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', screenshot2)
           .attach('screenshot_files', screenshot1)
@@ -1118,6 +1249,7 @@ describe('Manage', () => {
 
         const res = await request(app)
           .put(route)
+          .field('license', 'GNU GPL v3')
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', notAScreenshot)
           .expect(400);
@@ -1136,6 +1268,7 @@ describe('Manage', () => {
 
         const res = await request(app)
           .put(route)
+          .field('license', 'GNU GPL v3')
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', screenshot2)
           .expect(200);
@@ -1143,7 +1276,7 @@ describe('Manage', () => {
         assert.ok(res.body.success);
         assert.equal(res.body.data.screenshots.length, 2);
 
-        const res2 = await request(app).put(route).send({ screenshots: [] }).expect(200);
+        const res2 = await request(app).put(route).send({ license: 'GNU GPL v3', screenshots: [] }).expect(200);
 
         assert.ok(res2.body.success);
         assert.equal(res2.body.data.screenshots.length, 0);
@@ -1159,6 +1292,7 @@ describe('Manage', () => {
 
         const res = await request(app)
           .put(route)
+          .field('license', 'GNU GPL v3')
           .attach('screenshot_files', screenshot1)
           .attach('screenshot_files', screenshot2)
           .expect(200);
@@ -1169,6 +1303,7 @@ describe('Manage', () => {
         const res2 = await request(app)
           .put(route)
           .send({
+            license: 'GNU GPL v3',
             screenshots: [
               res.body.data.screenshots[1].replace('http://local.open-store.io/screenshots/', ''),
               res.body.data.screenshots[0].replace('http://local.open-store.io/screenshots/', ''),
@@ -1195,6 +1330,7 @@ describe('Manage', () => {
         const res = await request(app)
           .put(route)
           .send({
+            license: 'GNU GPL v3',
             source: 'https://example.com/',
             support_url: 'https://example.com/',
             donate_url: 'https://example.com/',
@@ -1213,6 +1349,7 @@ describe('Manage', () => {
         const res2 = await request(app)
           .put(route)
           .send({
+            license: 'GNU GPL v3',
             source: '',
             support_url: '',
             donate_url: '',
@@ -1355,7 +1492,11 @@ describe('Manage', () => {
         { version: '1.1.0', changelog: 'New version changelog' },
       ];
 
-      const res = await request(app).put(route).field('version_changelogs', JSON.stringify(versionChangelogs)).expect(200);
+      const res = await request(app)
+        .put(route)
+        .field('license', 'GNU GPL v3')
+        .field('version_changelogs', JSON.stringify(versionChangelogs))
+        .expect(200);
 
       assert.ok(res.body.success);
       assert.equal(res.body.data.version_changelogs.length, 2);
@@ -1370,7 +1511,11 @@ describe('Manage', () => {
       // Test replace behavior: sending only a subset removes unlisted versions
       const reducedChangelogs = [{ version: '1.0.0', changelog: 'Kept initial release notes' }];
 
-      const res2 = await request(app).put(route).field('version_changelogs', JSON.stringify(reducedChangelogs)).expect(200);
+      const res2 = await request(app)
+        .put(route)
+        .field('license', 'GNU GPL v3')
+        .field('version_changelogs', JSON.stringify(reducedChangelogs))
+        .expect(200);
 
       assert.ok(res2.body.success);
       assert.equal(res2.body.data.version_changelogs.length, 1);

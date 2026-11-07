@@ -25,8 +25,6 @@ export const CATEGORIES = [
 ];
 
 export const LICENSES = [
-  'Proprietary',
-  'Proprietary, Source Available',
   'Apache License',
   'BSD License (Simplified)',
   'Creative Commons - No Rights Reserved',
@@ -52,6 +50,8 @@ export const LICENSES = [
   'Python License',
   'Zope Public License',
   'Other Open Source',
+  'Proprietary',
+  'Proprietary, Source Available',
 ];
 
 export const APP_TYPE_OPTIONS = [
