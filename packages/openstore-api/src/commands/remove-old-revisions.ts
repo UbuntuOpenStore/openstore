@@ -5,13 +5,16 @@ import path from 'path';
 
 import 'db'; // Make sure the database connection gets setup
 
-import { Package } from '../db/package';
+import { Architecture, Channel, Package } from '../db/package';
 import { config } from '../utils';
 import limitedApps from './limited-apps.json';
 
 const MAX_REVISIONS = 3;
 const MIN_FILES_CHECK = 10;
 const DRY_RUN = process.argv.includes('--dry-run');
+const CLICK_FILE_PATTERN = new RegExp(
+  `^(.*?)-(?:${Object.values(Channel).join('|')})-(?:${Object.values(Architecture).join('|')})-.*\\.click$`,
+);
 
 if (DRY_RUN) {
   console.log('Running in DRY RUN mode - no files will be deleted and no database changes will be made');
@@ -91,7 +94,8 @@ Package.find({ id: { $in: limitedApps } })
     const allFiles = fs.readdirSync(config.data_dir);
     const counts = allFiles
       .map((file) => {
-        return file.split('-xenial')[0];
+        const match = file.match(CLICK_FILE_PATTERN);
+        return match ? match[1] : file;
       })
       .reduce<{ [key: string]: number }>((acc, curr) => {
         if (!acc[curr]) {
