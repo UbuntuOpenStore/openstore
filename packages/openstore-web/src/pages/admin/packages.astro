@@ -3,6 +3,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import AdminMenu from "../../components/admin/AdminMenu";
 import CreatePackageForm from "../../components/admin/CreatePackageForm";
+import { config } from "../../lib/config";
 import { getUser } from "../../lib/user";
 import Loading from "../../components/Loading";
 
@@ -39,7 +40,7 @@ if (!user.role || user.role !== "admin") {
   </section>
 
   <section class="section grow max-w-2xl">
-    <CreatePackageForm client:only="preact">
+    <CreatePackageForm client:only="preact" clickSupportEnabled={config.clickSupportEnabled}>
       <Loading slot="fallback" />
     </CreatePackageForm>
   </section>

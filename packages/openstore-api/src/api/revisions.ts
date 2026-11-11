@@ -4,7 +4,7 @@ import express, { type Request, type Response } from 'express';
 import { Package } from '../db/package';
 import { Architecture, HydratedRevision, type Channel } from '../db/package/types';
 import { UserError } from '../exceptions';
-import { getDataArray, getData, success, asyncErrorWrapper } from '../utils';
+import { getDataArray, getData, success, asyncErrorWrapper, config } from '../utils';
 import { handleChannel } from '../utils/channels';
 import { INVALID_ARCH } from '../utils/error-messages';
 
@@ -27,7 +27,13 @@ async function revisionsByVersion(req: Request, res: Response) {
     return;
   }
 
-  const pkgs = (await Package.findByFilters({ published: true, ids }))
+  const pkgs = (
+    await Package.findByFilters({
+      published: true,
+      ids,
+      packageTypes: [...config.allowed_package_types],
+    })
+  )
     .filter((pkg) => pkg.architectures.includes(architecture) || pkg.architectures.includes(Architecture.ALL))
     .map((pkg) => {
       let version = versions.filter((v: string) => v.split('@')[0] === pkg.id)[0];

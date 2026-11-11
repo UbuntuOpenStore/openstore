@@ -7,6 +7,7 @@ import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
 import { getStaticPathsForLocales } from "@/lib/i18n";
+import { config } from "@/lib/config";
 
 export async function getStaticPaths() {
   return getStaticPathsForLocales();
@@ -26,6 +27,7 @@ await initializeI18N(Astro.currentLocale);
 
     <div class="w-full">
       <SearchApps
+        clickSupportEnabled={config.clickSupportEnabled}
         messages={{
           all: t("All Types"),
           apps: t("Apps"),

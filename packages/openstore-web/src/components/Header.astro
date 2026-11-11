@@ -1,6 +1,7 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { getRelativeLocaleUrl } from "@/lib/utils";
+import { config } from "@/lib/config";
 import SvgNavigationMenu from "./icons/NavigationMenu";
 import SearchBar from "./SearchBar";
 import LoginLogout from "./LoginLogout.astro";
@@ -41,9 +42,11 @@ const isSearchPage = Astro.url.pathname.includes("/apps/");
           <SearchBar isDark client:only="preact" messages={{ search: t("Search...") }} isSearchPage={isSearchPage} />
         </li>
 
-        <li>
-          <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/submit/")} data-astro-prefetch="tap">{t("Submit")}</a>
-        </li>
+        {config.clickSupportEnabled && (
+          <li>
+            <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/submit/")} data-astro-prefetch="tap">{t("Submit")}</a>
+          </li>
+        )}
         <li>
           <a class="header-link" href={getRelativeLocaleUrl(Astro.currentLocale, "/apps/")} data-astro-prefetch="tap">{t("Browse")}</a>
         </li>

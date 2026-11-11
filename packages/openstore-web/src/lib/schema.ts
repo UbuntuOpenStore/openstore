@@ -72,7 +72,7 @@ export const AppSchema = z.object({
   keywords: z.array(z.string()),
   license: z.string(),
   nsfw: z.boolean(),
-  published_date: z.coerce.date(),
+  published_date: z.coerce.date().nullish(),
   screenshots: z.array(z.string()),
   source: z.string(),
   support_url: z.string(),
@@ -81,7 +81,7 @@ export const AppSchema = z.object({
   translation_url: z.string(),
   types: z.array(z.string()),
   package_type: z.string(),
-  updated_date: z.coerce.date(),
+  updated_date: z.coerce.date().nullish(),
   languages: z.array(z.string()),
   revisions: z.array(AppRevisionSchema),
   totalDownloads: z.number(),
@@ -125,8 +125,8 @@ export const AppManageSchema = AppSchema.extend({
   type_override: z.string(),
   review_exceptions: z.array(z.string()),
   maintainer: z.string().optional(),
-  published_date: z.coerce.date().or(z.literal('')),
-  updated_date: z.coerce.date().or(z.literal('')),
+  published_date: z.coerce.date().or(z.literal('')).nullish(),
+  updated_date: z.coerce.date().or(z.literal('')).nullish(),
 });
 
 export type AppManageData = z.infer<typeof AppManageSchema>;
@@ -163,7 +163,7 @@ export const SlimAppSchema = z.object({
   }),
   published: z.boolean().optional(),
   publisher: z.string(),
-  published_date: z.string().optional(),
+  published_date: z.string().nullish(),
   totalDownloads: z.number().optional(),
   latestDownloads: z.number().optional(),
 });
@@ -177,7 +177,7 @@ export const DiscoverAppSchema = z.object({
   icon: z.string(),
   types: z.array(z.string()),
   package_type: z.string(),
-  published_date: z.string(),
+  published_date: z.string().nullish(),
   ratings: z.object({
     [RatingType.THUMBS_UP]: z.number(),
     [RatingType.THUMBS_DOWN]: z.number(),
@@ -198,7 +198,7 @@ export type AppListApp = {
   ratings: AppData["ratings"];
   types: AppData["types"];
   package_type: AppData["package_type"];
-  published_date?: string;
+  published_date?: string | null;
 };
 
 export const DiscoverSchema = z.object({

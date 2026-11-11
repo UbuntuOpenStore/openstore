@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import ManageList from "@/components/manage/ManageList";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { config } from "@/lib/config";
 import { getUser } from "@/lib/user";
 import { getRelativeLocaleUrl } from "@/lib/utils";
 import { initializeI18N } from "@/lib/i18n";
@@ -40,6 +41,7 @@ await initializeI18N(Astro.currentLocale);
       isAdmin={user.role === "admin"}
       userId={user._id}
       currentLocale={Astro.currentLocale}
+      clickSupportEnabled={config.clickSupportEnabled}
       messages={{
         filters: t("Filters"),
         filterByType: t("Filter by Type"),

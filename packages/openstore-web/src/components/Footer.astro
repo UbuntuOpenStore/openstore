@@ -4,6 +4,7 @@ import { initializeI18N } from "@/lib/i18n";
 import { getRelativeLocaleUrl } from "@/lib/utils";
 import { t } from "i18next";
 import LanguageSelect from "./LanguageSelect";
+import { config } from "@/lib/config";
 
 await initializeI18N(Astro.currentLocale);
 ---
@@ -32,7 +33,14 @@ await initializeI18N(Astro.currentLocale);
         <a href="/telegram" class="text-ubuntu-orange">{t("Chat with us on Telegram")}</a>
         <a href="https://ubports.com/code-of-conduct" class="text-ubuntu-orange">{t("Code of Conduct")}</a>
         <a href="https://stats.uptimerobot.com/R6Z8mtJ8P" class="text-ubuntu-orange">{t("Site Status")}</a>
-        <a href={getRelativeLocaleUrl(Astro.currentLocale, "/stats/")} class="text-ubuntu-orange">{t("Stats")}</a>
+
+        {
+          config.clickSupportEnabled && (
+            <a href={getRelativeLocaleUrl(Astro.currentLocale, "/stats/")} class="text-ubuntu-orange">
+              {t("Stats")}
+            </a>
+          )
+        }
       </div>
 
       <div class="text-sm flex flex-col mt-4 md:mt-0">

@@ -5,7 +5,7 @@ import express, { type Request, type Response } from 'express';
 
 import { Discover } from '../db/discover';
 import { Architecture, PackageType, type HydratedPackage, type SerializedDiscoverApp, type SerializedPackage } from '../db/package/types';
-import { success, getData, getDataArray, asyncErrorWrapper } from '../utils';
+import { success, getData, getDataArray, asyncErrorWrapper, config, filterAllowedPackageTypes } from '../utils';
 import { handleChannel } from '../utils/channels';
 import {
   CACHE_DURATION_MS,
@@ -41,7 +41,7 @@ router.get(
       architecture = Architecture.ARMHF;
     }
 
-    const packageTypes = [PackageType.CLICK];
+    const packageTypes = config.allowed_package_types.has(PackageType.CLICK) ? [PackageType.CLICK] : [];
     const cacheHash = crypto.createHash('md5').update(JSON.stringify({ packageTypes, frameworks })).digest('hex');
     const cacheKey = `v4-${channel}-${architecture}-${cacheHash}`;
 
@@ -118,7 +118,9 @@ v5Router.get(
     }
 
     const packageTypeParams = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
-    const packageTypes = packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [PackageType.CLICK];
+    const packageTypes = filterAllowedPackageTypes(
+      packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [...config.allowed_package_types],
+    );
 
     const cacheHash = crypto.createHash('md5').update(JSON.stringify({ packageTypes, frameworks })).digest('hex');
     const cacheKey = `v5-${channel}-${architecture}-${cacheHash}`;

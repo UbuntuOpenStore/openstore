@@ -25,6 +25,8 @@ import * as messages from '../utils/error-messages';
 
 describe('Apps API', () => {
   const route = '/api/v4/apps/';
+  const defaultAllowedPackageTypes = new Set(config.allowed_package_types);
+  const defaultRestrictedFetchPackageTypes = new Set(config.restricted_fetch_package_types);
   let app: App;
   let package1: TestPackage;
   let package2: TestPackage;
@@ -41,6 +43,8 @@ describe('Apps API', () => {
   });
 
   beforeEach(async () => {
+    config.allowed_package_types = new Set(defaultAllowedPackageTypes);
+    config.restricted_fetch_package_types = new Set(defaultRestrictedFetchPackageTypes);
     await cleanMongoose();
 
     [package1, package2, unpublishedPackage] = await Promise.all([
@@ -104,7 +108,7 @@ describe('Apps API', () => {
 
     test('returns 404 for package type not in allowed list', async function () {
       const originalAllowedTypes = config.allowed_package_types;
-      config.allowed_package_types = [PackageType.CLICK];
+      config.allowed_package_types = new Set([PackageType.CLICK]);
 
       const snapPackage = await factory.package({
         id: 'snap.test',
@@ -125,9 +129,32 @@ describe('Apps API', () => {
       config.allowed_package_types = originalAllowedTypes;
     });
 
-    test('allows access when package_type param matches app package type', async function () {
+    test('returns 404 when package_type param matches but type is not allowed', async function () {
       const originalAllowedTypes = config.allowed_package_types;
-      config.allowed_package_types = [PackageType.CLICK];
+      config.allowed_package_types = new Set([PackageType.CLICK]);
+
+      const snapPackage = await factory.package({
+        id: 'snap.test',
+        name: 'Test Snap',
+        author: 'Test Author',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        channels: [DEFAULT_CHANNEL],
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}?package_type=snap`).expect(404);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, 'Package type not available');
+
+      // Restore original config
+      config.allowed_package_types = originalAllowedTypes;
+    });
+
+    test('allows access to a restricted package type when explicitly requested', async function () {
+      const originalAllowedTypes = config.allowed_package_types;
+      config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
 
       const snapPackage = await factory.package({
         id: 'snap.test',
@@ -149,9 +176,52 @@ describe('Apps API', () => {
       config.allowed_package_types = originalAllowedTypes;
     });
 
+    test('returns 404 for a restricted package type when not explicitly requested', async function () {
+      const originalAllowedTypes = config.allowed_package_types;
+      config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
+      const snapPackage = await factory.package({
+        id: 'snap.test',
+        name: 'Test Snap',
+        author: 'Test Author',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        channels: [DEFAULT_CHANNEL],
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}`).expect(404);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, 'Package type not available');
+
+      // Restore original config
+      config.allowed_package_types = originalAllowedTypes;
+    });
+
+    test('allows access to a restricted package type when restrictions are empty', async function () {
+      config.restricted_fetch_package_types = new Set();
+
+      const snapPackage = await factory.package({
+        id: 'snap.test',
+        name: 'Test Snap',
+        author: 'Test Author',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        channels: [DEFAULT_CHANNEL],
+      });
+
+      const res = await request(app).get(`${route}${snapPackage.id}`).expect(200);
+
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.id, snapPackage.id);
+      assert.equal(res.body.data.package_type, PackageType.SNAP);
+    });
+
     test('returns 404 when package_type param does not match app package type', async function () {
       const originalAllowedTypes = config.allowed_package_types;
-      config.allowed_package_types = [PackageType.CLICK];
+      config.allowed_package_types = new Set([PackageType.CLICK]);
 
       const snapPackage = await factory.package({
         id: 'snap.test',
@@ -304,6 +374,8 @@ describe('Apps API', () => {
     });
 
     test('filters by package_type=snap', async () => {
+      config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
       await factory.package({
         id: 'snap.firefox',
         name: 'Firefox',
@@ -341,6 +413,8 @@ describe('Apps API', () => {
     });
 
     test('excludes snaps without a stable channel from listing', async () => {
+      config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
       await factory.package({
         id: 'snap.stable-only',
         name: 'Stable Snap',
@@ -371,6 +445,8 @@ describe('Apps API', () => {
     });
 
     test('filters by multiple package_types', async () => {
+      config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
       await factory.package({
         id: 'snap.firefox',
         name: 'Firefox',
@@ -496,6 +572,8 @@ describe('Apps API', () => {
     });
 
     test('prevents downloads for snap packages', async () => {
+      config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
       const snapPackage = await factory.package({
         id: 'snap.package',
         published: true,

@@ -11,6 +11,7 @@ type ManageFilterDialogProps = {
   published: boolean | undefined;
   packageType: PackageType | undefined;
   isAdmin: boolean;
+  clickSupportEnabled: boolean;
   onChange: (
     type: AppType | undefined,
     owner: "me" | undefined,
@@ -38,7 +39,16 @@ type ManageFilterDialogProps = {
   };
 };
 
-const ManageFilterDialog = ({ type, owner, published, packageType, isAdmin, onChange, messages }: ManageFilterDialogProps) => {
+const ManageFilterDialog = ({
+  type,
+  owner,
+  published,
+  packageType,
+  isAdmin,
+  clickSupportEnabled,
+  onChange,
+  messages,
+}: ManageFilterDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const onChangeWrapper = useCallback(
     (
@@ -181,15 +191,17 @@ const ManageFilterDialog = ({ type, owner, published, packageType, isAdmin, onCh
                   <label for="all-package-types">{messages.allPackageTypes}</label>
                 </div>
 
-                <div class="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    checked={packageType === PackageType.CLICK}
-                    onClick={() => onChangeWrapper(type, owner, published, PackageType.CLICK)}
-                    id="click"
-                  />
-                  <label for="click">{messages.click}</label>
-                </div>
+                {clickSupportEnabled && (
+                  <div class="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      checked={packageType === PackageType.CLICK}
+                      onClick={() => onChangeWrapper(type, owner, published, PackageType.CLICK)}
+                      id="click"
+                    />
+                    <label for="click">{messages.click}</label>
+                  </div>
+                )}
 
                 <div class="flex items-center space-x-2">
                   <input

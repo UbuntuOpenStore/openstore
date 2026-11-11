@@ -177,7 +177,7 @@ export type SerializedPackage = {
   };
   name: string;
   nsfw: boolean;
-  published_date: string;
+  published_date: string | null;
   published: boolean;
   locked: boolean;
   screenshots: string[];
@@ -188,7 +188,7 @@ export type SerializedPackage = {
   translation_url: string;
   tagline: string;
   types: AppType[];
-  updated_date: string;
+  updated_date: string | null;
   package_type: PackageType;
   source_store: SourceStore;
   languages: string[];
@@ -227,10 +227,10 @@ export type SerializedPackageSlim = {
   keywords?: string[];
   license?: string;
   nsfw?: boolean;
-  published_date?: string;
+  published_date?: string | null;
   tagline?: string;
   types?: AppType[];
-  updated_date?: string;
+  updated_date?: string | null;
   package_type?: PackageType;
   source_store?: SourceStore;
   ratings?: SerializedRatings;
@@ -423,7 +423,7 @@ export interface PackageModel extends Model<IPackage, unknown, IPackageMethods> 
   incrementDownload: (id: Types.ObjectId, revisionIndex: number) => Promise<void>;
   stats: () => Promise<PackageStats>;
   categoryStats: (channels: Channel[], packageTypes?: PackageType[], lomiriCompatible?: boolean) => Promise<CategoryStat[]>;
-  parseRequestFilters: (req: Request, defaultPackageTypes?: PackageType[]) => PackageRequestFilters;
+  parseRequestFilters: (req: Request) => PackageRequestFilters;
   parseFilters: (filters: PackageRequestFilters, textSearch?: boolean) => FilterQuery<IPackage>;
   countByFilters: (filters: PackageRequestFilters, textSearch?: boolean) => Promise<number>;
   findByFilters: (

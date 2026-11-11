@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import SubmitAppForm from "@/components/manage/SubmitAppForm";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { config } from "@/lib/config";
 import { initializeI18N } from "@/lib/i18n";
 import { generateSchema } from "@/lib/json-schema";
 import { t } from "i18next";
@@ -9,6 +10,10 @@ import { t } from "i18next";
 import { getStaticPathsForLocales } from "@/lib/i18n";
 
 export async function getStaticPaths() {
+  if (!config.clickSupportEnabled) {
+    return [];
+  }
+
   return getStaticPathsForLocales();
 }
 

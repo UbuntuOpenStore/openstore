@@ -4,6 +4,7 @@ import CopyToClipboard from "@/components/CopyToClipboard";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { initializeI18N } from "@/lib/i18n";
 import { getRelativeLocaleUrl } from "@/lib/utils";
+import { config } from "@/lib/config";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
 import SvgExternalLink from "@/components/icons/ExternalLink";
@@ -26,55 +27,74 @@ await initializeI18N(Astro.currentLocale);
   <section class="section space-y-4">
     <h1 class="text-4xl">{t("About the OpenStore")}</h1>
 
-    <p class="p-2" class="p-2">
-      {
-        t(
-          "The OpenStore is the official app store for Ubuntu Touch. It is an open source project run by a team of volunteers with help from the community. You can discover and install new apps on your Ubuntu Touch device. You can also upload and manage your own apps for publication. The OpenStore encourages the apps published within to be open source, but also accepts proprietary apps.",
-        )
-      }
-    </p>
+    {
+      config.clickSupportEnabled ? (
+        <>
+          <p class="p-2" class="p-2">
+            {t(
+              "The OpenStore is the official app repository for Ubuntu Touch. It is an open source project run by a team of volunteers with help from the community. You can discover and install new apps on your Ubuntu Touch device. You can also upload and manage your own apps for publication. The OpenStore encourages the apps published within to be open source, but also accepts proprietary apps.",
+            )}
+          </p>
+        </>
+      ) : (
+        <p class="p-2">
+          {t(
+            "The OpenStore is the official app repository for Ubuntu Touch and also a software manager for any Debian based Linux distribution. It is an open source project run by a team of volunteers with help from the community.",
+          )}
+        </p>
+      )
+    }
 
     <a href="http://ubuntu-touch.io/" class="underline p-2" target="_blank"
       >{t("Learn more about Ubuntu Touch")}<SvgExternalLink class="inline ml-2 -mt-1" /></a
     >
   </section>
 
-  <section class="section space-y-4">
-    <h2 class="text-2xl">{t("Badges")}</h2>
+  {
+    config.clickSupportEnabled && (
+      <>
+        <section class="section space-y-4">
+          <h2 class="text-2xl">{t("Badges")}</h2>
 
-    <p class="p-2">{t("Promote your app on the OpenStore!")}</p>
+          <p class="p-2">{t("Promote your app on the OpenStore!")}</p>
 
-    <img src="/badges/en_US.svg" alt="" class="h-16 p-2" />
+          <img src="/badges/en_US.svg" alt="" class="h-16 p-2" />
 
-    <a href={getRelativeLocaleUrl(Astro.currentLocale, "/badge/")} class="underline p-2">{t("Get your badge")}</a>
-  </section>
+          <a href={getRelativeLocaleUrl(Astro.currentLocale, "/badge/")} class="underline p-2">
+            {t("Get your badge")}
+          </a>
+        </section>
 
-  <section class="section space-y-4">
-    <h2 class="text-2xl">{t("Install")}</h2>
+        <section class="section space-y-4">
+          <h2 class="text-2xl">{t("Install")}</h2>
 
-    <p class="p-2">
-      {
-        t(
-          "The OpenStore app is installed by default on the UBports builds of Ubuntu Touch. But if you need to install the OpenStore manually, follow these steps:",
-        )
-      }
-    </p>
+          <p class="p-2">
+            {t(
+              "The OpenStore app is installed by default on the UBports builds of Ubuntu Touch. But if you need to install the OpenStore manually, follow these steps:",
+            )}
+          </p>
 
-    <ol class="list-decimal ml-4 p-2">
-      <li>
-        <a href={getRelativeLocaleUrl(Astro.currentLocale, "/app/openstore.openstore-team/")} target="_blank" class="underline"
-          >{t("Download the OpenStore App")}</a
-        >
-      </li>
-      <li>{t("Open the terminal app on your Ubuntu Touch device")}</li>
-      <li>{t("Navigate to the downloads folder")}</li>
-      <li>
-        {t("Run the command:")}
+          <ol class="list-decimal ml-4 p-2">
+            <li>
+              <a href={getRelativeLocaleUrl(Astro.currentLocale, "/app/openstore.openstore-team/")} target="_blank" class="underline">
+                {t("Download the OpenStore App")}
+              </a>
+            </li>
+            <li>{t("Open the terminal app on your Ubuntu Touch device")}</li>
+            <li>{t("Navigate to the downloads folder")}</li>
+            <li>
+              {t("Run the command:")}
 
-        <CopyToClipboard client:only="preact" code="pkcon install-local --allow-untrusted openstore.openstore-team_latest_armhf.click" />
-      </li>
-    </ol>
-  </section>
+              <CopyToClipboard
+                client:only="preact"
+                code="pkcon install-local --allow-untrusted openstore.openstore-team_latest_armhf.click"
+              />
+            </li>
+          </ol>
+        </section>
+      </>
+    )
+  }
 
   <section class="section space-y-4">
     <h2 class="text-2xl">{t("Contact")}</h2>
@@ -102,7 +122,7 @@ await initializeI18N(Astro.currentLocale);
     <p class="p-2">
       {
         t(
-          "The source code for OpenStore related projects is available under the GPL v3. You can find the code on the OpenStore GitLab page.",
+          "The source code for OpenStore related projects is available under the GPL v3 and AGPL. You can find the code on the OpenStore GitLab page.",
         )
       }
     </p>
@@ -111,7 +131,11 @@ await initializeI18N(Astro.currentLocale);
 
     <br />
 
-    <a href="https://gitlab.com/theopenstore/" target="_blank" class="p-2"
+    <a href="https://www.gnu.org/licenses/agpl-3.0.html" class="underline p-2" target="_blank">{t("AGPL License")}</a>
+
+    <br />
+
+    <a href="https://gitlab.com/theopenstore/" target="_blank" class="underline p-2"
       >{t("OpenStore source on GitLab")}<SvgExternalLink class="inline ml-2 -mt-1" /></a
     >
 
@@ -127,39 +151,66 @@ await initializeI18N(Astro.currentLocale);
   <section class="section space-y-4">
     <h2 class="text-2xl">{t("Terms")}</h2>
 
-    <p class="p-2">
-      {
-        t(
-          "The OpenStore a non-profit volunteer project. Although every effort is made to ensure that everything in the repository is safe to install, you use it AT YOUR OWN RISK. Apps uploaded to the OpenStore will be subject to an automated review process or a manual review process to check for potential security or privacy issues. This checking is far from exhaustive though, and there are no guarantees.",
-        )
-      }
-    </p>
+    {
+      config.clickSupportEnabled && (
+        <p class="p-2">
+          {t(
+            "The OpenStore a non-profit volunteer project. Although every effort is made to ensure that everything in the repository is safe to install, you use it AT YOUR OWN RISK. Apps uploaded to the OpenStore will be subject to an automated review process or a manual review process to check for potential security or privacy issues. This checking is far from exhaustive though, and there are no guarantees.",
+          )}
+        </p>
+      )
+    }
 
     <p class="p-2">
       {
         t(
-          "The OpenStore respects your privacy. We don't track you or your device. You do not need an account to download and install apps and we do not track your downloads. For developer information we count the number of downloads per app revision. Information about your device (the cpu architecture, framework versions, OS version, and OS language) are sent to the server to allow it to filter apps to only what you can install and present your native language where possible. This information is not logged or stored and cannot be used to uniquely identify you.",
+          "The OpenStore respects your privacy. We don't track you or your device. You do not need an account to download and install apps and we do not track your downloads.",
         )
       }
-    </p>
 
-    <p class="p-2">
       {
-        t(
-          "Any personal data you decide to give us (e.g. your email address when registering for an account to upload your apps) goes no further than us, and will not be used for anything other than allowing you to maintain your apps and, in rare cases, contact you in the event there is an issue with your app. Additionally, this site uses cookies to keep you logged in to your account.",
+        config.clickSupportEnabled && (
+          <>
+            {" "}
+            {t(
+              "For developer information we count the number of downloads per app revision. Information about your device (the cpu architecture, framework versions, OS version, and OS language) are sent to the server to allow it to filter apps to only what you can install and present your native language where possible. This information is not logged or stored and cannot be used to uniquely identify you.",
+            )}
+          </>
         )
       }
     </p>
 
-    <p class="p-2">
-      {
-        t(
-          "Apps uploaded to the OpenStore are subject to our submission rules and content policy. You can review the rules and policies before uploading your app.",
-        )
-      }
-    </p>
+    {
+      config.clickSupportEnabled ? (
+        <p class="p-2">
+          {t(
+            "Any personal data you decide to give us (e.g. your email address when registering for an account to upload your apps or leave a review) goes no further than us, and will not be used for anything other than allowing you to maintain your apps and, in rare cases, contact you in the event there is an issue with your app. Additionally, this site uses cookies to keep you logged in to your account.",
+          )}
+        </p>
+      ) : (
+        <p class="p-2">
+          {t(
+            "Any personal data you decide to give us (e.g. your email address when registering for an account to leave a review) goes no further than us. Additionally, this site uses cookies to keep you logged in to your account.",
+          )}
+        </p>
+      )
+    }
 
-    <a href={getRelativeLocaleUrl(Astro.currentLocale, "/submit/")} class="underline p-2">{t("Submit your app")}</a>
+    {
+      config.clickSupportEnabled && (
+        <>
+          <p class="p-2">
+            {t(
+              "Apps uploaded to the OpenStore are subject to our submission rules and content policy. You can review the rules and policies before uploading your app.",
+            )}
+          </p>
+
+          <a href={getRelativeLocaleUrl(Astro.currentLocale, "/submit/")} class="underline p-2">
+            {t("Submit your app")}
+          </a>
+        </>
+      )
+    }
 
     <br />
 
@@ -169,9 +220,14 @@ await initializeI18N(Astro.currentLocale);
 
     <br />
 
-    <a href="https://bhdouglass.com/blog/how-to-publish-an-ubuntu-touch-app/" class="underline p-2" target="_blank">
-      {t("App Submission Tutorial")}<SvgExternalLink class="inline ml-2 -mt-1" />
-    </a>
+    {
+      config.clickSupportEnabled && (
+        <a href="https://bhdouglass.com/blog/how-to-publish-an-ubuntu-touch-app/" class="underline p-2" target="_blank">
+          {t("App Submission Tutorial")}
+          <SvgExternalLink class="inline ml-2 -mt-1" />
+        </a>
+      )
+    }
   </section>
 
   <section class="section space-y-4 mb-8">

@@ -3,6 +3,7 @@
 
 interface ImportMetaEnv {
   readonly PUBLIC_API_URL: string;
+  readonly ALLOWED_PACKAGE_TYPES?: string;
 }
 
 interface ImportMeta {

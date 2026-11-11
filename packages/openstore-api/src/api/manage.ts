@@ -21,7 +21,7 @@ import {
   canManageLocked,
   maintenanceMode,
 } from '../middleware';
-import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper } from '../utils';
+import { success, error, captureException, moveFile, apiLinks, logger, asyncErrorWrapper, config } from '../utils';
 import { handleChannel } from '../utils/channels';
 import {
   APP_NOT_FOUND,
@@ -36,6 +36,7 @@ import {
   INVALID_CHANNEL,
   NO_LICENSE_SPECIFIED,
   INVALID_APP_ID_PREFIX,
+  PACKAGE_TYPE_NOT_ALLOWED,
 } from '../utils/error-messages';
 import { clickReview } from '../utils/review-package';
 import { validateNamespace } from '../utils/validate-namespace';
@@ -53,8 +54,7 @@ router.get(
   authenticate,
   userRole,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    const defaultPackageTypes = req.isAdminUser ? Object.values(PackageType) : undefined;
-    const filters = Package.parseRequestFilters(req, defaultPackageTypes);
+    const filters = Package.parseRequestFilters(req);
     if (!req.isAdminUser) {
       filters.publisherId = req.user!._id.toString();
     }
@@ -99,6 +99,11 @@ router.post(
 
     const { id: requestedId, name, license, source } = validation.data;
     const packageType = validation.data.package_type ?? PackageType.CLICK;
+
+    if (!config.allowed_package_types.has(packageType)) {
+      error(res, PACKAGE_TYPE_NOT_ALLOWED, 400);
+      return;
+    }
 
     // Click ids must be lowercase. Other package types are case sensitive and
     // keep the case provided by the caller.
@@ -344,6 +349,10 @@ router.post(
 
       if (!req.isAdminUser && pkg.locked) {
         throw new AuthorizationError(APP_LOCKED);
+      }
+
+      if (!config.allowed_package_types.has(pkg.package_type)) {
+        throw new UserError(PACKAGE_TYPE_NOT_ALLOWED);
       }
 
       if (!file.originalname.endsWith('.click')) {

@@ -13,11 +13,18 @@ const PACKAGE_TYPE_LABELS: Record<PackageType, string> = {
   [PackageType.PACKAGEKIT]: "PackageKit",
 };
 
-const CreatePackageForm = ({ onSuccess }: { onSuccess?: (pkg: AppManageData) => void }): JSX.Element => {
+const CreatePackageForm = ({
+  onSuccess,
+  clickSupportEnabled,
+}: {
+  onSuccess?: (pkg: AppManageData) => void;
+  clickSupportEnabled: boolean;
+}): JSX.Element => {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [created, setCreated] = useState<AppManageData | null>(null);
+  const packageTypes = PACKAGE_TYPES.filter((type) => clickSupportEnabled || type !== PackageType.CLICK);
 
   const save = useCallback(
     async (e: Event) => {
@@ -92,7 +99,7 @@ const CreatePackageForm = ({ onSuccess }: { onSuccess?: (pkg: AppManageData) => 
             Package Type
           </label>
           <select id="package_type" name="package_type" required class="form-input" defaultValue={PackageType.PACKAGEKIT}>
-            {PACKAGE_TYPES.map((type) => (
+            {packageTypes.map((type) => (
               <option key={type} value={type}>
                 {PACKAGE_TYPE_LABELS[type]}
               </option>

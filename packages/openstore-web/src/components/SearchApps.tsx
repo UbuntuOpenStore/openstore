@@ -27,6 +27,7 @@ const DEFAULT_TYPE = "";
 type Props = {
   category?: string;
   categoryName?: string;
+  clickSupportEnabled: boolean;
   messages: {
     all: string;
     app: string;
@@ -60,7 +61,7 @@ type Props = {
   currentLocale: string | undefined;
 };
 
-const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) => {
+const SearchApps = ({ category, categoryName, messages, currentLocale, clickSupportEnabled }: Props) => {
   const SORT_OPTIONS = [
     { value: "relevance", label: messages.options.relevance },
     { value: "-calculated_rating", label: messages.options["-calculated_rating"] },
@@ -195,7 +196,9 @@ const SearchApps = ({ category, categoryName, messages, currentLocale }: Props) 
             {categoryName && <> - {categoryName}</>}
           </h1>
 
-          <FilterDialog type={query.type as AppType | ""} showNsfw={!!query.showNsfw} onChange={setFilters} messages={messages} />
+          {clickSupportEnabled && (
+            <FilterDialog type={query.type as AppType | ""} showNsfw={!!query.showNsfw} onChange={setFilters} messages={messages} />
+          )}
         </div>
 
         <div class="md:hidden">

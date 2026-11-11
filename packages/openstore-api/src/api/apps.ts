@@ -21,7 +21,7 @@ import {
   error,
 } from '../utils';
 import { handleChannel } from '../utils/channels';
-import { DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH, SNAP_DOWNLOAD_NOT_SUPPORTED } from '../utils/error-messages';
+import { APP_NOT_FOUND, DOWNLOAD_NOT_FOUND_FOR_CHANNEL, INVALID_ARCH, SNAP_DOWNLOAD_NOT_SUPPORTED } from '../utils/error-messages';
 import reviews from './reviews';
 
 const router = express.Router();
@@ -72,11 +72,12 @@ router.post('/', asyncErrorWrapper(apps, 'Could not fetch app list at this time'
  * Get one app and return a serialized version.
  */
 router.get('/:id', fetchPublishedPackage(true), async (req: Request, res: Response) => {
-  // Allow access if either:
-  // 1. Package type is in the allowed list, OR
-  // 2. Request explicitly specifies package_type that matches the app's package_type
   const requestedPackageTypes = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
-  if (!config.allowed_package_types.includes(req.pkg.package_type) && !requestedPackageTypes.includes(req.pkg.package_type)) {
+
+  if (
+    !config.allowed_package_types.has(req.pkg.package_type) ||
+    (config.restricted_fetch_package_types.has(req.pkg.package_type) && !requestedPackageTypes.includes(req.pkg.package_type))
+  ) {
     error(res, 'Package type not available', 404);
     return;
   }
@@ -91,6 +92,10 @@ router.get('/:id', fetchPublishedPackage(true), async (req: Request, res: Respon
  * Gets the download for a given package for the given channel and architecture.
  */
 async function download(req: Request, res: Response) {
+  if (!config.allowed_package_types.has(req.pkg.package_type)) {
+    throw new NotFoundError(APP_NOT_FOUND);
+  }
+
   // Prevent downloads for snap packages
   if (req.pkg.package_type === PackageType.SNAP) {
     throw new UserError(SNAP_DOWNLOAD_NOT_SUPPORTED);

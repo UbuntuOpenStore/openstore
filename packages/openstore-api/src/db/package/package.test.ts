@@ -83,7 +83,7 @@ describe('Package', () => {
 
       assert.deepEqual(parsed, {
         types: [AppType.APP],
-        packageTypes: [PackageType.CLICK],
+        packageTypes: [...config.allowed_package_types],
         architectures: [Architecture.ALL],
         limit: 100,
         skip: 20,
@@ -138,26 +138,11 @@ describe('Package', () => {
       );
     });
 
-    test('defaults to click package type when not specified', () => {
+    test('defaults to the allowed package types when not specified', () => {
       const parsed = Package.parseRequestFilters({
         query: {},
       } as any);
-      assert.deepEqual(parsed.packageTypes, [PackageType.CLICK]);
-    });
-
-    test('uses the provided default package types when not specified', () => {
-      const parsed = Package.parseRequestFilters({ query: {} } as any, [PackageType.CLICK, PackageType.SNAP, PackageType.PACKAGEKIT]);
-      assert.deepEqual(parsed.packageTypes, [PackageType.CLICK, PackageType.SNAP, PackageType.PACKAGEKIT]);
-    });
-
-    test('an explicit package_type overrides the provided default package types', () => {
-      const parsed = Package.parseRequestFilters(
-        {
-          query: { package_type: PackageType.SNAP },
-        } as any,
-        [PackageType.CLICK, PackageType.SNAP, PackageType.PACKAGEKIT],
-      );
-      assert.deepEqual(parsed.packageTypes, [PackageType.SNAP]);
+      assert.deepEqual(parsed.packageTypes, [...config.allowed_package_types]);
     });
 
     test('handles package_type parameter', () => {

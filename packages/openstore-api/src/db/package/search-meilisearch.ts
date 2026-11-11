@@ -213,6 +213,10 @@ export class PackageSearch implements PackageSearchInterface {
   }
 
   async search(filters: PackageRequestFilters, sort: string = 'relevance', skip: number = 0, limit: number = 30) {
+    if (filters.packageTypes && filters.packageTypes.length === 0) {
+      return { hits: [], count: 0 };
+    }
+
     const searchParams: SearchParams = {
       offset: skip,
       limit,

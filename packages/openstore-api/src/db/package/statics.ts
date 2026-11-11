@@ -7,6 +7,7 @@ import { type FilterQuery, type Schema, type Types } from 'mongoose';
 import { UserError } from '../../exceptions';
 import { getData, getDataArray, getDataBooleanOrUndefined, getDataInt } from '../../utils';
 import { handleChannel } from '../../utils/channels';
+import { config, filterAllowedPackageTypes } from '../../utils/config';
 import { DUPLICATE_PACKAGE, NO_SPACES_NAME, BAD_NAMESPACE, MISSING_CHANNEL_ARCH, INVALID_PACKAGEKIT_ID } from '../../utils/error-messages';
 import { PACKAGEKIT_NAME_MAX_LENGTH } from '../../utils/limits';
 
@@ -53,11 +54,13 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
   };
 
   packageSchema.statics.stats = async function (): Promise<PackageStats> {
+    const packageType = PackageType.CLICK;
+
     const [categoryStats, typeStats, frameworkStats, archStats] = await Promise.all([
-      this.categoryStats(Object.values(Channel)),
+      this.categoryStats(Object.values(Channel), [packageType]),
       this.aggregate([
         {
-          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
+          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: packageType },
         },
         {
           $group: {
@@ -71,7 +74,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       ]),
       this.aggregate([
         {
-          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
+          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: packageType },
         },
         {
           $unwind: '$revisions',
@@ -96,7 +99,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       ]),
       this.aggregate([
         {
-          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: PackageType.CLICK },
+          $match: { published: true, channels: { $in: Object.values(Channel) }, package_type: packageType },
         },
         {
           $group: {
@@ -176,10 +179,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     return results as CategoryStat[];
   };
 
-  packageSchema.statics.parseRequestFilters = function (
-    req: Request,
-    defaultPackageTypes: PackageType[] = [PackageType.CLICK],
-  ): PackageRequestFilters {
+  packageSchema.statics.parseRequestFilters = function (req: Request): PackageRequestFilters {
     const types = [
       ...getDataArray(req, 'types'),
       // Handle non-pluralized form
@@ -193,7 +193,9 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       // Handle non-pluralized form
       ...getDataArray(req, 'package_type'),
     ];
-    const packageTypes = packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : defaultPackageTypes;
+    const packageTypes = filterAllowedPackageTypes(
+      packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : [...config.allowed_package_types],
+    );
 
     const architecture = getData(req, 'architecture').toLowerCase() as Architecture | undefined;
     let architectures: Architecture[] = [];
@@ -277,7 +279,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       };
     }
 
-    if (packageTypes && packageTypes.length > 0) {
+    if (packageTypes) {
       query.package_type = {
         $in: packageTypes,
       };
@@ -423,6 +425,10 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     filters: PackageRequestFilters,
     full = false,
   ): Promise<{ pkgs: HydratedPackage[]; count: number }> {
+    if (filters.packageTypes && filters.packageTypes.length === 0) {
+      return { pkgs: [], count: 0 };
+    }
+
     const { hits, count } = await packageSearchInstance.search(filters, filters.sort, filters.skip, filters.limit);
 
     const ids = hits.map((pkg: any) => pkg.id);

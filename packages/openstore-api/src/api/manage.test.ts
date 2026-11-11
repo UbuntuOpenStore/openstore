@@ -160,16 +160,23 @@ describe('Manage', () => {
         assert.equal(res.body.data.packages[0].maintainer, user._id.toString());
       });
 
-      test('shows only click packages for a community user', async () => {
-        await factory.package({ maintainer: user._id, name: 'Snap app', package_type: PackageType.SNAP });
-        await factory.package({ maintainer: user._id, name: 'PackageKit app', package_type: PackageType.PACKAGEKIT });
+      test('shows all allowed package types for a community user', async () => {
+        const snap = await factory.package({
+          maintainer: user._id,
+          name: 'Snap app',
+          package_type: PackageType.SNAP,
+          snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
+        });
+        const packagekit = await factory.package({ maintainer: user._id, name: 'PackageKit app', package_type: PackageType.PACKAGEKIT });
 
         const res = await request(app).get(route).expect(200);
 
         assert.ok(res.body.success);
-        assert.equal(res.body.data.count, 1);
-        assert.equal(res.body.data.packages[0].id, package1.id);
-        assert.equal(res.body.data.packages[0].package_type, PackageType.CLICK);
+        assert.equal(res.body.data.count, 3);
+        const ids = res.body.data.packages.map((p: TestPackage) => p.id);
+        assert.ok(ids.includes(package1.id));
+        assert.ok(ids.includes(snap.id));
+        assert.ok(ids.includes(packagekit.id));
       });
 
       test('fails gracefully', async (t) => {

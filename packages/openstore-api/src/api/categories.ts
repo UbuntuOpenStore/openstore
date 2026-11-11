@@ -3,7 +3,17 @@ import express, { type Request, type Response } from 'express';
 
 import { Package } from '../db/package';
 import { PackageType } from '../db/package/types';
-import { setLang, gettext, config, success, getData, getDataArray, getDataBooleanOrUndefined, asyncErrorWrapper } from '../utils';
+import {
+  setLang,
+  gettext,
+  config,
+  success,
+  getData,
+  getDataArray,
+  getDataBooleanOrUndefined,
+  asyncErrorWrapper,
+  filterAllowedPackageTypes,
+} from '../utils';
 import { handleChannel } from '../utils/channels';
 import categoryIcons from './json/category_icons.json';
 
@@ -20,7 +30,9 @@ router.get(
 
     const channel = handleChannel(getData(req, 'channel'));
     const packageTypeParams = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
-    const packageTypes = packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [PackageType.CLICK];
+    const packageTypes = filterAllowedPackageTypes(
+      packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [...config.allowed_package_types],
+    );
     const lomiriCompatible = getDataBooleanOrUndefined(req, 'lomiri_compatible');
     let categories = categoryNames.map((category) => {
       return {

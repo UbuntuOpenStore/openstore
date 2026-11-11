@@ -29,6 +29,7 @@ type ManageListProps = {
   isAdmin: boolean;
   userId: string;
   currentLocale: string | undefined;
+  clickSupportEnabled: boolean;
   messages: {
     filters: string;
     filterByType: string;
@@ -72,7 +73,7 @@ type ManageListProps = {
 
 type ViewMode = "grid" | "list";
 
-const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: ManageListProps) => {
+const ManageList = ({ apikey, isAdmin, userId, currentLocale, clickSupportEnabled, messages }: ManageListProps) => {
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
   const urlPage = parseInt(hashParams.get("page") ?? "0");
 
@@ -234,6 +235,7 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
             published={query.published}
             packageType={query.packageType}
             isAdmin={isAdmin}
+            clickSupportEnabled={clickSupportEnabled}
             onChange={setFilters}
             messages={messages}
           />
@@ -266,9 +268,11 @@ const ManageList = ({ apikey, isAdmin, userId, currentLocale, messages }: Manage
           </Button>
         </div>
 
-        <a href={getRelativeLocaleUrl(currentLocale, "/submit/")} class="btn bg-ubuntu-orange text-white inline-block">
-          {messages.submit}
-        </a>
+        {clickSupportEnabled && (
+          <a href={getRelativeLocaleUrl(currentLocale, "/submit/")} class="btn bg-ubuntu-orange text-white inline-block">
+            {messages.submit}
+          </a>
+        )}
       </div>
 
       {error ? (

@@ -8,6 +8,7 @@ import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
 import { getRelativeLocaleUrlList } from "astro:i18n";
+import { config } from "@/lib/config";
 
 export type Props = {
   category: CategoryData;
@@ -54,6 +55,7 @@ const { category } = Astro.props;
 
     <div class="w-full">
       <SearchApps
+        clickSupportEnabled={config.clickSupportEnabled}
         category={category.category}
         categoryName={category.translation}
         messages={{

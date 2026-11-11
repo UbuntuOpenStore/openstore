@@ -8,8 +8,13 @@ import { PackageStatsSchema } from "@/lib/schema";
 import { APP_TYPE_OPTIONS } from "@/lib/constants";
 
 import { getStaticPathsForLocales } from "@/lib/i18n";
+import { config } from "@/lib/config";
 
 export async function getStaticPaths() {
+  if (!config.clickSupportEnabled) {
+    return [];
+  }
+
   return getStaticPathsForLocales();
 }
 

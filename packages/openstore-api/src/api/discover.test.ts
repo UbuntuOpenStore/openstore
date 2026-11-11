@@ -33,6 +33,7 @@ function discoverAppIds(res: request.Response): string[] {
 describe('Discover API', () => {
   const route = '/api/v4/discover/';
   const v5Route = '/api/v5/discover/';
+  const defaultAllowedPackageTypes = new Set(config.allowed_package_types);
   let app: App;
 
   before(async () => {
@@ -46,6 +47,7 @@ describe('Discover API', () => {
   });
 
   beforeEach(async () => {
+    config.allowed_package_types = new Set(defaultAllowedPackageTypes);
     await cleanMongoose();
 
     // Clean up cache files
@@ -211,7 +213,9 @@ describe('Discover API', () => {
     assert.equal(getCountsByIdsSpy.mock.callCount(), 1);
   });
 
-  test('excludes snap packages from discover', async () => {
+  test('excludes snap packages from discover when not allowed', async () => {
+    config.allowed_package_types = new Set([PackageType.CLICK]);
+
     await factory.package({
       published: true,
       id: 'snap.firefox',
@@ -244,6 +248,8 @@ describe('Discover API', () => {
   });
 
   test('v5 includes snap packages when package_types=snap is requested', async () => {
+    config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
     await factory.package({
       published: true,
       id: 'snap.firefox',
@@ -275,6 +281,8 @@ describe('Discover API', () => {
   });
 
   test('v5 only selects categories that have apps for the requested package type', async (t) => {
+    config.allowed_package_types = new Set([PackageType.CLICK, PackageType.SNAP]);
+
     const snapPackage = {
       published: true,
       architectures: [Architecture.ALL],

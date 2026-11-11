@@ -42,8 +42,8 @@ export function generateSchema(url: string, breadcrumbs: { name: string, path: s
         screenshot: app.screenshots[0],
         abstract: app.tagline,
         about: app.description,
-        dateModified: new Date(app.updated_date).toISOString(),
-        datePublished: new Date(app.published_date).toISOString(),
+        dateModified: app.updated_date ? new Date(app.updated_date).toISOString() : undefined,
+        datePublished: app.published_date ? new Date(app.published_date).toISOString() : undefined,
         isFamilyFriendly: !app.nsfw,
 
       } : undefined,

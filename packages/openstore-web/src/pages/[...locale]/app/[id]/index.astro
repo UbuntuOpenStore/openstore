@@ -31,6 +31,7 @@ import SvgHome from "@/components/icons/Home";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
+import { config } from "@/lib/config";
 
 await initializeI18N(Astro.currentLocale);
 const lang = localeSlugToCode(Astro.currentLocale);
@@ -41,8 +42,6 @@ const [appResponse, reviewsResponse] = await Promise.all([
   fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}?lang=${lang}`, { headers: { 'X-Source': 'openstore-web-next', "User-Agent": "open-store.io" } }),
   fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}/reviews?lang=${lang}`, { headers: { 'X-Source': 'openstore-web-next', "User-Agent": "open-store.io" } }),
 ]);
-
-console.log(`${import.meta.env.PUBLIC_API_URL}api/v4/apps/${id}?lang=${lang}&architecture=${Architecture.ARM64}`)
 
 if (appResponse.status === 404) {
   return new Response(null, {
@@ -341,29 +340,41 @@ const publisherUrl = app.publisher_id ? `/users/${app.publisher_id}` : `/apps/#s
     <IconList
       title={t("Info")}
     >
-      <IconListItem label={t("Published Date")} value={dateFormatter.format(app.published_date)}>
-        <SvgDate />
-      </IconListItem>
+      {app.published_date && (
+        <IconListItem label={t("Published Date")} value={dateFormatter.format(app.published_date)}>
+          <SvgDate />
+        </IconListItem>
+      )}
 
-      <IconListItem label={t("Updated Date")} value={dateFormatter.format(app.updated_date)}>
-        <SvgDate />
-      </IconListItem>
+      {app.updated_date && (
+        <IconListItem label={t("Updated Date")} value={dateFormatter.format(app.updated_date)}>
+          <SvgDate />
+        </IconListItem>
+      )}
 
-      <IconListItem label={t("Current Version")} value={app.version}>
-        <SvgInfo />
-      </IconListItem>
+      {app.version && (
+        <IconListItem label={t("Current Version")} value={app.version}>
+          <SvgInfo />
+        </IconListItem>
+      )}
 
-      <IconListItem label={t("Total Downloads")} value={numberFormatter.format(app.totalDownloads)}>
-        <SvgSave />
-      </IconListItem>
+      {config.clickSupportEnabled && (
+        <IconListItem label={t("Total Downloads")} value={numberFormatter.format(app.totalDownloads)}>
+          <SvgSave />
+        </IconListItem>
+      )}
 
-      <IconListItem label={t("Latest Version Downloads")} value={numberFormatter.format(app.latestDownloads)}>
-        <SvgSave />
-      </IconListItem>
+      {config.clickSupportEnabled && (
+        <IconListItem label={t("Latest Version Downloads")} value={numberFormatter.format(app.latestDownloads)}>
+          <SvgSave />
+        </IconListItem>
+      )}
 
-      <IconListItem label={t("Supported Architectures")} value={app.architectures.join(", ")}>
-        <SvgDevice />
-      </IconListItem>
+      {app.architectures.length > 0 && (
+        <IconListItem label={t("Supported Architectures")} value={app.architectures.join(", ")}>
+          <SvgDevice />
+        </IconListItem>
+      )}
 
       {app.languages.length > 0 && (
         <IconListItem label={t("Translation Languages")} value={app.languages.join(", ")}>
