@@ -14,8 +14,11 @@ import type { DiscoverData } from './types';
 export const CACHE_DIR = path.join(config.cache_dir, 'discover');
 export const CACHE_DURATION_MS = 600000; // 10 minutes
 
-const NEW_AND_UPDATED = 'New and Updated Apps';
+const NEW = 'New Apps';
+const UPDATED = 'Updated Apps';
 const POPULAR = 'Most Loved';
+const NEW_APPS_LIMIT = 8;
+const UPDATED_APPS_LIMIT = 8;
 
 export type CachedData<T> = {
   data: T;
@@ -130,7 +133,11 @@ export async function getCategoryApps<TApp>(
 
   const allCategories = [
     {
-      category: { name: NEW_AND_UPDATED, tagline: 'Exciting new apps & updates', referral: '', ids: [] },
+      category: { name: NEW, tagline: 'Exciting new apps', referral: '', ids: [] },
+      apps: [] as HydratedPackage[],
+    },
+    {
+      category: { name: UPDATED, tagline: 'Apps with recent updates', referral: '', ids: [] },
       apps: [] as HydratedPackage[],
     },
     ...selectedCategories,
@@ -161,54 +168,39 @@ export async function getNewAndUpdatedApps<TApp>(
   packageTypes: PackageType[],
   serializeApp: (app: HydratedPackage) => TApp,
 ): Promise<void> {
+  const filters = {
+    published: true,
+    channel,
+    architectures: [architecture, Architecture.ALL],
+    frameworks,
+    nsfw: [null, false],
+    types: [AppType.APP],
+    packageTypes,
+  };
+
   const [newApps, updatedApps] = await Promise.all([
+    Package.findByFilters(filters, '-published_date', NEW_APPS_LIMIT),
     Package.findByFilters(
-      {
-        published: true,
-        channel,
-        architectures: [architecture, Architecture.ALL],
-        frameworks,
-        nsfw: [null, false],
-        types: [AppType.APP],
-        packageTypes,
-      },
-      '-published_date',
-      8,
-    ),
-    Package.findByFilters(
-      {
-        published: true,
-        channel,
-        architectures: [architecture, Architecture.ALL],
-        frameworks,
-        nsfw: [null, false],
-        types: [AppType.APP],
-        packageTypes,
-      },
+      filters,
       '-updated_date',
-      8,
+      // Fetch extra apps to leave room for removing the apps that are
+      // shown in the New Apps category
+      NEW_APPS_LIMIT + UPDATED_APPS_LIMIT,
     ),
   ]);
 
-  let newAndUpdatedApps = newApps.concat(updatedApps);
-  newAndUpdatedApps = newAndUpdatedApps.filter((app, pos) => {
-    return newAndUpdatedApps.findIndex((a) => a.id === app.id) === pos;
-  });
+  const newIds = new Set(newApps.map((app) => app.id));
 
-  newAndUpdatedApps.sort((a, b) => {
-    if (a.updated_date! > b.updated_date!) {
-      return -1;
-    }
+  const newCategory = categories.find((c) => c.name === NEW);
+  newCategory!.apps = newApps.map((app) => serializeApp(app));
 
-    if (a.updated_date! < b.updated_date!) {
-      return 1;
-    }
-
-    return 0;
-  });
-
-  const category = categories.find((c) => c.name === NEW_AND_UPDATED);
-  category!.apps = newAndUpdatedApps.slice(0, 10).map((app) => serializeApp(app));
+  // Apps qualify as updated when they received a revision after they were
+  // published, and they are not already shown in the New Apps category
+  const updatedCategory = categories.find((c) => c.name === UPDATED);
+  updatedCategory!.apps = updatedApps
+    .filter((app) => !!app.updated_date && app.updated_date !== app.published_date && !newIds.has(app.id))
+    .slice(0, UPDATED_APPS_LIMIT)
+    .map((app) => serializeApp(app));
 }
 
 export async function getPopularApps<TApp>(

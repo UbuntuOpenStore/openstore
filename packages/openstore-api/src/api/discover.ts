@@ -26,8 +26,8 @@ const router = express.Router();
  * Get highlighted apps based on the data stored in the database
  * This consists of a list of highlighted apps that have a banner image
  * and a list of categories that have several apps inside of them.
- * There are two static categories: one for new and updated apps
- * and one for popular apps.
+ * There are three static categories: one for new apps, one for updated
+ * apps and one for popular apps.
  */
 router.get(
   '/',
