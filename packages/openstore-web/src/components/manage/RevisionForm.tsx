@@ -4,7 +4,7 @@ import { useCallback, useState } from "preact/hooks";
 import SvgSpinner from "../icons/Spinner";
 import SvgCheck from "../icons/Check";
 import SvgClose from "../icons/Close";
-import { cn, getClientApiKey } from "@/lib/utils";
+import { cn, getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
 import SvgSave from "../icons/Save";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import SvgInfo from "../icons/Info";
@@ -12,6 +12,7 @@ import SvgExternalLink from "../icons/ExternalLink";
 
 type RevisionFormProps = {
   app: AppManageData;
+  currentLocale: string | undefined;
   messages: {
     appstreamMetainfo: string;
     appstreamDocs: string;
@@ -63,8 +64,7 @@ function uploadFile(
           errorBody = JSON.parse(xhr.responseText);
         } catch (e) {}
 
-        const message =
-          errorBody && typeof errorBody.message === "string" ? errorBody.message : errorMessages.unknownError;
+        const message = errorBody && typeof errorBody.message === "string" ? errorBody.message : errorMessages.unknownError;
 
         const data = errorBody?.data as Record<string, unknown> | undefined;
         const reasons = Array.isArray(data?.reasons) ? (data.reasons as string[]) : undefined;
@@ -81,7 +81,7 @@ function uploadFile(
   });
 }
 
-const RevisionForm = ({ app, messages }: RevisionFormProps) => {
+const RevisionForm = ({ app, currentLocale, messages }: RevisionFormProps) => {
   const [processing, setProcessing] = useState(false);
   const [files, setFiles] = useState<FileState[]>([]);
 
@@ -162,6 +162,8 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
     [app.id, messages]
   );
 
+  const showForm = !app.locked && (!app.admin_message || app.admin_message_acknowledged);
+
   if (processing) {
     const allFinished = files.every((file) => file.success || file.error);
 
@@ -212,79 +214,115 @@ const RevisionForm = ({ app, messages }: RevisionFormProps) => {
 
   return (
     <form class="space-y-4 h-full" onSubmit={save}>
-      <section class="section space-y-4">
-        <Alert class="flex gap-4" variant="info">
-          <div>
-            <SvgInfo class="text-blue-600" />
-          </div>
+      {app.admin_message && !app.admin_message_acknowledged && (
+        <section class="section">
+          <Alert variant={app.locked ? "destructive" : "warning"} class="flex gap-4">
+            <div class="w-full">
+              <AlertTitle>{app.locked ? "App locked" : "Message from the OpenStore admins"}</AlertTitle>
+              <AlertDescription>
+                <p class="whitespace-pre-wrap">{app.admin_message}</p>
 
-          <div>
-            <AlertTitle>{messages.appstreamMetainfo}</AlertTitle>
-            <AlertDescription>
-              <p>{messages.appstreamDescription}</p>
-              <p>
-                <a
-                  href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
-                  target="_blank"
-                  rel="noopener"
-                  class="text-blue-600 underline"
-                >
-                  {messages.appstreamDocs}
-                </a>
-                <a
-                  href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
-                  target="_blank"
-                  rel="noopener"
-                  class="ml-1"
-                >
-                  <SvgExternalLink class="inline text-blue-600" />
-                </a>
-              </p>
-            </AlertDescription>
-          </div>
-        </Alert>
-      </section>
+                {app.locked && (
+                  <p class="mt-2 font-medium">
+                    This app has been locked. If you would like to appeal this decision, please contact the OpenStore admins on{" "}
+                    <a href="/telegram" class="text-ubuntu-orange">
+                      Telegram
+                    </a>
+                  </p>
+                )}
 
-      <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+                {!app.locked && (
+                  <p class="mt-2 font-medium">
+                    You must acknowledge this message before uploading a new revision. You can acknowledge it on the{" "}
+                    <a href={getRelativeLocaleUrl(currentLocale, `/manage/${app.id}/`)} class="underline">
+                      manage page
+                    </a>
+                    .
+                  </p>
+                )}
+              </AlertDescription>
+            </div>
+          </Alert>
+        </section>
+      )}
 
-      <section class="section space-y-4">
-        <div class="form-group">
-          <label for="files" class="form-label">
-            {messages.clickFiles}
-          </label>
-          <div class="w-full">
-            <input
-              type="file"
-              id="files"
-              name="files"
-              accept=".click"
-              required
-              multiple
-              class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 file:cursor-pointer border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-        <p class="text-xs text-gray-500 text-right">{messages.multipleFilesDescription}</p>
-      </section>
+      {showForm && (
+        <>
+          <section class="section space-y-4">
+            <Alert class="flex gap-4" variant="info">
+              <div>
+                <SvgInfo class="text-blue-600" />
+              </div>
 
-      <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+              <div>
+                <AlertTitle>{messages.appstreamMetainfo}</AlertTitle>
+                <AlertDescription>
+                  <p>{messages.appstreamDescription}</p>
+                  <p>
+                    <a
+                      href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-blue-600 underline"
+                    >
+                      {messages.appstreamDocs}
+                    </a>
+                    <a
+                      href="https://www.freedesktop.org/software/appstream/docs/chap-CatalogData.html"
+                      target="_blank"
+                      rel="noopener"
+                      class="ml-1"
+                    >
+                      <SvgExternalLink class="inline text-blue-600" />
+                    </a>
+                  </p>
+                </AlertDescription>
+              </div>
+            </Alert>
+          </section>
 
-      <section class="section space-y-4">
-        <div class="form-group">
-          <label for="changelog" class="form-label">
-            {messages.changelog}
-          </label>
-          <textarea id="changelog" name="changelog" class="form-input" rows={4}></textarea>
-        </div>
-      </section>
+          <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
 
-      <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+          <section class="section space-y-4">
+            <div class="form-group">
+              <label for="files" class="form-label">
+                {messages.clickFiles}
+              </label>
+              <div class="w-full">
+                <input
+                  type="file"
+                  id="files"
+                  name="files"
+                  accept=".click"
+                  required
+                  multiple
+                  class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 file:cursor-pointer border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 text-right">{messages.multipleFilesDescription}</p>
+          </section>
 
-      <section class="section flex gap-4 items-center">
-        <button type="submit" class="btn bg-ubuntu-orange text-white font-bold cursor-pointer">
-          {messages.upload}
-        </button>
-      </section>
+          <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+
+          <section class="section space-y-4">
+            <div class="form-group">
+              <label for="changelog" class="form-label">
+                {messages.changelog}
+              </label>
+              <textarea id="changelog" name="changelog" class="form-input" rows={4}></textarea>
+            </div>
+          </section>
+
+          <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+
+          <section class="section flex gap-4 items-center">
+            <button type="submit" class="btn bg-ubuntu-orange text-white font-bold cursor-pointer">
+              {messages.upload}
+            </button>
+          </section>
+        </>
+      )}
     </form>
   );
 };

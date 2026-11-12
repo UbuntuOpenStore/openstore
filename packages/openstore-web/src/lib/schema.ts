@@ -122,6 +122,8 @@ export type PackageStatsData = z.infer<typeof PackageStatsSchema>;
 export const AppManageSchema = AppSchema.extend({
   published: z.boolean(),
   locked: z.boolean(),
+  admin_message: z.string().default(''),
+  admin_message_acknowledged: z.boolean().default(false),
   type_override: z.string(),
   review_exceptions: z.array(z.string()),
   maintainer: z.string().optional(),

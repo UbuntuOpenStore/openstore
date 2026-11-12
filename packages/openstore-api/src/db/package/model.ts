@@ -98,6 +98,8 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
   channel_architectures: [String], // A list of channel:architecture that the app supports
   device_compatibilities: [String], // A list of channel:arch:framework that the app supports
   locked: Boolean,
+  admin_message: String,
+  admin_message_acknowledged: Boolean,
   qml_imports: [],
   review_exceptions: [String],
   skip_review: Boolean,

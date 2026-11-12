@@ -31,6 +31,7 @@ import {
   NO_REVISIONS,
   APP_HAS_REVISIONS,
   APP_LOCKED,
+  ADMIN_MESSAGE_NOT_ACKNOWLEDGED,
   NEEDS_MANUAL_REVIEW,
   CLICK_REVIEW_ERROR,
   INVALID_CHANNEL,
@@ -62,7 +63,7 @@ router.get(
     const pkgs = await Package.findByFilters(filters, filters.sort, filters.limit, filters.skip, false);
     const count = await Package.countByFilters(filters, false);
 
-    const formatted = pkgs.map((pkg) => pkg.serialize(undefined, undefined, undefined, undefined, true));
+    const formatted = pkgs.map((pkg) => pkg.serialize(undefined, undefined, undefined, undefined, true, true));
     const { next, previous } = apiLinks(req.originalUrl, formatted.length, filters.limit, filters.skip);
     success(res, { count, next, previous, packages: formatted });
   }, 'Could not fetch app list at this time'),
@@ -72,7 +73,7 @@ router.get(
  * Get one app belonging to the logged in user.
  */
 router.get('/:id', authenticate, userRole, fetchPackage(), canManage, async (req: Request, res: Response) => {
-  success(res, req.pkg.serialize(undefined, undefined, undefined, undefined, true));
+  success(res, req.pkg.serialize(undefined, undefined, undefined, undefined, true, true));
 });
 
 /**
@@ -139,7 +140,7 @@ router.post(
 
     pkg = await pkg.save();
 
-    success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
+    success(res, pkg.serialize(undefined, undefined, undefined, undefined, true, true));
   }, 'There was an error creating your app, please try again later'),
 );
 
@@ -175,6 +176,20 @@ router.put(
       delete req.body.locked;
       delete req.body.type_override;
       delete req.body.desktop_names_override;
+      delete req.body.admin_message;
+
+      // Maintainers may only acknowledge an existing message while the app is not locked.
+      // They cannot un-acknowledge it.
+      if (req.body.admin_message_acknowledged !== undefined) {
+        const acknowledged =
+          req.body.admin_message_acknowledged === 'true' ||
+          req.body.admin_message_acknowledged === 'on' ||
+          req.body.admin_message_acknowledged === true;
+
+        if (!acknowledged || !req.pkg.admin_message || req.pkg.locked) {
+          delete req.body.admin_message_acknowledged;
+        }
+      }
     }
 
     const existingLicense = req.pkg.license?.trim() ?? '';
@@ -210,7 +225,7 @@ router.put(
       await packageSearchInstance.remove(pkg);
     }
 
-    success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
+    success(res, pkg.serialize(undefined, undefined, undefined, undefined, true, true));
   }, 'There was an error updating your app, please try again later'),
 );
 
@@ -351,6 +366,10 @@ router.post(
         throw new AuthorizationError(APP_LOCKED);
       }
 
+      if (!req.isAdminUser && pkg.admin_message && !pkg.admin_message_acknowledged) {
+        throw new UserError(ADMIN_MESSAGE_NOT_ACKNOWLEDGED);
+      }
+
       if (!config.allowed_package_types.has(pkg.package_type)) {
         throw new UserError(PACKAGE_TYPE_NOT_ALLOWED);
       }
@@ -387,7 +406,7 @@ router.post(
       }
 
       await Lock.release(lock, req);
-      success(res, pkg.serialize(undefined, undefined, undefined, undefined, true));
+      success(res, pkg.serialize(undefined, undefined, undefined, undefined, true, true));
     } catch (err) {
       if (lock) {
         await Lock.release(lock, req);

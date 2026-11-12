@@ -11,6 +11,7 @@ import { getClientApiKey, getRelativeLocaleUrl } from "@/lib/utils";
 import DeleteApp from "./DeleteApp";
 import SvgExternalLink from "../icons/ExternalLink";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 type ManageAppFormProps = {
   user: UserData;
@@ -211,6 +212,43 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
   return (
     <>
       <form class="space-y-4" onSubmit={save}>
+        {app.admin_message && (
+          <section class="section">
+            <Alert variant={app.locked ? "destructive" : "warning"} class="flex gap-4">
+              <div class="w-full">
+                <AlertTitle>{app.locked ? "App locked" : "Message from the OpenStore admins"}</AlertTitle>
+                <AlertDescription>
+                  <p class="whitespace-pre-wrap">{app.admin_message}</p>
+
+                  {app.locked && (
+                    <p class="mt-2 font-medium">
+                      This app has been locked. If you would like to appeal this decision, please contact the OpenStore admins on{" "}
+                      <a href="/telegram" class="underline">
+                        Telegram
+                      </a>
+                      .
+                    </p>
+                  )}
+
+                  {!app.locked && (
+                    <label class="mt-2 flex items-center gap-2 font-medium">
+                      <input
+                        type="checkbox"
+                        name="admin_message_acknowledged"
+                        value="true"
+                        defaultChecked={app.admin_message_acknowledged}
+                        disabled={app.admin_message_acknowledged}
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      {app.admin_message_acknowledged ? "Message acknowledged" : "I acknowledge that I have fixed the issue."}
+                    </label>
+                  )}
+                </AlertDescription>
+              </div>
+            </Alert>
+          </section>
+        )}
+
         <section class="section space-y-4">
           <div class="form-group">
             <label for="published" class="form-label">
@@ -583,6 +621,15 @@ const ManageAppForm = ({ user, app, maintainers, onSave, currentLocale, messages
                   Locked
                 </label>
                 <Switch id="locked" name="locked" defaultChecked={app.locked} />
+              </div>
+
+              <div class="form-group">
+                <label for="admin_message" class="form-label">
+                  Admin Message
+                </label>
+                <textarea id="admin_message" name="admin_message" class="form-input" rows={3} maxLength={messages.textMaxLength}>
+                  {app.admin_message}
+                </textarea>
               </div>
 
               <div class="form-group">

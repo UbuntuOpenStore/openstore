@@ -72,7 +72,7 @@ const RevisionPage = ({ id, currentLocale, messages }: RevisionPageProps) => {
       />
 
       <div class="grow">
-        <RevisionForm app={app} messages={messages} />
+        <RevisionForm app={app} currentLocale={currentLocale} messages={messages} />
       </div>
     </>
   );

@@ -180,6 +180,8 @@ export type SerializedPackage = {
   published_date: string | null;
   published: boolean;
   locked: boolean;
+  admin_message?: string;
+  admin_message_acknowledged?: boolean;
   screenshots: string[];
   source: string;
   support_url: string;
@@ -312,6 +314,8 @@ export interface IPackage {
   channel_architectures: ChannelArchitecture[];
   device_compatibilities: string[];
   locked?: boolean;
+  admin_message?: string;
+  admin_message_acknowledged?: boolean;
   qml_imports: {
     module: string;
     version: string;
@@ -334,6 +338,8 @@ export interface BodyUpdate {
   name?: string;
   published?: string | boolean;
   locked?: string | boolean;
+  admin_message?: string;
+  admin_message_acknowledged?: string | boolean;
   category?: string;
   changelog?: string;
   version_changelogs?: Array<{ version: string; changelog: string }> | string;
@@ -403,6 +409,7 @@ export interface IPackageMethods {
     frameworks?: string[],
     apiVersion?: number,
     fullChangelog?: boolean,
+    includeManageOnlyFields?: boolean,
   ) => SerializedPackage;
   updateScreenshotFiles: (screenshotFiles: File[]) => Promise<void>;
   updateBannerFile: (bannerFile: File) => Promise<boolean>;

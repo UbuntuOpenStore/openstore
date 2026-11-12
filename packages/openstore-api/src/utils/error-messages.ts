@@ -30,6 +30,8 @@ export const NO_NON_ALL = 'You cannot upload and architecture specific click for
 export const MISMATCHED_FRAMEWORK = 'Framework does not match existing click of a different architecture';
 export const MISMATCHED_PERMISSIONS = 'Permissions do not match existing click of a different architecture';
 export const APP_LOCKED = 'Sorry this app has been locked by an admin';
+export const ADMIN_MESSAGE_NOT_ACKNOWLEDGED =
+  'You must acknowledge the message from the OpenStore admins before uploading a new revision. You can acknowledge it on the app manage page.';
 export const INVALID_PACKAGE_TYPE = 'The provided package type is not valid';
 export const NO_LICENSE_SPECIFIED = 'No license specified';
 export const INVALID_LICENSE = 'The provided license is not valid';

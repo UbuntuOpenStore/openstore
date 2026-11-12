@@ -416,6 +416,20 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       this.locked = body.locked === 'true' || body.locked === 'on' || body.locked === true;
     }
 
+    if (body.admin_message !== undefined) {
+      const adminMessage = sanitize(body.admin_message);
+      if (adminMessage !== (this.admin_message ?? '')) {
+        this.admin_message = adminMessage;
+        // Changing the message requires the maintainer to acknowledge it again
+        this.admin_message_acknowledged = false;
+      }
+    }
+
+    if (body.admin_message_acknowledged !== undefined) {
+      this.admin_message_acknowledged =
+        body.admin_message_acknowledged === 'true' || body.admin_message_acknowledged === 'on' || body.admin_message_acknowledged === true;
+    }
+
     if (body.published !== undefined) {
       this.published = body.published === 'true' || body.published === 'on' || body.published === true;
     }
@@ -735,6 +749,7 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
       frameworks: string[] = [],
       apiVersion = 4,
       fullChangelog = false,
+      includeManageOnlyFields = false,
     ): SerializedPackage {
       // Clean up languages that got screwed up by click-parser
       let languages = this.languages ? this.languages.sort() : [];
@@ -839,6 +854,12 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         published_date: this.published_date || null,
         published: !!this.published,
         locked: !!this.locked,
+        ...(includeManageOnlyFields
+          ? {
+              admin_message: this.admin_message || '',
+              admin_message_acknowledged: !!this.admin_message_acknowledged,
+            }
+          : {}),
         screenshots: this.screenshots.map((file) => {
           // For snap packages, screenshots are already external URLs
           if (this.package_type === PackageType.SNAP) {

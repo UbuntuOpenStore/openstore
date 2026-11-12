@@ -102,6 +102,28 @@ describe('Manage Revision POST', () => {
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });
 
+    test('does not require acknowledging an admin message', async (t) => {
+      const lockAcquireSpy = t.mock.method(Lock, 'acquire');
+      const lockReleaseSpy = t.mock.method(Lock, 'release');
+
+      package1.admin_message = 'Please update your app';
+      await package1.save();
+
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
+        name: package1.id,
+        version: '1.0.0',
+        architecture: 'armhf',
+        apps: [],
+      }));
+
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
+
+      assert.ok(res.body.success);
+      assert.equal(lockAcquireSpy.mock.callCount(), 1);
+      assert.equal(lockReleaseSpy.mock.callCount(), 1);
+    });
+
     test('does not fail for manual review', async (t) => {
       const lockAcquireSpy = t.mock.method(Lock, 'acquire');
       const lockReleaseSpy = t.mock.method(Lock, 'release');
@@ -644,6 +666,44 @@ describe('Manage Revision POST', () => {
 
       assert.equal(res.body.success, false);
       assert.equal(res.body.message, messages.APP_LOCKED);
+      assert.equal(lockAcquireSpy.mock.callCount(), 1);
+      assert.equal(lockReleaseSpy.mock.callCount(), 1);
+    });
+
+    test('fails with a clear message when the admin message has not been acknowledged', async (t) => {
+      const lockAcquireSpy = t.mock.method(Lock, 'acquire');
+      const lockReleaseSpy = t.mock.method(Lock, 'release');
+
+      package1.admin_message = 'Please update your app';
+      await package1.save();
+
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(400);
+
+      assert.equal(res.body.success, false);
+      assert.equal(res.body.message, messages.ADMIN_MESSAGE_NOT_ACKNOWLEDGED);
+      assert.equal(lockAcquireSpy.mock.callCount(), 1);
+      assert.equal(lockReleaseSpy.mock.callCount(), 1);
+    });
+
+    test('allows uploads when the admin message has been acknowledged', async (t) => {
+      const lockAcquireSpy = t.mock.method(Lock, 'acquire');
+      const lockReleaseSpy = t.mock.method(Lock, 'release');
+
+      package1.admin_message = 'Please update your app';
+      package1.admin_message_acknowledged = true;
+      await package1.save();
+
+      clickReviewMock.mock.mockImplementation(async () => GOOD_REVIEW);
+      parseClickPackageMock.mock.mockImplementation(async () => ({
+        name: package1.id,
+        version: '1.0.0',
+        architecture: 'armhf',
+        apps: [],
+      }));
+
+      const res = await request(app).post(route1).attach('file', emptyClick).field('channel', Channel.FOCAL).expect(200);
+
+      assert.ok(res.body.success);
       assert.equal(lockAcquireSpy.mock.callCount(), 1);
       assert.equal(lockReleaseSpy.mock.callCount(), 1);
     });

@@ -890,6 +890,25 @@ describe('Manage', () => {
         assert.equal(pkg?.maintainer, user2._id.toString());
       });
 
+      test('can set an admin message and resets acknowledgement when the message changes', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        package1.admin_message = 'Old message';
+        package1.admin_message_acknowledged = true;
+        await package1.save();
+
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', admin_message: 'Please update your app' }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.admin_message, 'Please update your app');
+        assert.equal(res.body.data.admin_message_acknowledged, false);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.admin_message, 'Please update your app');
+        assert.equal(pkg?.admin_message_acknowledged, false);
+        assert.equal(removeSpy.mock.callCount(), 1);
+      });
+
       test('can update any package', async (t) => {
         const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
 
@@ -956,6 +975,55 @@ describe('Manage', () => {
         assert.equal(res.body.data.type_override, '');
         assert.equal(res.body.data.locked, false);
 
+        assert.equal(removeSpy.mock.callCount(), 1);
+      });
+
+      test('does not allow changing the admin message', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        package1.admin_message = 'Please update your app';
+        await package1.save();
+
+        const res = await request(app)
+          .put(route)
+          .send({ license: 'GNU GPL v3', admin_message: 'Message injected by a maintainer' })
+          .expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.admin_message, 'Please update your app');
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.admin_message, 'Please update your app');
+        assert.equal(removeSpy.mock.callCount(), 1);
+      });
+
+      test('can acknowledge an admin message when the app is not locked', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        package1.admin_message = 'Please update your app';
+        await package1.save();
+
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', admin_message_acknowledged: true }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.admin_message, 'Please update your app');
+        assert.equal(res.body.data.admin_message_acknowledged, true);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(pkg?.admin_message_acknowledged, true);
+        assert.equal(removeSpy.mock.callCount(), 1);
+      });
+
+      test('cannot acknowledge an admin message when there is no message', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
+
+        const res = await request(app).put(route).send({ license: 'GNU GPL v3', admin_message_acknowledged: true }).expect(200);
+
+        assert.ok(res.body.success);
+        assert.equal(res.body.data.admin_message_acknowledged, false);
+
+        const pkg = await Package.findOneByFilters(package1.id);
+        assert.equal(!!pkg?.admin_message_acknowledged, false);
         assert.equal(removeSpy.mock.callCount(), 1);
       });
 
