@@ -1053,19 +1053,22 @@ describe('Manage', () => {
         assert.equal(pkg?.name, 'User app');
       });
 
-      test('allows setting a license when the app does not have one', async () => {
+      test('allows setting a license when the app does not have one', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
         await Package.updateOne({ _id: package1._id }, { $unset: { license: 1 } });
 
         const res = await request(app).put(route).send({ license: 'GNU GPL v3' }).expect(200);
 
         assert.ok(res.body.success);
         assert.equal(res.body.data.license, 'GNU GPL v3');
+        assert.equal(removeSpy.mock.callCount(), 1);
 
         const pkg = await Package.findOneByFilters(package1.id);
         assert.equal(pkg?.license, 'GNU GPL v3');
       });
 
-      test('allows updating an app that already has a license without sending one', async () => {
+      test('allows updating an app that already has a license without sending one', async (t) => {
+        const removeSpy = t.mock.method(packageSearchInstance, 'remove', mockSearchMethod);
         package1.license = 'GNU GPL v3';
         await package1.save();
 
@@ -1074,6 +1077,7 @@ describe('Manage', () => {
         assert.ok(res.body.success);
         assert.equal(res.body.data.name, 'Foo Bar');
         assert.equal(res.body.data.license, 'GNU GPL v3');
+        assert.equal(removeSpy.mock.callCount(), 1);
       });
 
       test('accepts a description at the 3072 character limit', async (t) => {

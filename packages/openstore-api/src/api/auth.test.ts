@@ -9,12 +9,22 @@ import passport from 'passport';
 import request from 'supertest';
 import { type App } from 'supertest/types';
 
-import * as api from '.';
+import type * as Api from '.';
 import { User } from '../db/user';
 import factory, { type TestUser } from '../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../tests/utils';
 import { type GithubProfile, type GitlabProfile, type UbuntuProfile } from '../utils/auth.schema';
 import { config } from '../utils/config';
+
+// Passport only registers the GitHub and GitLab strategies when OAuth credentials are
+// configured. The verify callback tests use fake profiles, so configure placeholder
+// credentials before the api is loaded below.
+config.github.clientID ||= 'test-github-client-id';
+config.github.clientSecret ||= 'test-github-client-secret';
+config.gitlab.clientID ||= 'test-gitlab-client-id';
+config.gitlab.clientSecret ||= 'test-gitlab-client-secret';
+
+const api: typeof Api = require('.');
 
 interface PassportStrategy {
   authenticate(this: StrategyCreatedStatic, req: Request): void;
