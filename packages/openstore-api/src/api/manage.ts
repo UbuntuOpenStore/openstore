@@ -55,7 +55,7 @@ router.get(
   authenticate,
   userRole,
   asyncErrorWrapper(async (req: Request, res: Response) => {
-    const filters = Package.parseRequestFilters(req);
+    const filters = Package.parseRequestFilters(req, [...config.allowed_package_types]);
     if (!req.isAdminUser) {
       filters.publisherId = req.user!._id.toString();
     }

@@ -31,7 +31,7 @@ router.get(
     const channel = handleChannel(getData(req, 'channel'));
     const packageTypeParams = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
     const packageTypes = filterAllowedPackageTypes(
-      packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [...config.allowed_package_types],
+      packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [...config.default_package_types],
     );
     const lomiriCompatible = getDataBooleanOrUndefined(req, 'lomiri_compatible');
     let categories = categoryNames.map((category) => {

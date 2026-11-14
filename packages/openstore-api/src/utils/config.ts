@@ -14,6 +14,8 @@ const restrictedFetchPackageTypes = new Set(
     .filter(Boolean) as PackageType[],
 );
 
+const defaultPackageTypes = new Set([...allowedPackageTypes].filter((type) => !restrictedFetchPackageTypes.has(type)));
+
 let configuration = {
   data_dir: process.env.DATA_DIR || './.data/clicks',
   screenshot_dir: process.env.IMAGE_DIR || './.data/screenshots',
@@ -23,6 +25,7 @@ let configuration = {
   cache_dir: process.env.CACHE_DIR || './.data/cache',
   allowed_package_types: allowedPackageTypes,
   restricted_fetch_package_types: restrictedFetchPackageTypes,
+  default_package_types: defaultPackageTypes,
   server: {
     ip: process.env.NODEJS_IP || '0.0.0.0',
     port: parseInt(process.env.PORT || process.env.NODEJS_PORT || '6543', 10),

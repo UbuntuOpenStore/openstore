@@ -179,7 +179,10 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
     return results as CategoryStat[];
   };
 
-  packageSchema.statics.parseRequestFilters = function (req: Request): PackageRequestFilters {
+  packageSchema.statics.parseRequestFilters = function (
+    req: Request,
+    defaultPackageTypes: PackageType[] = [...config.default_package_types],
+  ): PackageRequestFilters {
     const types = [
       ...getDataArray(req, 'types'),
       // Handle non-pluralized form
@@ -194,7 +197,7 @@ export function setupStatics(packageSchema: Schema<IPackage, PackageModel, IPack
       ...getDataArray(req, 'package_type'),
     ];
     const packageTypes = filterAllowedPackageTypes(
-      packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : [...config.allowed_package_types],
+      packageTypeParams.length > 0 ? ([...new Set(packageTypeParams)] as PackageType[]) : defaultPackageTypes,
     );
 
     const architecture = getData(req, 'architecture').toLowerCase() as Architecture | undefined;

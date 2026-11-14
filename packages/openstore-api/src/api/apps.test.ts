@@ -352,6 +352,34 @@ describe('Apps API', () => {
       assert.equal(res.body.data.count, 2);
     });
 
+    test('excludes restricted package types from the default listing', async () => {
+      await factory.package({
+        id: 'snap.firefox',
+        name: 'Firefox',
+        author: 'Mozilla',
+        published: true,
+        package_type: PackageType.SNAP,
+        source_store: SourceStore.SNAPCRAFT,
+        snap_data: { channels: [SnapChannel.STABLE], confinement: SnapConfinement.STRICT, base: 'core22' },
+      });
+      await factory.package({
+        id: 'packagekit.org.gnome.Calculator',
+        name: 'Calculator',
+        author: 'GNOME',
+        published: true,
+        package_type: PackageType.PACKAGEKIT,
+      });
+
+      const res = await request(app).get(route).expect(200);
+      assert.ok(res.body.success);
+      assert.equal(res.body.data.count, 2);
+      assert.deepEqual(res.body.data.packages.map((pkg: TestPackage) => pkg.id).sort(), [package1.id, package2.id].sort());
+
+      const snapRes = await request(app).get(`${route}?package_type=snap`).expect(200);
+      assert.equal(snapRes.body.data.count, 1);
+      assert.equal(snapRes.body.data.packages[0].id, 'snap.firefox');
+    });
+
     test('filters by package_type=click explicitly', async () => {
       await factory.package({
         id: 'snap.firefox',

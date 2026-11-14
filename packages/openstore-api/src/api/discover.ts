@@ -119,7 +119,7 @@ v5Router.get(
 
     const packageTypeParams = [...getDataArray(req, 'package_types'), ...getDataArray(req, 'package_type')];
     const packageTypes = filterAllowedPackageTypes(
-      packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [...config.allowed_package_types],
+      packageTypeParams.length > 0 ? (packageTypeParams as PackageType[]) : [...config.default_package_types],
     );
 
     const cacheHash = crypto.createHash('md5').update(JSON.stringify({ packageTypes, frameworks })).digest('hex');
