@@ -1,0 +1,46 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdminMenu from "../../components/admin/AdminMenu";
+import AppstreamSyncConfigPage from "../../components/admin/AppstreamSyncConfigPage";
+import { getUser } from "../../lib/user";
+import Loading from "../../components/Loading";
+
+export const prerender = false;
+
+const apikey = Astro.cookies.get("apikey")?.value;
+if (!apikey) {
+  return Astro.redirect("/login/");
+}
+
+const user = await getUser(apikey);
+if (!user) {
+  Astro.cookies.delete("apikey");
+  return Astro.redirect("/login/");
+}
+
+if (!user.role || user.role !== "admin") {
+  return Astro.redirect("/");
+}
+---
+
+<BaseLayout
+  title="Manage AppStream Sync Config | OpenStore"
+  pageTitle="Manage AppStream Sync Config"
+  description="Manage AppStream sync sources and allowlist in OpenStore"
+  schema={undefined}
+>
+  <section class="section">
+    <h1 class="text-4xl">Manage AppStream Sync Config</h1>
+
+    <AdminMenu currentPath={Astro.url.pathname} />
+
+    <div class="w-full h-[1px] bg-ubuntu-gradient rounded-full mx-auto max-w-6xl"></div>
+  </section>
+
+  <section class="section grow">
+    <AppstreamSyncConfigPage client:only="preact">
+      <Loading slot="fallback" />
+    </AppstreamSyncConfigPage>
+  </section>
+</BaseLayout>

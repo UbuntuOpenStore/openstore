@@ -9,7 +9,7 @@ import type { AppstreamExportData } from 'click-parser';
 import { Package } from '.';
 import '../index';
 import { UserError, ValidationError } from '../../exceptions';
-import { type TestPackage } from '../../tests/factory';
+import factory, { type TestPackage } from '../../tests/factory';
 import { cleanMongoose, closeMongoose, waitForMongoose } from '../../tests/utils';
 import { getAppstreamLocalizedString, mapSpdxLicense, mapAppstreamCategory } from '../../utils/appstream-helpers';
 import { config } from '../../utils/config';
@@ -729,6 +729,26 @@ describe('Package', () => {
         serialized = testPkg.serialize(Architecture.ARMHF, DEFAULT_CHANNEL, [], 4);
         assert.deepEqual(serialized.desktop_names, ['custom.desktop']);
       });
+
+      test('serializes PackageKit content_rating from packagekit_data', async () => {
+        const contentRating = {
+          type: 'oars-1.1' as const,
+          content_attributes: [{ id: 'violence-cartoon', value: 'none' }],
+        };
+        const pkg = await factory.package({
+          package_type: PackageType.PACKAGEKIT,
+          packagekit_data: { content_rating: contentRating },
+        });
+
+        assert.deepEqual(pkg.serialize().content_rating, contentRating);
+      });
+
+      test('keeps PackageKit screenshots absolute', async () => {
+        const screenshots = ['https://cdn.example.com/shot1.png', 'https://cdn.example.com/shot2.png'];
+        const pkg = await factory.package({ package_type: PackageType.PACKAGEKIT, screenshots });
+
+        assert.deepEqual(pkg.serialize().screenshots, screenshots);
+      });
     });
 
     describe('serializeRatings', () => {
@@ -1067,6 +1087,18 @@ describe('Package', () => {
 
       test('handles compound SPDX expressions (AND)', () => {
         assert.equal(mapSpdxLicense('MIT AND Apache-2.0'), 'MIT/X/Expat License');
+      });
+
+      test('handles lowercase compound SPDX operators', () => {
+        assert.equal(mapSpdxLicense('GPL-2.0-or-later and MIT'), 'GNU GPL v2');
+      });
+
+      test('handles deprecated plus license suffix', () => {
+        assert.equal(mapSpdxLicense('GPL-2.0+'), 'GNU GPL v2');
+      });
+
+      test('uses the first license from a compound expression', () => {
+        assert.equal(mapSpdxLicense('GPL-2.0+ and CC-BY-SA'), 'GNU GPL v2');
       });
 
       test('returns Other Open Source for unknown identifiers', () => {
