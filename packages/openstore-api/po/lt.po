@@ -94,6 +94,26 @@ msgid "Exciting new apps & updates"
 msgstr "Įdomios naujos programos ir naujiniai"
 
 # Discovery section category name
+msgid "New Apps"
+msgstr ""
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "Įdomios naujos programos ir naujiniai"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "Naujos ir atnaujintos programos"
+
+# Discovery section category tagline for "Updated Apps"
+msgid "Apps with recent updates"
+msgstr ""
+
+# Discovery section category name
 msgid "Health & Wellness"
 msgstr "Sveikata ir grožis"
 

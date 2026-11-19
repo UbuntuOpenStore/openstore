@@ -92,6 +92,30 @@ msgstr "最新软件"
 msgid "Exciting new apps & updates"
 msgstr "最令人激动的软件更新"
 
+# Discovery section category name
+#, fuzzy
+#| msgid "Core Apps"
+msgid "New Apps"
+msgstr "核心应用"
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "最令人激动的软件更新"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "最新软件"
+
+# Discovery section category tagline for "Most Loved"
+#, fuzzy
+#| msgid "Apps with the highest ratings"
+msgid "Apps with recent updates"
+msgstr "评分最高的应用"
+
 msgid "Health & Wellness"
 msgstr "健康 & 健身"
 

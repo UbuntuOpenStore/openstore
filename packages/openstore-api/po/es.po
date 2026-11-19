@@ -92,6 +92,30 @@ msgstr "Aplicaciones nuevas y actualizadas"
 msgid "Exciting new apps & updates"
 msgstr "Emocionantes aplicaciones nuevas y actualizaciones"
 
+# Discovery section category name
+#, fuzzy
+#| msgid "Core Apps"
+msgid "New Apps"
+msgstr "Aplicaciones principales"
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "Emocionantes aplicaciones nuevas y actualizaciones"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "Aplicaciones nuevas y actualizadas"
+
+# Discovery section category tagline for "Most Loved"
+#, fuzzy
+#| msgid "Apps with the highest ratings"
+msgid "Apps with recent updates"
+msgstr "Aplicaciones con las mejores puntuaciones"
+
 msgid "Health & Wellness"
 msgstr "Salud y bienestar"
 
