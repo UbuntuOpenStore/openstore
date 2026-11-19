@@ -92,6 +92,30 @@ msgstr "Nové a aktualizované aplikace"
 msgid "Exciting new apps & updates"
 msgstr "Vzrušující nové aplikace a aktualizace"
 
+# Discovery section category name
+#, fuzzy
+#| msgid "Core Apps"
+msgid "New Apps"
+msgstr "Základní aplikace"
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "Vzrušující nové aplikace a aktualizace"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "Nové a aktualizované aplikace"
+
+# Discovery section category tagline for "Most Loved"
+#, fuzzy
+#| msgid "Apps with the highest ratings"
+msgid "Apps with recent updates"
+msgstr "Aplikace s nejvyšším hodnocením"
+
 msgid "Health & Wellness"
 msgstr "Zdraví a wellness"
 

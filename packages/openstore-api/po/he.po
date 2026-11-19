@@ -94,6 +94,30 @@ msgid "Exciting new apps & updates"
 msgstr "יישומונים ועדכונים חדשים ומרתקים"
 
 # Discovery section category name
+#, fuzzy
+#| msgid "Core Apps"
+msgid "New Apps"
+msgstr "יישומוני ליבה"
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "יישומונים ועדכונים חדשים ומרתקים"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "יישומונים חדשים ועדכניים"
+
+# Discovery section category tagline for "Most Loved"
+#, fuzzy
+#| msgid "Apps with the highest ratings"
+msgid "Apps with recent updates"
+msgstr "יישומונים עם הדירוג הגבוה ביותר"
+
+# Discovery section category name
 msgid "Health & Wellness"
 msgstr "בריאות גוף ונפש"
 

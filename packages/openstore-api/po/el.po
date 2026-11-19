@@ -93,6 +93,28 @@ msgid "Exciting new apps & updates"
 msgstr "Συναρπαστικές νέες εφαρμογές και ενημερώσεις"
 
 # Discovery section category name
+msgid "New Apps"
+msgstr ""
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "Συναρπαστικές νέες εφαρμογές και ενημερώσεις"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "Νέες και Ενημερωμένες Εφαρμογές"
+
+# Discovery section category tagline for "Most Loved"
+#, fuzzy
+#| msgid "Apps with the highest ratings"
+msgid "Apps with recent updates"
+msgstr "Εφαρμογές με τις υψηλότερες βαθμολογίες"
+
+# Discovery section category name
 msgid "Health & Wellness"
 msgstr "Υγεία & Ευεξία"
 

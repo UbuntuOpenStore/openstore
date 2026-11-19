@@ -99,6 +99,30 @@ msgstr "Nya och Uppdaterade Appar"
 msgid "Exciting new apps & updates"
 msgstr "Spännande nya appar & uppdateringar"
 
+# Discovery section category name
+#, fuzzy
+#| msgid "Core Apps"
+msgid "New Apps"
+msgstr "Bas-appar"
+
+# Discovery section category tagline for "New and Updated Apps"
+#, fuzzy
+#| msgid "Exciting new apps & updates"
+msgid "Exciting new apps"
+msgstr "Spännande nya appar & uppdateringar"
+
+# Discovery section category name
+#, fuzzy
+#| msgid "New and Updated Apps"
+msgid "Updated Apps"
+msgstr "Nya och Uppdaterade Appar"
+
+# Discovery section category tagline for "Most Loved"
+#, fuzzy
+#| msgid "Apps with the highest ratings"
+msgid "Apps with recent updates"
+msgstr "Appar med högst betyg"
+
 msgid "Health & Wellness"
 msgstr "Hälsa & Välmående"
 
