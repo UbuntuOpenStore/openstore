@@ -167,7 +167,9 @@ function dedupeAndFinalize(data: ParsedData): ParsedData {
       for (const ud of app.urlDispatcher as Array<{ protocol?: string; 'domain-suffix'?: string }>) {
         if (ud.protocol) {
           let url = `${ud.protocol}://`;
-          if (ud['domain-suffix']) url += ud['domain-suffix'];
+          if (ud['domain-suffix']) {
+            url += ud['domain-suffix'];
+          }
           urlsSet.add(url);
         }
       }
@@ -176,7 +178,9 @@ function dedupeAndFinalize(data: ParsedData): ParsedData {
     const seen = new Set<string>();
     app.qmlImports = app.qmlImports.filter((qmlImport) => {
       const key = qmlImport.module + (qmlImport.version ?? '');
-      if (seen.has(key)) return false;
+      if (seen.has(key)) {
+        return false;
+      }
       seen.add(key);
       return true;
     });

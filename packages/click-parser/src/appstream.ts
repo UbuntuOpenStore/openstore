@@ -21,12 +21,20 @@ type XmlNode = {
 function getNodeText(children: XmlNode[]): string {
   return children
     .map((n) => {
-      if (n['#text'] !== undefined) return String(n['#text']);
+      if (n['#text'] !== undefined) {
+        return String(n['#text']);
+      }
       const tag = Object.keys(n).find((k) => k !== ':@' && k !== '#text');
-      if (!tag) return '';
+      if (!tag) {
+        return '';
+      }
       const inner = getNodeText(n[tag] as XmlNode[]);
-      if (tag === 'em') return `*${inner}*`;
-      if (tag === 'code') return `\`${inner}\``;
+      if (tag === 'em') {
+        return `*${inner}*`;
+      }
+      if (tag === 'code') {
+        return `\`${inner}\``;
+      }
       return inner;
     })
     .join(' ')
@@ -75,28 +83,40 @@ function processDescriptionChildren(descChildren: XmlNode[]): AppstreamExportloc
   const byLang = new Map<string, string[]>();
 
   function addChunk(lang: string, chunk: string) {
-    if (!byLang.has(lang)) byLang.set(lang, []);
+    if (!byLang.has(lang)) {
+      byLang.set(lang, []);
+    }
     byLang.get(lang)!.push(chunk);
   }
 
   for (const child of descChildren) {
-    if (child['#text'] !== undefined) continue; // skip whitespace text nodes
+    if (child['#text'] !== undefined) {
+      continue;
+    } // skip whitespace text nodes
     const lang = getNodeLang(child);
     const tag = Object.keys(child).find((k) => k !== ':@' && k !== '#text');
-    if (!tag) continue;
+    if (!tag) {
+      continue;
+    }
 
     const children = child[tag] as XmlNode[];
     if (tag === 'p') {
       const text = getNodeText(children);
-      if (text) addChunk(lang, text);
+      if (text) {
+        addChunk(lang, text);
+      }
     } else if (tag === 'ul' || tag === 'ol') {
       const items: string[] = [];
       for (const liNode of children) {
-        if (liNode['#text'] !== undefined) continue;
+        if (liNode['#text'] !== undefined) {
+          continue;
+        }
         const liTag = Object.keys(liNode).find((k) => k !== ':@' && k !== '#text');
         if (liTag === 'li') {
           const liText = getNodeText(liNode[liTag] as XmlNode[]);
-          if (liText) items.push(liText);
+          if (liText) {
+            items.push(liText);
+          }
         }
       }
       if (items.length > 0) {
@@ -144,7 +164,9 @@ export interface AppstreamExportData {
 }
 
 export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExportData | undefined {
-  if (!rawData) return undefined;
+  if (!rawData) {
+    return undefined;
+  }
 
   let nodes: XmlNode[];
   try {
@@ -155,7 +177,9 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
 
   // Prefer type="desktop-application" if multiple components exist
   const componentNodes = findChildren(nodes, 'component');
-  if (componentNodes.length === 0) return undefined;
+  if (componentNodes.length === 0) {
+    return undefined;
+  }
   const componentNode = componentNodes.find((c) => c.attrs['@_type'] === 'desktop-application') ?? componentNodes[0];
   const cc = componentNode.children;
 
@@ -174,7 +198,9 @@ export function parseAppstream(rawData: Uint8Array | undefined): AppstreamExport
       if (!env || env === 'lomiri' || env.startsWith('lomiri:')) {
         for (const imgNode of findChildren(ssNode.children, 'image')) {
           const url = getNodeText(imgNode.children);
-          if (url) screenshots.push(url);
+          if (url) {
+            screenshots.push(url);
+          }
         }
       }
     }

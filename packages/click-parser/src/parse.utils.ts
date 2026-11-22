@@ -62,21 +62,27 @@ export function parseIniFile(data: Uint8Array | undefined): Record<string, unkno
 
 export function parseJsonAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
   const raw = parseJsonFile(data);
-  if (raw === undefined) return undefined;
+  if (raw === undefined) {
+    return undefined;
+  }
   const result = schema.safeParse(raw);
   return result.success ? result.data : undefined;
 }
 
 export function parseXmlAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>, parser: XMLParser): T | undefined {
   const raw = parseXmlFile(data, parser);
-  if (raw === undefined) return undefined;
+  if (raw === undefined) {
+    return undefined;
+  }
   const result = schema.safeParse(raw);
   return result.success ? result.data : undefined;
 }
 
 export function parseIniAs<T>(data: Uint8Array | undefined, schema: z.ZodType<T>): T | undefined {
   const raw = parseIniFile(data);
-  if (raw === undefined) return undefined;
+  if (raw === undefined) {
+    return undefined;
+  }
   const result = schema.safeParse(raw);
   return result.success ? result.data : undefined;
 }

@@ -28,7 +28,9 @@ export async function recalculatePackageRatings(pkgId: string) {
   for (const ratingName of RATINGS) {
     let count = 0;
     for (const rev of reviews) {
-      if (rev.rating === ratingName) count++;
+      if (rev.rating === ratingName) {
+        count++;
+      }
     }
 
     calculatedRating += RATING_MAP[ratingName as keyof typeof RATING_MAP] * count;
