@@ -99,6 +99,22 @@ msgstr ""
 msgid "Exciting new apps & updates"
 msgstr ""
 
+# Discovery section category name
+msgid "New Apps"
+msgstr ""
+
+# Discovery section category tagline for "New Apps"
+msgid "Exciting new apps"
+msgstr ""
+
+# Discovery section category name
+msgid "Updated Apps"
+msgstr ""
+
+# Discovery section category tagline for "Updated Apps"
+msgid "Apps with recent updates"
+msgstr ""
+
 #, fuzzy
 #| msgid "Health & Fitness"
 msgid "Health & Wellness"
