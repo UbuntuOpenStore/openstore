@@ -309,6 +309,7 @@ export interface IPackage {
   source_store: SourceStore;
   external_id?: string;
   snap_data?: SnapData;
+  packagekit_data?: { content_rating?: ContentRating };
   languages: string[];
   architectures: Architecture[];
   channel_architectures: ChannelArchitecture[];

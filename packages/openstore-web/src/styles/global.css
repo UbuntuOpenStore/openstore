@@ -38,7 +38,7 @@
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center rounded-3xl shadow-md text-center py-3 px-8;
+  @apply inline-flex items-center justify-center rounded-3xl shadow-md text-center py-3 px-8 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 @utility pagination-btn {

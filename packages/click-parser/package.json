@@ -39,7 +39,7 @@
     "test": "node -r tsx/cjs --test --experimental-test-module-mocks test/*.ts",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "lint": "oxlint src/*.ts test/*.ts bin/click-parser",
+    "lint": "oxlint --fix src/*.ts test/*.ts bin/click-parser",
     "lint:nofix": "oxlint src/*.ts test/*.ts bin/click-parser"
   },
   "dependencies": {

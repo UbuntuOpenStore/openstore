@@ -8,7 +8,9 @@ type AppstreamLocalized = { text: string; lang: string };
  * The click-parser defaults lang to 'en' when no xml:lang attribute is present.
  */
 export function getAppstreamLocalizedString(items: AppstreamLocalized[] | undefined): string | undefined {
-  if (!items || items.length === 0) return undefined;
+  if (!items || items.length === 0) {
+    return undefined;
+  }
   const en = items.find((item) => item.lang === 'en' || item.lang === '');
   return (en ?? items[0]).text || undefined;
 }
@@ -44,11 +46,17 @@ const SPDX_MAP: Record<string, string> = {
  * Handles compound expressions with AND/OR by returning the first recognized token.
  */
 export function mapSpdxLicense(spdx: string): string {
-  if (!spdx) return 'Other Open Source';
-  const tokens = spdx.split(/ AND | OR /);
+  if (!spdx) {
+    return 'Other Open Source';
+  }
+  // TODO: Support multiple licenses per app instead of picking the first recognizable one.
+  const tokens = spdx.split(/\s+(?:AND|OR)\s+/i);
   for (const token of tokens) {
-    const mapped = SPDX_MAP[token.trim()];
-    if (mapped) return mapped;
+    const id = token.trim().replace(/\+$/, '-or-later');
+    const mapped = SPDX_MAP[id];
+    if (mapped) {
+      return mapped;
+    }
   }
   return 'Other Open Source';
 }
@@ -94,7 +102,9 @@ const APPSTREAM_CATEGORY_MAP: Record<string, string> = {
 export function mapAppstreamCategory(categories: string[]): string | undefined {
   for (const category of categories) {
     const mapped = APPSTREAM_CATEGORY_MAP[category];
-    if (mapped) return mapped;
+    if (mapped) {
+      return mapped;
+    }
   }
   return undefined;
 }

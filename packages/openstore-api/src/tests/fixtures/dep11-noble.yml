@@ -1,0 +1,300 @@
+---
+File: DEP-11
+Version: '0.14'
+Origin: ubuntu-noble-main
+MediaBaseUrl: https://appstream.ubuntu.com/media/noble
+Time: 20231112T224135
+---
+Type: desktop-application
+ID: libreoffice-writer.desktop
+Package: libreoffice-writer
+Name:
+  C: LibreOffice Writer
+Summary:
+  C: Word processor part of the LibreOffice productivity suite
+Description:
+  C: >-
+    <p>
+
+    Writer is the word processor inside LibreOffice productivity suite.
+
+    Use it for everything, from dashing off a quick letter to producing an entire
+
+    book with tables of contents, embedded illustrations, bibliographies and diagrams.
+
+    The while-you-type auto-completion, auto-formatting and automatic spell-checking
+
+    make difficult tasks easy (but are easy to disable if you prefer).
+
+    Writer is powerful enough to tackle desktop publishing tasks such as creating
+
+    multi-column newsletters and brochures. The only limit is your imagination.
+
+    </p>
+
+    <p>
+
+    Based on the what-you-see-is-what-you-get principle, Writer allows you to apply
+
+    various styles and formatting effects to your document and view the results
+
+    immediately.
+
+    </p>
+
+    <p>
+
+    LibreOffice supports opening and saving into a wide variety of formats, so you
+
+    can easily share documents with users of other popular office suites without
+
+    worrying about compatibility.
+
+    </p>
+DeveloperName:
+  C: The Document Foundation
+ProjectLicense: MPL-2.0
+Categories:
+- Office
+- WordProcessor
+Keywords:
+  C:
+  - Text
+  - Letter
+  - Fax
+  - Document
+  - OpenDocument Text
+  - Microsoft Word
+  - Microsoft Works
+  - Lotus WordPro
+  - OpenOffice Writer
+  - CV
+  - odt
+  - doc
+  - docx
+  - rtf
+Url:
+  homepage: http://www.libreoffice.org/discover/writer/
+  bugtracker: https://bugs.documentfoundation.org/
+  help: http://www.libreoffice.org/get-help/documentation/
+  translate: https://hub.libreoffice.org/translate
+  faq: https://hub.libreoffice.org/faq
+  donation: https://donate.libreoffice.org/
+Icon:
+  cached:
+  - name: libreoffice-writer_libreoffice-writer.png
+    width: 48
+    height: 48
+  - name: libreoffice-writer_libreoffice-writer.png
+    width: 64
+    height: 64
+  - name: libreoffice-writer_libreoffice-writer.png
+    width: 128
+    height: 128
+  remote:
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/icons/128x128/libreoffice-writer_libreoffice-writer.png
+    width: 128
+    height: 128
+  stock: libreoffice-writer
+Launchable:
+  desktop-id:
+  - libreoffice-writer.desktop
+Provides:
+  mediatypes:
+  - application/vnd.oasis.opendocument.text
+  - application/vnd.oasis.opendocument.text-template
+  - application/vnd.oasis.opendocument.text-web
+  - application/vnd.oasis.opendocument.text-master
+  - application/vnd.oasis.opendocument.text-master-template
+  - application/vnd.sun.xml.writer
+  - application/vnd.sun.xml.writer.template
+  - application/vnd.sun.xml.writer.global
+  - application/msword
+  - application/vnd.ms-word
+  - application/x-doc
+  - application/x-hwp
+  - application/rtf
+  - text/rtf
+  - application/vnd.wordperfect
+  - application/wordperfect
+  - application/vnd.lotus-wordpro
+  - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+  - application/vnd.ms-word.document.macroEnabled.12
+  - application/vnd.openxmlformats-officedocument.wordprocessingml.template
+  - application/vnd.ms-word.template.macroEnabled.12
+  - application/vnd.ms-works
+  - application/vnd.stardivision.writer-global
+  - application/x-extension-txt
+  - application/x-t602
+  - text/plain
+  - application/vnd.oasis.opendocument.text-flat-xml
+  - application/x-fictionbook+xml
+  - application/macwriteii
+  - application/x-aportisdoc
+  - application/prs.plucker
+  - application/vnd.palm
+  - application/clarisworks
+  - application/x-sony-bbeb
+  - application/x-abiword
+  - application/x-iwork-pages-sffpages
+  - application/vnd.apple.pages
+  - application/x-mswrite
+  - application/x-starwriter
+Screenshots:
+- default: true
+  caption: {}
+  thumbnails:
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-1_752x470.png
+    width: 752
+    height: 470
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-1_624x390.png
+    width: 624
+    height: 390
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-1_224x140.png
+    width: 224
+    height: 140
+  source-image:
+    url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-1_orig.png
+    width: 1129
+    height: 707
+- caption: {}
+  thumbnails:
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-2_752x472.png
+    width: 752
+    height: 472
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-2_624x391.png
+    width: 624
+    height: 391
+  - url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-2_224x140.png
+    width: 224
+    height: 140
+  source-image:
+    url: l/li/libreoffice-writer.desktop/d49020eeca581c367c5d5dd298594c7d/screenshots/image-2_orig.png
+    width: 1135
+    height: 713
+ContentRating:
+  oars-1.0: {}
+---
+Type: inputmethod
+ID: org.freedesktop.ibus.engine.table.cangjie
+Package: ibus-table-cangjie
+Name:
+  C: Cangjie input methods
+Summary:
+  C: Chinese input method
+Description:
+  C: >-
+    <p>
+          Cangjie based input methods, includes: Cangjie3, Canjie5, and
+          Cangjie big tables.
+        </p>
+    <p>
+          Input methods are typing systems allowing users to input complex
+          languages.  They are necessary because these contain too many
+          characters to simply be laid out on a traditional keyboard.
+        </p>
+ProjectLicense: GPL-3.0-or-later
+Keywords:
+  C:
+  - input-method
+  - Chinese
+Url:
+  homepage: https://github.com/mike-fabian/ibus-table
+  bugtracker: https://github.com/mike-fabian/ibus-table/issues
+  help: https://mike-fabian.github.io/ibus-table
+  translate: https://translate.fedoraproject.org/projects/ibus-table/
+Languages:
+- locale: zh_CN
+  percentage: 100
+- locale: zh_HK
+  percentage: 100
+- locale: zh_SG
+  percentage: 100
+- locale: zh_TW
+  percentage: 100
+ContentRating:
+  oars-1.1: {}
+---
+Type: desktop-application
+ID: htop.desktop
+Package: htop
+Name:
+  C: Htop
+Summary:
+  nl: Systeemprocessen tonen
+  es: Mostrar procesos del sistema
+  sv: Visa systemprocesser
+  sr@ijekavianlatin: Prikaz sistemskih procesa
+  sk: Zobraziť systémové procesy
+  en_GB: Show System Processes
+  fi: Katsele järjestelmän prosesseja
+  ca: Visualitzeu els processos del sistema
+  it: Mostra processi di sistema
+  pt: Mostrar os Processos do Sistema
+  tr: Sistem Süreçlerini Göster
+  de: Systemprozesse anzeigen
+  fr: Affiche les processus système
+  nb: Vis systemprosesser
+  pl: Pokaż procesy systemowe
+  sl: Prikaz sistemskih opravil
+  zh_TW: 顯示系統行程
+  C: Show System Processes
+  sr@latin: Prikaz sistemskih procesa
+  sr@ijekavian: Приказ системских процеса
+  nn: Vis systemprosessar
+  sr: Приказ системских процеса
+  uk: Перегляд системних процесів
+  pt_BR: Mostra os processos do sistema
+  zh_CN: 显示系统进程
+  ko: 시스템 프로세스 보기
+  da: Vis systemprocesser
+  gl: Mostrar os procesos do sistema.
+  ru: Просмотр списка процессов в системе
+Description:
+  C: >-
+    <p>Htop is an ncursed-based process viewer similar to top, but it allows one to scroll the list vertically and horizontally
+    to see all processes and their full command lines.</p>
+
+    <p>Tasks related to processes (killing, renicing) can be done without entering their PIDs.</p>
+  en: >-
+    <p>Htop is an ncursed-based process viewer similar to top, but it allows one to scroll the list vertically and horizontally
+    to see all processes and their full command lines.</p>
+
+    <p>Tasks related to processes (killing, renicing) can be done without entering their PIDs.</p>
+Categories:
+- System
+- Monitor
+- ConsoleOnly
+Keywords:
+  C:
+  - system
+  - process
+  - task
+Icon:
+  cached:
+  - name: htop_htop.png
+    width: 48
+    height: 48
+  - name: htop_htop.png
+    width: 64
+    height: 64
+  - name: htop_htop.png
+    width: 128
+    height: 128
+  remote:
+  - url: h/ht/htop.desktop/df546ab0ecc422b4b27db6922a907065/icons/128x128/htop_htop.png
+    width: 128
+    height: 128
+  stock: htop
+Launchable:
+  desktop-id:
+  - htop.desktop
+---
+Type: codec
+ID: gstreamer1.0-gtk3
+Package: gstreamer1.0-gtk3
+Name:
+  C: GStreamer Multimedia Codecs
+Summary:
+  C: GStreamer plugin for GTK+3
+  en: GStreamer plugin for GTK+3

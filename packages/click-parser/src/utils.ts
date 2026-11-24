@@ -12,7 +12,9 @@ export function execFileAsync(
 ): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
     execFile(file, args, options, (err, stdout, stderr) => {
-      if (err) return reject(err);
+      if (err) {
+        return reject(err);
+      }
       resolve({ stdout: stdout.toString(), stderr: stderr.toString() });
     });
   });
@@ -136,7 +138,9 @@ export async function readFileRegular(filePath: string): Promise<Buffer> {
 }
 
 export async function extractFiles(cwd: string, members: string[]): Promise<void> {
-  if (members.length === 0) return;
+  if (members.length === 0) {
+    return;
+  }
   for (const member of members) {
     if (!isPathSafe(member)) {
       throw new Error(`Unsafe path in tar archive: ${member}`);

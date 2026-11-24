@@ -126,7 +126,7 @@ export const AppManageSchema = AppSchema.extend({
   admin_message_acknowledged: z.boolean().default(false),
   type_override: z.string(),
   review_exceptions: z.array(z.string()),
-  maintainer: z.string().optional(),
+  maintainer: z.string().nullish(),
   published_date: z.coerce.date().or(z.literal('')).nullish(),
   updated_date: z.coerce.date().or(z.literal('')).nullish(),
 });

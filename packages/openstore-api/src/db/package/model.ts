@@ -113,6 +113,16 @@ const packageSchema = new Schema<IPackage, PackageModel, IPackageMethods>({
     confinement: String,
     base: String,
   },
+  packagekit_data: {
+    type: {
+      content_rating: {
+        type: { type: String },
+        content_attributes: [{ value: String, id: String }],
+      },
+    },
+    default: undefined,
+    _id: false,
+  },
 
   // Publication metadata
   published: Boolean,

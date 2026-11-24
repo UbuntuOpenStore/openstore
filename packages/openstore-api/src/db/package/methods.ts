@@ -770,6 +770,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
 
       const { revisionData } = this.getLatestRevision(defaultChannel, this.architectures.includes(architecture) ? architecture : undefined);
       const installedSize = revisionData ? toBytes(revisionData.filesize) : 0;
+      const contentRating =
+        this.package_type === PackageType.PACKAGEKIT ? this.packagekit_data?.content_rating : revisionData?.content_rating;
 
       const revisions = (this.revisions || [])
         .map((rData) => {
@@ -861,8 +863,8 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
             }
           : {}),
         screenshots: this.screenshots.map((file) => {
-          // For snap packages, screenshots are already external URLs
-          if (this.package_type === PackageType.SNAP) {
+          // Snap and PackageKit screenshots are already external URLs
+          if (this.package_type === PackageType.SNAP || this.package_type === PackageType.PACKAGEKIT) {
             return file;
           }
           return `${config.server.host}/screenshots/${file}`;
@@ -889,10 +891,14 @@ export function setupMethods(packageSchema: Schema<IPackage, PackageModel, IPack
         permissions: revisionData ? (revisionData.permissions ?? []) : [],
         read_paths: revisionData ? (revisionData.read_paths ?? []) : [],
         write_paths: revisionData ? (revisionData.write_paths ?? []) : [],
-        content_rating: revisionData?.content_rating
+        content_rating: contentRating
           ? {
-              type: revisionData.content_rating.type || '',
-              content_attributes: revisionData.content_rating.content_attributes || [],
+              type: contentRating.type || '',
+              // PackageKit ratings come from stored subdocuments; strip their Mongo internals.
+              content_attributes:
+                this.package_type === PackageType.PACKAGEKIT
+                  ? (contentRating.content_attributes || []).map(({ id, value }) => ({ id, value }))
+                  : contentRating.content_attributes || [],
             }
           : undefined,
         desktop_names: desktopNames,

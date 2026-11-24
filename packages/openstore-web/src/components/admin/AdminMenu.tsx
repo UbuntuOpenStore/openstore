@@ -69,6 +69,18 @@ const AdminMenu = ({ currentPath }: AdminMenuProps): JSX.Element => {
             Discover
           </a>
         </li>
+        <li>
+          <a
+            href="/admin/appstream-sync-config/"
+            className={`block py-2 ${
+              currentPath.startsWith('/admin/appstream-sync-config')
+                ? 'text-ubuntu-orange border-b-2 border-ubuntu-orange'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            AppStream Sync Config
+          </a>
+        </li>
       </ul>
     </nav>
   );

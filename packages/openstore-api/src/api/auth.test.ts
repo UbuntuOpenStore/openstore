@@ -42,9 +42,13 @@ function callUbuntuVerify(strategy: PassportStrategy, identifier: string, profil
   const verify = (strategy as unknown as { _verify: UbuntuVerifyFn })._verify;
   return new Promise<Express.User>((resolve, reject) => {
     verify(identifier, profile, (err, user) => {
-      if (err) reject(err);
-      else if (user) resolve(user);
-      else reject(new Error('User not returned from verify'));
+      if (err) {
+        reject(err);
+      } else if (user) {
+        resolve(user);
+      } else {
+        reject(new Error('User not returned from verify'));
+      }
     });
   });
 }
@@ -58,9 +62,13 @@ function callOAuthVerify(
   const verify = (strategy as unknown as { _verify: OAuthVerifyFn })._verify;
   return new Promise<Express.User>((resolve, reject) => {
     verify(accessToken, refreshToken, profile, (err, user) => {
-      if (err) reject(err);
-      else if (user) resolve(user);
-      else reject(new Error('User not returned from verify'));
+      if (err) {
+        reject(err);
+      } else if (user) {
+        resolve(user);
+      } else {
+        reject(new Error('User not returned from verify'));
+      }
     });
   });
 }

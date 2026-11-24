@@ -5,5 +5,8 @@
   },
   "options": {
     "typeAware": true
+  },
+  "rules": {
+    "curly": ["error", "all"]
   }
 }
