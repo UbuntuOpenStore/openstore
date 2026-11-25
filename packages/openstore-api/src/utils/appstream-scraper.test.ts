@@ -358,7 +358,6 @@ describe('AppStream scraper utils', () => {
         architectures: [Architecture.AMD64, Architecture.ARM64],
         device_compatibilities: [],
         updated_date: new Date(1700000000 * 1000).toISOString(),
-        changelog: 'New features.',
         version_changelogs: [
           { version: '7.4', changelog: 'New features.' },
           { version: '7.3', changelog: 'Old fixes.' },
@@ -399,7 +398,6 @@ describe('AppStream scraper utils', () => {
       assert.deepEqual(result.keywords, []);
       assert.equal(result.support_url, 'https://example.org/bugs');
       assert.deepEqual(result.screenshots, []);
-      assert.equal(result.changelog, '');
       assert.deepEqual(result.version_changelogs, []);
       assert.ok(!('updated_date' in result));
       assert.deepEqual(result.packagekit_data, {
