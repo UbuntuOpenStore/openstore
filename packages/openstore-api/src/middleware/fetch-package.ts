@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { type Request, type Response, type NextFunction } from 'express';
 
-import { Package, PACKAGEKIT_ID_PREFIX, type PackageRequestFilters } from '../db/package';
+import { Package, type PackageRequestFilters } from '../db/package';
 import { NotFoundError } from '../exceptions';
 import { asyncErrorWrapper } from '../utils';
 import { APP_NOT_FOUND } from '../utils/error-messages';
@@ -30,25 +30,4 @@ export function fetchPackage(published = false, useQuery = false) {
 
 export function fetchPublishedPackage(useQuery = false) {
   return fetchPackage(true, useQuery);
-}
-
-/**
- * Fetch a published package for review/rating. When the package does not exist yet
- * and the id belongs to the PackageKit namespace, it is created automatically.
- */
-export function fetchOrCreatePackage() {
-  return asyncErrorWrapper(async (req: Request, res: Response, next: NextFunction) => {
-    let pkg = await Package.findOneByFilters(req.params.id, { published: true });
-
-    if (!pkg && req.params.id.startsWith(PACKAGEKIT_ID_PREFIX)) {
-      pkg = await Package.createPackageKit(req.params.id);
-    }
-
-    if (!pkg) {
-      throw new NotFoundError(APP_NOT_FOUND);
-    }
-
-    req.pkg = pkg;
-    next();
-  }, 'Could not fetch app info at this time');
 }

@@ -36,7 +36,6 @@ export const INVALID_PACKAGE_TYPE = 'The provided package type is not valid';
 export const NO_LICENSE_SPECIFIED = 'No license specified';
 export const INVALID_LICENSE = 'The provided license is not valid';
 export const INVALID_APP_ID_PREFIX = 'The provided app ID prefix is not valid';
-export const INVALID_PACKAGEKIT_ID = 'The provided PackageKit app ID is not valid';
 export const PACKAGE_TYPE_NOT_ALLOWED = 'This package type is not allowed';
 
 export const PARAMETER_MISSING = 'Missing parameters for this endpoint';

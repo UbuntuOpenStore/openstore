@@ -4,8 +4,6 @@ import { ChannelArchitecture, type IPackage, PackageType } from './types';
 
 export const PACKAGEKIT_ID_PREFIX = 'packagekit.';
 
-export const PACKAGEKIT_ID_REGEX = /^packagekit\.[a-zA-Z0-9][a-zA-Z0-9._+-]*$/;
-
 export function packageKitDefaults(): Pick<IPackage, 'package_type' | 'published' | 'channel_architectures'> {
   return {
     package_type: PackageType.PACKAGEKIT,

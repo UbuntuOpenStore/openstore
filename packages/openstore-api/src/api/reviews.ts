@@ -6,7 +6,7 @@ import '../db/comment';
 import { PackageType } from '../db/package/types';
 import { recalculatePackageRatings } from '../db/rating_count/utils';
 import { Review, RATINGS, REVIEW_MAX_LEN } from '../db/review';
-import { authenticate, anonymousAuthenticate, userRole, fetchPublishedPackage, fetchOrCreatePackage } from '../middleware';
+import { authenticate, anonymousAuthenticate, userRole, fetchPublishedPackage } from '../middleware';
 import { error, success, apiLinks, asyncErrorWrapper } from '../utils';
 import { PARAMETER_MISSING, REVIEW_TOO_LONG, INVALID_RATING, VERSION_NOT_FOUND, CANNOT_REVIEW_OWN_APP } from '../utils/error-messages';
 
@@ -78,14 +78,14 @@ router.post(
   '/',
   authenticate,
   userRole,
-  fetchOrCreatePackage(),
+  fetchPublishedPackage(),
   asyncErrorWrapper(upsertReview, 'There was an error posting your review, please try again later'),
 );
 router.put(
   '/',
   authenticate,
   userRole,
-  fetchOrCreatePackage(),
+  fetchPublishedPackage(),
   asyncErrorWrapper(upsertReview, 'There was an error posting your review, please try again later'),
 );
 
