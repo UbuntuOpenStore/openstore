@@ -1144,3 +1144,69 @@ msgstr ""
 
 #~ msgid "Vivid and Xenial"
 #~ msgstr "Vivid i Xenial"
+
+msgid "Accessibility"
+msgstr "Accessibilitat"
+
+msgid "Books & Comics"
+msgstr "Llibres i còmics"
+
+msgid "Business & Finance"
+msgstr "Negocis i finances"
+
+msgid "Communication & Social"
+msgstr "Comunicació i xarxes"
+
+msgid "Developer Tools"
+msgstr "Eines de desenvolupament"
+
+msgid "Education & Reference"
+msgstr "Educació i referència"
+
+msgid "Entertainment"
+msgstr "Entreteniment"
+
+msgid "Food & Drink"
+msgstr "Menjar i beure"
+
+msgid "Games"
+msgstr "Jocs"
+
+msgid "Graphics"
+msgstr "Gràfics"
+
+msgid "Health & Fitness"
+msgstr "Salut i benestar"
+
+msgid "Lifestyle"
+msgstr "Estil de vida"
+
+msgid "Media & Video"
+msgstr "Multimèdia i vídeo"
+
+msgid "Music & Audio"
+msgstr "Música i àudio"
+
+msgid "News & Magazines"
+msgstr "Notícies i publicacions"
+
+msgid "Personalisation"
+msgstr "Personalització"
+
+msgid "Productivity"
+msgstr "Productivitat"
+
+msgid "Science & Engineering"
+msgstr "Ciència i enginyeria"
+
+msgid "Shopping"
+msgstr "Compres"
+
+msgid "Sports"
+msgstr "Esports"
+
+msgid "Travel & Weather"
+msgstr "Viatjes i meteorologia"
+
+msgid "Utilities"
+msgstr "Utilitats"

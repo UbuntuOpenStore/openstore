@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
+    "check:categories": "diff -u ../openstore-api/src/api/json/category_icons.json src/lib/category_icons.json",
     "sync": "astro sync",
     "convert-icons": "svgr --out-dir src/components/icons/ src/assets/icons/ && sed -i 's/#000/currentColor/g' src/components/icons/* && sed -i 's/gray/currentColor/g' src/components/icons/*",
     "convert-po": "bash -c 'for file in po/*.po; do LANG=$(basename \"$file\" .po); i18next-conv -l \"$LANG\" -s \"po/$LANG.po\" -t \"src/locales/$LANG.json\"; done'",

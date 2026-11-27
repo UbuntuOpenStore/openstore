@@ -952,3 +952,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "Atzessibilidade"
+
+msgid "Books & Comics"
+msgstr "Libros e fumigheddos"
+
+msgid "Business & Finance"
+msgstr "Afàrios e finantzia"
+
+msgid "Communication & Social"
+msgstr "Comunicatzione e retes sotziales"
+
+msgid "Developer Tools"
+msgstr "Ainas de s'isvilupadore"
+
+msgid "Education & Reference"
+msgstr "Educatzione e riferimentos"
+
+msgid "Entertainment"
+msgstr "Ispàssiu"
+
+msgid "Food & Drink"
+msgstr "Papare e bufare"
+
+msgid "Games"
+msgstr "Giogos"
+
+msgid "Graphics"
+msgstr "Gràfica"
+
+msgid "Health & Fitness"
+msgstr "Salude e benèssere"
+
+msgid "Lifestyle"
+msgstr "Istile de vida"
+
+msgid "Media & Video"
+msgstr "Multimèdia e vìdeo"
+
+msgid "Music & Audio"
+msgstr "Mùsica e àudio"
+
+msgid "News & Magazines"
+msgstr "Noas e rivistas"
+
+msgid "Personalisation"
+msgstr "Personalizatzione"
+
+msgid "Productivity"
+msgstr "Produtividade"
+
+msgid "Science & Engineering"
+msgstr "Iscèntzia e ingegneria"
+
+msgid "Shopping"
+msgstr "Còmporas"
+
+msgid "Sports"
+msgstr "Isport"
+
+msgid "Travel & Weather"
+msgstr "Biàgios e tempus"
+
+msgid "Utilities"
+msgstr "Utilidades"

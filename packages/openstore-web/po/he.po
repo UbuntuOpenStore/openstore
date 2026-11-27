@@ -1204,3 +1204,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "יישום אינטרנט+"
+
+msgid "Accessibility"
+msgstr "נגישות"
+
+msgid "Books & Comics"
+msgstr "ספרים וקומיקס"
+
+msgid "Business & Finance"
+msgstr "עסקים וכלכלה"
+
+msgid "Communication & Social"
+msgstr "תקשורת וחברה"
+
+msgid "Developer Tools"
+msgstr "כלי פיתוח"
+
+msgid "Education & Reference"
+msgstr "חינוך וסימוכין"
+
+msgid "Entertainment"
+msgstr "בידור"
+
+msgid "Food & Drink"
+msgstr "מזון ושתייה"
+
+msgid "Games"
+msgstr "משחקים"
+
+msgid "Graphics"
+msgstr "גרפיקה"
+
+msgid "Health & Fitness"
+msgstr "בריאות וכושר"
+
+msgid "Lifestyle"
+msgstr "סגנון חיים"
+
+msgid "Media & Video"
+msgstr "מדיה ווידאו"
+
+msgid "Music & Audio"
+msgstr "מוזיקה ושמע"
+
+msgid "News & Magazines"
+msgstr "חדשות ועיתונים"
+
+msgid "Personalisation"
+msgstr "התאמה אישית"
+
+msgid "Productivity"
+msgstr "הפקה"
+
+msgid "Science & Engineering"
+msgstr "מדע והנדסה"
+
+msgid "Shopping"
+msgstr "קניות"
+
+msgid "Sports"
+msgstr "ספורט"
+
+msgid "Travel & Weather"
+msgstr "התניידות ומזג אוויר"
+
+msgid "Utilities"
+msgstr "כלי עזר"

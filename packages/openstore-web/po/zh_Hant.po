@@ -1107,3 +1107,69 @@ msgstr ""
 
 #~ msgid "Vivid and Xenial"
 #~ msgstr "Vivid 和 Xenial"
+
+msgid "Accessibility"
+msgstr "無障礙"
+
+msgid "Books & Comics"
+msgstr "書籍漫畫"
+
+msgid "Business & Finance"
+msgstr "商業金融"
+
+msgid "Communication & Social"
+msgstr "社交通訊"
+
+msgid "Developer Tools"
+msgstr "開發工具"
+
+msgid "Education & Reference"
+msgstr "教育資源"
+
+msgid "Entertainment"
+msgstr "休閒娛樂"
+
+msgid "Food & Drink"
+msgstr "美食佳飲"
+
+msgid "Games"
+msgstr "遊戲"
+
+msgid "Graphics"
+msgstr "圖形繪圖"
+
+msgid "Health & Fitness"
+msgstr "健康塑身"
+
+msgid "Lifestyle"
+msgstr "生活品味"
+
+msgid "Media & Video"
+msgstr "影音媒體"
+
+msgid "Music & Audio"
+msgstr "音樂音訊"
+
+msgid "News & Magazines"
+msgstr "新聞雜誌"
+
+msgid "Personalisation"
+msgstr "個人化"
+
+msgid "Productivity"
+msgstr "生產應用"
+
+msgid "Science & Engineering"
+msgstr "科學工程"
+
+msgid "Shopping"
+msgstr "購物"
+
+msgid "Sports"
+msgstr "運動"
+
+msgid "Travel & Weather"
+msgstr "天氣旅行"
+
+msgid "Utilities"
+msgstr "實用應用程式"

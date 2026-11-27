@@ -1,7 +1,8 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { CategoriesSchema } from "@/lib/schema";
-import { cn, getRelativeLocaleUrl, localeSlugToCode } from "@/lib/utils";
+import { t } from "i18next";
+import { categories } from "@/lib/categories";
+import { cn, getRelativeLocaleUrl } from "@/lib/utils";
 
 export type Props = {
   class?: string;
@@ -9,12 +10,6 @@ export type Props = {
   linkClass?: string;
   selected?: string;
 };
-
-const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/categories?all=true&lang=${localeSlugToCode(Astro.currentLocale)}`, {
-  headers: { "X-Source": "openstore-web-next" },
-});
-const { data } = await response.json();
-const categories = CategoriesSchema.parse(data);
 
 const { showDivider = true, linkClass = "text-ubuntu-orange font-bold", selected } = Astro.props;
 ---
@@ -29,7 +24,7 @@ const { showDivider = true, linkClass = "text-ubuntu-orange font-bold", selected
         >
           <img src={category.icon} alt="" class="h-6 w-6" />
 
-          {category.translation}
+          {t(category.name)}
         </a>
 
         <div class={cn("w-full h-0.5", showDivider && "bg-ubuntu-gradient rounded-full")} />

@@ -1355,3 +1355,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "网页应用++"
+
+msgid "Accessibility"
+msgstr "无障碍"
+
+msgid "Books & Comics"
+msgstr "书籍 & 漫画"
+
+msgid "Business & Finance"
+msgstr "商业 & 金融"
+
+msgid "Communication & Social"
+msgstr "沟通 & 社会"
+
+msgid "Developer Tools"
+msgstr "开发者工具"
+
+msgid "Education & Reference"
+msgstr "教育 & 参考"
+
+msgid "Entertainment"
+msgstr "娱乐"
+
+msgid "Food & Drink"
+msgstr "美食 & 饮料"
+
+msgid "Games"
+msgstr "游戏"
+
+msgid "Graphics"
+msgstr "图像"
+
+msgid "Health & Fitness"
+msgstr "健康 & 健身"
+
+msgid "Lifestyle"
+msgstr "生活方式"
+
+msgid "Media & Video"
+msgstr "媒体 & 视频"
+
+msgid "Music & Audio"
+msgstr "音乐 & 音频"
+
+msgid "News & Magazines"
+msgstr "新闻 & 杂志"
+
+msgid "Personalisation"
+msgstr "个性化"
+
+msgid "Productivity"
+msgstr "生产能力"
+
+msgid "Science & Engineering"
+msgstr "科学 & 工程"
+
+msgid "Shopping"
+msgstr "购物"
+
+msgid "Sports"
+msgstr "运动"
+
+msgid "Travel & Weather"
+msgstr "旅游 & 天气"
+
+msgid "Utilities"
+msgstr "公共事业"

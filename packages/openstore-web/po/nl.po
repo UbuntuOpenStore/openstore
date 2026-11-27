@@ -1122,3 +1122,69 @@ msgstr ""
 
 #~ msgid "Vivid and Xenial"
 #~ msgstr "Vivid en Xenial"
+
+msgid "Accessibility"
+msgstr "Toegankelijkheid"
+
+msgid "Books & Comics"
+msgstr "Boeken en strips"
+
+msgid "Business & Finance"
+msgstr "Zakelijk en financiën"
+
+msgid "Communication & Social"
+msgstr "Communicatie en sociaal"
+
+msgid "Developer Tools"
+msgstr "Ontwikkelaarshulpmiddelen"
+
+msgid "Education & Reference"
+msgstr "Educatie en opzoeken"
+
+msgid "Entertainment"
+msgstr "Vermaak"
+
+msgid "Food & Drink"
+msgstr "Eten en drinken"
+
+msgid "Games"
+msgstr "Spellen"
+
+msgid "Graphics"
+msgstr "Grafisch"
+
+msgid "Health & Fitness"
+msgstr "Gezondheid en fitness"
+
+msgid "Lifestyle"
+msgstr "Levensstijl"
+
+msgid "Media & Video"
+msgstr "Media en video"
+
+msgid "Music & Audio"
+msgstr "Muziek en geluid"
+
+msgid "News & Magazines"
+msgstr "Nieuws en tijdschriften"
+
+msgid "Personalisation"
+msgstr "Personalisatie"
+
+msgid "Productivity"
+msgstr "Productiviteit"
+
+msgid "Science & Engineering"
+msgstr "Wetenschap en techniek"
+
+msgid "Shopping"
+msgstr "Winkelen"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Reizen en weer"
+
+msgid "Utilities"
+msgstr "Hulpprogramma's"

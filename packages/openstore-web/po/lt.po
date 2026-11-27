@@ -953,3 +953,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "Prieinamumas"
+
+msgid "Books & Comics"
+msgstr "Knygos ir komiksai"
+
+msgid "Business & Finance"
+msgstr "Verslas ir finansai"
+
+msgid "Communication & Social"
+msgstr "Bendravimas ir socialiniai tinklai"
+
+msgid "Developer Tools"
+msgstr "Plėtotojo įrankiai"
+
+msgid "Education & Reference"
+msgstr "Švietimas ir rekomendacijos"
+
+msgid "Entertainment"
+msgstr "Pramogos"
+
+msgid "Food & Drink"
+msgstr "Maistas ir gėrimai"
+
+msgid "Games"
+msgstr "Žaidimai"
+
+msgid "Graphics"
+msgstr "Grafika"
+
+msgid "Health & Fitness"
+msgstr "Sveikata ir fitnesas"
+
+msgid "Lifestyle"
+msgstr "Gyvensena"
+
+msgid "Media & Video"
+msgstr "Medija ir vaizdo įrašai"
+
+msgid "Music & Audio"
+msgstr "Muzika ir garso įrašai"
+
+msgid "News & Magazines"
+msgstr "Naujienos ir žurnalai"
+
+msgid "Personalisation"
+msgstr "Suasmeninimas"
+
+msgid "Productivity"
+msgstr "Produktyvumas"
+
+msgid "Science & Engineering"
+msgstr "Mokslas ir inžinerija"
+
+msgid "Shopping"
+msgstr "Apsipirkimas"
+
+msgid "Sports"
+msgstr "Sportas"
+
+msgid "Travel & Weather"
+msgstr "Kelionės ir orai"
+
+msgid "Utilities"
+msgstr "Įrankiai"

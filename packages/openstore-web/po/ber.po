@@ -962,3 +962,24 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Developer Tools"
+msgstr "imassen n usebuɣlu"
+
+msgid "Games"
+msgstr "tirarin"
+
+msgid "Media & Video"
+msgstr "amidya d uvidyu"
+
+msgid "Music & Audio"
+msgstr "aẓawan d imsli"
+
+msgid "Science & Engineering"
+msgstr "tamassant d atwal"
+
+msgid "Shopping"
+msgstr "tamsɣiwin"
+
+msgid "Sports"
+msgstr "tunnunin"

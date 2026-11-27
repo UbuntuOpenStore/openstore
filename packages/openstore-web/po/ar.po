@@ -1164,3 +1164,69 @@ msgstr ""
 
 #~ msgid "Vivid and Xenial"
 #~ msgstr "Vivid و Xenial"
+
+msgid "Accessibility"
+msgstr "إتاحة"
+
+msgid "Books & Comics"
+msgstr "كتب وقصص مصورة"
+
+msgid "Business & Finance"
+msgstr "تجارية ومالية"
+
+msgid "Communication & Social"
+msgstr "التواصل الإجتماعي"
+
+msgid "Developer Tools"
+msgstr "ادوات المطورين"
+
+msgid "Education & Reference"
+msgstr "تعليم ومراجع"
+
+msgid "Entertainment"
+msgstr "تسالي"
+
+msgid "Food & Drink"
+msgstr "طعام و شراب"
+
+msgid "Games"
+msgstr "ألعاب"
+
+msgid "Graphics"
+msgstr "رسوميات"
+
+msgid "Health & Fitness"
+msgstr "الصحة واللياقة"
+
+msgid "Lifestyle"
+msgstr "اسلوب الحياة"
+
+msgid "Media & Video"
+msgstr "الوسائط والفيديو"
+
+msgid "Music & Audio"
+msgstr "موسيقى وصوتيات"
+
+msgid "News & Magazines"
+msgstr "اخبار ومجلات"
+
+msgid "Personalisation"
+msgstr "تخصيص"
+
+msgid "Productivity"
+msgstr "إنتاجية"
+
+msgid "Science & Engineering"
+msgstr "العلوم والهندسة"
+
+msgid "Shopping"
+msgstr "التسوق"
+
+msgid "Sports"
+msgstr "الرياضة"
+
+msgid "Travel & Weather"
+msgstr "السفر والطقس"
+
+msgid "Utilities"
+msgstr "خدمات"

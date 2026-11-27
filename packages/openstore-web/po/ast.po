@@ -1120,3 +1120,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "WebApp+"
+
+msgid "Accessibility"
+msgstr "Accesibilidá"
+
+msgid "Books & Comics"
+msgstr "Llibros y cómics"
+
+msgid "Business & Finance"
+msgstr "Negocios y finances"
+
+msgid "Communication & Social"
+msgstr "Comunicación y socialización"
+
+msgid "Developer Tools"
+msgstr "Ferramientes pa desendolcadores"
+
+msgid "Education & Reference"
+msgstr "Educación y referencies"
+
+msgid "Entertainment"
+msgstr "Entretenimientu"
+
+msgid "Food & Drink"
+msgstr "Comida y bébora"
+
+msgid "Games"
+msgstr "Xuegos"
+
+msgid "Graphics"
+msgstr "Gráficos"
+
+msgid "Health & Fitness"
+msgstr "Salú y exerciciu"
+
+msgid "Lifestyle"
+msgstr "Estilu de vida"
+
+msgid "Media & Video"
+msgstr "Multimedia y videu"
+
+msgid "Music & Audio"
+msgstr "Música y audiu"
+
+msgid "News & Magazines"
+msgstr "Noticies y magacinos"
+
+msgid "Personalisation"
+msgstr "Personalización"
+
+msgid "Productivity"
+msgstr "Productividá"
+
+msgid "Science & Engineering"
+msgstr "Ciencia ya inxeniería"
+
+msgid "Shopping"
+msgstr "Merques"
+
+msgid "Sports"
+msgstr "Deportes"
+
+msgid "Travel & Weather"
+msgstr "Viaxes y clima"
+
+msgid "Utilities"
+msgstr "Utilidaes"

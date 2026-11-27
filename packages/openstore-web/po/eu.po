@@ -952,3 +952,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "Irisgarritasuna"
+
+msgid "Books & Comics"
+msgstr "Liburu eta komikiak"
+
+msgid "Business & Finance"
+msgstr "Salerosketa eta Finantzak"
+
+msgid "Communication & Social"
+msgstr "Komunikazioa eta Soziala"
+
+msgid "Developer Tools"
+msgstr "Garatzaile tresnak"
+
+msgid "Education & Reference"
+msgstr "Hezkuntza eta Erreferentzia"
+
+msgid "Entertainment"
+msgstr "Entretenimendua"
+
+msgid "Food & Drink"
+msgstr "Janaria eta Edaria"
+
+msgid "Games"
+msgstr "Jokuak"
+
+msgid "Graphics"
+msgstr "Grafikoak"
+
+msgid "Health & Fitness"
+msgstr "Osasuna eta Sasoia"
+
+msgid "Lifestyle"
+msgstr "Bizimodua"
+
+msgid "Media & Video"
+msgstr "Multimedia eta Bideoa"
+
+msgid "Music & Audio"
+msgstr "Musika eta Audioa"
+
+msgid "News & Magazines"
+msgstr "Berriak eta Aldizkariak"
+
+msgid "Personalisation"
+msgstr "Pertsonalizazioa"
+
+msgid "Productivity"
+msgstr "Produktibitatea"
+
+msgid "Science & Engineering"
+msgstr "Zientzia eta Ingeniaritza"
+
+msgid "Shopping"
+msgstr "Erosketak"
+
+msgid "Sports"
+msgstr "Kirolak"
+
+msgid "Travel & Weather"
+msgstr "Bidaiak eta Eguraldia"
+
+msgid "Utilities"
+msgstr "Tresnak"

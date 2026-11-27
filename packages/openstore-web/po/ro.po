@@ -961,3 +961,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "Accesibilitate"
+
+msgid "Books & Comics"
+msgstr "Cărți și Comicuri"
+
+msgid "Business & Finance"
+msgstr "Afaceri și Finanțe"
+
+msgid "Communication & Social"
+msgstr "Comunicare și Socializare"
+
+msgid "Developer Tools"
+msgstr "Unelte Dezvoltatori"
+
+msgid "Education & Reference"
+msgstr "Educație și Referințe"
+
+msgid "Entertainment"
+msgstr "Divertisment"
+
+msgid "Food & Drink"
+msgstr "Mâncare și Băuturi"
+
+msgid "Games"
+msgstr "Jocuri"
+
+msgid "Graphics"
+msgstr "Grafică"
+
+msgid "Health & Fitness"
+msgstr "Sănătate și Fitness"
+
+msgid "Lifestyle"
+msgstr "Mod de viață"
+
+msgid "Media & Video"
+msgstr "Media și Video"
+
+msgid "Music & Audio"
+msgstr "Muzică și Audio"
+
+msgid "News & Magazines"
+msgstr "Știri și Reviste"
+
+msgid "Personalisation"
+msgstr "Personalizare"
+
+msgid "Productivity"
+msgstr "Productivitate"
+
+msgid "Science & Engineering"
+msgstr "Știință și Inginerie"
+
+msgid "Shopping"
+msgstr "Cumpărături"
+
+msgid "Sports"
+msgstr "Sporturi"
+
+msgid "Travel & Weather"
+msgstr "Călătorii și Vreme"
+
+msgid "Utilities"
+msgstr "Utilități"

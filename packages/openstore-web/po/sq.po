@@ -952,3 +952,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "Lehtësim barriere"
+
+msgid "Books & Comics"
+msgstr "Libra & Argëtime"
+
+msgid "Business & Finance"
+msgstr "Biznesi dhe Financat"
+
+msgid "Communication & Social"
+msgstr "Komunikim & Rrjeti social"
+
+msgid "Developer Tools"
+msgstr "Veglat e zhvilluesve"
+
+msgid "Education & Reference"
+msgstr "Edukim & referencë"
+
+msgid "Entertainment"
+msgstr "Argëtim"
+
+msgid "Food & Drink"
+msgstr "Ushqim & pije"
+
+msgid "Games"
+msgstr "Lojrat"
+
+msgid "Graphics"
+msgstr "Grafik"
+
+msgid "Health & Fitness"
+msgstr "Mjekësi-Fitness"
+
+msgid "Lifestyle"
+msgstr "Moda"
+
+msgid "Media & Video"
+msgstr "Mediat & Video"
+
+msgid "Music & Audio"
+msgstr "Muzikë & Zë"
+
+msgid "News & Magazines"
+msgstr "Lajme & Revista"
+
+msgid "Personalisation"
+msgstr "Personalizime"
+
+msgid "Productivity"
+msgstr "Produktiviteti"
+
+msgid "Science & Engineering"
+msgstr "Shkencë & Inxhinieri"
+
+msgid "Shopping"
+msgstr "Pazar"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Udhëtim & moti"
+
+msgid "Utilities"
+msgstr "Shërbimet"

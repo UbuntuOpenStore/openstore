@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-11-11T04:35:14.796Z\n"
-"PO-Revision-Date: 2026-11-11T04:35:14.796Z\n"
+"POT-Creation-Date: 2026-11-27T14:27:23.666Z\n"
+"PO-Revision-Date: 2026-11-27T14:27:23.670Z\n"
 
 msgid "Report an Issue"
 msgstr "Report an Issue"
@@ -1434,3 +1434,69 @@ msgstr "webapp"
 
 msgid "View all apps by this user"
 msgstr "View all apps by this user"
+
+msgid "Accessibility"
+msgstr "Accessibility"
+
+msgid "Books & Comics"
+msgstr "Books & Comics"
+
+msgid "Business & Finance"
+msgstr "Business & Finance"
+
+msgid "Communication & Social"
+msgstr "Communication & Social"
+
+msgid "Developer Tools"
+msgstr "Developer Tools"
+
+msgid "Education & Reference"
+msgstr "Education & Reference"
+
+msgid "Entertainment"
+msgstr "Entertainment"
+
+msgid "Food & Drink"
+msgstr "Food & Drink"
+
+msgid "Games"
+msgstr "Games"
+
+msgid "Graphics"
+msgstr "Graphics"
+
+msgid "Health & Fitness"
+msgstr "Health & Fitness"
+
+msgid "Lifestyle"
+msgstr "Lifestyle"
+
+msgid "Media & Video"
+msgstr "Media & Video"
+
+msgid "Music & Audio"
+msgstr "Music & Audio"
+
+msgid "News & Magazines"
+msgstr "News & Magazines"
+
+msgid "Personalisation"
+msgstr "Personalisation"
+
+msgid "Productivity"
+msgstr "Productivity"
+
+msgid "Science & Engineering"
+msgstr "Science & Engineering"
+
+msgid "Shopping"
+msgstr "Shopping"
+
+msgid "Sports"
+msgstr "Sports"
+
+msgid "Travel & Weather"
+msgstr "Travel & Weather"
+
+msgid "Utilities"
+msgstr "Utilities"

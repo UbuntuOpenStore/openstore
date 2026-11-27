@@ -1157,3 +1157,69 @@ msgstr ""
 
 #~ msgid "Vivid and Xenial"
 #~ msgstr "Vivid und Xenial"
+
+msgid "Accessibility"
+msgstr "Barrierefreiheit"
+
+msgid "Books & Comics"
+msgstr "Bücher & Comics"
+
+msgid "Business & Finance"
+msgstr "Beruf & Finanzen"
+
+msgid "Communication & Social"
+msgstr "Kommunikation & Soziale Netzwerke"
+
+msgid "Developer Tools"
+msgstr "Entwicklerwerkzeuge"
+
+msgid "Education & Reference"
+msgstr "Bildung & Wissen"
+
+msgid "Entertainment"
+msgstr "Unterhaltung"
+
+msgid "Food & Drink"
+msgstr "Essen & Trinken"
+
+msgid "Games"
+msgstr "Spiele"
+
+msgid "Graphics"
+msgstr "Bildbearbeitung"
+
+msgid "Health & Fitness"
+msgstr "Gesundheit & Fitness"
+
+msgid "Lifestyle"
+msgstr "Mode"
+
+msgid "Media & Video"
+msgstr "Medien & Film"
+
+msgid "Music & Audio"
+msgstr "Musik & Audio"
+
+msgid "News & Magazines"
+msgstr "Nachrichten & Magazine"
+
+msgid "Personalisation"
+msgstr "Personalisierung"
+
+msgid "Productivity"
+msgstr "Produktivität"
+
+msgid "Science & Engineering"
+msgstr "Wissenschaft & Technik"
+
+msgid "Shopping"
+msgstr "Einkaufen"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Reisen & Wetter"
+
+msgid "Utilities"
+msgstr "Zubehör"

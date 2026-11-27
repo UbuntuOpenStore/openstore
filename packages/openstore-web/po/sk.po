@@ -1034,3 +1034,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "Webová aplikácia+"
+
+msgid "Accessibility"
+msgstr "Príslušenstvo"
+
+msgid "Books & Comics"
+msgstr "Knihy & Komixy"
+
+msgid "Business & Finance"
+msgstr "Podnikanie a financie"
+
+msgid "Communication & Social"
+msgstr "Komunikácia a sociálne siete"
+
+msgid "Developer Tools"
+msgstr "Vývoj"
+
+msgid "Education & Reference"
+msgstr "Vzdelávanie a referencie"
+
+msgid "Entertainment"
+msgstr "Zábava"
+
+msgid "Food & Drink"
+msgstr "Jedlá a nápoje"
+
+msgid "Games"
+msgstr "Hry"
+
+msgid "Graphics"
+msgstr "Grafika"
+
+msgid "Health & Fitness"
+msgstr "Zdravie a fitnes"
+
+msgid "Lifestyle"
+msgstr "Životný štýl"
+
+msgid "Media & Video"
+msgstr "Médiá a video"
+
+msgid "Music & Audio"
+msgstr "Hudba a audio"
+
+msgid "News & Magazines"
+msgstr "Správy a časopisy"
+
+msgid "Personalisation"
+msgstr "Prispôsobenie"
+
+msgid "Productivity"
+msgstr "Produktivita"
+
+msgid "Science & Engineering"
+msgstr "Veda a technika"
+
+msgid "Shopping"
+msgstr "Nakupovanie"
+
+msgid "Sports"
+msgstr "Športy"
+
+msgid "Travel & Weather"
+msgstr "Cestovanie a počasie"
+
+msgid "Utilities"
+msgstr "Príslušenstvo"

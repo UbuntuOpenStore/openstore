@@ -228,18 +228,6 @@ export const AppSearchSchema = z.object({
   packages: z.array(SlimAppSchema),
 });
 
-export const CategorySchema = z.object({
-  category: z.string(),
-  translation: z.string(),
-  count: z.number(),
-  icon: z.string(),
-  slug: z.string(),
-});
-
-export type CategoryData = z.infer<typeof CategorySchema>;
-
-export const CategoriesSchema = z.array(CategorySchema);
-
 export const UserSchema = z.object({
   _id: z.string(),
   name: z.string().optional(),

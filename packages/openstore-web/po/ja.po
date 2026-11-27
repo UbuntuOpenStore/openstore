@@ -1096,3 +1096,48 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "ウェブアプリ+"
+
+msgid "Accessibility"
+msgstr "アクセシビリティ"
+
+msgid "Books & Comics"
+msgstr "本＆コミック"
+
+msgid "Business & Finance"
+msgstr "ビジネス＆ファイナンス"
+
+msgid "Communication & Social"
+msgstr "コミュニケーション＆SNS"
+
+msgid "Developer Tools"
+msgstr "開発者ツール"
+
+msgid "Education & Reference"
+msgstr "教育＆文献"
+
+msgid "Entertainment"
+msgstr "エンターテイメント"
+
+msgid "Food & Drink"
+msgstr "フード＆ドリンク"
+
+msgid "Games"
+msgstr "ゲーム"
+
+msgid "Graphics"
+msgstr "グラフィックス"
+
+msgid "Health & Fitness"
+msgstr "ヘルス＆フィットネス"
+
+msgid "Lifestyle"
+msgstr "ライフスタイル"
+
+msgid "Media & Video"
+msgstr "メディア＆動画"
+
+msgid "Music & Audio"
+msgstr "音楽＆オーディオ"
+
+msgid "News & Magazines"
+msgstr "ニュース＆雑誌"

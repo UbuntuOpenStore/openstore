@@ -1121,3 +1121,69 @@ msgstr ""
 
 #~ msgid "Vivid and Xenial"
 #~ msgstr "Vivid a Xenial"
+
+msgid "Accessibility"
+msgstr "Usnadnění"
+
+msgid "Books & Comics"
+msgstr "Knihy a komiksy"
+
+msgid "Business & Finance"
+msgstr "Podnikání a finance"
+
+msgid "Communication & Social"
+msgstr "Komunikace a sociální sítě"
+
+msgid "Developer Tools"
+msgstr "Vývojářské nástroje"
+
+msgid "Education & Reference"
+msgstr "Vzdělávání a odkazy"
+
+msgid "Entertainment"
+msgstr "Zábava"
+
+msgid "Food & Drink"
+msgstr "Jídlo a pití"
+
+msgid "Games"
+msgstr "Hry"
+
+msgid "Graphics"
+msgstr "Grafika"
+
+msgid "Health & Fitness"
+msgstr "Zdraví a fitness"
+
+msgid "Lifestyle"
+msgstr "Životní styl"
+
+msgid "Media & Video"
+msgstr "Média a videa"
+
+msgid "Music & Audio"
+msgstr "Hudba a audio"
+
+msgid "News & Magazines"
+msgstr "Zprávy a časopisy"
+
+msgid "Personalisation"
+msgstr "Přizpůsobení"
+
+msgid "Productivity"
+msgstr "Produktivita"
+
+msgid "Science & Engineering"
+msgstr "Věda a technika"
+
+msgid "Shopping"
+msgstr "Nakupování"
+
+msgid "Sports"
+msgstr "Sporty"
+
+msgid "Travel & Weather"
+msgstr "Cestování a počasí"
+
+msgid "Utilities"
+msgstr "Pomůcky"

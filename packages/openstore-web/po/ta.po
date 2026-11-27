@@ -1379,3 +1379,69 @@ msgid ""
 msgstr ""
 "எங்கள் நிர்வாகிகளின் விருப்பப்படி எச்சரிக்கையின்றி உங்கள் பயன்பாட்டை இழுக்க முடியும்.\n"
 " சாத்தியமான இடங்களில், இதுபோன்ற ஏதேனும் செயல்கள் குறித்து நாங்கள் உங்களைத் தொடர்புகொள்வோம்."
+
+msgid "Accessibility"
+msgstr "அணுகல்"
+
+msgid "Books & Comics"
+msgstr "புத்தகங்கள் & காமிக்ச்"
+
+msgid "Business & Finance"
+msgstr "வணிகம் மற்றும் பொருள்"
+
+msgid "Communication & Social"
+msgstr "தொடர்பு & சமூக"
+
+msgid "Developer Tools"
+msgstr "உருவாக்குபவர் கருவிகள்"
+
+msgid "Education & Reference"
+msgstr "கல்வி & குறிப்பு"
+
+msgid "Entertainment"
+msgstr "பொழுதுபோக்கு"
+
+msgid "Food & Drink"
+msgstr "உணவு & பானம்"
+
+msgid "Games"
+msgstr "விளையாட்டுகள்"
+
+msgid "Graphics"
+msgstr "கிராபிக்ச்"
+
+msgid "Health & Fitness"
+msgstr "உடல்நலம் மற்றும் உடற்பயிற்சி"
+
+msgid "Lifestyle"
+msgstr "வாழ்க்கை முறை"
+
+msgid "Media & Video"
+msgstr "மீடியா & வீடியோ"
+
+msgid "Music & Audio"
+msgstr "இசை & ஆடியோ"
+
+msgid "News & Magazines"
+msgstr "செய்தி & பத்திரிகைகள்"
+
+msgid "Personalisation"
+msgstr "தனிப்பயனாக்கம்"
+
+msgid "Productivity"
+msgstr "உற்பத்தித்திறன்"
+
+msgid "Science & Engineering"
+msgstr "அறிவியல் மற்றும் பொறியியல்"
+
+msgid "Shopping"
+msgstr "சாப்பிங்"
+
+msgid "Sports"
+msgstr "விளையாட்டு"
+
+msgid "Travel & Weather"
+msgstr "பயணம் & வானிலை"
+
+msgid "Utilities"
+msgstr "பயன்பாடுகள்"

@@ -44,6 +44,7 @@ api-build:
 web-check:
   stage: check
   script:
+    - npm run check:categories -w openstore-web
     - npm run convert-po -w openstore-web
     - npm run check -w openstore-web
 

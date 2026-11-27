@@ -952,3 +952,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "تۇسالغۇسىز"
+
+msgid "Books & Comics"
+msgstr "كىتابلار&ھەجۋىي رەسىم"
+
+msgid "Business & Finance"
+msgstr "سودا& پۇل مۇئامىلىسى"
+
+msgid "Communication & Social"
+msgstr "خەۋەرلىشىش&ئىجتىمائىي"
+
+msgid "Developer Tools"
+msgstr "ئاچقۇچىلار قۇرالى"
+
+msgid "Education & Reference"
+msgstr "مائارىپ  &پايدىلانما"
+
+msgid "Entertainment"
+msgstr "ئويۇن-تاماشا"
+
+msgid "Food & Drink"
+msgstr "تاتلىق تۈرۈم&سۇغۇق ئىچىملىكلەر"
+
+msgid "Games"
+msgstr "ئۇيۇنلار"
+
+msgid "Graphics"
+msgstr "گىرافىك"
+
+msgid "Health & Fitness"
+msgstr "ساغلاملىق&گىمناستىكا"
+
+msgid "Lifestyle"
+msgstr "تۇرمۇش ئۇسۇلى"
+
+msgid "Media & Video"
+msgstr "ۋاسىتە & سىن"
+
+msgid "Music & Audio"
+msgstr "مۇزىكا & ئاۋاز"
+
+msgid "News & Magazines"
+msgstr "ئاخبارات & ژۇرنال"
+
+msgid "Personalisation"
+msgstr "خاسلىق"
+
+msgid "Productivity"
+msgstr "ئىشلەپچىقىرىش ئىقتىدارى"
+
+msgid "Science & Engineering"
+msgstr "ئىلىم-پەن &  ئىنژېنېرلىق"
+
+msgid "Shopping"
+msgstr "نەرسە سېتىۋېلىش"
+
+msgid "Sports"
+msgstr "تەنھەرىكەت"
+
+msgid "Travel & Weather"
+msgstr "ساياھەت &  ھاۋا رايى"
+
+msgid "Utilities"
+msgstr "ئاممىۋى ئىشلار"

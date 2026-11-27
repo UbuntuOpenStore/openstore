@@ -1,28 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-export const CATEGORIES = [
-  "Accessibility",
-  "Books & Comics",
-  "Business & Finance",
-  "Communication & Social",
-  "Developer Tools",
-  "Education & Reference",
-  "Entertainment",
-  "Food & Drink",
-  "Games",
-  "Graphics",
-  "Health & Fitness",
-  "Lifestyle",
-  "Media & Video",
-  "Music & Audio",
-  "News & Magazines",
-  "Personalisation",
-  "Productivity",
-  "Science & Engineering",
-  "Shopping",
-  "Sports",
-  "Travel & Weather",
-  "Utilities",
-];
+import { categories } from "./categories";
+
+export const CATEGORIES = categories.map((category) => category.name);
 
 export const LICENSES = [
   'Apache License',

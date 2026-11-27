@@ -952,3 +952,69 @@ msgid ""
 "Your app can be pulled without warning at the discretion of our admins. "
 "Where possible, we will contact you regarding any such actions."
 msgstr ""
+
+msgid "Accessibility"
+msgstr "Helppokäyttöisyys"
+
+msgid "Books & Comics"
+msgstr "Kirjat & sarjakuvat"
+
+msgid "Business & Finance"
+msgstr "Liiketoiminta ja talous"
+
+msgid "Communication & Social"
+msgstr "Viestintä & sosiaalinen"
+
+msgid "Developer Tools"
+msgstr "Kehittäjien työkalut"
+
+msgid "Education & Reference"
+msgstr "Koulutus"
+
+msgid "Entertainment"
+msgstr "Viihde"
+
+msgid "Food & Drink"
+msgstr "Ruoka & juoma"
+
+msgid "Games"
+msgstr "Pelit"
+
+msgid "Graphics"
+msgstr "Grafiikka"
+
+msgid "Health & Fitness"
+msgstr "Terveys & kuntoilu"
+
+msgid "Lifestyle"
+msgstr "Elämäntapa"
+
+msgid "Media & Video"
+msgstr "Media ja video"
+
+msgid "Music & Audio"
+msgstr "Musiikki & ääni"
+
+msgid "News & Magazines"
+msgstr "Uutiset & lehdet"
+
+msgid "Personalisation"
+msgstr "Personointi"
+
+msgid "Productivity"
+msgstr "Tuottavuus"
+
+msgid "Science & Engineering"
+msgstr "Tieteet ja tekniikka"
+
+msgid "Shopping"
+msgstr "Shoppailu"
+
+msgid "Sports"
+msgstr "Urheilu"
+
+msgid "Travel & Weather"
+msgstr "Matkustaminen & sää"
+
+msgid "Utilities"
+msgstr "Apuohjelmat"

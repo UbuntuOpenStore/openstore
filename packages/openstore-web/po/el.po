@@ -993,3 +993,69 @@ msgstr ""
 
 #~ msgid "Author"
 #~ msgstr "Δημιουργός"
+
+msgid "Accessibility"
+msgstr "Προσβασιμότητα"
+
+msgid "Books & Comics"
+msgstr "Βιβλία & Κόμικς"
+
+msgid "Business & Finance"
+msgstr "Επιχείρηση & Οικονομικά"
+
+msgid "Communication & Social"
+msgstr "Επικοινωνία & Κοινωνικά"
+
+msgid "Developer Tools"
+msgstr "Εργαλεία Προγραμματιστή"
+
+msgid "Education & Reference"
+msgstr "Εκπαίδευση & Αναφορά"
+
+msgid "Entertainment"
+msgstr "Διασκέδαση"
+
+msgid "Food & Drink"
+msgstr "Φαγητό και ποτό"
+
+msgid "Games"
+msgstr "Παιχνίδια"
+
+msgid "Graphics"
+msgstr "Γραφικά"
+
+msgid "Health & Fitness"
+msgstr "Υγεία & Φυσική κατάσταση"
+
+msgid "Lifestyle"
+msgstr "Τρόπος Ζωής"
+
+msgid "Media & Video"
+msgstr "Πολυμέσα & Βίντεο"
+
+msgid "Music & Audio"
+msgstr "Μουσική & Ήχος"
+
+msgid "News & Magazines"
+msgstr "Νέα & Περιοδικά"
+
+msgid "Personalisation"
+msgstr "Εξατομίκευση"
+
+msgid "Productivity"
+msgstr "Παραγωγικότητα"
+
+msgid "Science & Engineering"
+msgstr "Επιστήμη & Μηχανική"
+
+msgid "Shopping"
+msgstr "Ψώνια"
+
+msgid "Sports"
+msgstr "Αθλήματα"
+
+msgid "Travel & Weather"
+msgstr "Ταξίδια & Καιρός"
+
+msgid "Utilities"
+msgstr "Βοηθητικά προγράμματα"

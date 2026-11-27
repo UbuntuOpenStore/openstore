@@ -1172,3 +1172,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "Сетевое приложение+"
+
+msgid "Accessibility"
+msgstr "Доступность"
+
+msgid "Books & Comics"
+msgstr "Книги и комиксы"
+
+msgid "Business & Finance"
+msgstr "Бизнес и финансы"
+
+msgid "Communication & Social"
+msgstr "Общение и социальные сети"
+
+msgid "Developer Tools"
+msgstr "Инструменты разработчика"
+
+msgid "Education & Reference"
+msgstr "Образование и справочники"
+
+msgid "Entertainment"
+msgstr "Развлечения"
+
+msgid "Food & Drink"
+msgstr "Еда и напитки"
+
+msgid "Games"
+msgstr "Игры"
+
+msgid "Graphics"
+msgstr "Графика"
+
+msgid "Health & Fitness"
+msgstr "Здоровье и фитнес"
+
+msgid "Lifestyle"
+msgstr "Образ жизни"
+
+msgid "Media & Video"
+msgstr "Видео и медиа"
+
+msgid "Music & Audio"
+msgstr "Музыка и аудио"
+
+msgid "News & Magazines"
+msgstr "Новости и журналы"
+
+msgid "Personalisation"
+msgstr "Персонализация"
+
+msgid "Productivity"
+msgstr "Продуктивность"
+
+msgid "Science & Engineering"
+msgstr "Наука и техника"
+
+msgid "Shopping"
+msgstr "Покупки"
+
+msgid "Sports"
+msgstr "Спортивный"
+
+msgid "Travel & Weather"
+msgstr "Путешествия и погода"
+
+msgid "Utilities"
+msgstr "Вспомогательные средства"

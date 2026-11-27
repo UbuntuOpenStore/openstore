@@ -8,9 +8,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function categorySlug(category: string) {
-  return category.toLowerCase().replace('& ', '').replace(/ /g, '-');
-}
+export { categorySlug } from "./categories";
 
 export function getClientApiKey() {
   const match = document.cookie.match(new RegExp('(^| )apikey=([^;]+)'));

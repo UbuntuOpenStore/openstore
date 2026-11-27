@@ -1167,3 +1167,69 @@ msgstr ""
 
 #~ msgid "Filters"
 #~ msgstr "Filtri"
+
+msgid "Accessibility"
+msgstr "Accessibilità"
+
+msgid "Books & Comics"
+msgstr "Libri e fumetti"
+
+msgid "Business & Finance"
+msgstr "Business e finanza"
+
+msgid "Communication & Social"
+msgstr "Comunicazione e social"
+
+msgid "Developer Tools"
+msgstr "Strumenti per lo sviluppatore"
+
+msgid "Education & Reference"
+msgstr "Istruzione e fonti"
+
+msgid "Entertainment"
+msgstr "Intrattenimento"
+
+msgid "Food & Drink"
+msgstr "Cibo e bevande"
+
+msgid "Games"
+msgstr "Giochi"
+
+msgid "Graphics"
+msgstr "Grafica"
+
+msgid "Health & Fitness"
+msgstr "Salute e fitness"
+
+msgid "Lifestyle"
+msgstr "Life-style"
+
+msgid "Media & Video"
+msgstr "Multimedia e video"
+
+msgid "Music & Audio"
+msgstr "Musica e suono"
+
+msgid "News & Magazines"
+msgstr "Notizie e riviste"
+
+msgid "Personalisation"
+msgstr "Personalizzazione"
+
+msgid "Productivity"
+msgstr "Produttività"
+
+msgid "Science & Engineering"
+msgstr "Scienza e ingegneria"
+
+msgid "Shopping"
+msgstr "Acquisti"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Viaggi e meteo"
+
+msgid "Utilities"
+msgstr "Utilità"

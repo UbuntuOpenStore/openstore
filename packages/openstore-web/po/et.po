@@ -812,3 +812,69 @@ msgstr "veebirakendus"
 
 msgid "View all apps by this user"
 msgstr "Vaata selle kasutaja kõiki rakendusi"
+
+msgid "Accessibility"
+msgstr "Hõlpsus"
+
+msgid "Books & Comics"
+msgstr "Raamatud ja koomiksid"
+
+msgid "Business & Finance"
+msgstr "Äri ja rahandus"
+
+msgid "Communication & Social"
+msgstr "Suhtlus ja sotsiaalmeedia"
+
+msgid "Developer Tools"
+msgstr "Arendustarvikud"
+
+msgid "Education & Reference"
+msgstr "Haridus ja teabeotsing"
+
+msgid "Entertainment"
+msgstr "Meelelahutus"
+
+msgid "Food & Drink"
+msgstr "Toit ja jook"
+
+msgid "Games"
+msgstr "Mängud"
+
+msgid "Graphics"
+msgstr "Graafika"
+
+msgid "Health & Fitness"
+msgstr "Tervis ja vormisolek"
+
+msgid "Lifestyle"
+msgstr "Elustiil"
+
+msgid "Media & Video"
+msgstr "Meedia ja video"
+
+msgid "Music & Audio"
+msgstr "Muusika ja helimaailm"
+
+msgid "News & Magazines"
+msgstr "Uudised ja ajakirjad"
+
+msgid "Personalisation"
+msgstr "Isiklikustamine"
+
+msgid "Productivity"
+msgstr "Tarbetarkvara"
+
+msgid "Science & Engineering"
+msgstr "Teadus ja tehnika"
+
+msgid "Shopping"
+msgstr "Ostlemine"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Reisimine ja ilmaennustus"
+
+msgid "Utilities"
+msgstr "Tarvikud"

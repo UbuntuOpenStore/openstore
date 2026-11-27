@@ -1080,3 +1080,69 @@ msgstr ""
 
 #~ msgid "Packager/Publisher"
 #~ msgstr "Paketleyici/Yayımlayıcı"
+
+msgid "Accessibility"
+msgstr "Erişilebilirlik"
+
+msgid "Books & Comics"
+msgstr "Kitaplar & Çizgi Roman"
+
+msgid "Business & Finance"
+msgstr "İş Dünyası & Finans"
+
+msgid "Communication & Social"
+msgstr "İletişim & Sosyal Ağlar"
+
+msgid "Developer Tools"
+msgstr "Geliştirici Araçları"
+
+msgid "Education & Reference"
+msgstr "Eğitim & Referans"
+
+msgid "Entertainment"
+msgstr "Eğlence"
+
+msgid "Food & Drink"
+msgstr "Yiyecek & İçecek"
+
+msgid "Games"
+msgstr "Oyunlar"
+
+msgid "Graphics"
+msgstr "Grafikler"
+
+msgid "Health & Fitness"
+msgstr "Sağlık & Fitness"
+
+msgid "Lifestyle"
+msgstr "Yaşam Tarzı"
+
+msgid "Media & Video"
+msgstr "Medya & Video"
+
+msgid "Music & Audio"
+msgstr "Müzik & Ses"
+
+msgid "News & Magazines"
+msgstr "Haberler & Dergiler"
+
+msgid "Personalisation"
+msgstr "Kişiselleştirme"
+
+msgid "Productivity"
+msgstr "Üretkenlik"
+
+msgid "Science & Engineering"
+msgstr "Bilim & Mühendislik"
+
+msgid "Shopping"
+msgstr "Alışveriş"
+
+msgid "Sports"
+msgstr "Sporlar"
+
+msgid "Travel & Weather"
+msgstr "Seyahat & Hava Durumu"
+
+msgid "Utilities"
+msgstr "Yardımcı Uygulamalar"

@@ -3,7 +3,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SearchApps from "@/components/SearchApps";
 import CategoryList from "@/components/CategoryList.astro";
-import { CategoriesSchema, type CategoryData } from "@/lib/schema";
+import { categories, type Category } from "@/lib/categories";
 import { initializeI18N } from "@/lib/i18n";
 import { t } from "i18next";
 import { generateSchema } from "@/lib/json-schema";
@@ -11,16 +11,10 @@ import { getRelativeLocaleUrlList } from "astro:i18n";
 import { config } from "@/lib/config";
 
 export type Props = {
-  category: CategoryData;
+  category: Category;
 };
 
-export async function getStaticPaths() {
-  const response = await fetch(`${import.meta.env.PUBLIC_API_URL}api/v4/categories?all=true`, {
-    headers: { "X-Source": "openstore-web-next", "User-Agent": "open-store.io" },
-  });
-  const { data } = await response.json();
-  const categories = CategoriesSchema.parse(data);
-
+export function getStaticPaths() {
   const paths = getRelativeLocaleUrlList();
 
   return categories.flatMap((category) => {
@@ -39,15 +33,16 @@ export async function getStaticPaths() {
 await initializeI18N(Astro.currentLocale);
 
 const { category } = Astro.props;
+const categoryName = t(category.name);
 ---
 
 <BaseLayout
   title="OpenStore"
-  pageTitle={category.translation + " | OpenStore"}
+  pageTitle={categoryName + " | OpenStore"}
   description={t("The open source app store for Ubuntu Touch")}
   schema={generateSchema(Astro.url.href, [
     { name: "Apps", path: "/apps/" },
-    { name: category.category, path: `/apps/${category.slug}/` },
+    { name: category.name, path: `/apps/${category.slug}/` },
   ])}
 >
   <section class="grow flex flex-row py-3 px-4">
@@ -56,8 +51,8 @@ const { category } = Astro.props;
     <div class="w-full">
       <SearchApps
         clickSupportEnabled={config.clickSupportEnabled}
-        category={category.category}
-        categoryName={category.translation}
+        category={category.name}
+        categoryName={categoryName}
         messages={{
           all: t("All Types"),
           apps: t("Apps"),

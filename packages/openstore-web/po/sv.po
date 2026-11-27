@@ -1101,3 +1101,69 @@ msgstr ""
 
 #~ msgid "Filters"
 #~ msgstr "Filter"
+
+msgid "Accessibility"
+msgstr "Tillgänglighet"
+
+msgid "Books & Comics"
+msgstr "Böcker & serietidningar"
+
+msgid "Business & Finance"
+msgstr "Finans- & näringsliv"
+
+msgid "Communication & Social"
+msgstr "Kommunikation & socialt"
+
+msgid "Developer Tools"
+msgstr "Utvecklarverktyg"
+
+msgid "Education & Reference"
+msgstr "Utbildning & referens"
+
+msgid "Entertainment"
+msgstr "Underhållning"
+
+msgid "Food & Drink"
+msgstr "Mat och dryck"
+
+msgid "Games"
+msgstr "Spel"
+
+msgid "Graphics"
+msgstr "Grafik"
+
+msgid "Health & Fitness"
+msgstr "Kost och hälsa"
+
+msgid "Lifestyle"
+msgstr "Livsstil"
+
+msgid "Media & Video"
+msgstr "Media & Video"
+
+msgid "Music & Audio"
+msgstr "Musik & ljud"
+
+msgid "News & Magazines"
+msgstr "Tidningar & tidskrifter"
+
+msgid "Personalisation"
+msgstr "Personalisering"
+
+msgid "Productivity"
+msgstr "Produktivitet"
+
+msgid "Science & Engineering"
+msgstr "Vetenskap och teknik"
+
+msgid "Shopping"
+msgstr "Köp och Sälj"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Resor & väder"
+
+msgid "Utilities"
+msgstr "Nyttoprogram"

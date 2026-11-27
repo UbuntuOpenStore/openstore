@@ -2,6 +2,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { i18nextToPot } from "i18next-conv";
+import categoryIcons from "../src/lib/category_icons.json" with { type: "json" };
 
 const directoryPath = "./src";
 const fileExtensions = [".ts", ".tsx", ".astro"];
@@ -52,6 +53,11 @@ async function processFile(filePath) {
 
 async function main() {
   await walkDirectory(directoryPath);
+
+  // Category labels are translated from variables, so the source scan can't find them
+  for (const category of Object.keys(categoryIcons)) {
+    extractedStrings[category] ??= [];
+  }
 
   const totalKeys = Object.keys(extractedStrings).length;
   if (totalKeys > 0) {

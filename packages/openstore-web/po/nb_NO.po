@@ -1080,3 +1080,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "Nett-program+"
+
+msgid "Accessibility"
+msgstr "Tilgjengelighet"
+
+msgid "Books & Comics"
+msgstr "Bøker & tegneserier"
+
+msgid "Business & Finance"
+msgstr "Næring & finans"
+
+msgid "Communication & Social"
+msgstr "Kommunikasjon & sosiale medier"
+
+msgid "Developer Tools"
+msgstr "Utviklerverktøy"
+
+msgid "Education & Reference"
+msgstr "Utdanning & informasjon"
+
+msgid "Entertainment"
+msgstr "Underholdning"
+
+msgid "Food & Drink"
+msgstr "Mat & drikke"
+
+msgid "Games"
+msgstr "Spill"
+
+msgid "Graphics"
+msgstr "Grafikk"
+
+msgid "Health & Fitness"
+msgstr "Helse & velvære"
+
+msgid "Lifestyle"
+msgstr "Livsstil"
+
+msgid "Media & Video"
+msgstr "Media & video"
+
+msgid "Music & Audio"
+msgstr "Musikk & lyd"
+
+msgid "News & Magazines"
+msgstr "Nyheter & tidsskrifter"
+
+msgid "Personalisation"
+msgstr "Temaer & tilpasninger"
+
+msgid "Productivity"
+msgstr "Produktivitet"
+
+msgid "Science & Engineering"
+msgstr "Vitenskap & ingeniørvitenskap"
+
+msgid "Shopping"
+msgstr "Kjøp & salg"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Travel & Weather"
+msgstr "Reise & vær"
+
+msgid "Utilities"
+msgstr "Verktøy"

@@ -1245,3 +1245,69 @@ msgstr ""
 
 #~ msgid "Web App+"
 #~ msgstr "WebApp+"
+
+msgid "Accessibility"
+msgstr "Könnyű kezelés"
+
+msgid "Books & Comics"
+msgstr "Könyvek és képregények"
+
+msgid "Business & Finance"
+msgstr "Üzlet és pénzügy"
+
+msgid "Communication & Social"
+msgstr "Kommunikáció és kapcsolatok"
+
+msgid "Developer Tools"
+msgstr "Fejlesztői eszközök"
+
+msgid "Education & Reference"
+msgstr "Oktatás"
+
+msgid "Entertainment"
+msgstr "Szórakozás"
+
+msgid "Food & Drink"
+msgstr "Étel és ital"
+
+msgid "Games"
+msgstr "Játékok"
+
+msgid "Graphics"
+msgstr "Grafika"
+
+msgid "Health & Fitness"
+msgstr "Egészség és Fitnesz"
+
+msgid "Lifestyle"
+msgstr "Életstítlus"
+
+msgid "Media & Video"
+msgstr "Média és videó"
+
+msgid "Music & Audio"
+msgstr "Zene és hang"
+
+msgid "News & Magazines"
+msgstr "Hírek és magazinok"
+
+msgid "Personalisation"
+msgstr "Személyreszabás"
+
+msgid "Productivity"
+msgstr "Produktivitás"
+
+msgid "Science & Engineering"
+msgstr "Tudomány"
+
+msgid "Shopping"
+msgstr "Vásárlás"
+
+msgid "Sports"
+msgstr "Sportok"
+
+msgid "Travel & Weather"
+msgstr "Utazás és időjárás"
+
+msgid "Utilities"
+msgstr "Segédprogramok"
